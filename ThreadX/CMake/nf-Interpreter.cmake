@@ -277,8 +277,6 @@ list(APPEND NF_INTERPRETER_TARGET_COMMON_SOURCES
             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/HAL/nanoCRT.cpp
             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/HAL/targetHAL.cpp
             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/HAL/targetHAL_ConfigurationManager.cpp
-            ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/HAL/targetHAL_Power.c
-            ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/HAL/targetHAL_Rtos.c
             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/HAL/targetHAL_Time.cpp
             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/main.c
             

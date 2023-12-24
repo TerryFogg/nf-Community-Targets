@@ -4,7 +4,8 @@
 #
 
     list(APPEND NF_INTERPRETER_TARGET_SOURCES 
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H735G_DK/target_board.c
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H735G_DK/Power.c
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H735G_DK/board.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H735G_DK/FlashDriver.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H735G_DK/startup_stm32h735igkx.s
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H735G_DK/tx_initialize_low_level.s

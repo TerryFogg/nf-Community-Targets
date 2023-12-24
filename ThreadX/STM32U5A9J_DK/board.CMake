@@ -4,7 +4,8 @@
 #
 
     list(APPEND NF_INTERPRETER_TARGET_SOURCES
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/target_board.c
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/board.c
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/power.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/tx_initialize_low_level.s
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/startup_stm32u5a9xx.s
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/FlashDriver.c

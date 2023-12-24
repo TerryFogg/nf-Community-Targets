@@ -4,7 +4,8 @@
 #
 
     list(APPEND NF_INTERPRETER_TARGET_SOURCES 
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/target_board.c
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/board.c
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/power.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/tx_initialize_low_level.s
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/startup_stm32h743zitx.s
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/FlashDriver.c

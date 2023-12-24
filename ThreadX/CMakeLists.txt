@@ -25,7 +25,6 @@ target_include_directories(nanoCLR.elf PUBLIC ${NF_INTERPRETER_COMMON_INCLUDES}
 if(GRAPHICS_SUPPORT)
       target_sources(nanoCLR.elf PUBLIC "${NF_INTERPRETER_GRAPHICS_SOURCES}")
       target_include_directories(nanoCLR.elf PUBLIC "${NF_INTERPRETER_GRAPHICS_INCLUDES}")
-   #   target_sources(nanoCLR.elf PUBLIC "${NF_INTERPRETER_GRAPHICS_TARGET_BOARD_SOURCES}")
       #target_compile_definitions(nanoCLR.elf PUBLIC -DNANOCLR_GRAPHICS=TRUE)
 else()
       #target_compile_definitions(nanoCLR.elf PUBLIC -DNANOCLR_GRAPHICS=FALSE)

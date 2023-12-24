@@ -10,12 +10,8 @@
 
 uint32_t GetExistingConfigSize() {
   uint32_t currentConfigSize = 0;
-
-  currentConfigSize = g_TargetConfiguration.NetworkInterfaceConfigs->Count *
-                      sizeof(HAL_Configuration_NetworkInterface);
-  currentConfigSize += g_TargetConfiguration.Wireless80211Configs->Count *
-                       sizeof(HAL_Configuration_Wireless80211);
-
+  currentConfigSize = g_TargetConfiguration.NetworkInterfaceConfigs->Count * sizeof(HAL_Configuration_NetworkInterface);
+  currentConfigSize += g_TargetConfiguration.Wireless80211Configs->Count * sizeof(HAL_Configuration_Wireless80211);
   return currentConfigSize;
 }
 
@@ -26,39 +22,34 @@ uint32_t GetExistingConfigSize() {
 __nfweak void ConfigurationManager_Initialize() {
   // init g_TargetConfiguration
   memset(&g_TargetConfiguration, 0, sizeof(HAL_TARGET_CONFIGURATION));
-
-  // enumerate the blocks
   ConfigurationManager_EnumerateConfigurationBlocks();
 };
 
 // Enumerates the configuration blocks from the configuration flash sector
 // it's implemented with 'weak' attribute so it can be replaced at target level
 // if a different persistance mechanism is used
-__nfweak void ConfigurationManager_EnumerateConfigurationBlocks() {
+__nfweak void ConfigurationManager_EnumerateConfigurationBlocks() 
+{
   // start checking if this device has config block
   if (((uint32_t)&__nanoConfig_end__ - (uint32_t)&__nanoConfig_start__) > 0) {
     // find network configuration blocks
-    HAL_CONFIGURATION_NETWORK *networkConfigs = (HAL_CONFIGURATION_NETWORK *)
-        ConfigurationManager_FindNetworkConfigurationBlocks(
-            (uint32_t)&__nanoConfig_start__, (uint32_t)&__nanoConfig_end__);
+    HAL_CONFIGURATION_NETWORK *networkConfigs = (HAL_CONFIGURATION_NETWORK *)ConfigurationManager_FindNetworkConfigurationBlocks((uint32_t)&__nanoConfig_start__, (uint32_t)&__nanoConfig_end__);
 
     // check network configs count
-    if (networkConfigs->Count == 0) {
+    if (networkConfigs->Count == 0) 
+    {
       // there is no network config block available, get a default
       HAL_Configuration_NetworkInterface *networkConfig =
-          (HAL_Configuration_NetworkInterface *)platform_malloc(
-              sizeof(HAL_Configuration_NetworkInterface));
+          (HAL_Configuration_NetworkInterface *)platform_malloc(sizeof(HAL_Configuration_NetworkInterface));
 
-      if (InitialiseNetworkDefaultConfig(networkConfig, 0)) {
+      if (InitialiseNetworkDefaultConfig(networkConfig, 0)) 
+      {
         // config block created, store it
-        ConfigurationManager_StoreConfigurationBlock(
-            networkConfig, DeviceConfigurationOption_Network, 0,
-            sizeof(HAL_Configuration_NetworkInterface), 0, false);
+        ConfigurationManager_StoreConfigurationBlock(networkConfig, DeviceConfigurationOption_Network, 0,sizeof(HAL_Configuration_NetworkInterface), 0, false);
 
         // have to enumerate again to pick it up
         networkConfigs = (HAL_CONFIGURATION_NETWORK *)
-            ConfigurationManager_FindNetworkConfigurationBlocks(
-                (uint32_t)&__nanoConfig_start__, (uint32_t)&__nanoConfig_end__);
+            ConfigurationManager_FindNetworkConfigurationBlocks((uint32_t)&__nanoConfig_start__, (uint32_t)&__nanoConfig_end__);
       }
 
       platform_free(networkConfig);
@@ -66,66 +57,36 @@ __nfweak void ConfigurationManager_EnumerateConfigurationBlocks() {
 
     // find wireless 80211 network configuration blocks
     HAL_CONFIGURATION_NETWORK_WIRELESS80211 *networkWirelessConfigs =
-        (HAL_CONFIGURATION_NETWORK_WIRELESS80211 *)
-            ConfigurationManager_FindNetworkWireless80211ConfigurationBlocks(
-                (uint32_t)&__nanoConfig_start__, (uint32_t)&__nanoConfig_end__);
+        (HAL_CONFIGURATION_NETWORK_WIRELESS80211 *)ConfigurationManager_FindNetworkWireless80211ConfigurationBlocks((uint32_t)&__nanoConfig_start__, (uint32_t)&__nanoConfig_end__);
 
     // find X509 CA certificate blocks
     HAL_CONFIGURATION_X509_CERTIFICATE *certificateStore =
-        (HAL_CONFIGURATION_X509_CERTIFICATE *)
-            ConfigurationManager_FindX509CertificateConfigurationBlocks(
-                (uint32_t)&__nanoConfig_start__, (uint32_t)&__nanoConfig_end__);
+        (HAL_CONFIGURATION_X509_CERTIFICATE *)ConfigurationManager_FindX509CertificateConfigurationBlocks((uint32_t)&__nanoConfig_start__, (uint32_t)&__nanoConfig_end__);
 
     // find X509 device certificate blocks
     HAL_CONFIGURATION_X509_DEVICE_CERTIFICATE *deviceCertificates =
-        (HAL_CONFIGURATION_X509_DEVICE_CERTIFICATE *)
-            ConfigurationManager_FindX509DeviceCertificatesConfigurationBlocks(
-                (uint32_t)&__nanoConfig_start__, (uint32_t)&__nanoConfig_end__);
+        (HAL_CONFIGURATION_X509_DEVICE_CERTIFICATE *)ConfigurationManager_FindX509DeviceCertificatesConfigurationBlocks((uint32_t)&__nanoConfig_start__, (uint32_t)&__nanoConfig_end__);
 
     // alloc memory for g_TargetConfiguration
     // because this is a struct of structs that use flexible members the memory
     // has to be allocated from the heap the malloc size for each struct is
     // computed separately
-    uint32_t sizeOfNetworkInterfaceConfigs =
-        offsetof(HAL_CONFIGURATION_NETWORK, Configs) +
-        networkConfigs->Count * sizeof(networkConfigs->Configs[0]);
-    uint32_t sizeOfWireless80211Configs =
-        offsetof(HAL_CONFIGURATION_NETWORK_WIRELESS80211, Configs) +
-        networkWirelessConfigs->Count *
+    uint32_t sizeOfNetworkInterfaceConfigs = offsetof(HAL_CONFIGURATION_NETWORK, Configs) +networkConfigs->Count * sizeof(networkConfigs->Configs[0]);
+    uint32_t sizeOfWireless80211Configs = offsetof(HAL_CONFIGURATION_NETWORK_WIRELESS80211, Configs) + networkWirelessConfigs->Count *
             sizeof(networkWirelessConfigs->Configs[0]);
-    uint32_t sizeOfX509CertificateStore =
-        offsetof(HAL_CONFIGURATION_X509_CERTIFICATE, Certificates) +
-        certificateStore->Count * sizeof(certificateStore->Certificates[0]);
-    uint32_t sizeOfX509DeviceCertificate =
-        offsetof(HAL_CONFIGURATION_X509_DEVICE_CERTIFICATE, Certificates) +
-        deviceCertificates->Count * sizeof(deviceCertificates->Certificates[0]);
+    uint32_t sizeOfX509CertificateStore = offsetof(HAL_CONFIGURATION_X509_CERTIFICATE, Certificates) + certificateStore->Count * sizeof(certificateStore->Certificates[0]);
+    uint32_t sizeOfX509DeviceCertificate = offsetof(HAL_CONFIGURATION_X509_DEVICE_CERTIFICATE, Certificates) + deviceCertificates->Count * sizeof(deviceCertificates->Certificates[0]);
 
-    g_TargetConfiguration.NetworkInterfaceConfigs =
-        (HAL_CONFIGURATION_NETWORK *)platform_malloc(
-            sizeOfNetworkInterfaceConfigs);
-    g_TargetConfiguration.Wireless80211Configs =
-        (HAL_CONFIGURATION_NETWORK_WIRELESS80211 *)platform_malloc(
-            sizeOfWireless80211Configs);
-    g_TargetConfiguration.CertificateStore =
-        (HAL_CONFIGURATION_X509_CERTIFICATE *)platform_malloc(
-            sizeOfX509CertificateStore);
-    g_TargetConfiguration.DeviceCertificates =
-        (HAL_CONFIGURATION_X509_DEVICE_CERTIFICATE *)platform_malloc(
-            sizeOfX509DeviceCertificate);
+    g_TargetConfiguration.NetworkInterfaceConfigs = (HAL_CONFIGURATION_NETWORK *)platform_malloc(sizeOfNetworkInterfaceConfigs);
+    g_TargetConfiguration.Wireless80211Configs = (HAL_CONFIGURATION_NETWORK_WIRELESS80211 *)platform_malloc(sizeOfWireless80211Configs);
+    g_TargetConfiguration.CertificateStore = (HAL_CONFIGURATION_X509_CERTIFICATE *)platform_malloc(sizeOfX509CertificateStore);
+    g_TargetConfiguration.DeviceCertificates = (HAL_CONFIGURATION_X509_DEVICE_CERTIFICATE *)platform_malloc( sizeOfX509DeviceCertificate);
 
     // copy structs to g_TargetConfiguration
-    memcpy((HAL_CONFIGURATION_NETWORK *)
-               g_TargetConfiguration.NetworkInterfaceConfigs,
-           networkConfigs, sizeOfNetworkInterfaceConfigs);
-    memcpy((HAL_CONFIGURATION_NETWORK_WIRELESS80211 *)
-               g_TargetConfiguration.Wireless80211Configs,
-           networkWirelessConfigs, sizeOfWireless80211Configs);
-    memcpy((HAL_CONFIGURATION_X509_CERTIFICATE *)
-               g_TargetConfiguration.CertificateStore,
-           certificateStore, sizeOfX509CertificateStore);
-    memcpy((HAL_CONFIGURATION_X509_DEVICE_CERTIFICATE *)
-               g_TargetConfiguration.DeviceCertificates,
-           deviceCertificates, sizeOfX509DeviceCertificate);
+    memcpy((HAL_CONFIGURATION_NETWORK *)g_TargetConfiguration.NetworkInterfaceConfigs,networkConfigs, sizeOfNetworkInterfaceConfigs);
+    memcpy((HAL_CONFIGURATION_NETWORK_WIRELESS80211 *)g_TargetConfiguration.Wireless80211Configs,networkWirelessConfigs, sizeOfWireless80211Configs);
+    memcpy((HAL_CONFIGURATION_X509_CERTIFICATE *)g_TargetConfiguration.CertificateStore,certificateStore, sizeOfX509CertificateStore);
+    memcpy((HAL_CONFIGURATION_X509_DEVICE_CERTIFICATE *)g_TargetConfiguration.DeviceCertificates,deviceCertificates, sizeOfX509DeviceCertificate);
 
     // now free the memory of the original structs
     platform_free(networkConfigs);

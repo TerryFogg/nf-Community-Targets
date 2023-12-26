@@ -20,12 +20,12 @@ target_compile_definitions(nanoCLR.elf PUBLIC -DNANOCLR_SYSTEM_COLLECTIONS=TRUE)
 target_compile_definitions(nanoCLR.elf PUBLIC -DNANOCLR_REFLECTION=TRUE)
 target_compile_definitions(nanoCLR.elf PUBLIC -DHAL_USE_RTC=FALSE)
 target_compile_definitions(nanoCLR.elf PUBLIC -DHAL_USE_WDG=FALSE)
+target_compile_definitions(nanoCLR.elf PUBLIC -DPLATFORM_HAS_RNG=${RANDOM_NUMBER_GENERATOR})
 target_compile_definitions(nanoCLR.elf PUBLIC -DPLATFORM_NO_CLR_TRACE)
 
 target_compile_definitions(nanoCLR.elf PUBLIC -DTARGET_HAS_NANOBOOTER=FALSE)
 
 target_compile_definitions(nanoCLR.elf PUBLIC -DNANOCLR_GRAPHICS=${GRAPHICS_SUPPORT})
-
 
 
 # Split BUILD_VERSION into VERSION_MAJOR;VERSION_MINOR;VERSION_BUILD;VERSION_REVISION 
@@ -42,6 +42,11 @@ target_compile_definitions(nanoCLR.elf PUBLIC -DVERSION_BUILD=${VERSION_BUILD})
 target_compile_definitions(nanoCLR.elf PUBLIC -DVERSION_REVISION=${VERSION_REVISION})
 target_compile_definitions(nanoCLR.elf PUBLIC -DTARGETINFOSTRING=\"${INFOSTRING}\")
 
+target_compile_definitions(nanoCLR.elf PUBLIC -DTARGETNAMESTRING=\"${TARGET_BOARD}\")
+target_compile_definitions(nanoCLR.elf PUBLIC -DPLATFORMNAMESTRING=\"${TARGET_FAMILY}\")
+SET(OEM "nanoCLR running ${TARGET_BOARD}")
+target_compile_definitions(nanoCLR.elf PUBLIC -DOEMSYSTEMINFOSTRING=\"${OEM}\")
+
 
 # !!!!!!!!!! NOTE
 # Set build type here as buildpresets, inherits in CMakePresets.json does not appear to be working
@@ -54,6 +59,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDe
 endif()
 
 
+# --------
 # ADVANCED
 # --------
 # Defines used in the c/c++ code in rare situations to debug and profile

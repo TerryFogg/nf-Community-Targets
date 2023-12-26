@@ -25,5 +25,10 @@ HAL_TARGET_CONFIGURATION g_TargetConfiguration;
 bool Target_CanChangeMacAddress() { return false; }
 
 // this target can use JTAG for updates
+
+
+// Commenting out the next line leads to some timing issue during startup
 inline GET_TARGET_CAPABILITIES(TargetCapabilities_JtagUpdate);
+
+
 inline TARGET_HAS_PROPRIETARY_BOOTER(true);

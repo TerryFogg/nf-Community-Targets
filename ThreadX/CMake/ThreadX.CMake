@@ -15,7 +15,7 @@ FetchContent_Populate(threadX)
 set(THREADX_TOOLCHAIN gnu)
 
 
-set(TX_USER_FILE ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/target_tx_user.h CACHE STRING "Enable TX user configuration")
+set(TX_USER_FILE ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/RtosAdaption/target_tx_user.h CACHE STRING "Enable TX user configuration")
 
 
 list(APPEND THREADX_INCLUDES 

@@ -17,7 +17,7 @@
 #include "stm32h7xx_ll_dma.h"
 #include "stm32h7xx_ll_gpio.h"
 #include "stm32h7xx_ll_dma2d.h"
-#include "target_board.h"
+#include "board.h"
 
 #define LCD_COLOR_RGB565_BLACK      0x0000U
 

@@ -8,7 +8,7 @@
 #include "DisplayInterface.h"
 #include "Graphics.h"
 
-#include "target_board.h"
+#include "board.h"
 
 // RK043FN02H
 // Description : 4.3 inch TFT 480 * 272 pixels with LED

@@ -141,7 +141,6 @@ MEMORY    /*   Usage by nanoFramework */
 /*       | Retains power when D1 and D2       |     */
 /*       | domain enter DStandby mode         |     */
 /*       |                                    |     */ 
-/*       |                                    |CLR>>*/  HardFaultCount (xrw) : ORIGIN = ORIGIN(RAM_D4), LENGTH = 32
 /*       |------------------------------------|     */
 /*       |                                    |     */ 
 /*       |------------------------------------|     */
@@ -167,8 +166,8 @@ MEMORY    /*   Usage by nanoFramework */
 /*       |------------------------------------|     */
 /*       |                                    |     */ 
 /*       |------------------------------------|     */
-/*       | 0x09000000 : 64M OCTOSPI1 (Flash)  |SYS>>*/  OCTOSPI1_FLASH (xrw) : ORIGIN = 0x09000000, LENGTH = 64M
-/*       |                                    |CLR>>*/  config     (rx) : ORIGIN = ORIGIN(OCTOSPI1_FLASH), LENGTH = (config_size)
+/*       | 0x09000000 : 64M OCTOSPI1 (Flash)  |SYS>>*/  OCTOSPI1_FLASH (rx) : ORIGIN = 0x09000000, LENGTH = 64M
+/*       |                                    |CLR>>*/  config         (rx) : ORIGIN = ORIGIN(OCTOSPI1_FLASH), LENGTH = (config_size)
 /*       |                                    |     */
 /*       \------------------------------------/     */
 }
@@ -195,8 +194,6 @@ MEMORY    /*   Usage by nanoFramework */
 /*       | Bitmap objects created by C#       |CLR>>*/  Graphics_managed_heap = ORIGIN(graphics_ram); 
 /*       | and drawn into                     |CLR>>*/  Graphics_managed_end  = ORIGIN(graphics_ram) + LENGTH(graphics_ram);   
 /*       |                                    |     */  
-/*       | Used during debugging to stop      |     */  Hard_Fault_Count      = ORIGIN(HardFaultCount);
-/*       | reboot loop if faulting            |     */  
 /*       \------------------------------------/     */
 
 

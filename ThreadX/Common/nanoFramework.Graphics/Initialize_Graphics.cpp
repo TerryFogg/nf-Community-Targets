@@ -4,7 +4,7 @@
 //
 
 #include "GraphicsMemoryHeap.h"
-#include "target_board.h"
+#include "board.h"
 #include <nanoCLR_Headers.h>
 #include <nanoHAL_Graphics.h>
 extern TouchPanelDriver g_TouchPanelDriver;

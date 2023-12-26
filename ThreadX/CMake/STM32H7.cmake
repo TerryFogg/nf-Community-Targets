@@ -28,7 +28,7 @@
              ${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy
  )
  list(APPEND STM32H7_SOURCES
-             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_FAMILY}/system_stm32h7xx.c>
+             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/system_stm32h7xx.c>
              ${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_Hal_Driver/src/stm32h7xx_ll_adc.c
              ${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_Hal_Driver/src/stm32h7xx_ll_bdma.c
              ${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_Hal_Driver/src/stm32h7xx_ll_comp.c

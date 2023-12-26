@@ -19,6 +19,6 @@
         "ChibiOS/ST_STM32F411_DISCOVERY/CMakePresets.json",
         "ChibiOS/WEACT_F411CE/CMakePresets.json",
         "TI_SimpleLink/TI_CC1352P1_LAUNCHXL/CMakePresets.json",
-        "ThreadX/CMakePresets.json"
+        "ThreadX/CMake/CMakePresets.json"
     ]
 }

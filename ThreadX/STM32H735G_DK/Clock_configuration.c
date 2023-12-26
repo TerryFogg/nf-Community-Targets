@@ -3,7 +3,7 @@
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
 // See LICENSE file in the project root for full license information.
 //
-#include "target_board.h"
+#include "board.h"
 
 //
 //  System Clock Configuration

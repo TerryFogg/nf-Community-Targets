@@ -59,3 +59,25 @@ MEMORY_MAPPED_NOR_BLOCK_CONFIG Device_BlockStorageConfig = {
     0, // UINT32 ManufacturerCode;
     0, // UINT32 DeviceCode;
 };
+
+// map here the Block Storage Interface to the STM32 driver
+IBlockStorageDevice STM32Flash_BlockStorageInterface = {
+    &STM32FlashDriver_InitializeDevice,
+    &STM32FlashDriver_UninitializeDevice,
+    &STM32FlashDriver_GetDeviceInfo,
+    &STM32FlashDriver_Read,
+    &STM32FlashDriver_Write,
+    NULL,
+    &STM32FlashDriver_IsBlockErased,
+    &STM32FlashDriver_EraseBlock,
+    NULL,
+    NULL};
+
+void BlockStorage_AddDevices()
+{
+    BlockStorageList_AddDevice(
+        (BlockStorageDevice *)&Device_BlockStorage,
+        &STM32Flash_BlockStorageInterface,
+        &Device_BlockStorageConfig,
+        false);
+}

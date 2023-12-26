@@ -3,35 +3,35 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include "FlashDriver_Stm32h7.h"
+#include "FlashDriver.h"
 
-bool STM32FlashDriver_InitializeDevice(void *context)
+bool FlashDriver_InitializeDevice(void *context)
 {
     (void)context;
 
     // nothing to do here
     return true;
 }
-bool STM32FlashDriver_UninitializeDevice(void *context)
+bool FlashDriver_UninitializeDevice(void *context)
 {
     (void)context;
 
     // nothing to do here
     return true;
 }
-DeviceBlockInfo *STM32FlashDriver_GetDeviceInfo(void *context)
+DeviceBlockInfo *FlashDriver_GetDeviceInfo(void *context)
 {
     MEMORY_MAPPED_NOR_BLOCK_CONFIG *config = context;
     return config->BlockConfig.BlockDeviceInformation;
 }
-bool STM32FlashDriver_Read(void *context, ByteAddress startAddress, unsigned int numBytes, unsigned char *buffer)
+bool FlashDriver_Read(void *context, ByteAddress startAddress, unsigned int numBytes, unsigned char *buffer)
 {
     (void)context;
     // Read each byte, if it fails the MCU will fault and not return
     EmbeddedFlashReadBytes(startAddress, numBytes, buffer);
     return true;
 }
-bool STM32FlashDriver_Write(
+bool FlashDriver_Write(
     void *context,
     ByteAddress startAddress,
     unsigned int numBytes,
@@ -43,7 +43,7 @@ bool STM32FlashDriver_Write(
 
     return EmbeddedFlashWrite(startAddress, numBytes, buffer);
 }
-bool STM32FlashDriver_IsBlockErased(void *context, ByteAddress blockAddress, unsigned int length)
+bool FlashDriver_IsBlockErased(void *context, ByteAddress blockAddress, unsigned int length)
 {
     (void)context;
     (void)blockAddress;
@@ -62,7 +62,7 @@ bool STM32FlashDriver_IsBlockErased(void *context, ByteAddress blockAddress, uns
 
     return false;
 }
-bool STM32FlashDriver_EraseBlock(void *context, ByteAddress address)
+bool FlashDriver_EraseBlock(void *context, ByteAddress address)
 {
     (void)context;
     // Minimum erase size on STM32H735IG is 1 sector (128K bytes)

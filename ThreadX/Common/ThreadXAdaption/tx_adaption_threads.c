@@ -7,10 +7,6 @@
 #include "board.h"
 #include "tx_adaption.h"
 
-// byte pool configuration and definitions
-#define DEFAULT_BYTE_POOL_SIZE     16000
-#define CLR_THREAD_STACK_SIZE      6000
-#define RECEIVER_THREAD_STACK_SIZE 4096
 #define RECEIVER_THREAD_PRIORITY   4
 #define CLR_THREAD_PRIORITY        5
 

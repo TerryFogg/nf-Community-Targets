@@ -22,7 +22,6 @@ void Initialize_Board()
 {
     Initialize_Board_LEDS_And_Buttons();
 }
-
 void Initialize_Board_LEDS_And_Buttons()
 {
     bi_decl(bi_1pin_with_name(PICO_DEFAULT_LED_PIN, "LED"));

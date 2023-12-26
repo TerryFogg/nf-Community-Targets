@@ -18,10 +18,11 @@
 #include "tx_port.h"
 
 
-//-----------------------
-// Block Storagage
-//-----------------------
-// this device has 1 block storage devices
+// byte pool configuration and definitions
+#define DEFAULT_BYTE_POOL_SIZE     16000
+#define CLR_THREAD_STACK_SIZE      6000
+#define RECEIVER_THREAD_STACK_SIZE 4096
+
 
 #define TARGET_BLOCKSTORAGE_COUNT 1
 
@@ -41,6 +42,16 @@
 // Back-light control pin
 #define LCD_BL_CTRL_PIN       LL_GPIO_PIN_15
 #define LCD_BL_CTRL_GPIO_PORT GPIOG
+
+// Board Leds and buttons
+#define LED_GPIO_PORT GPIOC
+#define LED_GREEN     LL_GPIO_PIN_3
+#define LED_RED       LL_GPIO_PIN_2
+
+#define BUTTON_USER_GPIO_PORT GPIOC
+#define BUTTON_USER_PIN       LL_GPIO_PIN_13
+
+
 
 #define NANOCLR_AUDIO    FALSE
 #define NANOCLR_ETHERNET FALSE
@@ -113,17 +124,3 @@ extern "C"
 }
 #endif
 
-// ========================
-// STM32H735G-DK board Leds
-// ========================
-
-#define LED_GPIO_PORT GPIOC
-#define LED_GREEN     LL_GPIO_PIN_3
-#define LED_RED       LL_GPIO_PIN_2
-
-// ===============================
-// STM32H735G-DK board push button
-// ===============================
-
-#define BUTTON_USER_GPIO_PORT GPIOC
-#define BUTTON_USER_PIN       LL_GPIO_PIN_13

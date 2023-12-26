@@ -4,80 +4,8 @@
 #
 # RP2040 series
 
-# All libraries within the SDK are INTERFACE libraries. (Note this does not include the C/C++ standard libraries provided by
-# the compiler). Conceptually, a CMake INTERFACE library is a collection of:
-# - Source files
-# - Include paths
-# - Compiler definitions (visible to code as #defines)
-# - Compile and link options
-# - Dependencies (on other INTERFACE libraries)
 
-
-#list(APPEND PICO_SDK_LIBRARIES 
-#            pico_stdlib
-#
-#            hardware_irq 
-#            hardware_claim
-#            hardware_divider
-#            hardware_divider_headers
-#            hardware_dma
-#            hardware_exception
-#            hardware_flash
-#            hardware_interp
-#            hardware_pll
-#            hardware_regs
-#            hardware_resets
-#            hardware_rtc
-#            hardware_sync
-#            hardware_timer
-#            hardware_vreg
-#            hardware_watchdog
-#            hardware_xosc
-#            pico_bit_ops 
-#            pico_divider
-#            pico_double
-#            pico_float
-#            pico_int64_ops
-#           # pico_mems_op         # follow up, provides optimised machine code versions of memset, memcpy
-#            pico_standard_link
-#            pico_async_context_base
-#            pico_async_context_poll
-#            pico_async_context_threadsafe_background
-#            pico_binary_info
-#            pico_bootrom
-#            pico_bootsel_via_double_reset
-#            pico_fix_rp2040_usb_device_enumeration
-#            pico_rand
-#            pico_runtime
-#            pico_stdio_semihosting
-#            pico_stdio_uart
-#            pico_unique_id
-#            pico_multicore
-#            #lwip
-#
-#            #header
-#            hardware_base
-#            hardware_base_headers
-#
-#
-#            hardware_clocks
-#
-#            #IO
-#            hardware_adc
-#            hardware_gpio
-#            hardware_i2c
-#            hardware_pio
-#            hardware_pwm
-#            hardware_spi
-#            hardware_structs
-#            hardware_uart
-#            pico_usb_reset_interface
-#            tinyusb_board
-#            tinyusb_common_base
-#            tinyusb_device
-#)
-
- list(APPEND PICO_SDK_INCLUDES 
+ list(APPEND RP2040_INCLUDES 
              ${PICO_SDK_SOURCE}
              ${PICO_SDK_SOURCE}/src/boards/include
              ${PICO_SDK_SOURCE}/src/common/pico_base/include
@@ -139,10 +67,9 @@
              ${PICO_SDK_SOURCE}/lib/tinyusb/src/common
              ${PICO_SDK_SOURCE}/lib/tinyusb/src/device
              ${PICO_SDK_SOURCE}/lib/tinyusb/src/portable/raspberrypi/rp2040
-
  )
- list(APPEND PICO_SDK_SOURCES
-             ${CMAKE_SOURCE_DIR}/targets/AzureRTOS/RaspberryPi/RP2040/nanoCLR/Startup/bs2_default_padded_checksummed.s
+ list(APPEND RP2040_SOURCES
+             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RP2040/bs2_default_padded_checksummed.s
 
              ${PICO_SDK_SOURCE}/src/common/pico_sync/critical_section.c
              ${PICO_SDK_SOURCE}/src/common/pico_sync/lock_core.c
@@ -209,6 +136,7 @@
              ${PICO_SDK_SOURCE}/lib/tinyusb/src/device/usbd_control.c
              ${PICO_SDK_SOURCE}/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.c
              ${PICO_SDK_SOURCE}/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.c
- )
+ )                    
+ 
 
-                    
+

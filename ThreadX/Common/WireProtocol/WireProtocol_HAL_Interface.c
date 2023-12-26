@@ -5,6 +5,7 @@
 #include <WireProtocol.h>
 #include <nanoHAL_v2.h>
 #include <wp_Communications.h>
+#include <tx_api.h>
 
 WP_Message inboundMessage;
 

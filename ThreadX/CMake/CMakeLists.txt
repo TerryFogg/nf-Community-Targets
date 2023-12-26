@@ -1,7 +1,8 @@
 #
 # Copyright (c) .NET Foundation and Contributors
 # See LICENSE file in the project root for full license information.
-#
+
+
 project(nanoFramework VERSION ${BUILD_VERSION} LANGUAGES C CXX ASM)
 
 include( ${CMAKE_CURRENT_SOURCE_DIR}/nf-Interpreter.cmake)
@@ -9,26 +10,23 @@ include( ${CMAKE_CURRENT_SOURCE_DIR}/ThreadX.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_FAMILY}.cmake)
 include(../${PARENT_DIRECTORY}/${TARGET_BOARD}/board.cmake)
 
-add_executable(nanoCLR.elf ${NF_INTERPRETER_COMMON_SOURCES}
-                           ${NF_INTERPRETER_TARGET_COMMON_SOURCES}
-                           ${NF_INTERPRETER_TARGET_SOURCES}
+add_executable(nanoCLR.elf ${NF_INTERPRETER_SOURCES}
                            ${THREADX_SOURCES}
                            ${${TARGET_FAMILY}_SOURCES}
 )
 
-target_include_directories(nanoCLR.elf PUBLIC ${NF_INTERPRETER_COMMON_INCLUDES}
-                                              ${NF_INTERPRETER_TARGET_COMMON_INCLUDES}
+target_include_directories(nanoCLR.elf PUBLIC ${NF_INTERPRETER_INCLUDES}
                                               ${THREADX_INCLUDES}
                                               ${${TARGET_FAMILY}_INCLUDES}
 )
 
-if(GRAPHICS_SUPPORT)
-      target_sources(nanoCLR.elf PUBLIC "${NF_INTERPRETER_GRAPHICS_SOURCES}")
-      target_include_directories(nanoCLR.elf PUBLIC "${NF_INTERPRETER_GRAPHICS_INCLUDES}")
-      #target_compile_definitions(nanoCLR.elf PUBLIC -DNANOCLR_GRAPHICS=TRUE)
-else()
-      #target_compile_definitions(nanoCLR.elf PUBLIC -DNANOCLR_GRAPHICS=FALSE)
-endif()
+#if(GRAPHICS_SUPPORT)
+#      target_sources(nanoCLR.elf PUBLIC "${NF_INTERPRETER_GRAPHICS_SOURCES}")
+#      target_include_directories(nanoCLR.elf PUBLIC "${NF_INTERPRETER_GRAPHICS_INCLUDES}")
+#      #target_compile_definitions(nanoCLR.elf PUBLIC -DNANOCLR_GRAPHICS=TRUE)
+#else()
+#      #target_compile_definitions(nanoCLR.elf PUBLIC -DNANOCLR_GRAPHICS=FALSE)
+#endif()
 
 include( CommonDefinitions.cmake)
 include( BuildParameters_${TARGET_FAMILY}.cmake)

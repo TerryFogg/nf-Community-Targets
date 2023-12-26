@@ -6,7 +6,7 @@
 #include <nanoHAL.h>
 #include <nanoHAL_v2.h>
 #include <nanoWeak.h>
-#include "FlashDriver_Stm32h7.h"
+#include "FlashDriver.h"
 #include "memory.h"
 
 uint32_t GetExistingConfigSize()
@@ -333,7 +333,7 @@ __nfweak bool ConfigurationManager_StoreConfigurationBlock(
             }
 
             // now check if memory is erase, so the block can be stored
-            if (!STM32FlashDriver_IsBlockErased(NULL, storageAddress, blockSize))
+            if (!FlashDriver_IsBlockErased(NULL, storageAddress, blockSize))
             {
                 // memory not erased, can't store
                 return FALSE;
@@ -384,7 +384,7 @@ __nfweak bool ConfigurationManager_StoreConfigurationBlock(
             }
 
             // now check if memory is erase, so the block can be stored
-            if (!STM32FlashDriver_IsBlockErased(NULL, storageAddress, blockSize))
+            if (!FlashDriver_IsBlockErased(NULL, storageAddress, blockSize))
             {
                 // memory not erased, can't store
                 return FALSE;
@@ -416,7 +416,7 @@ __nfweak bool ConfigurationManager_StoreConfigurationBlock(
     }
 
     // copy the config block content to the config block storage
-    success = STM32FlashDriver_Write(NULL, storageAddress, blockSize, (unsigned char *)configurationBlock, true);
+    success = FlashDriver_Write(NULL, storageAddress, blockSize, (unsigned char *)configurationBlock, true);
 
     // enumeration is required after we are DONE with SUCCESSFULLY storing all the
     // config chunks
@@ -599,7 +599,7 @@ __nfweak bool ConfigurationManager_UpdateConfigurationBlock(
         }
 
         // erase config sector
-        if (STM32FlashDriver_EraseBlock(NULL, (uint32_t)&__nanoConfig_start__) == TRUE)
+        if (FlashDriver_EraseBlock(NULL, (uint32_t)&__nanoConfig_start__) == TRUE)
         {
             // flash block is erased
 
@@ -613,7 +613,7 @@ __nfweak bool ConfigurationManager_UpdateConfigurationBlock(
             memcpy(blockAddressInCopy, configurationBlock, blockSize);
 
             // copy the config block copy back to the config block storage
-            success = STM32FlashDriver_Write(
+            success = FlashDriver_Write(
                 NULL,
                 (uint32_t)&__nanoConfig_start__,
                 sizeOfConfigSector,

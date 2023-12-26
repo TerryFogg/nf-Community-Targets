@@ -38,18 +38,18 @@
 extern "C"
 {
 #endif
-    bool STM32FlashDriver_InitializeDevice(void *);
-    bool STM32FlashDriver_UninitializeDevice(void *);
-    DeviceBlockInfo *STM32FlashDriver_GetDeviceInfo(void *);
-    bool STM32FlashDriver_Read(void *, ByteAddress startAddress, unsigned int numBytes, unsigned char *buffer);
-    bool STM32FlashDriver_Write(
+    bool FlashDriver_InitializeDevice(void *);
+    bool FlashDriver_UninitializeDevice(void *);
+    DeviceBlockInfo *FlashDriver_GetDeviceInfo(void *);
+    bool FlashDriver_Read(void *, ByteAddress startAddress, unsigned int numBytes, unsigned char *buffer);
+    bool FlashDriver_Write(
         void *,
         ByteAddress startAddress,
         unsigned int numBytes,
         unsigned char *buffer,
         bool readModifyWrite);
-    bool STM32FlashDriver_IsBlockErased(void *, ByteAddress blockAddress, unsigned int length);
-    bool STM32FlashDriver_EraseBlock(void *, ByteAddress address);
+    bool FlashDriver_IsBlockErased(void *, ByteAddress blockAddress, unsigned int length);
+    bool FlashDriver_EraseBlock(void *, ByteAddress address);
 
     bool EmbeddedFlashUnlock(void);
     bool EmbeddedFlashLock(void);

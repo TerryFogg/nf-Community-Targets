@@ -17,12 +17,10 @@
 #include "tx_api.h"
 #include "tx_port.h"
 
-
 // byte pool configuration and definitions
 #define DEFAULT_BYTE_POOL_SIZE     16000
 #define CLR_THREAD_STACK_SIZE      6000
 #define RECEIVER_THREAD_STACK_SIZE 4096
-
 
 #define TARGET_BLOCKSTORAGE_COUNT 1
 
@@ -31,17 +29,82 @@
 //------------------------------------------
 //
 
-// LCD Display control pin
-#define LCD_DISP_CTRL_PIN       LL_GPIO_PIN_10
-#define LCD_DISP_CTRL_GPIO_PORT GPIOD
+// LCD 16-bit interface pins
+#define LCD_R0            LL_GPIO_PIN_0 
+#define LCD_R0_PORT       GPIOE
+#define LCD_R1            LL_GPIO_PIN_3
+#define LCD_R1_PORT       GPIOH
+#define LCD_R2            LL_GPIO_PIN_8
+#define LCD_R2_PORT       GPIOH
+#define LCD_R3            LL_GPIO_PIN_9
+#define LCD_R3_PORT       GPIOH
+#define LCD_R4            LL_GPIO_PIN_10
+#define LCD_R4_PORT       GPIOH
+#define LCD_R5            LL_GPIO_PIN_11
+#define LCD_R5_PORT       GPIOH
+#define LCD_R6            LL_GPIO_PIN_1
+#define LCD_R6_PORT       GPIOE
+#define LCD_R7            LL_GPIO_PIN_15
+#define LCD_R7_PORT       GPIOE
 
-// LCD Display enable pin
-#define LCD_DISP_EN_PIN       LL_GPIO_PIN_13
-#define LCD_DISP_EN_GPIO_PORT GPIOE
+#define LCD_G0            LL_GPIO_PIN_1
+#define LCD_G0_PORT       GPIOB
+#define LCD_G1            LL_GPIO_PIN_0
+#define LCD_G1_PORT       GPIOB
+#define LCD_G2            LL_GPIO_PIN_6
+#define LCD_G2_PORT       GPIOA
+#define LCD_G3            LL_GPIO_PIN_11
+#define LCD_G3_PORT       GPIOE
+#define LCD_G4            LL_GPIO_PIN_15
+#define LCD_G4_PORT       GPIOH
+#define LCD_G5            LL_GPIO_PIN_4
+#define LCD_G5_PORT       GPIOH
+#define LCD_G6            LL_GPIO_PIN_7
+#define LCD_G6_PORT       GPIOC
+#define LCD_G7            LL_GPIO_PIN_3
+#define LCD_G7_PORT       GPIOD
 
-// Back-light control pin
-#define LCD_BL_CTRL_PIN       LL_GPIO_PIN_15
-#define LCD_BL_CTRL_GPIO_PORT GPIOG
+#define LCD_B0            LL_GPIO_PIN_14
+#define LCD_B0_PORT       GPIOG
+#define LCD_B1            LL_GPIO_PIN_0
+#define LCD_B1_PORT       GPIOD
+#define LCD_B2            LL_GPIO_PIN_6
+#define LCD_B2_PORT       GPIOD
+#define LCD_B3            LL_GPIO_PIN_8
+#define LCD_B3_PORT       GPIOA
+#define LCD_B4            LL_GPIO_PIN_12
+#define LCD_B4_PORT       GPIOE
+#define LCD_B5            LL_GPIO_PIN_3
+#define LCD_B5_PORT       GPIOA
+#define LCD_B6            LL_GPIO_PIN_8
+#define LCD_B6_PORT       GPIOB
+#define LCD_B7            LL_GPIO_PIN_9
+#define LCD_B7_PORT       GPIOB
+
+#define LCD_CLK            LL_GPIO_PIN_7
+#define LCD_CLK_PORT       GPIOG
+#define LCD_HSYNC          LL_GPIO_PIN_6
+#define LCD_HSYNC_PORT     GPIOC
+#define LCD_VSYNC          LL_GPIO_PIN_4
+#define LCD_VSYNC_PORT     GPIOA
+
+#define LCD_DISP_CTRL_PIN  LL_GPIO_PIN_10
+#define LCD_DISP_CTRL_PORT GPIOD
+
+#define LCD_DISP_EN_PIN    LL_GPIO_PIN_13
+#define LCD_DISP_EN_PORT  GPIOE
+
+#define LCD_BL_CTRL_PIN    LL_GPIO_PIN_15
+#define LCD_BL_CTRL_PORT   GPIOG
+
+
+
+
+
+
+
+
+
 
 // Board Leds and buttons
 #define LED_GPIO_PORT GPIOC
@@ -52,11 +115,10 @@
 #define BUTTON_USER_PIN       LL_GPIO_PIN_13
 
 
-
 #define NANOCLR_AUDIO    FALSE
 #define NANOCLR_ETHERNET FALSE
 #define NANOCLR_FDCAN    FALSE
-// #define NANOCLR_GRAPHICS           TRUE
+
 #define NANOCLR_GRAPHICS_USING_SPI FALSE
 #define NANOCLR_MICROSD            FALSE
 #define NANOCLR_RTC                FALSE

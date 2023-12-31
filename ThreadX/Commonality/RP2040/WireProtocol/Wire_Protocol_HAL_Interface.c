@@ -22,7 +22,8 @@ uint8_t WP_TransmitMessage(WP_Message *message)
     wp_WriteBytes((uint8_t *)&message->m_header, sizeof(message->m_header));
     if (message->m_header.m_size && message->m_payload)
     {
-        // NOTE: 
+        // NOTE:  FOR USB bulk transfer
+        // ----------------------------
         // 1. If you write a 32 byte header followed by a 32 byte payload the system stalls.
         //    Apparently this is expected on the last packet sent as the system cannot determine if the stream is finished
         

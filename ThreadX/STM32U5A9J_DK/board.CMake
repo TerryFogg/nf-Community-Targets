@@ -3,7 +3,7 @@
 # See LICENSE file in the project root for full license information.
 #
 
-    list(APPEND NF_INTERPRETER_TARGET_SOURCES
+    list(APPEND NF_INTERPRETER_SOURCES
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/board.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/power.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/tx_initialize_low_level.s

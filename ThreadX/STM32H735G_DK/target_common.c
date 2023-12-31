@@ -1,9 +1,6 @@
 //
 // Copyright (c) .NET Foundation and Contributors
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
-// See LICENSE file in the project root for full license information.
-//
-
 
 #include <nanoHAL_v2.h>
 #include "target_common.h"
@@ -16,7 +13,6 @@ HAL_SYSTEM_CONFIG HalSystemConfig = {
 	0,				// ConvertCOM_DebugHandle(0),
 	921600,
 	0,				// STDIO = COM2 or COM1
-
 	{RAM1_MEMORY_StartAddress, RAM1_MEMORY_Size},
 	{FLASH1_MEMORY_StartAddress, FLASH1_MEMORY_Size} };
 
@@ -25,10 +21,5 @@ HAL_TARGET_CONFIGURATION g_TargetConfiguration;
 bool Target_CanChangeMacAddress() { return false; }
 
 // this target can use JTAG for updates
-
-
-// Commenting out the next line leads to some timing issue during startup
 inline GET_TARGET_CAPABILITIES(TargetCapabilities_JtagUpdate);
-
-
 inline TARGET_HAS_PROPRIETARY_BOOTER(true);

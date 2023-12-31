@@ -72,8 +72,8 @@ enum ST7789_Orientation : CLR_UINT8
     MADCTL_MY = 0x80   // sets the Row Order, 0=Top-Bottom and 1=Bottom-Top
 
 };
-extern DisplayInterface g_DisplayInterface;
 struct DisplayDriver g_DisplayDriver;
+extern DisplayInterface g_DisplayInterface;
 int lcd_width;
 int lcd_height;
 int xx;

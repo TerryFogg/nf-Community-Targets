@@ -10,7 +10,9 @@
         "NETXDUO_SOURCE_FOLDER": "C:/nftools/NetxDuo",
         "STM32H7_CUBE_SOURCE": "C:/nftools/STM32CubeH7",
         "STM32U5_CUBE_SOURCE": "C:/nftools/STM32CubeU5",
-        "PICO_SDK_SOURCE": "C:/nftools/pico-sdk"
+        "PICO_SDK_SOURCE": "C:/nftools/pico-sdk",
+        "ELF2UF2_EXECUTABLE" : "C:/nftools/Utilities/elf2uf2.exe"
+
       }
     },
     {
@@ -95,7 +97,7 @@
         "INFOSTRING": "Built with ThreadX  6.1.12",
         "GRAPHICS_SUPPORT": "TRUE",
         "RANDOM_NUMBER_GENERATOR": "TRUE",
-        "DISPLAY_CONTROLLER": "RK043FN48H_VideoMode.cpp",
+        "DISPLAY_CONTROLLER": "VideoMode.cpp",
         "DISPLAY_INTERFACE": "LTDC_DMA2D_To_Video.cpp"
       },
       "hidden": false
@@ -116,7 +118,9 @@
         "BUILD_VERSION": "1.0.0.0",
         "INFOSTRING": "Built with ThreadX  6.1.12",
         "GRAPHICS_SUPPORT": "TRUE",
-        "RANDOM_NUMBER_GENERATOR": "TRUE"
+        "RANDOM_NUMBER_GENERATOR": "TRUE",
+        "DISPLAY_CONTROLLER": "VideoMode.cpp",
+        "DISPLAY_INTERFACE": "LTDC_DMA2D_To_Video.cpp"
       },
       "hidden": false
     },

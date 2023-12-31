@@ -3,7 +3,7 @@
 // Portions Copyright (c) 2021 STMicroelectronics.  All rights reserved.
 // See LICENSE file in the project root for full license information.
 //
-#include "targetHAL_board.h"
+#include "board.h"
 #include "hardware\gpio.h"
 #include "pico\binary_info\code.h"
 #include "pico\multicore.h"

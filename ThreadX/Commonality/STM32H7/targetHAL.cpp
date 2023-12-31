@@ -17,19 +17,13 @@
 extern bool g_waitForDebuggerRequested;
 bool g_fDoNotUninitializeDebuggerPort = false;
 
-
-extern "C" {
-extern void Initialize_Graphics(void);
-}
-
-// global mutex protecting the internal state of the interpreter, including event flags
-// mutex_t interpreterGlobalMutex;
-
-// because nanoHAL_Initialize/Uninitialize needs to be called in both C and C++ we need a proxy to allow it to be called
-// in 'C'
 extern "C"
 {
+    extern void Initialize_Graphics(void);
+}
 
+extern "C"
+{
     void nanoHAL_Initialize_C()
     {
         nanoHAL_Initialize();
@@ -37,20 +31,20 @@ extern "C"
 
     void nanoHAL_Uninitialize_C(bool isPoweringDown)
     {
-      nanoHAL_Uninitialize(isPoweringDown);
+        nanoHAL_Uninitialize(isPoweringDown);
     }
 }
 
 void nanoHAL_Initialize()
 {
-  // initialize global mutex
+    // initialize global mutex
     // chMtxObjectInit(&interpreterGlobalMutex);
 
 #if (NANOCLR_GRAPHICS == TRUE)
-  Initialize_Graphics();
+    Initialize_Graphics();
 #endif
 
-  PalEvent_Initialize();
+    PalEvent_Initialize();
 
     HAL_CONTINUATION::InitializeList();
     HAL_COMPLETION::InitializeList();
@@ -72,12 +66,6 @@ void nanoHAL_Initialize()
 
     // Initialise Network Stack
     Network_Initialize();
-    
-    // Display Debug status if requested
-    if (g_waitForDebuggerRequested) 
-    {
-      g_waitForDebuggerRequested = true;
-    }
 }
 
 void nanoHAL_Uninitialize(bool isPoweringDown)
@@ -96,19 +84,6 @@ void HAL_AssertEx()
     __asm("BKPT #0\n");
     while (true)
     {
-      __NOP();
+        __NOP();
     }
 }
-
-//#if !defined(BUILD_RTM)
-//
-//void HARD_Breakpoint()
-//{
-//    __asm("BKPT #0\n");
-//    while (true)
-//    {
-//      __NOP();
-//    }
-//};
-
-//#endif

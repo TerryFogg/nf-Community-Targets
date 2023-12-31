@@ -3,8 +3,12 @@
 # See LICENSE file in the project root for full license information.
 #
 
-# Setup the compiler flags for the build
-########################################
+# Common compiler definitions
+# --------------------------------------------------------------
+set(CMAKE_C_STANDARD 17 CACHE INTERNAL "C standard for all targets")
+set(CMAKE_C_EXTENSIONS OFF CACHE INTERNAL "-std=c++17 instead of -std=gnu++17")
+set(CMAKE_CXX_STANDARD 17 CACHE INTERNAL "C++ standard for all targets")
+set(CMAKE_CXX_EXTENSIONS OFF CACHE INTERNAL "-std=c++17 instead of -std=gnu++17")
 
 target_compile_definitions(nanoCLR.elf PUBLIC -DUSE_FULL_LL_DRIVER)
 

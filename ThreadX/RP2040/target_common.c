@@ -3,7 +3,6 @@
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
 
 #include <nanoHAL_v2.h>
-#include "target_board.h"
 #include "target_common.h"
 #include <platform_target_capabilities.h>
 #include <stdbool.h>
@@ -14,7 +13,6 @@ HAL_SYSTEM_CONFIG HalSystemConfig = {
 	0,		// ConvertCOM_DebugHandle(0),
 	921600,
 	0,		// STDIO = COM2 or COM1
-
 	{RAM1_MEMORY_StartAddress, RAM1_MEMORY_Size},
 	{FLASH1_MEMORY_StartAddress, FLASH1_MEMORY_Size} };
 

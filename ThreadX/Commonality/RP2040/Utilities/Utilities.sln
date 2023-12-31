@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34221.43
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pioasm", "Pioasm\Pioasm.vcxproj", "{47157A75-7B83-40EC-B3CA-20300337F3A3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ELF2UF2", "ELF2UF2\ELF2UF2.vcxproj", "{67643395-C99B-4E27-8067-DF42E6A2C1AA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Executables", "Executables", "{6A6C3A1B-BC18-48CA-B3D4-DF7139170FD4}"
+	ProjectSection(SolutionItems) = preProject
+		x64\Debug\ELF2UF2.exe = x64\Debug\ELF2UF2.exe
+		x64\Debug\Pioasm.exe = x64\Debug\Pioasm.exe
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|VisualGDB = Debug|VisualGDB
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|VisualGDB = Release|VisualGDB
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{47157A75-7B83-40EC-B3CA-20300337F3A3}.Debug|VisualGDB.ActiveCfg = Debug|x64
+		{47157A75-7B83-40EC-B3CA-20300337F3A3}.Debug|VisualGDB.Build.0 = Debug|x64
+		{47157A75-7B83-40EC-B3CA-20300337F3A3}.Debug|x64.ActiveCfg = Debug|x64
+		{47157A75-7B83-40EC-B3CA-20300337F3A3}.Debug|x64.Build.0 = Debug|x64
+		{47157A75-7B83-40EC-B3CA-20300337F3A3}.Debug|x86.ActiveCfg = Debug|Win32
+		{47157A75-7B83-40EC-B3CA-20300337F3A3}.Debug|x86.Build.0 = Debug|Win32
+		{47157A75-7B83-40EC-B3CA-20300337F3A3}.Release|VisualGDB.ActiveCfg = Release|x64
+		{47157A75-7B83-40EC-B3CA-20300337F3A3}.Release|VisualGDB.Build.0 = Release|x64
+		{47157A75-7B83-40EC-B3CA-20300337F3A3}.Release|x64.ActiveCfg = Release|x64
+		{47157A75-7B83-40EC-B3CA-20300337F3A3}.Release|x64.Build.0 = Release|x64
+		{47157A75-7B83-40EC-B3CA-20300337F3A3}.Release|x86.ActiveCfg = Release|Win32
+		{47157A75-7B83-40EC-B3CA-20300337F3A3}.Release|x86.Build.0 = Release|Win32
+		{67643395-C99B-4E27-8067-DF42E6A2C1AA}.Debug|VisualGDB.ActiveCfg = Debug|x64
+		{67643395-C99B-4E27-8067-DF42E6A2C1AA}.Debug|VisualGDB.Build.0 = Debug|x64
+		{67643395-C99B-4E27-8067-DF42E6A2C1AA}.Debug|x64.ActiveCfg = Debug|x64
+		{67643395-C99B-4E27-8067-DF42E6A2C1AA}.Debug|x64.Build.0 = Debug|x64
+		{67643395-C99B-4E27-8067-DF42E6A2C1AA}.Debug|x86.ActiveCfg = Debug|Win32
+		{67643395-C99B-4E27-8067-DF42E6A2C1AA}.Debug|x86.Build.0 = Debug|Win32
+		{67643395-C99B-4E27-8067-DF42E6A2C1AA}.Release|VisualGDB.ActiveCfg = Release|x64
+		{67643395-C99B-4E27-8067-DF42E6A2C1AA}.Release|VisualGDB.Build.0 = Release|x64
+		{67643395-C99B-4E27-8067-DF42E6A2C1AA}.Release|x64.ActiveCfg = Release|x64
+		{67643395-C99B-4E27-8067-DF42E6A2C1AA}.Release|x64.Build.0 = Release|x64
+		{67643395-C99B-4E27-8067-DF42E6A2C1AA}.Release|x86.ActiveCfg = Release|Win32
+		{67643395-C99B-4E27-8067-DF42E6A2C1AA}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5016087C-087D-4F55-BCF3-0BC6E27B44DF}
+	EndGlobalSection
+EndGlobal

@@ -12,26 +12,27 @@
 #include <nanoHAL_ConfigurationManager.h>
 #include <nanoHAL_Graphics.h>
 #include <nanoHAL_v2.h>
-#include <platform_target_capabilities.h>
 #include "board.h"
 
 extern bool g_waitForDebuggerRequested;
+bool g_fDoNotUninitializeDebuggerPort = false;
 
-extern "C" {
-extern void Initialize_Graphics(void);
-}
-
-extern "C" {
-
-void nanoHAL_Initialize_C()
+extern "C"
 {
-    nanoHAL_Initialize();
+    extern void Initialize_Graphics(void);
 }
 
-void nanoHAL_Uninitialize_C(bool isPoweringDown)
+extern "C"
 {
-    nanoHAL_Uninitialize(isPoweringDown);
-}
+    void nanoHAL_Initialize_C()
+    {
+        nanoHAL_Initialize();
+    }
+
+    void nanoHAL_Uninitialize_C(bool isPoweringDown)
+    {
+        nanoHAL_Uninitialize(isPoweringDown);
+    }
 }
 
 void nanoHAL_Initialize()
@@ -65,11 +66,11 @@ void nanoHAL_Initialize()
 
     // Initialise Network Stack
     Network_Initialize();
-    
 }
 
 void nanoHAL_Uninitialize(bool isPoweringDown)
 {
+    (void)isPoweringDown;
     SOCKETS_CloseConnections();
     BlockStorageList_UnInitializeDevices();
     CPU_GPIO_Uninitialize();
@@ -86,16 +87,3 @@ void HAL_AssertEx()
         /*nop*/
     }
 }
-
-#if !defined(BUILD_RTM)
-
-void HARD_Breakpoint()
-{
-    __asm("BKPT #0\n");
-    while (true)
-    {
-        /*nop*/
-    }
-};
-
-#endif // !defined(BUILD_RTM)

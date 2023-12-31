@@ -7,11 +7,14 @@
 #include <nanoHAL_v2.h>
 #include "target_board.h"
 
-uint32_t WakeupReasonStore;
-
 inline void CPU_Reset()
 {
-    NVIC_SystemReset();
+    volatile uint32_t *aircr = (volatile uint32_t *)0xE000ED0C;
+    *aircr = (0x05FA << 16) | 0x1 << 2;
+    for (;;) /* wait until reset */
+    {
+        __asm__ volatile("nop");
+    }
 }
 
 inline bool CPU_IsSoftRebootSupported()
@@ -37,3 +40,4 @@ void CPU_SetPowerMode(PowerLevel_type powerLevel)
         break;
     }
 }
+

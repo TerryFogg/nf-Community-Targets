@@ -3,78 +3,93 @@
 # See LICENSE file in the project root for full license information.
 #
 
-    
-# The following pico_sdk_init.cmake is included in the top level CMakeLists.txt.
-# If it is not included before the project declaration, an error occurs in adding the ELF2UF2.
-#include(${PICO_SDK_SOURCE}/pico_sdk_init.cmake)
-#pico_sdk_init()
+    target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:  -mthumb -mcpu=cortex-m0plus>)
+    target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:-ffunction-sections -fdata-sections>)
 
- target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:  -mthumb -mcpu=cortex-m0plus>)
- target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:CXX>: -mthumb -mcpu=cortex-m0plus>)
- target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:ASM>: -mcpu=cortex-m0plus -x assembler-with-cpp>)
+    target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:CXX>: -mthumb -mcpu=cortex-m0plus>)
+    target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-ffunction-sections -fdata-sections>)
 
+    target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:ASM>: -mthumb -mcpu=cortex-m0plus -x assembler-with-cpp>)
 
-target_compile_definitions(nanoCLR.elf PUBLIC 
-                           DEBUG                           
-                           DPLATFORM_ARM
-                           __CM0_CMSIS_VERSION
-                           LIB_PICO_BIT_OPS=1
-                           LIB_PICO_BIT_OPS_PICO=1
-                           LIB_PICO_DIVIDER=1
-                           LIB_PICO_DIVIDER_HARDWARE=1
-                           #
-                           #  Apparently float/double in RAM is faster
-                           #
-                           PICO_FLOAT_IN_RAM=1
-                           PICO_DOUBLE_IN_RAM=1
+    target_compile_definitions(nanoCLR.elf PUBLIC 
+                               DEBUG                           
+                               DPLATFORM_ARM
+                               __CM0_CMSIS_VERSION
+                               LIB_PICO_BIT_OPS=1
+                               LIB_PICO_BIT_OPS_PICO=1
+                               LIB_PICO_DIVIDER=1
+                               LIB_PICO_DIVIDER_HARDWARE=1
+                               #
+                               #  Apparently float/double in RAM is faster
+                               #
+                               PICO_FLOAT_IN_RAM=1
+                               PICO_DOUBLE_IN_RAM=1
 
-                           LIB_PICO_DOUBLE=1
-                           LIB_PICO_DOUBLE_PICO=1
+                               LIB_PICO_DOUBLE=1
+                               LIB_PICO_DOUBLE_PICO=1
                            
-                           LIB_PICO_FLOAT=1
-                           LIB_PICO_FLOAT_PICO=1
+                               LIB_PICO_FLOAT=1
+                               LIB_PICO_FLOAT_PICO=1
                            
-                           LIB_PICO_INT64_OPS=1
-                           LIB_PICO_INT64_OPS_PICO=1
+                               LIB_PICO_INT64_OPS=1
+                               LIB_PICO_INT64_OPS_PICO=1
 
-                           LIB_PICO_MALLOC=1
-                           LIB_PICO_MEM_OPS=1
-                           LIB_PICO_MEM_OPS_PICO=1
+                               LIB_PICO_MALLOC=1
+                               LIB_PICO_MEM_OPS=1
+                               LIB_PICO_MEM_OPS_PICO=1
 
-                           LIB_PICO_PLATFORM=1
-                           LIB_PICO_PRINTF=1
-                           LIB_PICO_PRINTF_PICO=1
-                           LIB_PICO_RUNTIME=1
-                           LIB_PICO_STANDARD_LINK=1
+                               LIB_PICO_PLATFORM=1
+                               LIB_PICO_PRINTF=1
+                               LIB_PICO_PRINTF_PICO=1
+                               LIB_PICO_RUNTIME=1
+                               LIB_PICO_STANDARD_LINK=1
 
-                           LIB_PICO_STDIO=1
-                           LIB_PICO_STDIO_UART=1
+                               LIB_PICO_STDIO=1
+                               LIB_PICO_STDIO_UART=1
 
-                           LIB_PICO_STDLIB=1
+                               LIB_PICO_STDLIB=1
 
-                           LIB_PICO_SYNC=1
-                           LIB_PICO_SYNC_CORE=1
-                           LIB_PICO_SYNC_CRITICAL_SECTION=1
-                           LIB_PICO_SYNC_MUTEX=1
-                           LIB_PICO_SYNC_SEM=1
+                               LIB_PICO_SYNC=1
+                               LIB_PICO_SYNC_CORE=1
+                               LIB_PICO_SYNC_CRITICAL_SECTION=1
+                               LIB_PICO_SYNC_MUTEX=1
+                               LIB_PICO_SYNC_SEM=1
 
-                           LIB_PICO_TIME=1
-                           LIB_PICO_UTIL=1
-                           PICO_BOARD=\"pico\"
-                           PICO_BUILD=1
-                           PICO_COPY_TO_RAM=0
-                           PICO_CXX_ENABLE_EXCEPTIONS=0
-                           PICO_NO_FLASH=0
-                           PICO_NO_HARDWARE=0
-                           PICO_ON_DEVICE=1
-                           PICO_USE_BLOCKED_RAM=0
-                           PendSV_Handler=isr_pendsv
-                           SysTick_Handler=isr_systick
-                           CFG_TUSB_MCU=OPT_MCU_RP2040
- )
+                               LIB_PICO_TIME=1
+                               LIB_PICO_UTIL=1
+                               PICO_BOARD=\"pico\"
+                               PICO_BUILD=1
+                               PICO_COPY_TO_RAM=0
+                               PICO_CXX_ENABLE_EXCEPTIONS=0
+                               PICO_NO_FLASH=0
+                               PICO_NO_HARDWARE=0
+                               PICO_ON_DEVICE=1
+                               PICO_USE_BLOCKED_RAM=0
+                               PendSV_Handler=isr_pendsv
+                               SysTick_Handler=isr_systick
+                               CFG_TUSB_MCU=OPT_MCU_RP2040
+     )
 
 
-    target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=__ctzsi2")               # gcc
+     ## Link Options
+    target_link_options(nanoCLR.elf PUBLIC "-mthumb")
+    target_link_options(nanoCLR.elf PUBLIC "-mcpu=cortex-m0")
+    target_link_options(nanoCLR.elf PUBLIC "-mfpu=fpv5-sp-d16")
+    target_link_options(nanoCLR.elf PUBLIC "-mfloat-abi=hard")
+    target_link_options(nanoCLR.elf PUBLIC "-mabi=aapcs")
+    target_link_options(nanoCLR.elf PUBLIC "-Wl,--gc-sections")
+    target_link_options(nanoCLR.elf PUBLIC "-Wl,--no-wchar-size-warning")
+    target_link_options(nanoCLR.elf PUBLIC "-Wl,--print-memory-usage")
+
+
+# -------------------
+# CUSTOM LINK OPTIONS
+# -------------------
+# The following linker option e.g.  '--wrap=__aeabi_dsub' causes the linker to generate a weak symbol for the function 
+# which can be overridden by a strong symbol. For the RP2020, custom implementation of the following functions 
+# are provided which have improved performance.
+
+    target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=__ctzsi2")
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=__ctzdi2")
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=__popcountdi2")
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=__popcountsi2")
@@ -139,7 +154,7 @@ target_compile_definitions(nanoCLR.elf PUBLIC
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=tanh")
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=trunc")
 
-    # Divider
+    # Division
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=__aeabi_idiv")
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=__aeabi_idivmod")
      target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=__aeabi_ldivmod")
@@ -241,7 +256,6 @@ target_compile_definitions(nanoCLR.elf PUBLIC
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=vsnprintf")
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=sprintf")
 
-
     #stdio
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=getchar")
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=printf")
@@ -249,16 +263,12 @@ target_compile_definitions(nanoCLR.elf PUBLIC
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=puts")
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=vprintf")
 
-
     target_link_options(nanoCLR.elf PUBLIC "LINKER:-gc-sections")
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--no-warn-rwx-segments")
 
-    target_link_options(nanoCLR.elf PUBLIC "-T${CMAKE_SOURCE_DIR}/targets/AzureRTOS/RaspberryPi/RP2040/nanoCLR/Memory/RaspberryPiPico.ld")
 
-
-# Adds .hex, .bin, .dis, .elf outputs
-# If  PICO_NO_UF2 not set, builds ELF2UF2
-#pico_add_extra_outputs(nanoCLR.elf)
-
-
+# Add custom build command to create a .uf2 format file from the .elf file
+add_custom_command(TARGET nanoCLR.elf POST_BUILD
+      COMMAND ${ELF2UF2_EXECUTABLE}  $<TARGET_FILE:nanoCLR.elf>   ${CMAKE_BINARY_DIR}/nanoCLR.uf2
+)
 

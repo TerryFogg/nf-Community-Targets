@@ -4,6 +4,9 @@
 
 ---
 
+https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/4886/SITCore_System_on_Modules_Web.pdf
+
+
 # Welcome to .NET **nanoFramework** community targets repository!
 
 This repository contains target boards for .NET **nanoFramework**, provided and maintained by community members.

@@ -18,15 +18,8 @@ extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_System
 extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_System_Text;
 extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_Runtime_Events;
 extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_Runtime_Events_EventSink_DriverProcs;
-
-extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_System_Runtime_Serialization;
 extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_System_Math;
 extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_System_Device_Gpio;
-extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_System_Device_I2c;
-extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_System_Device_Adc;
-extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_System_Device_Pwm;
-extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_System_Device_Spi;
-extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_Hardware_RaspberryPiPico;
 
 const CLR_RT_NativeAssemblyData *g_CLR_InteropAssembliesNativeData[] = {
     &g_CLR_AssemblyNative_mscorlib,
@@ -37,16 +30,8 @@ const CLR_RT_NativeAssemblyData *g_CLR_InteropAssembliesNativeData[] = {
     &g_CLR_AssemblyNative_nanoFramework_System_Text,
     &g_CLR_AssemblyNative_nanoFramework_Runtime_Events,
     &g_CLR_AssemblyNative_nanoFramework_Runtime_Events_EventSink_DriverProcs,
-
-    &g_CLR_AssemblyNative_System_Runtime_Serialization,
     &g_CLR_AssemblyNative_System_Math,
     &g_CLR_AssemblyNative_System_Device_Gpio,
-    &g_CLR_AssemblyNative_System_Device_I2c,
-    &g_CLR_AssemblyNative_System_Device_Adc,
-    &g_CLR_AssemblyNative_System_Device_Pwm,
-    &g_CLR_AssemblyNative_System_Device_Spi,
-    &g_CLR_AssemblyNative_nanoFramework_Hardware_RaspberryPiPico,
-    NULL
-};
+    NULL};
 
-const uint16_t g_CLR_InteropAssembliesCount = (8 + 8);
+const uint16_t g_CLR_InteropAssembliesCount = (8 + 2);

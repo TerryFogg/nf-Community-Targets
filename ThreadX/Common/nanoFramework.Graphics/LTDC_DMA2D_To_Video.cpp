@@ -13,10 +13,6 @@
 #include <stdio.h>
 #include "DisplayInterface.h"
 #include <nanoCLR_Interop.h>
-#include "stm32h7xx_ll_bus.h"
-#include "stm32h7xx_ll_dma.h"
-#include "stm32h7xx_ll_gpio.h"
-#include "stm32h7xx_ll_dma2d.h"
 #include "board.h"
 
 #define LCD_COLOR_RGB565_BLACK 0x0000U
@@ -40,11 +36,11 @@ extern CLR_UINT32 Graphics_frame_buffer;
 CLR_UINT32 Width;
 CLR_UINT32 Height;
 
-void SetLcdPin(GPIO_TypeDef *GpioPort, CLR_UINT32 GpioPin, CLR_UINT32 AlternateFunction)
+void SetLcdPin(GPIO_TypeDef *GpioPort, CLR_UINT32 GpioPin, CLR_UINT32 AlternateFunction, CLR_UINT32 Mode)
 {
     // LTDC Pins configuration
     LL_GPIO_InitTypeDef GPIO_InitStruct;
-    GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+    GPIO_InitStruct.Mode = Mode;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
@@ -61,74 +57,62 @@ void DisplayInterface::Initialize(DisplayInterfaceConfig &config)
 
     LTDCClock_Config();
 
-    // Enable THE CLOCKS
-    LL_APB3_GRP1_EnableClock(LL_APB3_GRP1_PERIPH_LTDC);
-    LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOA);
-    LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOB);
-    LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOC);
-    LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOD);
-    LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOE);
-    LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOG);
-    LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOH);
+    ENABLE_LTDC;
+    ENABLE_PORT_GPIOA;
+    ENABLE_PORT_GPIOB;
+    ENABLE_PORT_GPIOC;
+    ENABLE_PORT_GPIOD;
+    ENABLE_PORT_GPIOE;
+    ENABLE_PORT_GPIOG;
+    ENABLE_PORT_GPIOH;
 
     // LTDC Pins configuration
-    SetLcdPin(LCD_R0_PORT, LCD_R0, LL_GPIO_AF_14);   // lcd r0
-    SetLcdPin(LCD_R1_PORT, LCD_R1, LL_GPIO_AF_14);   // lcd r1
-    SetLcdPin(LCD_R2_PORT, LCD_R2, LL_GPIO_AF_14);   // lcd r2
-    SetLcdPin(LCD_R3_PORT, LCD_R3, LL_GPIO_AF_14);   // lcd r3
-    SetLcdPin(LCD_R4_PORT, LCD_R4, LL_GPIO_AF_14);   // lcd r4
-    SetLcdPin(LCD_R5_PORT, LCD_R5, LL_GPIO_AF_14);   // lcd r5
-    SetLcdPin(LCD_R6_PORT, LCD_R6, LL_GPIO_AF_14);   // lcd r6
-    SetLcdPin(LCD_R7_PORT, LCD_R7, LL_GPIO_AF_14);   // lcd r7
+    SetLcdPin(LCD_R0_PORT, LCD_R0, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd r0
+    SetLcdPin(LCD_R1_PORT, LCD_R1, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd r1
+    SetLcdPin(LCD_R2_PORT, LCD_R2, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd r2
+    SetLcdPin(LCD_R3_PORT, LCD_R3, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd r3
+    SetLcdPin(LCD_R4_PORT, LCD_R4, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd r4
+    SetLcdPin(LCD_R5_PORT, LCD_R5, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd r5
+    SetLcdPin(LCD_R6_PORT, LCD_R6, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd r6
+    SetLcdPin(LCD_R7_PORT, LCD_R7, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd r7
+                                                                          
+    SetLcdPin(LCD_B0_PORT, LCD_B0, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd b0
+    SetLcdPin(LCD_B1_PORT, LCD_B1, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd b1
+    SetLcdPin(LCD_B2_PORT, LCD_B2, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd b2
+    SetLcdPin(LCD_B3_PORT, LCD_B3, LL_GPIO_AF_13,LL_GPIO_MODE_ALTERNATE); // lcd b3
+    SetLcdPin(LCD_B4_PORT, LCD_B4, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd b4
+    SetLcdPin(LCD_B5_PORT, LCD_B5, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd b5
+    SetLcdPin(LCD_B6_PORT, LCD_B6, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd b6
+    SetLcdPin(LCD_B7_PORT, LCD_B7, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd b7
+                                                                          
+    SetLcdPin(LCD_G0_PORT, LCD_G0, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd g0
+    SetLcdPin(LCD_G1_PORT, LCD_G1, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd g1
+    SetLcdPin(LCD_G2_PORT, LCD_G2, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd g2
+    SetLcdPin(LCD_G3_PORT, LCD_G3, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd g3
+    SetLcdPin(LCD_G4_PORT, LCD_G4, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd g4
+    SetLcdPin(LCD_G5_PORT, LCD_G5, LL_GPIO_AF_9, LL_GPIO_MODE_ALTERNATE); // lcd g5
+    SetLcdPin(LCD_G6_PORT, LCD_G6, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd g6
+    SetLcdPin(LCD_G7_PORT, LCD_G7, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd g7
 
-    SetLcdPin(LCD_B0_PORT, LCD_B0, LL_GPIO_AF_14);   // lcd b0
-    SetLcdPin(LCD_B1_PORT, LCD_B1, LL_GPIO_AF_14);   // lcd b1
-    SetLcdPin(LCD_B2_PORT, LCD_B2, LL_GPIO_AF_14);   // lcd b2
-    SetLcdPin(LCD_B3_PORT, LCD_B3, LL_GPIO_AF_13);   // lcd b3
-    SetLcdPin(LCD_B4_PORT, LCD_B4, LL_GPIO_AF_14);   // lcd b4
-    SetLcdPin(LCD_B5_PORT, LCD_B5, LL_GPIO_AF_14);   // lcd b5
-    SetLcdPin(LCD_B6_PORT, LCD_B6, LL_GPIO_AF_14);   // lcd b6
-    SetLcdPin(LCD_B7_PORT, LCD_B7, LL_GPIO_AF_14);   // lcd b7
+    SetLcdPin(LCD_VSYNC_PORT, LCD_VSYNC, LL_GPIO_AF_14, LL_GPIO_MODE_ALTERNATE); // Vertical Sync
+    SetLcdPin(LCD_HSYNC_PORT, LCD_HSYNC, LL_GPIO_AF_14, LL_GPIO_MODE_ALTERNATE); // Horizontal Sync
+    SetLcdPin(LCD_CLK_PORT, LCD_CLK, LL_GPIO_AF_14, LL_GPIO_MODE_ALTERNATE);     // LCD Clock
 
-    SetLcdPin(LCD_G0_PORT, LCD_G0, LL_GPIO_AF_14);   // lcd g0
-    SetLcdPin(LCD_G1_PORT, LCD_G1, LL_GPIO_AF_14);   // lcd g1
-    SetLcdPin(LCD_G2_PORT, LCD_G2, LL_GPIO_AF_14);   // lcd g2
-    SetLcdPin(LCD_G3_PORT, LCD_G3, LL_GPIO_AF_14);   // lcd g3
-    SetLcdPin(LCD_G4_PORT, LCD_G4, LL_GPIO_AF_9);    // lcd g4
-    SetLcdPin(LCD_G5_PORT, LCD_G5, LL_GPIO_AF_9);    // lcd g5
-    SetLcdPin(LCD_G6_PORT, LCD_G6, LL_GPIO_AF_14);   // lcd g6
-    SetLcdPin(LCD_G7_PORT, LCD_G7, LL_GPIO_AF_14);   // lcd g7
+    SetLcdPin(LCD_BL_CTRL_PORT, LCD_BL_CTRL_PIN, LL_GPIO_AF_14, LL_GPIO_OUTPUT_PUSHPULL);     // Backlight 
+    SetLcdPin(LCD_DISP_EN_PORT, LCD_DISP_CTRL_PIN, LL_GPIO_AF_14, LL_GPIO_OUTPUT_PUSHPULL);   // Display Enable
+    SetLcdPin(LCD_DISP_CTRL_PORT, LCD_DISP_CTRL_PIN, LL_GPIO_AF_14, LL_GPIO_OUTPUT_PUSHPULL); // Display Control 
 
-    SetLcdPin(LCD_VSYNC_PORT, LCD_VSYNC, LL_GPIO_AF_14);
-    SetLcdPin(LCD_HSYNC_PORT, LCD_HSYNC, LL_GPIO_AF_14);
-    SetLcdPin(LCD_CLK_PORT, LCD_CLK, LL_GPIO_AF_14);
-    SetLcdPin(LCD_DISP_CTRL_PORT, LCD_DISP_CTRL_PIN, LL_GPIO_AF_14);
-
-
-    // Set Enable, Control and Backlight pins to output mode
-    LL_GPIO_InitTypeDef GPIO_InitStructLCD;
-    GPIO_InitStructLCD.Mode = LL_GPIO_OUTPUT_PUSHPULL; // Output for all pins
-
-    GPIO_InitStructLCD.Pin = config.VideoDisplay.backlight;
-    LL_GPIO_Init(LCD_BL_CTRL_PORT, &GPIO_InitStructLCD); // Backlight
-
-    GPIO_InitStructLCD.Pin = config.VideoDisplay.enable;
-    LL_GPIO_Init(LCD_DISP_EN_PORT, &GPIO_InitStructLCD); // Enable
-
-    GPIO_InitStructLCD.Pin = config.VideoDisplay.control;
-    LL_GPIO_Init(LCD_DISP_CTRL_PORT, &GPIO_InitStructLCD); // Control
-
-        // Initialize the LTDC
-    LL_APB3_GRP1_ForceReset(LL_APB3_GRP1_PERIPH_LTDC); // Toggle Sw reset of LTDC IP
-    LL_APB3_GRP1_ReleaseReset(LL_APB3_GRP1_PERIPH_LTDC);
+    // Initialize the LTDC
+    LTDC_FORCE_RESET;
+    LTDC_RELEASE_RESET;
     
     LL_GPIO_ResetOutputPin(LCD_DISP_EN_PORT, LCD_DISP_EN_PIN);
     LL_GPIO_SetOutputPin(LCD_DISP_CTRL_PORT, LCD_DISP_CTRL_PIN);
     LL_GPIO_SetOutputPin(LCD_DISP_CTRL_PORT, LCD_BL_CTRL_PIN);
 
-    LL_AHB3_GRP1_EnableClock(LL_AHB3_GRP1_PERIPH_DMA2D); // Enable the DMA2D clock
-    LL_AHB3_GRP1_ForceReset(LL_AHB3_GRP1_PERIPH_DMA2D);  // Toggle Sw reset of DMA2D IP
-    LL_AHB3_GRP1_ReleaseReset(LL_AHB3_GRP1_PERIPH_DMA2D);
+    DMA2D_ENABLE;
+    DMA2D_RESET;
+    DMA2D_RELEASE_RESET;
 
     LL_DMA2D_SetOutputColorMode(DMA2D, LL_DMA2D_OUTPUT_MODE_RGB565); // Configure the DMA2D Color Mode
     LL_DMA2D_FGND_SetAlpha(DMA2D, 0xFF);                             // Always write opaque
@@ -277,7 +261,7 @@ void DisplayInterface::WriteToFrameBuffer(
     // Start the transfer
     LL_DMA2D_Start(DMA2D);
 
-    SCB_CleanInvalidateDCache();
+    INVALIDATE_DCACHE;
 }
 
 void DisplayInterface::DisplayBacklight(bool on)

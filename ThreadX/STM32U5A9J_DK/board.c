@@ -3,7 +3,7 @@
 // Portions Copyright (c) 2021 STMicroelectronics.  All rights reserved.
 // See LICENSE file in the project root for full license information.
 //
-#include "target_board.h"
+#include "board.h"
 
 void Initialize_Board()
 {
@@ -21,18 +21,19 @@ void Initialize_Board()
 }
 void CPU_CACHE_Enable(void)
 {
-    // Enable I-Cache
-    SCB_EnableICache();
-
-    // Enable D-Cache
-    SCB_EnableDCache();
+    // Check cache is not enabled
+    if (READ_BIT(ICACHE->CR, ICACHE_CR_EN) == 0U)
+    {
+        MODIFY_REG(ICACHE->CR, ICACHE_CR_WAYSEL, ICACHE_1WAY);
+    }
+    SET_BIT(ICACHE->CR, ICACHE_CR_EN);
+    return;
 }
+
 void Initialize_Board_LEDS_And_Buttons()
 {
-    // STM32H735G-DK Board
-    // ===================
     // LED's
-    LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOC);
+    ENABLE_PORT_GPIOE;
     LL_GPIO_InitTypeDef gpio_InitStruct = {0};
     gpio_InitStruct.Pin = LED_GREEN | LED_RED;
     gpio_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
@@ -46,7 +47,8 @@ void Initialize_Board_LEDS_And_Buttons()
     LL_GPIO_SetOutputPin(LED_GPIO_PORT, LED_RED);
 
     // USER button
-    //-- Same port clock, already enabled
+    ENABLE_PORT_GPIOC;
+    GPIO_InitTypeDef gpio_init_structure;
     gpio_InitStruct.Pin = BUTTON_USER_PIN;
     gpio_InitStruct.Mode = LL_GPIO_MODE_INPUT;
     gpio_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;

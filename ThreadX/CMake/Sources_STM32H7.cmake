@@ -28,7 +28,9 @@
              ${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy
  )
  list(APPEND STM32H7_SOURCES
-             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/system_stm32h7xx.c>
+             ${STM32H7_CUBE_SOURCE}/Drivers/CMSIS/Device/ST/STM32H7xx/Source/Templates/gcc/startup_${TARGET_SERIES}.s
+             ${STM32H7_CUBE_SOURCE}/Drivers/CMSIS/Device/ST/STM32H7xx/Source/Templates/system_stm32h7xx.c
+
              ${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_Hal_Driver/src/stm32h7xx_ll_adc.c
              ${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_Hal_Driver/src/stm32h7xx_ll_bdma.c
              ${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_Hal_Driver/src/stm32h7xx_ll_comp.c
@@ -62,7 +64,8 @@
              ${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_Hal_Driver/src/stm32h7xx_ll_utils.c
 )
 
- # Disable unused variables and parameters for STM32H7Cube supplied source file
+ # Set flags on code that is supplied by others but produces warning/errors with current build parameters
+ set_source_files_properties(${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_Hal_Driver/src/stm32h7xx_ll_hrtim.c COMPILE_FLAGS -Wno-unused-parameter)
  set_source_files_properties(${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_Hal_Driver/src/stm32h7xx_ll_rng.c COMPILE_FLAGS -Wno-unused-variable)
  set_source_files_properties(${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_Hal_Driver/src/stm32h7xx_ll_rng.c COMPILE_FLAGS -Wno-unused-parameter)
 

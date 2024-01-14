@@ -11,13 +11,24 @@
 #include <nanoHAL_v2.h>
 #include <nanoCLR_Headers.h>
 
-#include "stm32h7b3xxq.h"
-#include "stm32h7xx_ll.h"
-#include "stm32h7xx.h"
+#include "stm32u5a9xx.h"
+#include "stm32u5xx_ll.h"
+#include "stm32u5xx.h"
 #include "tx_api.h"
 #include "tx_port.h"
 
 #define TARGET_BLOCKSTORAGE_COUNT 1
+
+#pragma region Peripheral clocks
+#define ENABLE_PORT_GPIOA LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOA)
+#define ENABLE_PORT_GPIOB LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOB)
+#define ENABLE_PORT_GPIOC LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOC)
+#define ENABLE_PORT_GPIOD LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOD)
+#define ENABLE_PORT_GPIOE LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOE)
+#define ENABLE_PORT_GPIOF LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOF)
+#define ENABLE_PORT_GPIOG LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOG)
+#define ENABLE_PORT_GPIOH LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOH)
+#pragma endregion
 
 #pragma region Byte pool configuration and definitions
 #define DEFAULT_BYTE_POOL_SIZE     16000
@@ -25,24 +36,15 @@
 #define RECEIVER_THREAD_STACK_SIZE 4096
 #pragma endregion
 
-#pragma region Peripheral clocks
-#define ENABLE_PORT_GPIOA LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOA)
-#define ENABLE_PORT_GPIOB LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOB)
-#define ENABLE_PORT_GPIOC LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOC)
-#define ENABLE_PORT_GPIOD LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOD)
-#define ENABLE_PORT_GPIOE LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOE)
-#define ENABLE_PORT_GPIOF LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOF)
-#define ENABLE_PORT_GPIOG LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOG)
-#define ENABLE_PORT_GPIOH LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOH)
-#pragma endregion
-
 #pragma region Display interface and controller setup parameters
-#define ENABLE_LTDC       LL_APB3_GRP1_EnableClock(LL_APB3_GRP1_PERIPH_LTDC)
-#define LTDC_FORCE_RESET   LL_APB3_GRP1_ForceReset(LL_APB3_GRP1_PERIPH_LTDC)
-#define LTDC_RELEASE_RESET LL_APB3_GRP1_ReleaseReset(LL_APB3_GRP1_PERIPH_LTDC)
-#define DMA2D_ENABLE        LL_AHB3_GRP1_EnableClock(LL_AHB3_GRP1_PERIPH_DMA2D)
-#define DMA2D_RESET         LL_AHB3_GRP1_ForceReset(LL_AHB3_GRP1_PERIPH_DMA2D)
-#define DMA2D_RELEASE_RESET LL_AHB3_GRP1_ReleaseReset(LL_AHB3_GRP1_PERIPH_DMA2D)
+#define ENABLE_LTDC LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_LTDC)
+
+#define LTDC_FORCE_RESET   LL_APB2_GRP1_ForceReset(LL_APB2_GRP1_PERIPH_LTDC)
+#define LTDC_RELEASE_RESET LL_APB2_GRP1_ReleaseReset(LL_APB2_GRP1_PERIPH_LTDC)
+
+#define DMA2D_ENABLE        LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA2D)
+#define DMA2D_RESET         LL_AHB1_GRP1_ForceReset(LL_AHB1_GRP1_PERIPH_DMA2D)
+#define DMA2D_RELEASE_RESET LL_AHB1_GRP1_ReleaseReset(LL_AHB1_GRP1_PERIPH_DMA2D)
 
 // LCD 16-bit interface pins
 #define LCD_R0      LL_GPIO_PIN_0
@@ -113,15 +115,21 @@
 #define LCD_BL_CTRL_PORT GPIOG
 
 // Low level I2C for Display touch controller
-#define I2C_ENABLE_TOUCH_CLOCK        LL_APB4_GRP1_EnableClock(LL_APB4_GRP1_PERIPH_I2C4)
-#define I2C_TOUCH_FORCE_RESET         LL_APB4_GRP1_ForceReset(LL_APB4_GRP1_PERIPH_I2C4)
-#define I2C_TOUCH_FORCE_RELEASE_RESET LL_APB4_GRP1_ReleaseReset(LL_APB4_GRP1_PERIPH_I2C4)
+#define I2C_ENABLE_TOUCH_CLOCK        LL_APB1_GRP2_EnableClock(LL_APB1_GRP2_PERIPH_I2C4)
+#define I2C_TOUCH_FORCE_RESET         LL_APB1_GRP2_ForceReset(LL_APB1_GRP2_PERIPH_I2C4)
+#define I2C_TOUCH_FORCE_RELEASE_RESET LL_APB1_GRP2_ReleaseReset(LL_APB1_GRP2_PERIPH_I2C4)
+
+////
+#define TS_INT_PIN       GPIO_PIN_8  // PE8
+#define TS_INT_EXTI_IRQn EXTI8_IRQn
+
+
 #pragma endregion
 
 #pragma region Local board buttons and leds
-#define LED_GPIO_PORT         GPIOC
-#define LED_GREEN             LL_GPIO_PIN_3
-#define LED_RED               LL_GPIO_PIN_2
+#define LED_GPIO_PORT         GPIOE
+#define LED_GREEN             LL_GPIO_PIN_0
+#define LED_RED               LL_GPIO_PIN_1
 #define BUTTON_USER_GPIO_PORT GPIOC
 #define BUTTON_USER_PIN       LL_GPIO_PIN_13
 #pragma endregion
@@ -137,9 +145,7 @@
 // For example, the STM32H7B3 microcontroller does not have FLASH_CR_PSIZE bits in its FLASH_CR1 register.
 //
 
-// Flash program/erase by 64 bits
-#define FLASH_VOLTAGE_RANGE_4 FLASH_CR_PSIZE
-#define FLASH_ERASE_SIZE      FLASH_VOLTAGE_RANGE_4
+#define FLASH_ERASE_SIZE FLASH_VOLTAGE_RANGE_4
 
 // End Of Program on Bank 1 flag
 // #define FLASH_FLAG_EOP_BANK1 FLASH_SR_EOP
@@ -181,7 +187,7 @@ static inline bool OSPI2_WaitUntilState(uint32_t Flag, FlagStatus State)
 }
 #pragma endregion
 
-#define INVALIDATE_DCACHE SCB_CleanInvalidateDCache()
+#define INVALIDATE_DCACHE
 
 #define NANOCLR_AUDIO    FALSE
 #define NANOCLR_ETHERNET FALSE

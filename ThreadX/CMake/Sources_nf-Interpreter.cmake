@@ -7,6 +7,7 @@
  #    ${CMAKE_SOURCE_DIR}/src/PAL/COM/sockets/ssl/mbedTLS
  #    ${CMAKE_SOURCE_DIR}/src/PAL/COM/sockets/ssl
  #    ${CMAKE_SOURCE_DIR}/src/PAL/COM/sockets
+
 #Region "SOURCES NOT USED"
  #    ${CMAKE_SOURCE_DIR}/src/CLR/nanoRingBuffer/nanoRingBuffer.c
  #    ${CMAKE_SOURCE_DIR}/src/DeviceInterfaces/Networking.Sntp/nf_networking_sntp.cpp
@@ -37,6 +38,7 @@
  #    ${CMAKE_SOURCE_DIR}/src/System.IO.FileSystem/nf_sys_io_filesystem_System_IO_FileStream.cpp
  #    ${CMAKE_SOURCE_DIR}/src/System.IO.Ports/sys_io_ser_native.cpp
  #    ${CMAKE_SOURCE_DIR}/src/System.IO.Ports/sys_io_ser_native_System_IO_Ports_SerialPort__.cpp
+
 #Region "CORE INCLUDES"
         list(APPEND NF_INTERPRETER_INCLUDES 
                     ${CMAKE_SOURCE_DIR}/src/CLR/Include
@@ -71,6 +73,7 @@
                     ${CMAKE_SOURCE_DIR}/src/System.IO.FileSystem
                     ${CMAKE_SOURCE_DIR}/src/System.Net
                     ${CMAKE_SOURCE_DIR}/src/Windows.Storage)
+
 #Region "CORE SOURCES"
         list(APPEND NF_INTERPRETER_SOURCES
                     ${CMAKE_SOURCE_DIR}/src/CLR/Core/Cache.cpp
@@ -256,6 +259,7 @@
                      ${CMAKE_SOURCE_DIR}/src/Windows.Storage/win_storage_native_Windows_Storage_StorageFile_stubs.cpp
                      ${CMAKE_SOURCE_DIR}/src/Windows.Storage/win_storage_native_Windows_Storage_StorageFolder_stubs.cpp
         )
+
 #Region "COMMON TARGET INCLUDES"
         list(APPEND NF_INTERPRETER_INCLUDES 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_BOARD}
@@ -269,6 +273,7 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/DeviceIO																																																																																																																																																																																							
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/WireProtocol)
+
 #Region "COMMON TARGET SOURCES"
         list(APPEND NF_INTERPRETER_SOURCES 
             
@@ -290,6 +295,8 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/main.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/hard_fault_handler.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/targetHAL.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/FlashDriver.c
+
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/DeviceIO/cpu_System.Device.Adc.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/DeviceIO/cpu_System.Device.Dac.cpp
@@ -299,6 +306,7 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/DeviceIO/cpu_System.Device.SPI.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/DeviceIO/cpu_System.IO.Ports.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/WireProtocol/wp_Communications.c)  
+
 #Region "COMMON GRAPHICS INCLUDES"
     if(GRAPHICS_SUPPORT)
         list(APPEND NF_INTERPRETER_INCLUDES 
@@ -310,6 +318,7 @@
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/TouchPanel/Core
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/TouchPanel/Devices)
     endif()
+
 #Region "COMMON GRAPHICS SOURCES"
     if(GRAPHICS_SUPPORT)
         list(APPEND NF_INTERPRETER_SOURCES
@@ -391,7 +400,20 @@
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/Graphics_Memory.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/${DISPLAY_CONTROLLER}
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/${DISPLAY_INTERFACE}
         )
         endif()
 
- set_source_files_properties(${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Boot.c COMPILE_FLAGS -Wno-unused-parameter)
+#Region Touch Controller
+     if(TOUCH_DISPLAY_SUPPORT)
+        list(APPEND NF_INTERPRETER_INCLUDES
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics
+        )
+        list(APPEND NF_INTERPRETER_SOURCES
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/${TOUCH_INTERFACE}
+        )
+        
+        endif()
+
+# Set flags on code that is required but produces warning/errors with current build parameters
+set_source_files_properties(${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Boot.c COMPILE_FLAGS -Wno-unused-parameter)

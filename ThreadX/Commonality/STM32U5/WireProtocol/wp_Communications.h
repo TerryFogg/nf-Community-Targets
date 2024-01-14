@@ -6,38 +6,34 @@
 //
 
 #include "board.h"
-
 #include <stdbool.h>
-#include "stm32h7xx_ll_bus.h"
-#include "stm32h7xx_ll_dma.h"
-#include "stm32h7xx_ll_gpio.h"
-#include "stm32h7xx_ll_usart.h"
+
+// TLINK - V3E supports the Virtual COM port(VCP)
+// by default.Communication between the target MCU and ST - LINK MCU is enabled on USART1(PA9 / PA10)
 
 #define wpUSART_DMA_Receive_Buffer_size 2048
 
 #define wpBAUD_RATE 921600
 
-#define wpUSART                         USART3
-#define wpUSART_IRQn                    USART3_IRQn
-#define wpUSART_IRQHANDLER()            void USART3_IRQHandler(void)
-#define wpUSART_PERIPHERAL_CLOCK_ENABLE LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART3)
+#define wpUSART                         USART1
+#define wpUSART_IRQn                    USART1_IRQn
+#define wpUSART_IRQHANDLER()            void USART1_IRQHandler(void)
+#define wpUSART_PERIPHERAL_CLOCK_ENABLE LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_USART1)
 
-#define wpUSART_GPIO_PORT                    GPIOD
-#define wpUSART_RX_PIN                       LL_GPIO_PIN_9
-#define wpUSART_TX_PIN                       LL_GPIO_PIN_8
-#define wpUSART_GPIO_PERIPHERAL_CLOCK_ENABLE LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOD)
+#define wpUSART_GPIO_PORT                    GPIOA
+#define wpUSART_RX_PIN                       LL_GPIO_PIN_10
+#define wpUSART_TX_PIN                       LL_GPIO_PIN_9
+#define wpUSART_GPIO_PERIPHERAL_CLOCK_ENABLE ENABLE_PORT_GPIOA
+#define wpDMA                                GPDMA1
 
-#define wpDMA                               DMA1
 #define wpDMA_ReceiveStreamInterrupt        DMA1_Stream0_IRQn
 #define wpDMA_TransmitStreamInterrupt       DMA1_Stream1_IRQn
 #define wpUSART_DMA_PERIPHERAL_CLOCK_ENABLE LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1)
 
-#define wpDMA_ReceiveStream              LL_DMA_STREAM_0
-#define wpDMA_ReceiveMux                 LL_DMAMUX1_REQ_USART3_RX
+#define wpDMA_ReceiveChannel             LL_DMA_CHANNEL_0
 #define wpDMA_ReceiveStream_IRQHandler() void DMA1_Stream0_IRQHandler(void)
 
-#define wpDMA_TransmitStream              LL_DMA_STREAM_1
-#define wpDMA_TransmitMux                 LL_DMAMUX1_REQ_USART3_TX
+#define wpDMA_TransmitChannel             LL_DMA_CHANNEL_1
 #define wpDMA_TransmitStream_IRQHandler() void DMA1_Stream1_IRQHandler(void)
 
 void InitWireProtocolCommunications();

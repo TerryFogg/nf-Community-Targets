@@ -20,14 +20,13 @@
 
  FetchContent_Populate(stm32u5_ll)
 
- list(APPEND STM32U5_LL_INCLUDES 
-             ${STM32U5_CUBE_SOURCE}/src/boards/include
+ list(APPEND STM32U5_INCLUDES 
              ${STM32U5_CUBE_SOURCE}/Drivers/CMSIS/Include
              ${STM32U5_CUBE_SOURCE}/Drivers/CMSIS/Device/ST/STM32U5xx/Include
              ${STM32U5_CUBE_SOURCE}/Drivers/STM32U5xx_HAL_Driver/Inc
              ${STM32U5_CUBE_SOURCE}/Drivers/STM32U5xx_HAL_Driver/Inc/Legacy
  )
- list(APPEND STM32U5_LL_INCLUDES
+ list(APPEND STM32U5_SOURCES
 
              ${STM32U5_CUBE_SOURCE}/Drivers/STM32U5xx_Hal_Driver/src/STM32U5xx_ll_adc.c
              ${STM32U5_CUBE_SOURCE}/Drivers/STM32U5xx_Hal_Driver/src/STM32U5xx_ll_comp.c

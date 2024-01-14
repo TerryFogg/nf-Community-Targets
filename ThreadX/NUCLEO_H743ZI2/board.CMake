@@ -8,7 +8,6 @@
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/power.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/tx_initialize_low_level.s
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/startup_stm32h743zitx.s
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/FlashDriver.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/Clock_configuration.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/CLR_RT_InteropAssembliesTable.cpp
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/Device_BlockStorage.c

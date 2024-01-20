@@ -5,8 +5,12 @@
 //
 #include "board.h"
 
+void SystemPower_Config(void);
+
+
 void Initialize_Board()
 {
+    SystemPower_Config();
     CPU_CACHE_Enable();
     // Configure the system clock to 520 MHz
     SystemClock_Config();
@@ -21,13 +25,12 @@ void Initialize_Board()
 }
 void CPU_CACHE_Enable(void)
 {
-    // Check cache is not enabled
-    if (READ_BIT(ICACHE->CR, ICACHE_CR_EN) == 0U)
-    {
-        MODIFY_REG(ICACHE->CR, ICACHE_CR_WAYSEL, ICACHE_1WAY);
-    }
-    SET_BIT(ICACHE->CR, ICACHE_CR_EN);
-    return;
+
+      /* Configure ICACHE associativity mode */
+    LL_ICACHE_SetMode(LL_ICACHE_1WAY);
+
+    /* Enable ICACHE */
+    LL_ICACHE_Enable();
 }
 
 void Initialize_Board_LEDS_And_Buttons()
@@ -141,3 +144,26 @@ bool BoardUserButton_Pressed()
         return false;
     }
 }
+
+
+void SystemPower_Config(void)
+{
+
+    /*
+     * Disable the internal Pull-Up in Dead Battery pins of UCPD peripheral
+     */
+    HAL_PWREx_DisableUCPDDeadBattery();
+
+    /*
+     * Switch to SMPS regulator instead of LDO
+     */
+    if (HAL_PWREx_ConfigSupply(PWR_SMPS_SUPPLY) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    /* USER CODE BEGIN PWR */
+    /* USER CODE END PWR */
+}
+
+
+

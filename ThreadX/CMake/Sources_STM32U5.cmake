@@ -25,8 +25,13 @@
              ${STM32U5_CUBE_SOURCE}/Drivers/CMSIS/Device/ST/STM32U5xx/Include
              ${STM32U5_CUBE_SOURCE}/Drivers/STM32U5xx_HAL_Driver/Inc
              ${STM32U5_CUBE_SOURCE}/Drivers/STM32U5xx_HAL_Driver/Inc/Legacy
+             ${STM32U5_CUBE_SOURCE}/Drivers/BSP/STM32U5x9J-DK
+
+
  )
  list(APPEND STM32U5_SOURCES
+
+             ${STM32U5_CUBE_SOURCE}/Drivers/CMSIS/Device/ST/STM32U5xx/Source/Templates/system_stm32u5xx.c
 
              ${STM32U5_CUBE_SOURCE}/Drivers/STM32U5xx_Hal_Driver/src/STM32U5xx_ll_adc.c
              ${STM32U5_CUBE_SOURCE}/Drivers/STM32U5xx_Hal_Driver/src/STM32U5xx_ll_comp.c
@@ -60,6 +65,4 @@
              ${STM32U5_CUBE_SOURCE}/Drivers/STM32U5xx_Hal_Driver/src/STM32U5xx_ll_usb.c
              ${STM32U5_CUBE_SOURCE}/Drivers/STM32U5xx_Hal_Driver/src/STM32U5xx_ll_utils.c
  )
-
-
-
+ set_source_files_properties(${STM32U5_CUBE_SOURCE}/Drivers/STM32U5xx_Hal_Driver/src/stm32u5xx_ll_dac.c COMPILE_FLAGS -Wno-unused-parameter)

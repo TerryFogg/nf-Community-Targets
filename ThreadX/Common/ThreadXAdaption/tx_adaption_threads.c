@@ -22,7 +22,6 @@ uint32_t receiverThreadStack[RECEIVER_THREAD_STACK_SIZE / sizeof(uint32_t)];
 uint32_t CLRThreadStack[CLR_THREAD_STACK_SIZE / sizeof(uint32_t)];
 
 
-
 void tx_application_define(void *first_unused_memory)
 {
     (void)first_unused_memory;

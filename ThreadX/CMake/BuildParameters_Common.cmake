@@ -5,6 +5,8 @@
 
 target_link_options(nanoCLR.elf PUBLIC "-T${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_BOARD}/Linker_script.ld")
 
+# detect when linker changes so a re-link is executed
+set_target_properties(nanoCLR.elf PROPERTIES LINK_DEPENDS "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_BOARD}/Linker_script.ld")
 
 if(GRAPHICS_SUPPORT)
       target_compile_definitions(nanoCLR.elf PUBLIC -DNANOCLR_GRAPHICS=TRUE)

@@ -6,56 +6,47 @@
 /* SYS>>   Bare metal code or RTOS                  */
 /* CLR>>   Use by Common Language Runtime           */
 
-/*       /------------------------------------\     */
-/*       |  Entry Point                       |     */  ENTRY(_entry_point)
-/*       \------------------------------------/     */
-
-/*       /------------------------------------\     */
-/*       |  PARAMETERS                        |     */   
-/*       | ================================== |     */
-/*       |                                    |     */   
-/*       |                                    |     */   
-/*       |------------------------------------|     */   
-/*       | The flash sector must be aligned to|SYS>>*/  flash_sector_size  = 4096 ; 
-/*       | a 4096-byte sector and count must  |     */
-/*       | be a multiple of 4096 bytes.       |     */
-/*       |                                    |     */   
-/*       | Each flash write must be aligned   |SYS>>*/  flash_page_size    = 256;
-/*       | to a 256-byte boundary and count   |     */
-/*       | must be a multiple of 256.         |     */
-/*       |                                    |     */   
-/*       | Number of flash pages on the RP2040|SYS>>*/  Total_flash_page_count   = 512;
-/*       |------------------------------------|     */
-/*       | Configuration to store             |     */   
-/*       | persistent information             |     */   
-/*       | Use the minimum erase size 1 sector|CLR>>*/  config_size =  1;
-/*       | Keep in sync with                  |     */   
-/*       | "targetHAL_ConfigurationManger.cpp"|     */   
-/*       |                                    |     */   
-/*       |                                    |     */   
-/*       |  Graphics Frame buffer not used    |     */  graphics_Frame_Buffer_not_used = 0; 
-/*       |  Direct drawing from graphics      |     */  
-/*       |  screen memory                     |     */   
-/*       |                                    |     */   
-/*       |                                    |     */   
-/*       \------------------------------------/     */
+/* NOTE */
+/* Division of internal flash is limited by the smallest */
+/* erase size of 4K */
+/* Each flash write must be aligned */  
+/* to a 256-byte boundary and count */
+/* must be a multiple of 256.       */
 
 
-MEMORY    /*   Usage by nanoFramework */
+ENTRY(_entry_point)
+  
+flash_sector_size  = 4096 ; 
+flash_page_size    = 256;
+Total_flash_page_count   = 512;
+config_size =  1;
+graphics_Frame_Buffer_not_used = 0; 
+
+/* Define the availability of FLASH */
+sector_size = 128k;
+number_sectors_total = 8;
+total_flash_size = number_sectors_total * sector_size;
+ram_total = 192K + 128K;
+native_ram_size = 20k;
+config_size = 20k;
+
+
+
+MEMORY
 {
-/*       /------------------------------------\     */
-/*       | Raspberry Pi Pico Physical memory  |     */
-/*       | =================================  |     */
-/*       |                                    |     */   
-/*       | 0x00000000 : 16KB ROM              |SYS>>*/  /* Factory System Memory */
-/*       |                                    |     */  /* The ROM contents are fixed at the time the silicon is */
-/*       |                                    |     */  /* manufactured. It contains:                            */
-/*       |                                    |     */  /*  • Initial startup routine                            */
-/*       |                                    |     */  /*  • Flash boot sequence                                */
-/*       |                                    |     */  /*  • Flash programming routines                         */
-/*       |                                    |     */  /*  • USB mass storage device with UF2 support           */
-/*       |                                    |     */  /*  • Utility libraries such as fast floating point      */
-/*       |                                    |     */   
+
+  /* =============== */
+  /* PHYSICAL MEMORY */
+  /* =============== */
+
+    /* ============== */
+    /* RP2040 - PICO */
+    /* ============== */
+
+   FACTORY_SYSTEM_MEMORY (RX) : ORIGIN = 0x00000000, LENGHT = 16KB
+
+   /* RAM can be addressed as striped or non-striped
+
 /*       |------------------------------------|     */
 /*       | SRAM 256KB addressed as striped    |     */
 /*       | memory OR non striped memory       |     */   

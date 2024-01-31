@@ -10,7 +10,7 @@ set(CMAKE_C_EXTENSIONS OFF CACHE INTERNAL "-std=c++17 instead of -std=gnu++17")
 set(CMAKE_CXX_STANDARD 17 CACHE INTERNAL "C++ standard for all targets")
 set(CMAKE_CXX_EXTENSIONS OFF CACHE INTERNAL "-std=c++17 instead of -std=gnu++17")
 
-target_compile_definitions(nanoCLR.elf PUBLIC -DUSE_FULL_LL_DRIVER)
+target_compile_definitions(nanoCLR.elf PUBLIC -DUSE_FULL_LL_DRIVER -DOCTOSPI) 
 
 target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:-mthumb -mcpu=cortex-m33 -mfpu=fpv5-d16 -mfloat-abi=hard -frounding-math -fsignaling-nans -ffloat-store>)
 target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:-fno-exceptions -fno-builtin -fno-common -fno-unroll-loops -fno-math-errno>)
@@ -20,7 +20,7 @@ target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:-mabi=aapcs -
 target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:-Wall -Wextra -Werror>)
 
 target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions -fno-builtin -fno-common -fno-unroll-loops -fno-math-errno>)
-target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-mthumb -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -frounding-math -fsignaling-nans -ffloat-store>)
+target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-mthumb -mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -frounding-math -fsignaling-nans -ffloat-store>)
 target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-fshort-wchar -falign-functions=16>)
 target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-ffunction-sections -fdata-sections -fomit-frame-pointer>)
 target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-mabi=aapcs -mlong-calls -fdollars-in-identifiers -ftree-vectorize -fcheck-new>)

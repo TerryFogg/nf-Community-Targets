@@ -6,23 +6,24 @@
 #include <nanoHAL_Types.h>
 #include <nanoPAL_BlockStorage.h>
 #include "FlashDriver.h"
+#include "memory.h"
 
 BlockStorageDevice Device_BlockStorage;
 
-// Block Size 128KB (Smallest erase size)
+// Block Size 8KB (Smallest erase size)
 const BlockRange BlockRange1[] = {
-    {BlockRange_BLOCKTYPE_CODE, 0, 4},
-    {BlockRange_BLOCKTYPE_DEPLOYMENT, 5, 7},
+    {BlockRange_BLOCKTYPE_CODE, (uint32_t)(uint32_t *)&clr_block_start, (uint32_t)(uint32_t *)&clr_block_end},
+    {BlockRange_BLOCKTYPE_DEPLOYMENT, (uint32_t)(uint32_t *)&deployment_block_start, (uint32_t)(uint32_t *)&deployment_block_end}
 };
 
 const BlockRegionInfo BlockRegions[] = {
     {
-        (BlockRegionAttribute_ProgramWidthIs256bits),
-        0x08000000,                        // start address for block region
-        8,                                 // total number of blocks in this region
-        0x20000,                           // total number of bytes per block
-        ARRAYSIZE_CONST_EXPR(BlockRange1), // size
-        BlockRange1,                       // Address
+        (BlockRegionAttribute_ProgramWidthIs128bits),
+        0x08000000,                          // start address for block region
+        (uint32_t)(uint32_t *)&total_blocks, // total number of blocks in this region
+        (uint32_t)(uint32_t *)&block_size,   // total number of bytes per block
+        ARRAYSIZE_CONST_EXPR(BlockRange1),   // size
+        BlockRange1,                         // Address
     },
 };
 
@@ -50,7 +51,7 @@ MEMORY_MAPPED_NOR_BLOCK_CONFIG Device_BlockStorageConfig = {
         0,          // UINT32 CPU_MEMORY_CONFIG::ReleaseCounts;
         16,         // UINT32 CPU_MEMORY_CONFIG::BitWidth;
         0x08000000, // UINT32 CPU_MEMORY_CONFIG::BaseAddress;
-        0x00200000, // UINT32 CPU_MEMORY_CONFIG::SizeInBytes;
+        0x00400000, // UINT32 CPU_MEMORY_CONFIG::SizeInBytes;
         0,          // UINT8  CPU_MEMORY_CONFIG::XREADYEnable
         0,          // UINT8  CPU_MEMORY_CONFIG::ByteSignalsForRead
         0,          // UINT8  CPU_MEMORY_CONFIG::ExternalBufferEnable

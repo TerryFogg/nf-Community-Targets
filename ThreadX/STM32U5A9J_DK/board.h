@@ -13,9 +13,11 @@
 
 #include "stm32u5a9xx.h"
 #include "stm32u5xx_ll.h"
+#include "stm32u5xx_hal_conf.h"
 #include "stm32u5xx.h"
 #include "tx_api.h"
 #include "tx_port.h"
+#include "tx_adaption.h"
 
 #define TARGET_BLOCKSTORAGE_COUNT 1
 
@@ -28,6 +30,7 @@
 #define ENABLE_PORT_GPIOF LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOF)
 #define ENABLE_PORT_GPIOG LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOG)
 #define ENABLE_PORT_GPIOH LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOH)
+#define ENABLE_PORT_GPIOI LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOI)
 #pragma endregion
 
 #pragma region Byte pool configuration and definitions
@@ -37,6 +40,15 @@
 #pragma endregion
 
 #pragma region Display interface and controller setup parameters
+#define DSI_RESET_PORT GPIOD
+#define DSI_BACKLIGHT_CONTROL GPIOI
+
+// Use the non secure DSI 
+#define DSI DSI_NS
+
+
+
+
 #define ENABLE_LTDC LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_LTDC)
 
 #define LTDC_FORCE_RESET   LL_APB2_GRP1_ForceReset(LL_APB2_GRP1_PERIPH_LTDC)
@@ -130,8 +142,12 @@
 #define LED_GPIO_PORT         GPIOE
 #define LED_GREEN             LL_GPIO_PIN_0
 #define LED_RED               LL_GPIO_PIN_1
-#define BUTTON_USER_GPIO_PORT GPIOC
-#define BUTTON_USER_PIN       LL_GPIO_PIN_13
+#define BUTTON_USER_PIN                GPIO_PIN_13
+#define BUTTON_USER_GPIO_PORT          GPIOC
+#define BUTTON_USER_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOC_CLK_ENABLE()
+#define BUTTON_USER_GPIO_CLK_DISABLE() __HAL_RCC_GPIOC_CLK_DISABLE()
+#define BUTTON_USER_EXTI_IRQn          EXTI13_IRQn
+#define BUTTON_USER_EXTI_LINE          EXTI_LINE_13
 #pragma endregion
 
 #pragma region Flash SOC parameters and onboard external flash parameters

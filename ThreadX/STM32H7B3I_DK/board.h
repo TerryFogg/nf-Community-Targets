@@ -36,6 +36,36 @@
 #define ENABLE_PORT_GPIOH LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOH)
 #pragma endregion
 
+#pragma region Wire protocol USART
+#define wpUSART_DMA_Receive_Buffer_size 2048
+
+#define wpBAUD_RATE 921600
+
+#define wpUSART                         USART3
+#define wpUSART_IRQn                    USART3_IRQn
+#define wpUSART_IRQHANDLER()            void USART3_IRQHandler(void)
+#define wpUSART_PERIPHERAL_CLOCK_ENABLE LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART3)
+
+#define wpUSART_GPIO_PORT                    GPIOD
+#define wpUSART_RX_PIN                       LL_GPIO_PIN_9
+#define wpUSART_TX_PIN                       LL_GPIO_PIN_8
+#define wpUSART_GPIO_PERIPHERAL_CLOCK_ENABLE LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOD)
+
+#define wpDMA                               DMA1
+#define wpDMA_ReceiveStreamInterrupt        DMA1_Stream0_IRQn
+#define wpDMA_TransmitStreamInterrupt       DMA1_Stream1_IRQn
+#define wpUSART_DMA_PERIPHERAL_CLOCK_ENABLE LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1)
+
+#define wpDMA_ReceiveStream              LL_DMA_STREAM_0
+#define wpDMA_ReceiveMux                 LL_DMAMUX1_REQ_USART3_RX
+#define wpDMA_ReceiveStream_IRQHandler() void DMA1_Stream0_IRQHandler(void)
+
+#define wpDMA_TransmitStream              LL_DMA_STREAM_1
+#define wpDMA_TransmitMux                 LL_DMAMUX1_REQ_USART3_TX
+#define wpDMA_TransmitStream_IRQHandler() void DMA1_Stream1_IRQHandler(void)
+
+#pragma endregion
+
 #pragma region Display interface and controller setup parameters
 #define ENABLE_LTDC       LL_APB3_GRP1_EnableClock(LL_APB3_GRP1_PERIPH_LTDC)
 #define LTDC_FORCE_RESET   LL_APB3_GRP1_ForceReset(LL_APB3_GRP1_PERIPH_LTDC)

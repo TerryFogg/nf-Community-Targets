@@ -168,7 +168,7 @@
         "TOUCH_DISPLAY_SUPPORT": "TRUE",
         "RANDOM_NUMBER_GENERATOR": "TRUE",
         "DISPLAY_CONTROLLER": "VideoMode.cpp",
-        "DISPLAY_INTERFACE": "LTDC_DMA2D_To_Video.cpp",
+        "DISPLAY_INTERFACE": "LTDC_DSI_DMA2D_Video.cpp",
         "TOUCH_INTERFACE": "I2C_To_Touch_STM32.c"
       },
       "hidden": false

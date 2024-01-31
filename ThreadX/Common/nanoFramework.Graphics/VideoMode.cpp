@@ -15,7 +15,9 @@ extern DisplayInterface g_DisplayInterface;
 int lcd_width;
 int lcd_height;
 
-// Note to self static int counter fixes problem????????????
+// Note to self 
+// Something strange is happening and 
+// static int counter fixes problem????????????
 static int counter = 0;
 bool DisplayDriver::Initialize()
 {

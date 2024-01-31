@@ -6,25 +6,30 @@
 #include <nanoHAL_Types.h>
 #include <nanoPAL_BlockStorage.h>
 #include "FlashDriver.h"
+#include "memory.h"
 
 BlockStorageDevice Device_BlockStorage;
 
 // Block Size 128KB (Smallest erase size)
 const BlockRange BlockRange1[] = {
-    {BlockRange_BLOCKTYPE_CODE, 0, 4},
-    {BlockRange_BLOCKTYPE_DEPLOYMENT, 5, 7},
+    {BlockRange_BLOCKTYPE_CODE,       (uint32_t)(uint32_t *)&clr_block_start, (uint32_t)(uint32_t *)&clr_block_end},
+    {BlockRange_BLOCKTYPE_DEPLOYMENT, (uint32_t)(uint32_t *)&deployment_block_start, (uint32_t)(uint32_t *)&deployment_block_end}
 };
+
 
 const BlockRegionInfo BlockRegions[] = {
     {
         (BlockRegionAttribute_ProgramWidthIs256bits),
-        0x08000000,                        // start address for block region
-        8,                                 // total number of blocks in this region
-        0x20000,                           // total number of bytes per block
-        ARRAYSIZE_CONST_EXPR(BlockRange1), // size
-        BlockRange1,                       // Address
+        0x08000000,                          // start address for block region
+        (uint32_t)(uint32_t *)&total_blocks, // total number of blocks in this region
+        (uint32_t)(uint32_t *)&block_size,   // total number of bytes per block
+        ARRAYSIZE_CONST_EXPR(BlockRange1),   // size
+        BlockRange1,                         // Address
     },
 };
+extern const uint32_t number_flash_banks;
+extern const uint32_t blocks_per_bank;
+
 
 const DeviceBlockInfo Device_BlockInfo = {
     (MediaAttribute_SupportsXIP),       // STM32 flash memory is XIP

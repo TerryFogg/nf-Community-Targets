@@ -21,6 +21,7 @@
 #include "wp_CircularBuffer.h"
 #include <assert.h>
 #include <tx_api.h>
+#include "board.h"
 
 // USART receive buffer for DMA - make sure it is in RAM accessible by the DMA controller used.
 // Also, check alignment
@@ -53,36 +54,25 @@ void wp_InitializeUsart(void)
 {
 #define WP_UART_PINS_SETUP
 
-#pragma region Setup UART GPIO
+#pragma region Setup Uart GPIO
     LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
     wpUSART_GPIO_PERIPHERAL_CLOCK_ENABLE;
     GPIO_InitStruct.Pin = wpUSART_TX_PIN | wpUSART_RX_PIN;
     GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-    GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+    GPIO_InitStruct.Pull = LL_GPIO_PULL_DOWN;
     GPIO_InitStruct.Alternate = LL_GPIO_AF_7;
     LL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 #pragma endregion
 
 #pragma region Setup UART DMA functionality
+    LL_DMA_InitTypeDef dmaReceive = {0};
+    LL_DMA_InitTypeDef dmaTransmit = {0};
 
-    LL_USART_InitTypeDef USART_InitStruct = {0};
     wpUSART_DMA_PERIPHERAL_CLOCK_ENABLE;
-
-    NVIC_SetPriority(GPDMA1_Channel0_IRQn, 0);
-    NVIC_EnableIRQ(GPDMA1_Channel0_IRQn);
-
-
-    // UART Dma Setup
-    LL_DMA_InitTypeDef dmaReceive;
-    LL_DMA_InitTypeDef dmaTransmit;
-
-    LL_DMA_SetPeriphRequest(wpDMA, wpDMA_ReceiveChannel, LL_GPDMA1_REQUEST_USART1_RX);
-    LL_DMA_SetPeriphRequest(wpDMA, wpDMA_TransmitChannel, LL_GPDMA1_REQUEST_USART1_TX);
-
     dmaReceive.SrcAddress = LL_USART_DMA_GetRegAddr(wpUSART, LL_USART_DMA_REG_DATA_RECEIVE);
-    dmaReceive.DestAddress = wpUSART_DMA_Receive_Buffer;
+    dmaReceive.DestAddress = (uint32_t)wpUSART_DMA_Receive_Buffer;
     dmaReceive.Direction = LL_DMA_DIRECTION_PERIPH_TO_MEMORY;
     dmaReceive.BlkHWRequest = LL_DMA_HWREQUEST_SINGLEBURST;
     dmaReceive.DataAlignment = LL_DMA_DATA_ALIGN_ZEROPADD; //?
@@ -119,33 +109,36 @@ void wp_InitializeUsart(void)
     dmaReceive.LinkedListAddrOffset = 0;
     LL_DMA_Init(wpDMA, wpDMA_ReceiveChannel, &dmaReceive);
 
-    dmaTransmit.SrcAddress = LL_USART_DMA_GetRegAddr(wpUSART, LL_USART_DMA_REG_DATA_RECEIVE);
-    dmaTransmit.DestAddress = &wpUSART_DMA_Receive_Buffer;
+    dmaTransmit.SrcAddress = (uint32_t)&wpUSART_DMA_Receive_Buffer;
+    dmaTransmit.DestAddress = LL_USART_DMA_GetRegAddr(USART1, LL_USART_DMA_REG_DATA_TRANSMIT);
     dmaTransmit.Direction = LL_DMA_DIRECTION_MEMORY_TO_PERIPH;
     dmaTransmit.BlkHWRequest = LL_DMA_HWREQUEST_SINGLEBURST;
-    dmaTransmit.DataAlignment = LL_DMA_DATA_ALIGN_ZEROPADD; //?
-    dmaTransmit.SrcBurstLength = 1;                         // ?
-    dmaTransmit.DestBurstLength = 1;                        // ?
+    dmaTransmit.DataAlignment = LL_DMA_DATA_ALIGN_ZEROPADD;
+    dmaTransmit.SrcBurstLength = 1;
+    dmaTransmit.DestBurstLength = 1;
     dmaTransmit.SrcDataWidth = LL_DMA_SRC_DATAWIDTH_BYTE;
-    dmaTransmit.DestDataWidth = LL_DMA_SRC_DATAWIDTH_BYTE;
+    dmaTransmit.DestDataWidth = LL_DMA_DEST_DATAWIDTH_BYTE;
     dmaTransmit.SrcIncMode = LL_DMA_SRC_INCREMENT;
-    dmaTransmit.DestIncMode = LL_DMA_SRC_FIXED;
+    dmaTransmit.DestIncMode = LL_DMA_DEST_FIXED;
     dmaTransmit.Priority = LL_DMA_HIGH_PRIORITY;
-    dmaTransmit.BlkDataLength = 0; //?
+    dmaTransmit.BlkDataLength = 0; //? 10?
     dmaTransmit.BlkRptCount = 0;
     dmaTransmit.TriggerMode = LL_DMA_TRIGM_BLK_TRANSFER;         //?
-    dmaTransmit.TriggerPolarity = LL_DMA_TRIG_POLARITY_FALLING;  //?
+    dmaTransmit.TriggerPolarity = LL_DMA_TRIG_POLARITY_MASKED;   //?
     dmaTransmit.TriggerSelection = LL_GPDMA1_TRIGGER_EXTI_LINE0; //?
-    dmaTransmit.Request = LL_GPDMA1_REQUEST_USART1_RX;
-    dmaTransmit.TransferEventMode = LL_DMA_TCEM_BLK_TRANSFER;      //?
-    dmaTransmit.DestHWordExchange = LL_DMA_DEST_HALFWORD_PRESERVE; //?
-    dmaTransmit.DestByteExchange = LL_DMA_DEST_BYTE_PRESERVE;
-    dmaTransmit.SrcByteExchange = LL_DMA_SRC_BYTE_PRESERVE;
-    dmaTransmit.SrcAllocatedPort = LL_DMA_SRC_ALLOCATED_PORT0;         //?
-    dmaTransmit.DestAllocatedPort = LL_DMA_DEST_ALLOCATED_PORT0;       //?
-    dmaTransmit.LinkAllocatedPort = LL_DMA_LINK_ALLOCATED_PORT0;       //?
-    dmaTransmit.LinkStepMode = LL_DMA_LSM_FULL_EXECUTION;              //?
-    dmaTransmit.SrcAddrUpdateMode = LL_DMA_BURST_SRC_ADDR_INCREMENT;   //?
+    dmaTransmit.Request = LL_GPDMA1_REQUEST_USART1_TX;
+
+    // dmaTransmit.TransferEventMode = LL_DMA_TCEM_BLK_TRANSFER;      //?
+    // dmaTransmit.DestHWordExchange = LL_DMA_DEST_HALFWORD_PRESERVE; //?
+    // dmaTransmit.DestByteExchange = LL_DMA_DEST_BYTE_PRESERVE;
+    // dmaTransmit.SrcByteExchange = LL_DMA_SRC_BYTE_PRESERVE;
+
+    dmaTransmit.SrcAllocatedPort = LL_DMA_SRC_ALLOCATED_PORT0;       //?
+    dmaTransmit.DestAllocatedPort = LL_DMA_DEST_ALLOCATED_PORT0;     //?
+    dmaTransmit.LinkAllocatedPort = LL_DMA_LINK_ALLOCATED_PORT1;     //?
+    dmaTransmit.LinkStepMode = LL_DMA_LSM_FULL_EXECUTION;            //?
+    dmaTransmit.SrcAddrUpdateMode = LL_DMA_BURST_SRC_ADDR_INCREMENT; //?
+
     dmaTransmit.DestAddrUpdateMode = LL_DMA_BURST_DEST_ADDR_INCREMENT; //?
     dmaTransmit.SrcAddrOffset = 0;                                     //  only for 2D addressing channels
     dmaTransmit.DestAddrOffset = 0;                                    //  only for 2D addressing channels
@@ -157,21 +150,14 @@ void wp_InitializeUsart(void)
     dmaTransmit.LinkedListAddrOffset = 0;
     LL_DMA_Init(wpDMA, wpDMA_ReceiveChannel, &dmaTransmit);
 
-    // Enable receive half transfer interrupt
-    LL_DMA_EnableIT_HT(wpDMA, wpDMA_ReceiveChannel);
-
-    // Enable receive transfer complete interrupt
-    LL_DMA_EnableIT_TC(wpDMA, wpDMA_ReceiveChannel);
-
-    // Enable transmit transfer complete interrupt
-    LL_DMA_EnableIT_TC(wpDMA, wpDMA_TransmitChannel);
-
-    LL_DMA_EnableChannel(wpDMA, wpDMA_ReceiveChannel);
+    //? NVIC_SetPriority(GPDMA1_Channel0_IRQn, 0);
+    // ? NVIC_EnableIRQ(GPDMA1_Channel0_IRQn);
 
 #pragma endregion
 
 #pragma region Setup USART
     // Configure WireProtocol wpUSART
+    LL_USART_InitTypeDef USART_InitStruct = {0};
     wpUSART_PERIPHERAL_CLOCK_ENABLE;
     USART_InitStruct.PrescalerValue = LL_USART_PRESCALER_DIV1;
     USART_InitStruct.BaudRate = wpBAUD_RATE;
@@ -181,12 +167,11 @@ void wp_InitializeUsart(void)
     USART_InitStruct.TransferDirection = LL_USART_DIRECTION_TX_RX;
     USART_InitStruct.HardwareFlowControl = LL_USART_HWCONTROL_NONE;
     USART_InitStruct.OverSampling = LL_USART_OVERSAMPLING_16;
-    LL_USART_DisableOneBitSamp(&USART_InitStruct);
+    LL_USART_DisableOneBitSamp(wpUSART);
 
-//    huart1.Init.ClockPrescaler = UART_PRESCALER_DIV1;
-//    huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+    //    huart1.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+    //    huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
 
-    // Required to make changes, LL_USART_Init doesn't work unless disabled
     LL_USART_Disable(wpUSART);
     {
         LL_USART_Init(wpUSART, &USART_InitStruct);
@@ -199,13 +184,28 @@ void wp_InitializeUsart(void)
         LL_USART_EnableIT_IDLE(wpUSART);
         NVIC_SetPriority(wpUSART_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
         NVIC_EnableIRQ(wpUSART_IRQn);
+        LL_USART_EnableIT_TC(USART1);
+        LL_USART_EnableDMAReq_TX(USART1);
     }
     LL_USART_Enable(wpUSART);
+
     // Wait for UART initialization to complete
     while (!LL_USART_IsActiveFlag_TEACK(wpUSART) || !LL_USART_IsActiveFlag_REACK(wpUSART))
     {
     }
 #pragma endregion
+
+    // Enable transmit transfer complete interrupt
+    LL_DMA_EnableIT_TC(wpDMA, wpDMA_TransmitChannel);
+    LL_DMA_EnableChannel(wpDMA, wpDMA_TransmitChannel);
+
+    // Enable the following interrupts for receive
+    LL_DMA_EnableIT_HT(wpDMA, wpDMA_ReceiveChannel);
+    LL_DMA_EnableIT_TC(wpDMA, wpDMA_ReceiveChannel);
+    LL_DMA_EnableIT_USE(wpDMA, wpDMA_ReceiveChannel);
+    LL_DMA_EnableIT_ULE(wpDMA, wpDMA_ReceiveChannel);
+    LL_DMA_EnableIT_DTE(wpDMA, wpDMA_ReceiveChannel);
+    LL_DMA_EnableChannel(wpDMA, wpDMA_ReceiveChannel);
 }
 int wp_ReadBytes(uint8_t **ptr, uint32_t *size, uint32_t wait_time)
 {
@@ -217,9 +217,9 @@ int wp_ReadBytes(uint8_t **ptr, uint32_t *size, uint32_t wait_time)
 }
 bool wp_WriteBytes(uint8_t *ptr, uint16_t size)
 {
-    SCB_CleanInvalidateDCache();
+    // SCB_CleanInvalidateDCache();
     wp_WriteBuffer(&TransmitCircularBuffer, ptr, size);
-    SCB_CleanInvalidateDCache();
+    //  SCB_CleanInvalidateDCache();
     wp_StartTransmitTransfer();
     return true;
 }
@@ -228,12 +228,15 @@ void wp_DataReceived(void)
     static size_t old_position;
 
     // Calculate current position in buffer and check for new data available
-    int length_data_received = LL_DMA_GetDataLength(wpDMA, wpDMA_ReceiveChannel);
+
+    int length_data_received = LL_DMA_GetBlkDataLength(wpDMA, wpDMA_ReceiveChannel);
+//    int length_data_received = LL_DMA_GetDataLength(wpDMA, wpDMA_ReceiveChannel);
     size_t position = ARRAY_LEN(wpUSART_DMA_Receive_Buffer) - length_data_received;
 
     if (position != old_position)
     {
-        SCB_CleanInvalidateDCache_by_Addr((uint32_t *)&wpUSART_DMA_Receive_Buffer, sizeof(wpUSART_DMA_Receive_Buffer));
+        // SCB_CleanInvalidateDCache_by_Addr((uint32_t *)&wpUSART_DMA_Receive_Buffer,
+        // sizeof(wpUSART_DMA_Receive_Buffer));
 
         if (position > old_position)
         {
@@ -283,22 +286,21 @@ uint8_t wp_StartTransmitTransfer(void)
     {
         // Wait for any previous DMA to finish
         // Wait for any previous DMA / stream 1 transfers to complete
-        while (LL_DMA_IsActiveFlag_TC1(wpDMA))
+        while (LL_DMA_IsActiveFlag_TC(wpDMA, wpDMA_ReceiveChannel))
         {
         };
         // Disable channel if enabled
         LL_DMA_DisableChannel(wpDMA, wpDMA_TransmitChannel);
 
         // Clear all flags
-        LL_DMA_ClearFlag_TC1(wpDMA);
-        LL_DMA_ClearFlag_HT1(wpDMA);
-        LL_DMA_ClearFlag_TE1(wpDMA);
-        LL_DMA_ClearFlag_DME1(wpDMA);
-        LL_DMA_ClearFlag_FE1(wpDMA);
+        LL_DMA_ClearFlag_TC(wpDMA, wpDMA_TransmitChannel);
+        LL_DMA_ClearFlag_HT(wpDMA, wpDMA_TransmitChannel);
 
         // Prepare DMA data and length
-        LL_DMA_SetDataLength(wpDMA, wpDMA_TransmitChannel, usart_tx_dma_current_len);
-        LL_DMA_SetMemoryAddress(
+        LL_DMA_SetBlkDataLength(wpDMA, wpDMA_TransmitChannel, usart_tx_dma_current_len);
+      //  LL_DMA_SetDataLength(wpDMA, wpDMA_TransmitChannel, usart_tx_dma_current_len);
+        // LL_DMA_SetMemoryAddress(
+        LL_DMA_SetSrcAddress(
             wpDMA,
             wpDMA_TransmitChannel,
             (uint32_t)&TransmitCircularBuffer.buffer[TransmitCircularBuffer.r]);
@@ -312,24 +314,24 @@ uint8_t wp_StartTransmitTransfer(void)
 wpDMA_ReceiveChannel_IRQHandler()
 {
     // Check half-transfer complete interrupt
-    if (LL_DMA_IsEnabledIT_HT(wpDMA, wpDMA_ReceiveChannel) && LL_DMA_IsActiveFlag_HT0(wpDMA))
+    if (LL_DMA_IsEnabledIT_HT(wpDMA, wpDMA_ReceiveChannel) && LL_DMA_IsActiveFlag_HT(wpDMA, wpDMA_ReceiveChannel))
     {
-        LL_DMA_ClearFlag_HT0(wpDMA);
+        LL_DMA_ClearFlag_HT(wpDMA, wpDMA_ReceiveChannel);
         wp_DataReceived();
     }
 
     // Check transfer-complete interrupt
-    if (LL_DMA_IsEnabledIT_TC(wpDMA, wpDMA_ReceiveChannel) && LL_DMA_IsActiveFlag_TC0(wpDMA))
+    if (LL_DMA_IsEnabledIT_TC(wpDMA, wpDMA_ReceiveChannel) && LL_DMA_IsActiveFlag_TC(wpDMA, wpDMA_ReceiveChannel))
     {
-        LL_DMA_ClearFlag_TC0(wpDMA);
+        LL_DMA_ClearFlag_TC(wpDMA, wpDMA_ReceiveChannel);
         wp_DataReceived();
     }
 }
 wpDMA_TransmitChannel_IRQHandler()
 {
-    if (LL_DMA_IsEnabledIT_TC(wpDMA, wpDMA_TransmitChannel) && LL_DMA_IsActiveFlag_TC1(wpDMA))
+    if (LL_DMA_IsEnabledIT_TC(wpDMA, wpDMA_TransmitChannel) && LL_DMA_IsActiveFlag_TC(wpDMA, wpDMA_ReceiveChannel))
     {
-        LL_DMA_ClearFlag_TC1(wpDMA);
+        LL_DMA_ClearFlag_TC(wpDMA, wpDMA_ReceiveChannel);
 
         size_t number_bytes_waiting = wp_BufferBytesWaiting(&TransmitCircularBuffer);
         TransmitCircularBuffer.r += BUF_MIN(usart_tx_dma_current_len, number_bytes_waiting);

@@ -5,9 +5,8 @@
 //
 
 /*
-Board: STM32H735G-DK
 
-   _STM32H735G-DK____________STLINK_3E_________      ___PC____
+   _STM32H7__________________STLINK_3E_________      ___PC____
   |   __________________   ________            |    |         |
   |  |     USART       |   | USART |           |    |         |
   |  | (wpUSART_TX_PIN)|---|-RX    |           |    | Virtual |
@@ -18,6 +17,7 @@ Board: STM32H735G-DK
 
 */
 
+#include "board.h"
 #include "wp_Communications.h"
 #include "wp_CircularBuffer.h"
 #include <assert.h>
@@ -128,20 +128,22 @@ void wp_InitializeUsart(void)
 
     // Required to make changes, LL_USART_Init doesn't work unless disabled
     LL_USART_Disable(wpUSART);
-    LL_USART_Init(wpUSART, &USART_InitStruct);
-    LL_USART_SetTXFIFOThreshold(wpUSART, LL_USART_FIFOTHRESHOLD_7_8);
-    LL_USART_SetRXFIFOThreshold(wpUSART, LL_USART_FIFOTHRESHOLD_7_8);
-    LL_USART_EnableFIFO(wpUSART);
-    LL_USART_ConfigAsyncMode(wpUSART);
-    LL_USART_EnableDMAReq_RX(wpUSART);
-    LL_USART_EnableDMAReq_TX(wpUSART);
-    LL_USART_EnableIT_IDLE(wpUSART);
+    {
+        LL_USART_Init(wpUSART, &USART_InitStruct);
+        LL_USART_SetTXFIFOThreshold(wpUSART, LL_USART_FIFOTHRESHOLD_7_8);
+        LL_USART_SetRXFIFOThreshold(wpUSART, LL_USART_FIFOTHRESHOLD_7_8);
+        LL_USART_EnableFIFO(wpUSART);
+        LL_USART_ConfigAsyncMode(wpUSART);
+        LL_USART_EnableDMAReq_RX(wpUSART);
+        LL_USART_EnableDMAReq_TX(wpUSART);
+        LL_USART_EnableIT_IDLE(wpUSART);
 
-    // USART interrupt, same priority as DMA channel
-    NVIC_SetPriority(wpUSART_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
-    NVIC_EnableIRQ(wpUSART_IRQn);
+        // USART interrupt, same priority as DMA channel
+        NVIC_SetPriority(wpUSART_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
+        NVIC_EnableIRQ(wpUSART_IRQn);
 
-    LL_DMA_EnableStream(wpDMA, wpDMA_ReceiveStream);
+        LL_DMA_EnableStream(wpDMA, wpDMA_ReceiveStream);
+    }
     LL_USART_Enable(wpUSART);
 
     // Polling wpUSART initialization

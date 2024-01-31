@@ -6,33 +6,35 @@
 #include "board.h"
 
 void SystemPower_Config(void);
-
+void SystemClock_Config(void);
+void PeriphCommonClock_Config(void);
+    extern void TestGraphicsU5(void);
 
 void Initialize_Board()
 {
-    SystemPower_Config();
-    CPU_CACHE_Enable();
-    // Configure the system clock to 520 MHz
-    SystemClock_Config();
-    // Disabling FMC Bank1 ? To prevent this CortexM7  speculative read accesses on FMC bank1
-    // it is recommended to disable it when it is not used
-    // Counter used for microsecond delays (blocking)
-    FMC_Bank1_R->BTCR[0] &= ~FMC_BCRx_MBKEN;
+  __HAL_FLASH_PREFETCH_BUFFER_ENABLE();
+    HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
 
-    Initialize_DWT_Counter();
+    SystemPower_Config();
+    SystemClock_Config();
+    CPU_CACHE_Enable();
+    PeriphCommonClock_Config();
+
+    TestGraphicsU5();
+    
     Initialize_Board_LEDS_And_Buttons();
-    Initialize_OCTOSPI2_Hyperam();
+
+    // Initialize_DWT_Counter();
+    // Initialize_OCTOSPI2_Hyperam();
 }
 void CPU_CACHE_Enable(void)
 {
-
-      /* Configure ICACHE associativity mode */
+    // Configure ICACHE associativity mode
     LL_ICACHE_SetMode(LL_ICACHE_1WAY);
 
-    /* Enable ICACHE */
+    // Enable ICACHE
     LL_ICACHE_Enable();
 }
-
 void Initialize_Board_LEDS_And_Buttons()
 {
     // LED's
@@ -51,7 +53,6 @@ void Initialize_Board_LEDS_And_Buttons()
 
     // USER button
     ENABLE_PORT_GPIOC;
-    GPIO_InitTypeDef gpio_init_structure;
     gpio_InitStruct.Pin = BUTTON_USER_PIN;
     gpio_InitStruct.Mode = LL_GPIO_MODE_INPUT;
     gpio_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
@@ -144,26 +145,113 @@ bool BoardUserButton_Pressed()
         return false;
     }
 }
+void SystemClock_Config(void)
+{
+    //
+    // System Clock Configuration
+    // The system Clock is configured as follows :
+    //   System Clock source            = PLL (MSI)
+    //   SYSCLK(Hz)                     = 160000000
+    //   HCLK(Hz)                       = 160000000
+    //   AHB Prescaler                  = 1
+    //   APB1 Prescaler                 = 1
+    //   APB2 Prescaler                 = 1
+    //   MSI Frequency(Hz)              = 4000000
+    //   PLL_MBOOST                     = 1
+    //   PLL_M                          = 1
+    //   PLL_N                          = 80
+    //   PLL_Q                          = 2
+    //   PLL_R                          = 2
+    //   PLL_P                          = 2
+    //   Flash Latency(WS)              = 4
+    //
+    // Enable PWR clock */
+    LL_AHB3_GRP1_EnableClock(LL_AHB3_GRP1_PERIPH_PWR);
 
+    /* Set the regulator supply output voltage */
+    LL_PWR_SetRegulVoltageScaling(LL_PWR_REGU_VOLTAGE_SCALE1);
+    while (LL_PWR_IsActiveFlag_VOS() == 0)
+    {
+    }
 
+    /* Enable MSI oscillator */
+    LL_RCC_MSIS_SetRange(LL_RCC_MSISRANGE_4);
+    LL_RCC_MSI_SetCalibTrimming(10, LL_RCC_MSI_OSCILLATOR_0);
+    LL_RCC_MSIS_Enable();
+    while (LL_RCC_MSIS_IsReady() != 1)
+    {
+    }
+
+    /* Set FLASH latency */
+    LL_FLASH_SetLatency(LL_FLASH_LATENCY_4);
+
+    /* Configure PLL clock source */
+    LL_RCC_PLL1_SetMainSource(LL_RCC_PLL1SOURCE_MSIS);
+
+    /* Enable the EPOD to reach max frequency */
+    LL_PWR_EnableEPODBooster();
+    while (LL_PWR_IsActiveFlag_BOOST() == 0)
+    {
+    }
+
+    /* Main PLL configuration and activation */
+    LL_RCC_PLL1_EnableDomain_SYS();
+    LL_RCC_PLL1FRACN_Disable();
+    LL_RCC_PLL1_SetVCOInputRange(LL_RCC_PLLINPUTRANGE_4_8);
+    LL_RCC_SetPll1EPodPrescaler(LL_RCC_PLL1MBOOST_DIV_1);
+    LL_RCC_PLL1_SetDivider(1);
+    LL_RCC_PLL1_SetN(80);
+    LL_RCC_PLL1_SetP(2);
+    LL_RCC_PLL1_SetQ(2);
+    LL_RCC_PLL1_SetR(2);
+
+    LL_RCC_PLL1_Enable();
+    while (LL_RCC_PLL1_IsReady() != 1)
+    {
+    }
+
+    /* Set AHB, APB1, APB2 and APB3 prescalers */
+    LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_1);
+    LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
+    LL_RCC_SetAPB2Prescaler(LL_RCC_APB2_DIV_1);
+    LL_RCC_SetAPB3Prescaler(LL_RCC_APB3_DIV_1);
+
+    /* Set PLL1 as System Clock Source */
+    LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_PLL1);
+    while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_PLL1)
+    {
+    }
+
+    // Sets an internal variable used in other calls ( should be able to delete this)
+    LL_SetSystemCoreClock(160000000);
+}
 void SystemPower_Config(void)
 {
-
-    /*
-     * Disable the internal Pull-Up in Dead Battery pins of UCPD peripheral
-     */
-    HAL_PWREx_DisableUCPDDeadBattery();
-
-    /*
-     * Switch to SMPS regulator instead of LDO
-     */
-    if (HAL_PWREx_ConfigSupply(PWR_SMPS_SUPPLY) != HAL_OK)
-    {
-        Error_Handler();
-    }
-    /* USER CODE BEGIN PWR */
-    /* USER CODE END PWR */
+    LL_PWR_DisableUCPDDeadBattery();
+    LL_PWR_SetRegulatorSupply(LL_PWR_SMPS_SUPPLY);
 }
 
 
+void PeriphCommonClock_Config(void)
+{
+    RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
+    //* Initializes the common periph clock
+
+    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_LTDC | RCC_PERIPHCLK_DSI;
+    PeriphClkInit.DsiClockSelection = RCC_DSICLKSOURCE_PLL3;
+    PeriphClkInit.LtdcClockSelection = RCC_LTDCCLKSOURCE_PLL3;
+    PeriphClkInit.PLL3.PLL3Source = RCC_PLLSOURCE_HSE;
+    PeriphClkInit.PLL3.PLL3M = 4;
+    PeriphClkInit.PLL3.PLL3N = 125;
+    PeriphClkInit.PLL3.PLL3P = 8;
+    PeriphClkInit.PLL3.PLL3Q = 2;
+    PeriphClkInit.PLL3.PLL3R = 24;
+    PeriphClkInit.PLL3.PLL3RGE = RCC_PLLVCIRANGE_0;
+    PeriphClkInit.PLL3.PLL3FRACN = 0;
+    PeriphClkInit.PLL3.PLL3ClockOut = RCC_PLL3_DIVP | RCC_PLL3_DIVR;
+    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+    {
+        assert_param(1);
+    }
+}

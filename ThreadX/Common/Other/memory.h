@@ -6,11 +6,28 @@
 
 #include "nanoCLR_Headers.h"
 
-extern int HeapBegin;
-extern int HeapEnd;
-extern uint32_t __nanoImage_start__;
-extern uint32_t __nanoImage_end__;
-extern uint32_t __nanoConfig_start__;
-extern uint32_t __nanoConfig_end__;
-extern uint32_t __deployment_start__;
-extern uint32_t __deployment_end__;
+extern const int HeapBegin;
+extern const int HeapEnd;
+extern const uint32_t __nanoImage_start__;
+extern const uint32_t __nanoImage_end__;
+extern const uint32_t __nanoConfig_start__;
+extern const uint32_t __nanoConfig_end__;
+extern const uint32_t __deployment_start__;
+extern const uint32_t __deployment_end__;
+extern const uint32_t __deployment_size__;
+extern const uint32_t graphics_vfb;
+extern const uint32_t graphics_ram;
+
+extern const uint32_t block_size;
+extern const uint32_t number_flash_banks;
+extern const uint32_t blocks_per_bank;
+extern const uint32_t total_blocks;
+extern const uint32_t clr_block_start;
+extern const uint32_t clr_block_end;
+extern const uint32_t deployment_block_start;
+extern const uint32_t deployment_block_end;
+extern const uint32_t config_block_start;
+extern const uint32_t config_block_end;
+extern const uint32_t blocks_reserved_for_clr;
+extern const uint32_t blocks_reserved_for_config;
+extern const uint32_t blocks_reserved_for_deployment;

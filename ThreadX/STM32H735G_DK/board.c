@@ -6,7 +6,6 @@
 #include "board.h"
 
 
-
 void Initialize_Board()
 {
     CPU_CACHE_Enable();

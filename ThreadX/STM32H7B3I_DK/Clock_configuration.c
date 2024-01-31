@@ -25,7 +25,7 @@
 //             Flash Latency(WS)              = 6
 // /
 
- void SystemClock_Config(void)
+  void SystemClock_Config(void)
  {
      // Power Configuration
      LL_PWR_ConfigSupply(LL_PWR_DIRECT_SMPS_SUPPLY);

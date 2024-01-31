@@ -9,5 +9,3 @@
 
 // Maximum number of devices per SPI bus
 #define MAX_SPI_DEVICES 1
-
-

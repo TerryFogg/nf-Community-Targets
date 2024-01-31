@@ -277,12 +277,13 @@
 #Region "COMMON TARGET SOURCES"
         list(APPEND NF_INTERPRETER_SOURCES 
             
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/main.c
+
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/Memory.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/nanoCRT.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/sys_calls.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/targetHAL_ConfigurationManager.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/time_utilities.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/wp_CircularBuffer.c
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Startup/Thread_CLRStartup.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Startup/Thread_WireProtocolReceiver.c
@@ -291,8 +292,8 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/tx_adaption_threads.c
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/WireProtocol_HAL_Interface.c
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/wp_CircularBuffer.c
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/main.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/hard_fault_handler.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/targetHAL.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/FlashDriver.c

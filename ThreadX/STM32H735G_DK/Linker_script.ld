@@ -1,202 +1,117 @@
 /*
-// Copyright (c) .NET Foundation and Contributors
-// See LICENSE file in the project root for full license information.
+   Copyright (c) .NET Foundation and Contributors
+   See LICENSE file in the project root for full license information.
 */
 
-/* Note:                                  */
-/* SYS>>   Bare metal code or RTOS        */
-/* CLR>>   Use by Common Language Runtime */
+/* NOTE */
+/* Division of internal flash is limited by the smallest erase size of 128K */
 
-/*       /------------------------------------\     */
-/*       |   Addresses required by            |     */   
-/*       |   startup_stm32h735igkx.s          |     */   
-/*       | ================================== |     */
-/*       |  Entry Point                       |SYS>>*/  ENTRY(Reset_Handler)
-/*       |------------------------------------|     */
-/*       |  Address of the .data section      |     */  
-/*       |  Copy from flash to RAM            |     */  
-/*       |  at startup                        |     */   
-/*       | =================================  |     */
-/*       |                                    |SYS>>*/  _sidata = LOADADDR(.data);
-/*       |  Start                             |SYS>>*/  /*_sdata , defined in .data section below */
-/*       |  End                               |SYS>>*/  /*_edata , defined in .data section below */
-/*       |------------------------------------|     */
-/*       |  Address of the .bss section       |     */  
-/*       |  Zero fill at startup              |     */   
-/*       | ================================== |     */
-/*       |  Start                             |SYS>>*/  /*_sbss  , defined in .bss section below */
-/*       |  End                               |SYS>>*/  /*_ebss  , defined in .bss section below */
-/*       |------------------------------------|     */
-/*       |  Stack pointer address             |SYS>>*/  _estack = ORIGIN(RAM_D1) + LENGTH(RAM_D1);   
-/*       |  Set to top of RAM                 |     */   
-/*       |  Stack works down                  |     */   
-/*       \------------------------------------/     */
+/* Entry point */
+ENTRY(Reset_Handler)
 
-/*       /------------------------------------\     */
-/*       |  PARAMETERS                        |     */   
-/*       | ================================== |     */
-/*       | See section ._user_heap_stack      |     */
-/*       | Generate a link error if the heap  |     */
-/*       | and stack don't fit into RAM       |     */   
-/*       | Required heap size                 |SYS>>*/  _Min_Heap_Size = 0x200; 
-/*       | Required stack size                |SYS>>*/  _Min_Stack_Size = 0x400; 
-/*       |------------------------------------|     */   
-/*       | The flash sector size is 128K      |CLR>>*/  flash_sector_size  = 0x20000 ; 
-/*       | Each flash word is 256 bits,       |CLR>>*/  flash_word_size    = 32;
-/*       | (32 bytes). Smaller writes than    |     */
-/*       | this requires force write with     |     */
-/*       | the remaining bytes set to 1's     |     */
-/*       |------------------------------------|     */
-/*       | Configuration are to store         |     */   
-/*       | persistent information             |     */   
-/*       |                                    |CLR>>*/  config_size =  20K;
-/*       | Keep in sync with                  |     */   
-/*       | "targetHAL_ConfigurationManger.cpp"|     */   
-/*       \------------------------------------/     */
+/* _sidata is used in ThreadX to copy the data segment from ROM to RAM during initialization */
+_sidata = LOADADDR(.data);
+
+/* _estack is used in ThreadX to define the end of the stack memory for the main thread */
+_estack = ORIGIN(DTCM_SRAM) + LENGTH(DTCM_SRAM);
+
+/* Stack and heap size */
+_Min_Heap_Size = 0x200; 
+_Min_Stack_Size = 0x400; 
+
+/* Define the availability of FLASH */
+/* Minimum flash erase size is define as a sector for STM32H7 series*/
+sector_size = 128k; 
+
+block_size = sector_size;
+number_flash_banks = 1;
+blocks_per_bank = 8;
+total_blocks = number_flash_banks * blocks_per_bank;
+
+clr_block_start = 0;
+clr_block_end = 4;
+blocks_reserved_for_clr = (clr_block_end - clr_block_start) + 1;
+
+deployment_block_start = 5;
+deployment_block_end = 7;
+blocks_reserved_for_deployment = (deployment_block_end - deployment_block_start) + 1;
+
+/* Not used yet */
+config_block_start = 0;
+config_block_end = 0;
+blocks_reserved_for_config = 0;
 
 
-MEMORY    /*   Usage by nanoFramework */
+/* NOTE: config is not currently enabled for this board.                              */
+/*       The problem is how to have a small config when the minium erase size is 128K */
+
+
+MEMORY
 {
-/*       /------------------------------------\     */
-/*       | STM32H735G-DK Physical memory      |     */
-/*       | =================================  |     */
-/*       |                                    |     */   
-/*       | 0x00000000 : 64K ITCM SRAM         |...>>*/  /* FUTURE USE*/  
-/*       | ITCM-RAM  can be used to host      |     */
-/*       | critical real-time code such as    |     */
-/*       | interrupt handlers                 |     */
-/*       |                                    |     */   
-/*       |------------------------------------|     */
-/*       |                                    |     */   
-/*       |------------------------------------|     */
-/*       | 0x08FFF000 : 1K Flash User OTP     |...>>*/  /* FUTURE USE*/
-/*       | Possible one time programmable use |     */
-/*       |------------------------------------|     */
-/*       |                                    |     */   
-/*       |------------------------------------|     */
-/*       | 0x08FFFC00 : 512 Flash STM Read    |     */  /* Factory System Memory */
-/*       |      System Not useable            |     */ 
-/*       |------------------------------------|     */
-/*       |                                    |     */   
-/*       |------------------------------------|     */
-/*       | 0x08000000 : 1024K AXI Flash       |SYS>>*/  FLASH      (rx) : ORIGIN = 0x08000000,   LENGTH = 1024k
-/*       | Single Flash Bank                  |     */   
-/*       | Sector size 128K                   |     */   
-/*       | Smallest erase 1 Sector, so align  |     */ 
-/*       | deployment on sector boundary      |     */ 
-/*       | 8 x Sectors, each 128K             |     */ 
-/*       |....................................|     */
-/*       | Sector 0 : 128K                    |CLR>>*/  nanoCLR    (rx) : ORIGIN = ORIGIN(FLASH), LENGTH = (5*flash_sector_size)
-/*       | Sector 1 : 128K                    |     */
-/*       | Sector 2 : 128K                    |     */
-/*       | Sector 3 : 128K                    |     */
-/*       | Sector 4 : 128K                    |     */
-/*       |....................................|     */
-/*       | Sector 5 : 128K                    |CLR>>*/  deployment (rx) : ORIGIN = ORIGIN(nanoCLR) + LENGTH(nanoCLR), LENGTH = 3*flash_sector_size
-/*       | Sector 6 : 128K                    |     */
-/*       | Sector 7 : 128K                    |     */
-/*       |                                    |     */
-/*       | 0x080FFFFF : FLASH END             |     */
-/*       |------------------------------------|     */
-/*       |                                    |     */ 
-/*       |------------------------------------|     */
-/*       | 0x1FF00000 : 128K System memory    |SYS>>*/  /* SYSTEM Not available for user use*/ 
-/*       | Bootloader or Secure bootloader and|     */ 
-/*       | secure library if option secure    |     */ 
-/*       |------------------------------------|     */
-/*       |                                    |     */ 
-/*       |------------------------------------|     */
-/*       | 0x20000000 : 128K DTCM SRAM        |CLR>>*/  /* FUTURE USE */  
-/*       | DTCM-RAM can be used as read-write |     */
-/*       | segment to host critical real-time |     */
-/*       | data (such as stack and heap)      |     */
-/*       |                                    |     */
-/*       |------------------------------------|     */
-/*       |                                    |     */ 
-/*       |------------------------------------|     */
-/*       | Power Domain 1                     |     */
-/*       | 0x24000000 : 192K AXI SRAM         |SYS>>*/  RAM_D1     (xrw) : ORIGIN = 0x24000000,   LENGTH = 320K   
-/*       | 0x24030000 : 128K AXI SRAM         |     */
-/*       | Use both RAM banks contiguously    |     */ 
-/*       |                                    |     */ 
-/*       | Used by                            |     */ 
-/*       |   .data                            |     */ 
-/*       |   .bss                             |     */ 
-/*       |   .user_heap                       |     */ 
-/*       |------------------------------------|     */
-/*       |                                    |     */ 
-/*       |------------------------------------|     */
-/*       | Power Domain 2                     |     */
-/*       | 0x30000000 : 16K AHB SRAM1         |SYS>>*/  RAM_D2     (xrw) : ORIGIN = 0x30000000,   LENGTH = 32K  
-/*       | 0x30040000 : 16K AHB SRAM2         |     */
-/*       | Use both RAM banks contiguously    |     */ 
-/*       |                                    |     */ 
-/*       | Accessible by DMA 1 and            |CLR>>*/  RAM_DMA    (xrw) : ORIGIN = ORIGIN(RAM_D2), LENGTH = LENGTH(RAM_D2)
-/*       | DMA 2 controllers                  |     */ 
-/*       |------------------------------------|     */
-/*       |                                    |     */ 
-/*       |------------------------------------|     */
-/*       | Power Domain 3                     |     */
-/*       | 0x38000000 : 16K SRAM4             |SYS>>*/  RAM_D4     (xrw) : ORIGIN = 0x38000000,     LENGTH = 16K
-/*       | Retains power when D1 and D2       |     */
-/*       | domain enter DStandby mode         |     */
-/*       |                                    |     */ 
-/*       |------------------------------------|     */
-/*       |                                    |     */ 
-/*       |------------------------------------|     */
-/*       | 0x38800000 : 4K Backup SRAM        |CLR>>*/  /* FUTURE USE */
-/*       | With a battery connected to the    |     */
-/*       | VBAT pin,the backup SRAM can       |     */
-/*       | be used to retain data during      |     */
-/*       | low-power mode                     |     */
-/*       |------------------------------------|     */
-/*       |                                    |     */ 
-/*       |------------------------------------|     */
-/*       | 0x70000000 : 16M OCTOSPI2          |SYS>>*/  OCTOSPI2_RAM (xrw) : ORIGIN = 0x70000000, LENGTH = 16M
-/*       | ON STM32735G-DK (Hyperram)         |     */
-/*       |                                    |     */
-/*       | Video frame buffer                 |CLR>>*/  graphics_vfb (xrw) : ORIGIN = ORIGIN(OCTOSPI2_RAM), LENGTH = 255k
-/*       | Sized to the display on the        |     */
-/*       | STM32H735G-DK board                |     */
-/*       |                                    |     */
-/*       | nanoCLR graphics bitmaps,          |CLR>>*/  graphics_ram (xrw) : ORIGIN = ORIGIN(graphics_vfb) + LENGTH(graphics_vfb), LENGTH = 8M
-/*       | drawing surfaces                   |     */
-/*       |                                    |     */
-/*       | nanoCLR managed heap               |CLR>>*/  external_ram (xrw) : ORIGIN = ORIGIN(graphics_ram) + LENGTH(graphics_ram), LENGTH = LENGTH(OCTOSPI2_RAM) - LENGTH(graphics_vfb) - LENGTH(graphics_ram)
-/*       |------------------------------------|     */
-/*       |                                    |     */ 
-/*       |------------------------------------|     */
-/*       | 0x09000000 : 64M OCTOSPI1 (Flash)  |SYS>>*/  OCTOSPI1_FLASH (rx) : ORIGIN = 0x09000000, LENGTH = 64M
-/*       |                                    |CLR>>*/  config         (rx) : ORIGIN = ORIGIN(OCTOSPI1_FLASH), LENGTH = (config_size)
-/*       |                                    |     */
-/*       \------------------------------------/     */
+  /* ===============*/
+  /* PHYSICAL MEMORY*/
+  /* ===============*/
+
+    /* ==============*/
+    /* STM32H735IGK6U*/
+    /* ==============*/
+
+     ITCM_SRAM  (rxw):ORIGIN = 0x00000000,LENGTH = 64K 
+     FLASH      (rx) :ORIGIN = 0x08000000,LENGTH = 1024K
+     OTP        (rx) :ORIGIN = 0x08FFF000,LENGTH = 1024
+     DTCM_SRAM  (rxw):ORIGIN = 0x20000000,LENGTH = 128K 
+     RAM_D1     (rxw):ORIGIN = 0x24000000,LENGTH = 320K
+     RAM_D2     (rxw):ORIGIN = 0x30000000,LENGTH = 32K
+     RAM_D4     (rxw):ORIGIN = 0x38000000,LENGTH = 16K
+     BACKUP_RAM (rxw):ORIGIN = 0x38800000,LENGTH = 4k
+
+     /* External RAM on development board (STM32H735G-DK) */
+     OCTOSPI2_RAM   (rxw):ORIGIN = 0x70000000,LENGTH = 16M
+     OCTOSPI1_FLASH (rx ):ORIGIN = 0x09000000,LENGTH = 64M
+
+  /* ============================= */
+  /* Memory usage by nanoFramework */
+  /* ============================= */
+
+     nanoCLR    (rx) : ORIGIN = ORIGIN(FLASH), LENGTH = (blocks_reserved_for_clr*block_size)
+     deployment (rx) : ORIGIN = ORIGIN(nanoCLR) + LENGTH(nanoCLR), LENGTH = (blocks_reserved_for_deployment*block_size)
+     config     (rx) : ORIGIN = ORIGIN(OCTOSPI1_FLASH), LENGTH = (blocks_reserved_for_config*block_size)
+
+     /* Native code ram (Azure, nativeCLR) */
+     NATIVE_RAM   (rxw) : ORIGIN = ORIGIN(DTCM_SRAM), LENGTH = LENGTH(DTCM_SRAM)
+
+     /* RAM accessible by the DMA controller */
+     RAM_DMA      (rxw) : ORIGIN = ORIGIN(RAM_D2), LENGTH = LENGTH(RAM_D2)
+
+     graphics_vfb (rxw) : ORIGIN = ORIGIN(OCTOSPI2_RAM), LENGTH = 255k
+     graphics_ram (rxw) : ORIGIN = ORIGIN(graphics_vfb) + LENGTH(graphics_vfb), LENGTH = 7M -  LENGTH(graphics_vfb)
+
+     /* CLR managed heap ram */
+     CLR_RAM  (rxw) : ORIGIN = ORIGIN(graphics_ram) + LENGTH(graphics_ram), LENGTH = LENGTH(OCTOSPI2_RAM) - LENGTH(graphics_vfb) - LENGTH(graphics_ram)
 }
-        
-/*       /------------------------------------\     */
-/*       |  VARIABLES REFERENCED BY C/C++     |     */   
-/*       | ================================== |     */
-/*       | The CLR managed heap for CLR       |CLR>>*/  HeapBegin             = ORIGIN(external_ram); 
-/*       | objects                            |CLR>>*/  HeapEnd               = ORIGIN(external_ram) + LENGTH(external_ram); 
-/*       |------------------------------------|     */   
-/*       | CLR Image                          |CLR>>*/  __nanoImage_start__   = ORIGIN(nanoCLR); 
-/*       |                                    |CLR>>*/  __nanoImage_end__     = LENGTH(nanoCLR); 
-/*       |------------------------------------|     */   
-/*       | Flash region where the C#          |CLR>>*/  __deployment_start__  = ORIGIN(deployment); 
-/*       | Portable Executable (PE) file      |CLR>>*/  __deployment_size__   = LENGTH(deployment); 
-/*       | is stored                          |CLR>>*/  __deployment_end__    = __deployment_start__ + __deployment_size__; 
-/*       |------------------------------------|     */   
-/*       | Small area of persistent storage   |     */  __nanoConfig_start__  = ORIGIN(config);
-/*       |                                    |     */  __nanoConfig_end__    = ORIGIN(config) + config_size;
-/*       |------------------------------------|     */   
-/*       | Bit pixel copy of the screen       |CLR>>*/  Graphics_frame_buffer = ORIGIN(graphics_vfb); 
-/*       | Updated by DMA                     |     */    
-/*       |------------------------------------|     */   
-/*       | Bitmap objects created by C#       |CLR>>*/  Graphics_managed_heap = ORIGIN(graphics_ram); 
-/*       | and drawn into                     |CLR>>*/  Graphics_managed_end  = ORIGIN(graphics_ram) + LENGTH(graphics_ram);   
-/*       |                                    |     */  
-/*       \------------------------------------/     */
 
+/* The CLR managed heap for CLR */
+HeapBegin             = ORIGIN(CLR_RAM); 
+HeapEnd               = ORIGIN(CLR_RAM) + LENGTH(CLR_RAM); 
 
+/* The CLR native Image */
+__nanoImage_start__   = ORIGIN(nanoCLR); 
+__nanoImage_end__     = ORIGIN(nanoCLR) + LENGTH(nanoCLR); 
+ 
+/*  C# Portable Executable (PE) file is stored */
+__deployment_start__  = ORIGIN(deployment); 
+__deployment_end__    = ORIGIN(deployment) + LENGTH(deployment); 
+ 
+/* Small area of persistent storage */
+__nanoConfig_start__  = ORIGIN(config);
+__nanoConfig_end__    = ORIGIN(config) + LENGTH(config);
+ 
+/* Bit pixel copy of the screen */
+Graphics_frame_buffer = ORIGIN(graphics_vfb); 
+  
+/*  Bitmap objects */
+Graphics_managed_heap = ORIGIN(graphics_ram); 
+Graphics_managed_end  = ORIGIN(graphics_ram) + LENGTH(graphics_ram);   
 
 /* Define output sections */
 SECTIONS
@@ -258,7 +173,7 @@ SECTIONS
   
   .ARM : 
   {
-    __exidx_start = .;         /*exidx is used to contain index entries for stack unwinding */
+    __exidx_start = .;         /* exidx is used to contain index entries for stack unwinding */
     *(.ARM.exidx*)
     __exidx_end = .;
   } >FLASH
@@ -305,11 +220,9 @@ SECTIONS
                        /* Used in LoopCopyDataInit:, "startup_st,32h735igks.s"
     *(.data)           /* .data sections */
     *(.data*)          /* .data* sections */
-    *(.RamFunc)        /* .RamFunc sections */
-    *(.RamFunc*)       /* .RamFunc* sections */
     . = ALIGN(4);
     _edata = .;        /* define a global symbol at data end */
-  } >RAM_D1 AT> FLASH
+  } >NATIVE_RAM AT> FLASH
   
   /* -------------------------------------------------------------------*/
   /* This section holds uninitialized data                             */
@@ -329,7 +242,7 @@ SECTIONS
     . = ALIGN(4);
     _ebss = .;         /* define a global symbol at bss end */
     __bss_end__ = _ebss;
-  } >RAM_D1
+  } >NATIVE_RAM
 
 /* -----------------------------------------------------------------*/
 /* Not using "DYNAMIC_MEMORY" so no need for a ._threadx_heap here.
@@ -355,7 +268,7 @@ SECTIONS
     . = . + _Min_Stack_Size;
     . = ALIGN(8);
         __RAM_segment_used_end__ = .;
-  } >RAM_D1
+  } >NATIVE_RAM
 
 
   /* -----------------------------------------------*/
@@ -369,4 +282,3 @@ SECTIONS
   }
   .ARM.attributes 0 : { *(.ARM.attributes) }
 }
-

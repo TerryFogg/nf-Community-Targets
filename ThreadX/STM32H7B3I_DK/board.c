@@ -10,11 +10,6 @@ void Initialize_Board()
     CPU_CACHE_Enable();
     // Configure the system clock to 520 MHz
     SystemClock_Config();
-    // Disabling FMC Bank1 ? To prevent this CortexM7  speculative read accesses on FMC bank1
-    // it is recommended to disable it when it is not used
-    // Counter used for microsecond delays (blocking)
-    FMC_Bank1_R->BTCR[0] &= ~FMC_BCRx_MBKEN;
-
     Initialize_DWT_Counter();
     Initialize_Board_LEDS_And_Buttons();
     Initialize_OCTOSPI2_Hyperam();

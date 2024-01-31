@@ -36,29 +36,40 @@ set(TX_USER_FILE ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/RtosAdapti
                         ${THREADX_SOURCE}/ports/cortex_m7/gnu/inc
                         ${THREADX_SOURCE}/filex/ports/cortex_m7/gnu/inc)
             list(APPEND THREADX_SOURCES
+	                    ${THREADX_SOURCE}/ports/cortex_m7/gnu/src/tx_misra.S
 	                    ${THREADX_SOURCE}/ports/cortex_m7/gnu/src/tx_thread_context_restore.S
 	                    ${THREADX_SOURCE}/ports/cortex_m7/gnu/src/tx_thread_context_save.S
 	                    ${THREADX_SOURCE}/ports/cortex_m7/gnu/src/tx_thread_interrupt_control.S
-	                    ${THREADX_SOURCE}/ports/cortex_m7/gnu/src/tx_thread_stack_build.S
-	                    ${THREADX_SOURCE}/ports/cortex_m7/gnu/src/tx_thread_schedule.S
-	                    ${THREADX_SOURCE}/ports/cortex_m7/gnu/src/tx_thread_system_return.S
-	                    ${THREADX_SOURCE}/ports/cortex_m7/gnu/src/tx_timer_interrupt.S
                         ${THREADX_SOURCE}/ports/cortex_m7/gnu/src/tx_thread_interrupt_disable.S
-                        ${THREADX_SOURCE}/ports/cortex_m7/gnu/src/tx_thread_interrupt_restore.S)
+                        ${THREADX_SOURCE}/ports/cortex_m7/gnu/src/tx_thread_interrupt_restore.S
+	                    ${THREADX_SOURCE}/ports/cortex_m7/gnu/src/tx_thread_schedule.S
+	                    ${THREADX_SOURCE}/ports/cortex_m7/gnu/src/tx_thread_stack_build.S
+	                    ${THREADX_SOURCE}/ports/cortex_m7/gnu/src/tx_thread_system_return.S
+	                    ${THREADX_SOURCE}/ports/cortex_m7/gnu/src/tx_timer_interrupt.S)
         elseif(${ARM_PROCESSOR} STREQUAL "Cortex-M33")
             list(APPEND THREADX_INCLUDES 
                         ${THREADX_SOURCE}/ports/cortex_m33/gnu/inc
                         ${THREADX_SOURCE}/filex/ports/cortex_33/gnu/inc)
                list(APPEND THREADX_SOURCES
+	                    ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/tx_misra.S
+	                    ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/tx_initialize_low_level.S
 	                    ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/tx_thread_context_restore.S
 	                    ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/tx_thread_context_save.S
 	                    ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/tx_thread_interrupt_control.S
-	                    ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/tx_thread_stack_build.S
+                        ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/tx_thread_interrupt_disable.S
+                        ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/tx_thread_interrupt_restore.S
 	                    ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/tx_thread_schedule.S
 	                    ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/tx_thread_system_return.S
-	                    ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/tx_timer_interrupt.S
-                        ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/tx_thread_interrupt_disable.S
-                        ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/tx_thread_interrupt_restore.S)
+	                    ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/tx_timer_interrupt.S)
+
+	     # for secure coding               ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/tx_thread_stack_build.S
+         # for secure coding               ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/tx_thread_secure_stack.c
+	     # for secure coding               ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/tx_thread_secure_stack_allocate.S
+	     # for secure coding               ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/tx_thread_secure_stack_free.S
+	     # for secure coding               ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/tx_thread_secure_stack_initialize.S
+	     # for secure coding               ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/txe_thread_secure_stack_allocate.c
+	     # for secure coding               ${THREADX_SOURCE}/ports/cortex_m33/gnu/src/txe_thread_secure_stack_free.c
+
         endif()
 #Region "THREADX INCLUDES"
         list(APPEND THREADX_INCLUDES 

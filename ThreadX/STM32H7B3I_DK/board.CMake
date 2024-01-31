@@ -12,6 +12,7 @@
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H7B3I_DK/MicroSD.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H7B3I_DK/OSPI_memory.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H7B3I_DK/power.c
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H7B3I_DK/startup_stm32h7b3xx.s
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H7B3I_DK/target_common.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H7B3I_DK/tx_initialize_low_level.s
 

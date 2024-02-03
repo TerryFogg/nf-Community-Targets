@@ -1,4 +1,6 @@
 
+#define assert_param(expr) ((void)0U)
+
 #include "stm32h7xx_hal_rcc.h"
 #include "stm32h7xx_hal_gpio.h"
 #include "stm32h7xx_hal_dma.h"

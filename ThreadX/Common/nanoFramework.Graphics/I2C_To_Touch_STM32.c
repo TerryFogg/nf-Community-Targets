@@ -5,7 +5,7 @@
 
 void Initialize_I2C()
 {
-    ENABLE_PORT_GPIOF;
+    ENABLE_CLOCK_ON_PORT_GPIOF;
 
     // SCL Pin as : Alternate function, High Speed, Open drain, No Pull
     LL_GPIO_SetPinMode(GPIOF, LL_GPIO_PIN_14, LL_GPIO_MODE_ALTERNATE);

@@ -18,6 +18,8 @@ extern const uint32_t __deployment_size__;
 extern const uint32_t graphics_vfb;
 extern const uint32_t graphics_ram;
 
+extern const uint32_t flash_block_1;
+extern const uint32_t flash_block_1_size;
 extern const uint32_t block_size;
 extern const uint32_t number_flash_banks;
 extern const uint32_t blocks_per_bank;

@@ -9,7 +9,6 @@
 void Initialize_Board()
 {
     CPU_CACHE_Enable();
-    // Configure the system clock to 520 MHz
     SystemClock_Config();
     // Disabling FMC Bank1 ? To prevent this CortexM7  speculative read accesses on FMC bank1
     // it is recommended to disable it when it is not used
@@ -30,8 +29,6 @@ void CPU_CACHE_Enable(void)
 }
 void Initialize_Board_LEDS_And_Buttons()
 {
-    // STM32H735G-DK Board
-    // ===================
     // LED's
     LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOC);
     LL_GPIO_InitTypeDef gpio_InitStruct = {0};

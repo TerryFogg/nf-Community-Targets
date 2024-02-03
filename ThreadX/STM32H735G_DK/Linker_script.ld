@@ -13,7 +13,7 @@ ENTRY(Reset_Handler)
 _sidata = LOADADDR(.data);
 
 /* _estack is used in ThreadX to define the end of the stack memory for the main thread */
-_estack = ORIGIN(DTCM_SRAM) + LENGTH(DTCM_SRAM);
+_estack = ORIGIN(RAM_D1) + LENGTH(RAM_D1);
 
 /* Stack and heap size */
 _Min_Heap_Size = 0x200; 
@@ -21,6 +21,8 @@ _Min_Stack_Size = 0x400;
 
 /* Define the availability of FLASH */
 /* Minimum flash erase size is define as a sector for STM32H7 series*/
+flash_block_1 = 0x08000000;
+flash_block_1_size = 1024K;
 sector_size = 128k; 
 
 block_size = sector_size;
@@ -36,15 +38,9 @@ deployment_block_start = 5;
 deployment_block_end = 7;
 blocks_reserved_for_deployment = (deployment_block_end - deployment_block_start) + 1;
 
-/* Not used yet */
 config_block_start = 0;
 config_block_end = 0;
 blocks_reserved_for_config = 0;
-
-
-/* NOTE: config is not currently enabled for this board.                              */
-/*       The problem is how to have a small config when the minium erase size is 128K */
-
 
 MEMORY
 {
@@ -78,16 +74,15 @@ MEMORY
      config     (rx) : ORIGIN = ORIGIN(OCTOSPI1_FLASH), LENGTH = (blocks_reserved_for_config*block_size)
 
      /* Native code ram (Azure, nativeCLR) */
-     NATIVE_RAM   (rxw) : ORIGIN = ORIGIN(DTCM_SRAM), LENGTH = LENGTH(DTCM_SRAM)
+     NATIVE_RAM   (rxw) : ORIGIN = ORIGIN(RAM_D1), LENGTH = LENGTH(RAM_D1)
 
      /* RAM accessible by the DMA controller */
      RAM_DMA      (rxw) : ORIGIN = ORIGIN(RAM_D2), LENGTH = LENGTH(RAM_D2)
 
-     graphics_vfb (rxw) : ORIGIN = ORIGIN(OCTOSPI2_RAM), LENGTH = 255k
-     graphics_ram (rxw) : ORIGIN = ORIGIN(graphics_vfb) + LENGTH(graphics_vfb), LENGTH = 7M -  LENGTH(graphics_vfb)
-
+     graphics_vfb (rxw) : ORIGIN = ORIGIN(OCTOSPI2_RAM), LENGTH = 255K
+     graphics_ram (rxw) : ORIGIN = ORIGIN(graphics_vfb) + LENGTH(graphics_vfb), LENGTH = 4M
      /* CLR managed heap ram */
-     CLR_RAM  (rxw) : ORIGIN = ORIGIN(graphics_ram) + LENGTH(graphics_ram), LENGTH = LENGTH(OCTOSPI2_RAM) - LENGTH(graphics_vfb) - LENGTH(graphics_ram)
+     CLR_RAM  (rxw) : ORIGIN = ORIGIN(graphics_ram)+ LENGTH(graphics_ram), LENGTH =  LENGTH(OCTOSPI2_RAM) - LENGTH(graphics_ram) - LENGTH(graphics_vfb)
 }
 
 /* The CLR managed heap for CLR */

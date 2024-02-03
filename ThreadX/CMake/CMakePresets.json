@@ -12,7 +12,6 @@
         "STM32U5_CUBE_SOURCE": "C:/nftools/STM32CubeU5",
         "PICO_SDK_SOURCE": "C:/nftools/pico-sdk",
         "ELF2UF2_EXECUTABLE" : "C:/nftools/Utilities/elf2uf2.exe"
-
       }
     },
     {
@@ -25,7 +24,7 @@
     },
     {
       "name": "RELEASE",
-      "description": "This is optimized for speed without debugging symbols and asserts disabled.",
+      "description": "This is optimized for speed without debugging symbols and with asserts disabled.",
       "hidden": true,
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
@@ -33,7 +32,7 @@
     },
     {
       "name": "RELEASE_WITH_DEBUG_INFO",
-      "description": "This provides optimized code and includes debug symbols but disabled asserts",
+      "description": "This provides optimized code and includes debug symbols but with asserts disabled",
       "hidden": true,
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo"
@@ -94,12 +93,12 @@
         "TARGET_SERIES": "STM32H735xx",
         "ARM_PROCESSOR": "Cortex-M7",
         "BUILD_VERSION": "1.0.0.0",
-        "INFOSTRING": "Built with ThreadX  6.1.12",
+        "INFOSTRING": "Built with ThreadX 6.1.12",
         "GRAPHICS_SUPPORT": "TRUE",
         "TOUCH_DISPLAY_SUPPORT": "TRUE",
         "RANDOM_NUMBER_GENERATOR": "TRUE",
         "DISPLAY_CONTROLLER": "VideoMode.cpp",
-        "DISPLAY_INTERFACE": "LTDC_DMA2D_To_Video.cpp",
+        "DISPLAY_INTERFACE": "LTDC_PARALLEL_DMA2D_To_Video.cpp",
         "TOUCH_INTERFACE": "I2C_To_Touch_STM32.c"
       },
       "hidden": false
@@ -117,13 +116,14 @@
         "TARGET_FAMILY": "STM32H7",
         "TARGET_SERIES": "STM32H7B3xxQ",
         "ARM_PROCESSOR": "Cortex-M7",
+        "SDRAM": true,
         "BUILD_VERSION": "1.0.0.0",
-        "INFOSTRING": "Built with ThreadX  6.1.12",
-        "GRAPHICS_SUPPORT": "TRUE",
-        "TOUCH_DISPLAY_SUPPORT": "TRUE",
-        "RANDOM_NUMBER_GENERATOR": "TRUE",
+        "INFOSTRING": "Built with ThreadX 6.1.12",
+        "GRAPHICS_SUPPORT": true,
+        "TOUCH_DISPLAY_SUPPORT": true,
+        "RANDOM_NUMBER_GENERATOR": true,
         "DISPLAY_CONTROLLER": "VideoMode.cpp",
-        "DISPLAY_INTERFACE": "LTDC_DMA2D_To_Video.cpp",
+        "DISPLAY_INTERFACE": "LTDC_PARALLEL_DMA2D_To_Video.cpp",
         "TOUCH_INTERFACE": "I2C_To_Touch_STM32.c"
       },
       "hidden": false
@@ -142,7 +142,7 @@
         "TARGET_SERIES": "STM32H743xx",
         "ARM_PROCESSOR": "Cortex-M7",
         "BUILD_VERSION": "1.0.0.0",
-        "INFOSTRING": "Built with ThreadX  6.1.12",
+        "INFOSTRING": "Built with ThreadX 6.1.12",
         "GRAPHICS_SUPPORT": "FALSE",
         "TOUCH_DISPLAY_SUPPORT": "FALSE",
         "RANDOM_NUMBER_GENERATOR": "TRUE"
@@ -163,7 +163,7 @@
         "TARGET_SERIES": "STM32U5A9xx",
         "ARM_PROCESSOR": "Cortex-M33",
         "BUILD_VERSION": "1.0.0.0",
-        "INFOSTRING": "Built with ThreadX  6.1.12",
+        "INFOSTRING": "Built with ThreadX 6.1.12",
         "GRAPHICS_SUPPORT": "TRUE",
         "TOUCH_DISPLAY_SUPPORT": "TRUE",
         "RANDOM_NUMBER_GENERATOR": "TRUE",
@@ -187,7 +187,7 @@
         "TARGET_SERIES": "RP2040",
         "ARM_PROCESSOR": "Cortex-M0",
         "BUILD_VERSION": "1.0.0.0",
-        "INFOSTRING": "Built with ThreadX  6.1.12",
+        "INFOSTRING": "Built with ThreadX 6.1.12",
         "GRAPHICS_SUPPORT": "TRUE",
         "RANDOM_NUMBER_GENERATOR": "TRUE",
         "DISPLAY_CONTROLLER": "pico-LCD-1.14V2-ST7789VW.cpp",

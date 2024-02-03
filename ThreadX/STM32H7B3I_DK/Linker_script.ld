@@ -13,7 +13,7 @@ ENTRY(Reset_Handler)
 _sidata = LOADADDR(.data);
 
 /* _estack is used in ThreadX to define the end of the stack memory for the main thread */
-_estack = ORIGIN(DTCM_SRAM) + LENGTH(DTCM_SRAM);
+_estack = ORIGIN(AXI_RAM) + LENGTH(AXI_RAM);
 
 /* Stack and heap size */
 _Min_Heap_Size = 0x200; 
@@ -21,7 +21,9 @@ _Min_Stack_Size = 0x400;
 
 /* Define the availability of FLASH */
 /* Minimum flash erase size is define as a sector for STM32H7 series*/
-sector_size = 8k;
+flash_block_1 = 0x08000000;
+flash_block_1_size = 2048k;
+sector_size = 8K; 
 
 block_size = sector_size;
 number_flash_banks = 2;
@@ -36,13 +38,9 @@ deployment_block_start = 80;
 deployment_block_end = 251;
 blocks_reserved_for_deployment = (deployment_block_end - deployment_block_start) + 1;
 
-config_block_start = 252;
-config_block_end = 255;
-blocks_reserved_for_config = (config_block_end - config_block_start) + 1;
-
-/* NOTE: config is not currently enabled for this board.    */
-/*       This is to be done                                 */
-
+config_block_start = 0;
+config_block_end = 0;
+blocks_reserved_for_config = 0; 
 
 MEMORY
 {
@@ -65,26 +63,26 @@ MEMORY
 
      /* External RAM on development board (STM32H7B3I_DK) */
      OCTOSPI1_FLASH (xrw) : ORIGIN = 0x09000000, LENGTH = 64M
-     SDRAM          (xrw) : ORIGIN = 0xD0000000, LENGTH = 16M
+     OCTOSPI2_RAM   (xrw) : ORIGIN = 0xD0000000, LENGTH = 16M
 
   /* ============================= */
   /* Memory usage by nanoFramework */
   /* ============================= */
+
      nanoCLR      (rx)  : ORIGIN = ORIGIN(FLASH), LENGTH = (blocks_reserved_for_clr*block_size)
      deployment   (rx)  : ORIGIN = ORIGIN(nanoCLR) + LENGTH(nanoCLR), LENGTH = (blocks_reserved_for_deployment*block_size)
      config       (rx)  : ORIGIN = ORIGIN(OCTOSPI1_FLASH), LENGTH = (blocks_reserved_for_config*block_size)
 
      /* Native code ram (Azure, nativeCLR) */
-     NATIVE_RAM   (xrw) : ORIGIN = ORIGIN(DTCM_SRAM), LENGTH = LENGTH(DTCM_SRAM)
-
-     /* CLR managed heap ram */
-     CLR_RAM      (xrw) : ORIGIN = ORIGIN(AXI_RAM), LENGTH = 300K
-     graphics_vfb (xrw) : ORIGIN = ORIGIN(CLR_RAM) + LENGTH(CLR_RAM), LENGTH = 255k
-     graphics_ram (xrw) : ORIGIN = ORIGIN(graphics_vfb) + LENGTH(graphics_vfb), LENGTH = (LENGTH(AXI_RAM) - LENGTH(graphics_vfb) - LENGTH(CLR_RAM))
+     NATIVE_RAM   (xrw) : ORIGIN = ORIGIN(AXI_RAM), LENGTH = LENGTH(AXI_RAM)
 
      /* RAM accessible by the DMA controller */
      RAM_DMA  (xrw) : ORIGIN = ORIGIN(AHB_RAM), LENGTH = LENGTH(SRD_RAM)
 
+     graphics_vfb (rxw) : ORIGIN = ORIGIN(OCTOSPI2_RAM), LENGTH = 255K
+     graphics_ram (rxw) : ORIGIN = ORIGIN(graphics_vfb) + LENGTH(graphics_vfb), LENGTH = 4M
+     /* CLR managed heap ram */
+     CLR_RAM  (rxw) : ORIGIN = ORIGIN(graphics_ram)+ LENGTH(graphics_ram), LENGTH =  LENGTH(OCTOSPI2_RAM) - LENGTH(graphics_ram) - LENGTH(graphics_vfb)
 }
 
 /* The CLR managed heap for CLR */

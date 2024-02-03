@@ -308,6 +308,13 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/DeviceIO/cpu_System.IO.Ports.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/WireProtocol/wp_Communications.c)  
 
+#Region "SDRAM if available"
+    if(SDRAM)
+        list(APPEND NF_INTERPRETER_SOURCES 
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/STM32_FMC_SDRAM.c)  
+    endif()
+
+
 #Region "COMMON GRAPHICS INCLUDES"
     if(GRAPHICS_SUPPORT)
         list(APPEND NF_INTERPRETER_INCLUDES 

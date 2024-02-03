@@ -8,11 +8,15 @@
 void Initialize_Board()
 {
     CPU_CACHE_Enable();
-    // Configure the system clock to 520 MHz
     SystemClock_Config();
+    // Disabling FMC Bank1 ? To prevent this CortexM7  speculative read accesses on FMC bank1
+    // it is recommended to disable it when it is not used
+    // Counter used for microsecond delays (blocking)
+    FMC_Bank1_R->BTCR[0] &= ~FMC_BCRx_MBKEN;
+
     Initialize_DWT_Counter();
     Initialize_Board_LEDS_And_Buttons();
-    Initialize_OCTOSPI2_Hyperam();
+    Initialize_SDRAM(SDRAM_BANK_ADDR, SDRAM_RAM_REGION_SIZE);
 }
 void CPU_CACHE_Enable(void)
 {
@@ -24,32 +28,32 @@ void CPU_CACHE_Enable(void)
 }
 void Initialize_Board_LEDS_And_Buttons()
 {
-    // STM32H735G-DK Board
-    // ===================
     // LED's
-    LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOC);
-    LL_GPIO_InitTypeDef gpio_InitStruct = {0};
-    gpio_InitStruct.Pin = LED_GREEN | LED_RED;
-    gpio_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-    gpio_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-    gpio_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
-    gpio_InitStruct.Pull = LL_GPIO_PULL_UP;
-    LL_GPIO_Init(LED_GPIO_PORT, &gpio_InitStruct);
+    {
+        LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOG);
 
+        LL_GPIO_InitTypeDef gpio_InitStruct = {0};
+        gpio_InitStruct.Pin = LED3_RED | LED2_BLUE;
+        gpio_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+        gpio_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+        gpio_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
+        gpio_InitStruct.Pull = LL_GPIO_PULL_UP;
+        LL_GPIO_Init(LED_GPIO_PORT, &gpio_InitStruct);
+    }
     // Turn them off
-    LL_GPIO_SetOutputPin(LED_GPIO_PORT, LED_GREEN);
-    LL_GPIO_SetOutputPin(LED_GPIO_PORT, LED_RED);
+    LL_GPIO_SetOutputPin(LED_GPIO_PORT, LED3_RED);
+    LL_GPIO_SetOutputPin(LED_GPIO_PORT, LED2_BLUE);
 
     // USER button
-    //-- Same port clock, already enabled
-    gpio_InitStruct.Pin = BUTTON_USER_PIN;
-    gpio_InitStruct.Mode = LL_GPIO_MODE_INPUT;
-    gpio_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
-    gpio_InitStruct.Pull = LL_GPIO_PULL_DOWN;
-    LL_GPIO_Init(LED_GPIO_PORT, &gpio_InitStruct);
-
-    //    LL_EXTI_EnableRisingTrig_0_31(BUTTON_USER_PIN);
-    //    LL_EXTI_EnableIT_0_31(BUTTON_USER_PIN);
+    {
+        LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOC);
+        LL_GPIO_InitTypeDef gpio_InitStruct = {0};
+        gpio_InitStruct.Pin = BUTTON_USER_PIN;
+        gpio_InitStruct.Mode = LL_GPIO_MODE_INPUT;
+        gpio_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
+        gpio_InitStruct.Pull = LL_GPIO_PULL_DOWN;
+        LL_GPIO_Init(BUTTON_USER_GPIO_PORT, &gpio_InitStruct);
+    }
 }
 void Initialize_DWT_Counter()
 {

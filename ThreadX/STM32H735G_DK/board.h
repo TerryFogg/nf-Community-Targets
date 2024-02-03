@@ -14,6 +14,7 @@
 #include "stm32h735xx.h"
 #include "stm32h7xx.h"
 #include "stm32h7xx_ll.h"
+#include "stm32h7xx_hal_pwr.h"
 #include "tx_api.h"
 #include "tx_port.h"
 
@@ -26,66 +27,36 @@
 #pragma endregion
 
 #pragma region Peripheral clocks
-#define ENABLE_PORT_GPIOA LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOA)
-#define ENABLE_PORT_GPIOB LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOB)
-#define ENABLE_PORT_GPIOC LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOC)
-#define ENABLE_PORT_GPIOD LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOD)
-#define ENABLE_PORT_GPIOE LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOE)
-#define ENABLE_PORT_GPIOF LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOF)
-#define ENABLE_PORT_GPIOG LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOG)
-#define ENABLE_PORT_GPIOH LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOH)
+#define ENABLE_CLOCK_ON_PORT_GPIOA LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOA)
+#define ENABLE_CLOCK_ON_PORT_GPIOB LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOB)
+#define ENABLE_CLOCK_ON_PORT_GPIOC LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOC)
+#define ENABLE_CLOCK_ON_PORT_GPIOD LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOD)
+#define ENABLE_CLOCK_ON_PORT_GPIOE LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOE)
+#define ENABLE_CLOCK_ON_PORT_GPIOF LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOF)
+#define ENABLE_CLOCK_ON_PORT_GPIOG LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOG)
+#define ENABLE_CLOCK_ON_PORT_GPIOH LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOH)
+#define ENABLE_CLOCK_ON_USART3     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART3)
+#define ENABLE_CLOCK_ON_DMA1       LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1)
 #pragma endregion
 
 #pragma region Wire protocol USART
 #define wpUSART_DMA_Receive_Buffer_size 2048
-
-#define wpUSART_DMA_Receive_Buffer_size 2048
-
-#define wpBAUD_RATE 921600
-
-#define wpUSART USART3
-#define wpUSART_IRQn USART3_IRQn
-#define wpUSART_IRQHANDLER() void USART3_IRQHandler(void)
-#define wpUSART_PERIPHERAL_CLOCK_ENABLE                                        \
-  LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART3)
-
-#define wpUSART_GPIO_PORT GPIOD
-#define wpUSART_RX_PIN LL_GPIO_PIN_9
-#define wpUSART_TX_PIN LL_GPIO_PIN_8
-#define wpUSART_GPIO_PERIPHERAL_CLOCK_ENABLE                                   \
-  LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOD)
-
-#define wpDMA DMA1
-#define wpDMA_ReceiveStreamInterrupt DMA1_Stream0_IRQn
-#define wpDMA_TransmitStreamInterrupt DMA1_Stream1_IRQn
-#define wpUSART_DMA_PERIPHERAL_CLOCK_ENABLE                                    \
-  LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1)
-
-#define wpDMA_ReceiveStream LL_DMA_STREAM_0
-#define wpDMA_ReceiveMux LL_DMAMUX1_REQ_USART3_RX
-#define wpDMA_ReceiveStream_IRQHandler() void DMA1_Stream0_IRQHandler(void)
-
-#define wpDMA_TransmitStream LL_DMA_STREAM_1
-#define wpDMA_TransmitMux LL_DMAMUX1_REQ_USART3_TX
-#define wpDMA_TransmitStream_IRQHandler() void DMA1_Stream1_IRQHandler(void)
-#define wpUSART_DMA_Receive_Buffer_size   2048
-
 #define wpBAUD_RATE 921600
 
 #define wpUSART                         USART3
 #define wpUSART_IRQn                    USART3_IRQn
 #define wpUSART_IRQHANDLER()            void USART3_IRQHandler(void)
-#define wpUSART_PERIPHERAL_CLOCK_ENABLE LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART3)
+#define wpUSART_PERIPHERAL_CLOCK_ENABLE ENABLE_CLOCK_ON_USART3
 
 #define wpUSART_GPIO_PORT                    GPIOD
 #define wpUSART_RX_PIN                       LL_GPIO_PIN_9
 #define wpUSART_TX_PIN                       LL_GPIO_PIN_8
-#define wpUSART_GPIO_PERIPHERAL_CLOCK_ENABLE LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOD)
+#define wpUSART_GPIO_PERIPHERAL_CLOCK_ENABLE ENABLE_CLOCK_ON_PORT_GPIOD
 
 #define wpDMA                               DMA1
 #define wpDMA_ReceiveStreamInterrupt        DMA1_Stream0_IRQn
 #define wpDMA_TransmitStreamInterrupt       DMA1_Stream1_IRQn
-#define wpUSART_DMA_PERIPHERAL_CLOCK_ENABLE LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1)
+#define wpUSART_DMA_PERIPHERAL_CLOCK_ENABLE ENABLE_CLOCK_ON_DMA1
 
 #define wpDMA_ReceiveStream              LL_DMA_STREAM_0
 #define wpDMA_ReceiveMux                 LL_DMAMUX1_REQ_USART3_RX

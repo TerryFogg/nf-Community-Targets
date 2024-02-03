@@ -43,6 +43,10 @@ set(CMAKE_CXX_EXTENSIONS OFF CACHE INTERNAL "-std=c++17 instead of -std=gnu++17"
 
 target_compile_definitions(nanoCLR.elf PUBLIC -DUSE_FULL_LL_DRIVER)
 
+if(SDRAM)
+    target_compile_definitions(nanoCLR.elf PUBLIC -DHAL_SDRAM_MODULE_ENABLED)
+endif()
+
 target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:-mthumb -mcpu=cortex-m7 -mfpu=fpv5-d16 -mfloat-abi=hard -frounding-math -fsignaling-nans>)
 target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:-fno-builtin -fno-common -fno-unroll-loops>)
 target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:-fshort-wchar -falign-functions=16>)

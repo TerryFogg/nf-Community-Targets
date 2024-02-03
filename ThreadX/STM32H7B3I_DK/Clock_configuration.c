@@ -35,6 +35,8 @@
      }
 
      // Enable HSE oscillator
+     //LL_RCC_HSE_EnableBypass();
+     //LL_RCC_HSE_SelectDigitalClock();
      LL_RCC_HSE_Enable();
      while (LL_RCC_HSE_IsReady() != 1)
      {

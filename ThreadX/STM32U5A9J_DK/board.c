@@ -38,7 +38,7 @@ void CPU_CACHE_Enable(void)
 void Initialize_Board_LEDS_And_Buttons()
 {
     // LED's
-    ENABLE_PORT_GPIOE;
+    ENABLE_CLOCK_ON_PORT_GPIOE;
     LL_GPIO_InitTypeDef gpio_InitStruct = {0};
     gpio_InitStruct.Pin = LED_GREEN | LED_RED;
     gpio_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
@@ -52,7 +52,7 @@ void Initialize_Board_LEDS_And_Buttons()
     LL_GPIO_SetOutputPin(LED_GPIO_PORT, LED_RED);
 
     // USER button
-    ENABLE_PORT_GPIOC;
+    ENABLE_CLOCK_ON_PORT_GPIOC;
     gpio_InitStruct.Pin = BUTTON_USER_PIN;
     gpio_InitStruct.Mode = LL_GPIO_MODE_INPUT;
     gpio_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;

@@ -24,6 +24,8 @@
 
 void Initialize_SDRAM(uint32_t sdram_base_address, uint32_t sdram_region_size)
 {
+    (void)sdram_base_address;
+    (void)sdram_region_size;
 #pragma region Setup the FMC pin definitions
     LL_GPIO_InitTypeDef gpio_init_structure;
 
@@ -77,7 +79,7 @@ void Initialize_SDRAM(uint32_t sdram_base_address, uint32_t sdram_region_size)
     // Disable MPU
     LL_MPU_Disable();
     {
-        // Configure the MPU as Strongly ordered for undefined regions
+            // Configure the MPU as Strongly ordered for undefined regions
         LL_MPU_ConfigRegion(
             LL_MPU_REGION_NUMBER0,
             0x87,

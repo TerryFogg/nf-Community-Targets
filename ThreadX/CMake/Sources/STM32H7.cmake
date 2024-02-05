@@ -62,8 +62,6 @@
              ${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_Hal_Driver/src/stm32h7xx_ll_usb.c
              ${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_Hal_Driver/src/stm32h7xx_ll_utils.c
 
-             ${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_Hal_Driver/src/stm32h7xx_hal_pwr.c
-             ${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_Hal_Driver/src/stm32h7xx_hal_rcc.c
 
 )
 

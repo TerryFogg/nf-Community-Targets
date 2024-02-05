@@ -9,11 +9,13 @@
 /* Entry point */
 ENTRY(Reset_Handler)
 
+
+/* _estack is used in ThreadX to define the end of the stack memory for the main thread */
+_estack = 0x20010000;
+
 /* _sidata is used in ThreadX to copy the data segment from ROM to RAM during initialization */
 _sidata = LOADADDR(.data);
 
-/* _estack is used in ThreadX to define the end of the stack memory for the main thread */
-_estack = ORIGIN(AXI_RAM) + LENGTH(AXI_RAM);
 
 /* Stack and heap size */
 _Min_Heap_Size = 0x200; 
@@ -44,46 +46,54 @@ blocks_reserved_for_config = 0;
 
 MEMORY
 {
-  /* =============== */
-  /* PHYSICAL MEMORY */
-  /* =============== */
+  /* ===============*/
+  /* PHYSICAL MEMORY*/
+  /* ===============*/
 
-    /* =============== */
-    /* STM32H7B3LIH6QU */
-    /* =============== */
+    /* ===============*/
+    /* STM32H7B3LIH6QU*/
+    /* ===============*/
 
-     ITCM_SRAM  (rx)  : ORIGIN = 0x00000000, LENGTH = 64K 
-     FLASH      (rx)  : ORIGIN = 0x08000000, LENGTH = 2048k
-     OTP        (rx)  : ORIGIN = 0x08000000, LENGTH = 1024
-     DTCM_SRAM  (rx)  : ORIGIN = 0x20000000, LENGTH = 128K 
-     AXI_RAM    (xrw) : ORIGIN = 0x24000000, LENGTH = 1024K  /* ( 256K + 384K + 384K ) */
-     AHB_RAM    (xrw) : ORIGIN = 0x30000000, LENGTH = 128K   /* (64K + 64K) */
-     SRD_RAM    (xrw) : ORIGIN = 0x38000000, LENGTH = 32K
-     BACKUP_RAM (xrw) : ORIGIN = 0x38800000, LENGTH = 4k
+     ITCM_SRAM  (rxw):ORIGIN = 0x00000000,LENGTH = 64K 
+     FLASH      (rx) :ORIGIN = 0x08000000,LENGTH = 2048k
+     OTP        (rx) :ORIGIN = 0x08000000,LENGTH = 1024
+     DTCM_SRAM  (rxw):ORIGIN = 0x20000000,LENGTH = 64K 
+     AXI_RAM1   (rxw):ORIGIN = 0x24000000,LENGTH = 256K
+     AXI_RAM2   (rxw):ORIGIN = 0x24040000,LENGTH = 384K
+     AXI_RAM3   (rxw):ORIGIN = 0x240A0000,LENGTH = 384K
+     AHB_RAM    (rxw):ORIGIN = 0x30000000,LENGTH = 128K   /* (64K + 64K) */
+     SRD_RAM    (rxw):ORIGIN = 0x38000000,LENGTH = 32K
+     BACKUP_RAM (rxw):ORIGIN = 0x38800000,LENGTH = 4k
 
      /* External RAM on development board (STM32H7B3I_DK) */
      OCTOSPI1_FLASH (xrw) : ORIGIN = 0x09000000, LENGTH = 64M
-     OCTOSPI2_RAM   (xrw) : ORIGIN = 0xD0000000, LENGTH = 16M
+     FMC_SDRAM      (xrw) : ORIGIN = 0xD0000000, LENGTH = 16M
 
   /* ============================= */
   /* Memory usage by nanoFramework */
   /* ============================= */
 
-     nanoCLR      (rx)  : ORIGIN = ORIGIN(FLASH), LENGTH = (blocks_reserved_for_clr*block_size)
-     deployment   (rx)  : ORIGIN = ORIGIN(nanoCLR) + LENGTH(nanoCLR), LENGTH = (blocks_reserved_for_deployment*block_size)
-     config       (rx)  : ORIGIN = ORIGIN(OCTOSPI1_FLASH), LENGTH = (blocks_reserved_for_config*block_size)
+     nanoCLR    (rx) : ORIGIN = ORIGIN(FLASH), LENGTH = (blocks_reserved_for_clr*block_size)
+     deployment (rx) : ORIGIN = ORIGIN(nanoCLR) + LENGTH(nanoCLR), LENGTH = (blocks_reserved_for_deployment*block_size)
+     config     (rx) : ORIGIN = ORIGIN(OCTOSPI1_FLASH), LENGTH = (blocks_reserved_for_config*block_size)
 
      /* Native code ram (Azure, nativeCLR) */
-     NATIVE_RAM   (xrw) : ORIGIN = ORIGIN(AXI_RAM), LENGTH = LENGTH(AXI_RAM)
+     /* NATIVE_RAM   (rxw) : ORIGIN = ORIGIN(AXI_RAM), LENGTH = LENGTH(AXI_RAM) */
+  
+  NATIVE_RAM   (rxw) : ORIGIN = ORIGIN(AXI_RAM1), LENGTH = LENGTH(AXI_RAM1)
+  CLR_RAM  (rxw) : ORIGIN = ORIGIN(AXI_RAM2), LENGTH =  LENGTH(AXI_RAM2) + LENGTH(AXI_RAM3)
 
      /* RAM accessible by the DMA controller */
-     RAM_DMA  (xrw) : ORIGIN = ORIGIN(AHB_RAM), LENGTH = LENGTH(SRD_RAM)
+     RAM_DMA      (rxw) : ORIGIN = ORIGIN(AHB_RAM), LENGTH = LENGTH(AHB_RAM)
 
-     graphics_vfb (rxw) : ORIGIN = ORIGIN(OCTOSPI2_RAM), LENGTH = 255K
+     graphics_vfb (rxw) : ORIGIN = ORIGIN(FMC_SDRAM), LENGTH = 255K
      graphics_ram (rxw) : ORIGIN = ORIGIN(graphics_vfb) + LENGTH(graphics_vfb), LENGTH = 4M
-     /* CLR managed heap ram */
-     CLR_RAM  (rxw) : ORIGIN = ORIGIN(graphics_ram)+ LENGTH(graphics_ram), LENGTH =  LENGTH(OCTOSPI2_RAM) - LENGTH(graphics_ram) - LENGTH(graphics_vfb)
+ 
+ 
+ /* CLR managed heap ram */
+ /*    CLR_RAM  (rxw) : ORIGIN = ORIGIN(graphics_ram)+ LENGTH(graphics_ram), LENGTH =  LENGTH(FMC_SDRAM) - LENGTH(graphics_ram) - LENGTH(graphics_vfb) */
 }
+
 
 /* The CLR managed heap for CLR */
 HeapBegin             = ORIGIN(CLR_RAM); 
@@ -168,7 +178,7 @@ SECTIONS
   
   .ARM : 
   {
-    __exidx_start = .;         /*exidx is used to contain index entries for stack unwinding */
+    __exidx_start = .;         /* exidx is used to contain index entries for stack unwinding */
     *(.ARM.exidx*)
     __exidx_end = .;
   } >FLASH
@@ -215,8 +225,6 @@ SECTIONS
                        /* Used in LoopCopyDataInit:, "startup_st,32h735igks.s"
     *(.data)           /* .data sections */
     *(.data*)          /* .data* sections */
-    *(.RamFunc)        /* .RamFunc sections */
-    *(.RamFunc*)       /* .RamFunc* sections */
     . = ALIGN(4);
     _edata = .;        /* define a global symbol at data end */
   } >NATIVE_RAM AT> FLASH

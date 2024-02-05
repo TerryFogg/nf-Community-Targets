@@ -67,7 +67,7 @@ void wp_InitializeUsart(void)
     GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
     GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
     GPIO_InitStruct.Alternate = LL_GPIO_AF_7;
-    LL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+    LL_GPIO_Init(wpUSART_GPIO_PORT, &GPIO_InitStruct);
 
     // wpUSART Receive Initialize
     LL_DMA_SetPeriphRequest(wpDMA, wpDMA_ReceiveStream, wpDMA_ReceiveMux);

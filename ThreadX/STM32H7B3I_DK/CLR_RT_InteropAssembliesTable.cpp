@@ -32,6 +32,7 @@ const CLR_RT_NativeAssemblyData *g_CLR_InteropAssembliesNativeData[] = {
     &g_CLR_AssemblyNative_nanoFramework_Runtime_Events_EventSink_DriverProcs,
     &g_CLR_AssemblyNative_System_Math,
     &g_CLR_AssemblyNative_System_Device_Gpio,
-    NULL};
+    NULL
+};
 
 const uint16_t g_CLR_InteropAssembliesCount = (8 + 2);

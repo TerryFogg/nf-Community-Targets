@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file      startup_stm32h7b3xx.s
+  * @file      startup_stm32h7b3xxq.s
   * @author    MCD Application Team
   * @brief     STM32H7B3xx Devices vector table for GCC based toolchain. 
   *            This module performs:

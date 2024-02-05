@@ -4,19 +4,27 @@
 // See LICENSE file in the project root for full license information.
 //
 #include "board.h"
+#include <stm32h7xx_hal.h>
+#include <stm32h7xx_hal_cortex.h>
+#include <core_cm7.h>
 
 void Initialize_Board()
 {
+
+
     CPU_CACHE_Enable();
+   // HAL_Init();
+
     SystemClock_Config();
+
+
     // Disabling FMC Bank1 ? To prevent this CortexM7  speculative read accesses on FMC bank1
     // it is recommended to disable it when it is not used
-    // Counter used for microsecond delays (blocking)
     FMC_Bank1_R->BTCR[0] &= ~FMC_BCRx_MBKEN;
 
     Initialize_DWT_Counter();
     Initialize_Board_LEDS_And_Buttons();
-    Initialize_SDRAM(SDRAM_BANK_ADDR, SDRAM_RAM_REGION_SIZE);
+   // Initialize_SDRAM(SDRAM_BANK_ADDR, SDRAM_RAM_REGION_SIZE);
 }
 void CPU_CACHE_Enable(void)
 {

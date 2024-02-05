@@ -12,8 +12,8 @@
 #include <nanoCLR_Headers.h>
 
 #include "stm32h7b3xxq.h"
-#include "stm32h7xx_ll.h"
 #include "stm32h7xx.h"
+#include "stm32h7xx_ll.h"
 #include "stm32h7xx_hal_pwr.h"
 #include "tx_api.h"
 #include "tx_port.h"

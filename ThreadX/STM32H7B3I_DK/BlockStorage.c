@@ -11,19 +11,18 @@
 BlockStorageDevice Device_BlockStorage;
 
 const BlockRange BlockRange1[] = {
-    {BlockRange_BLOCKTYPE_CODE, (uint32_t)(uint32_t *)&clr_block_start, (uint32_t)(uint32_t *)&clr_block_end},
-    {BlockRange_BLOCKTYPE_DEPLOYMENT,
-     (uint32_t)(uint32_t *)&deployment_block_start,
-     (uint32_t)(uint32_t *)&deployment_block_end}};
+     {BlockRange_BLOCKTYPE_CODE,       (uint32_t)(uint32_t *)&clr_block_start, (uint32_t)(uint32_t *)&clr_block_end},
+     {BlockRange_BLOCKTYPE_DEPLOYMENT, (uint32_t)(uint32_t *)&deployment_block_start, (uint32_t)(uint32_t *)&deployment_block_end}
+};
 
 const BlockRegionInfo BlockRegions[] = {
     {
         (BlockRegionAttribute_ProgramWidthIs128bits),
         (uint32_t)(uint32_t *)&flash_block_1, // start address for block region
-        (uint32_t)(uint32_t *)&total_blocks,  // total number of blocks in this region
-        (uint32_t)(uint32_t *)&block_size,    // total number of bytes per block
-        ARRAYSIZE_CONST_EXPR(BlockRange1),    // size
-        BlockRange1,                          // Address
+        (uint32_t)(uint32_t *)&total_blocks, // total number of blocks in this region
+        (uint32_t)(uint32_t *)&block_size,   // total number of bytes per block
+        ARRAYSIZE_CONST_EXPR(BlockRange1),   // size
+        BlockRange1,                         // Address
     },
 };
 
@@ -45,16 +44,16 @@ MEMORY_MAPPED_NOR_BLOCK_CONFIG Device_BlockStorageConfig = {
     },
     {
         // CPU_MEMORY_CONFIG
-        0,                                         // UINT8  CPU_MEMORY_CONFIG::ChipSelect;
-        true,                                      // UINT8  CPU_MEMORY_CONFIG::ReadOnly;
-        0,                                         // UINT32 CPU_MEMORY_CONFIG::WaitStates;
-        0,                                         // UINT32 CPU_MEMORY_CONFIG::ReleaseCounts;
-        16,                                        // UINT32 CPU_MEMORY_CONFIG::BitWidth;
-        (uint32_t)(uint32_t *)&flash_block_1,      // UINT32 CPU_MEMORY_CONFIG::BaseAddress;
+        0,          // UINT8  CPU_MEMORY_CONFIG::ChipSelect;
+        true,       // UINT8  CPU_MEMORY_CONFIG::ReadOnly;
+        0,          // UINT32 CPU_MEMORY_CONFIG::WaitStates;
+        0,          // UINT32 CPU_MEMORY_CONFIG::ReleaseCounts;
+        16,         // UINT32 CPU_MEMORY_CONFIG::BitWidth;
+        (uint32_t)(uint32_t *)&flash_block_1, // UINT32 CPU_MEMORY_CONFIG::BaseAddress;
         (uint32_t)(uint32_t *)&flash_block_1_size, // UINT32 CPU_MEMORY_CONFIG::SizeInBytes;
-        0,                                         // UINT8  CPU_MEMORY_CONFIG::XREADYEnable
-        0,                                         // UINT8  CPU_MEMORY_CONFIG::ByteSignalsForRead
-        0,                                         // UINT8  CPU_MEMORY_CONFIG::ExternalBufferEnable
+        0,          // UINT8  CPU_MEMORY_CONFIG::XREADYEnable
+        0,          // UINT8  CPU_MEMORY_CONFIG::ByteSignalsForRead
+        0,          // UINT8  CPU_MEMORY_CONFIG::ExternalBufferEnable
     },
     0, // UINT32 ChipProtection;
     0, // UINT32 ManufacturerCode;

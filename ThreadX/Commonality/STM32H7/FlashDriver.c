@@ -50,58 +50,80 @@ bool FlashDriver_Write(
     int number_of_flash_words = numBytes / (FLASH_NB_32BITWORD_IN_FLASHWORD * 4U);
     int remaining_bytes = numBytes % (FLASH_NB_32BITWORD_IN_FLASHWORD * 4U);
 
-    FlashUnlock(bank);
+    FlashUnlock();
+
+    switch (bank)
     {
-        if (number_of_flash_words != 0) // Program the full flash word
+        case 1:
+            SET_BIT(FLASH->CR1, FLASH_CR_PG);
+            break;
+#if defined(DUAL_BANK)
+        case 2:
+            SET_BIT(FLASH->CR2, FLASH_CR_PG);
+            break;
+#endif
+    }
+    if (number_of_flash_words != 0) // Program the full flash word
+    {
+        for (int flash_word_index = 0; flash_word_index < number_of_flash_words; flash_word_index++)
         {
-            for (int flash_word_index = 0; flash_word_index < number_of_flash_words; flash_word_index++)
-            {
-                WaitForLastOperation(bank);
-                int row_index = FLASH_NB_32BITWORD_IN_FLASHWORD;
-                __ISB();
-                __DSB();
-                do
-                {
-                    *dest_addr = *src_addr;
-                    dest_addr++;
-                    src_addr++;
-                    row_index--;
-                } while (row_index != 0);
-                __ISB();
-                __DSB();
-            }
-        }
-        if (remaining_bytes != 0)
-        {
-            __IO uint8_t *dest_addr_8_bit = (__IO uint8_t *)(dest_addr);
-            __IO uint8_t *src_addr_8_bit = (__IO uint8_t *)(src_addr);
             WaitForLastOperation(bank);
+            int row_index = FLASH_NB_32BITWORD_IN_FLASHWORD;
             __ISB();
             __DSB();
             do
             {
-                *dest_addr_8_bit = *src_addr_8_bit;
-                dest_addr_8_bit++;
-                src_addr_8_bit++;
-                remaining_bytes--;
-            } while (remaining_bytes != 0);
+                *dest_addr = *src_addr;
+                dest_addr++;
+                src_addr++;
+                row_index--;
+            } while (row_index != 0);
             __ISB();
             __DSB();
-
-            switch (bank)
-            {
-                case 1:
-                    SET_BIT(FLASH->CR1, FLASH_CR_FW);
-                    break;
-#if defined(DUAL_BANK)
-                case 2:
-                    SET_BIT(FLASH->CR2, FLASH_CR_FW);
-                    break;
-#endif
-            }
         }
     }
-    FlashLock(bank);
+    if (remaining_bytes != 0)
+    {
+        __IO uint8_t *dest_addr_8_bit = (__IO uint8_t *)(dest_addr);
+        __IO uint8_t *src_addr_8_bit = (__IO uint8_t *)(src_addr);
+        WaitForLastOperation(bank);
+        __ISB();
+        __DSB();
+        do
+        {
+            *dest_addr_8_bit = *src_addr_8_bit;
+            dest_addr_8_bit++;
+            src_addr_8_bit++;
+            remaining_bytes--;
+        } while (remaining_bytes != 0);
+        __ISB();
+        __DSB();
+
+        switch (bank)
+        {
+            case 1:
+                SET_BIT(FLASH->CR1, FLASH_CR_FW);
+                break;
+#if defined(DUAL_BANK)
+            case 2:
+                SET_BIT(FLASH->CR2, FLASH_CR_FW);
+                break;
+#endif
+        }
+    }
+    switch (bank)
+    {
+        case 1:
+            CLEAR_BIT(FLASH->CR1, FLASH_CR_PG);
+            break;
+#if defined(DUAL_BANK)
+        case 2:
+            CLEAR_BIT(FLASH->CR2, FLASH_CR_PG);
+            break;
+#endif
+    }
+
+    FlashLock();
 
     return true;
 }
@@ -131,9 +153,10 @@ bool FlashDriver_EraseBlock(void *context, ByteAddress address)
     uint32_t sector = GetSector(address);
     uint32_t bank = GetBank(address);
 
-    FlashUnlock(bank);
+    FlashUnlock();
     {
-        if (WaitForLastOperation(bank)) // Flash unlocked?
+        success = WaitForLastOperation(bank);
+        if (success) // Flash unlocked?
         {
             switch (bank)
             {
@@ -165,64 +188,61 @@ bool FlashDriver_EraseBlock(void *context, ByteAddress address)
 #endif
             }
         }
+        else
+        {
+            success = false;
+        }
     }
-    FlashLock(bank);
+    FlashLock();
     return success;
 }
-bool FlashUnlock(uint32_t bank)
+bool FlashUnlock()
 {
     //  The application software must not unlock a register that is already
     //  unlocked, otherwise this register will remain locked until next system
     //  reset.Similar constraints apply to bank erase requests.
-    switch (bank)
+    if (READ_BIT(FLASH->CR1, FLASH_CR_LOCK) != 0U)
     {
-        case 1:
-            if (READ_BIT(FLASH->CR1, FLASH_CR_LOCK) != 0U)
-            {
-                // Authorize the FLASH Bank1 Registers access
-                WRITE_REG(FLASH->KEYR1, FLASH_KEY1);
-                WRITE_REG(FLASH->KEYR1, FLASH_KEY2);
+        // Authorize the FLASH Bank1 Registers access
+        WRITE_REG(FLASH->KEYR1, FLASH_KEY1);
+        WRITE_REG(FLASH->KEYR1, FLASH_KEY2);
 
-                // Verify Flash Bank1 is unlocked
-                if (READ_BIT(FLASH->CR1, FLASH_CR_LOCK) != 0U)
-                {
-                    return false;
-                }
-            }
-            SET_BIT(FLASH->CR1, FLASH_CR_PG);
-            break;
-#if defined(DUAL_BANK)
-        case 2:
-            SET_BIT(FLASH->CR2, FLASH_CR_PG);
-            break;
-#endif
+        // Verify Flash Bank1 is unlocked
+        if (READ_BIT(FLASH->CR1, FLASH_CR_LOCK) != 0U)
+        {
+            return false;
+        }
     }
+#if defined(DUAL_BANK)
+    if (READ_BIT(FLASH->CR2, FLASH_CR_LOCK) != 0U)
+    {
+        // Authorize the FLASH Bank2 Registers access
+        WRITE_REG(FLASH->KEYR2, FLASH_KEY1);
+        WRITE_REG(FLASH->KEYR2, FLASH_KEY2);
+
+        // Verify Flash Bank2 is unlocked
+        if (READ_BIT(FLASH->CR2, FLASH_CR_LOCK) != 0U)
+        {
+            return HAL_ERROR;
+        }
+    }
+#endif
     return true;
 }
-bool FlashLock(uint32_t bank)
+bool FlashLock()
 {
-    switch (bank)
+    SET_BIT(FLASH->CR1, FLASH_CR_LOCK);            // Lock FLASH Bank1 Control Register access
+    if (READ_BIT(FLASH->CR1, FLASH_CR_LOCK) == 0U) // Verify Flash Bank1 is locked
     {
-        case 1:
-            SET_BIT(FLASH->CR1, FLASH_CR_LOCK);            // Lock FLASH Bank1 Control Register access
-            if (READ_BIT(FLASH->CR1, FLASH_CR_LOCK) == 0U) // Verify Flash Bank1 is locked
-            {
-                return false;
-            }
-            CLEAR_BIT(FLASH->CR1, FLASH_CR_PG); // Disable internal buffer for write operations
-            break;
-#if defined(DUAL_BANK)
-        case 2:
-            SET_BIT(FLASH->CR2, FLASH_CR_LOCK);            // Lock FLASH Bank1 Control Register access
-            if (READ_BIT(FLASH->CR2, FLASH_CR_LOCK) == 0U) // Verify Flash Bank1 is locked
-            {
-                return false;
-            }
-            CLEAR_BIT(FLASH->CR1, FLASH_CR_PG); // Disable internal buffer for write operations
-            break;
-            break;
-#endif
+        return false;
     }
+#if defined(DUAL_BANK)
+    SET_BIT(FLASH->CR2, FLASH_CR_LOCK);            // Lock FLASH Bank1 Control Register access
+    if (READ_BIT(FLASH->CR2, FLASH_CR_LOCK) == 0U) // Verify Flash Bank1 is locked
+    {
+        return false;
+    }
+#endif
     return true;
 }
 void WriteFlashWord(uint32_t bank, uint32_t *aligned_dest_addr, uint32_t *buffer_256bits)
@@ -231,7 +251,7 @@ void WriteFlashWord(uint32_t bank, uint32_t *aligned_dest_addr, uint32_t *buffer
     // Buffer must contain exactly 32 bytes ( 256 bits)
     // NOTE: Calling method must lock and unlock the flash before calling
 
-    FlashUnlock(bank);
+    FlashUnlock();
     {
         if (WaitForLastOperation(bank))
         {
@@ -256,7 +276,7 @@ void WriteFlashWord(uint32_t bank, uint32_t *aligned_dest_addr, uint32_t *buffer
             }
         }
     }
-    FlashLock(bank);
+    FlashLock();
 }
 uint32_t GetSector(uint32_t Address)
 {
@@ -314,20 +334,20 @@ bool WaitForLastOperation(uint32_t bank)
             break;
 #if defined(DUAL_BANK)
         case 2:
-             errorflag = FLASH->SR2 & FLASH_FLAG_ALL_ERRORS_BANK2;
+            errorflag = FLASH->SR2 & FLASH_FLAG_ALL_ERRORS_BANK2;
             while (READ_BIT(FLASH->SR2, FLASH_FLAG_QW_BANK2))
             {
                 // TODO : (timeout code here) is this necessary?
             }
             // In case of error reported in Flash SR1 or SR2 register
-            if ((errorflag & 0x7FFFFFFFU) != 0U) 
+            if ((errorflag & 0x7FFFFFFFU) != 0U)
             {
                 // Clear error programming flags
-                WRITE_REG(FLASH->CCR2, errorflag); 
+                WRITE_REG(FLASH->CCR2, errorflag);
                 return false;
             }
             // Clear FLASH End of Operation pending bit
-            WRITE_REG(FLASH->CCR2, (FLASH_SR_CRCRDERR | 0x80000000U)); 
+            WRITE_REG(FLASH->CCR2, (FLASH_SR_CRCRDERR | 0x80000000U));
             break;
 #endif
     }

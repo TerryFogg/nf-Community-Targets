@@ -5,7 +5,7 @@
 
 #include <nanoHAL_Power.h>
 #include <nanoHAL_v2.h>
-#include "target_board.h"
+#include "board.h"
 
 uint32_t WakeupReasonStore;
 

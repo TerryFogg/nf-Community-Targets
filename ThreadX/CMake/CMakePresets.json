@@ -5,13 +5,14 @@
       "name": "LOCAL_SOURCES",
       "description": "Configuration for setting up locations where external source repositories have been copied to local disk",
       "hidden": true,
+      // $env{<variable-name>}
       "cacheVariables": {
         "THREADX_SOURCE": "C:/nftools/ThreadX",
         "NETXDUO_SOURCE_FOLDER": "C:/nftools/NetxDuo",
         "STM32H7_CUBE_SOURCE": "C:/nftools/STM32CubeH7",
         "STM32U5_CUBE_SOURCE": "C:/nftools/STM32CubeU5",
         "PICO_SDK_SOURCE": "C:/nftools/pico-sdk",
-        "ELF2UF2_EXECUTABLE" : "C:/nftools/Utilities/elf2uf2.exe"
+        "ELF2UF2_EXECUTABLE": "C:/nftools/Utilities/elf2uf2.exe"
       }
     },
     {

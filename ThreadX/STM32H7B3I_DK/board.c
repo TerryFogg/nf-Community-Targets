@@ -11,20 +11,15 @@
 void Initialize_Board()
 {
 
-
     CPU_CACHE_Enable();
-   // HAL_Init();
-
     SystemClock_Config();
-
-
     // Disabling FMC Bank1 ? To prevent this CortexM7  speculative read accesses on FMC bank1
     // it is recommended to disable it when it is not used
     FMC_Bank1_R->BTCR[0] &= ~FMC_BCRx_MBKEN;
 
     Initialize_DWT_Counter();
     Initialize_Board_LEDS_And_Buttons();
-   // Initialize_SDRAM(SDRAM_BANK_ADDR, SDRAM_RAM_REGION_SIZE);
+    Initialize_SDRAM(SDRAM_BANK_ADDR, SDRAM_RAM_REGION_SIZE);
 }
 void CPU_CACHE_Enable(void)
 {
@@ -38,7 +33,7 @@ void Initialize_Board_LEDS_And_Buttons()
 {
     // LED's
     {
-        LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOG);
+        ENABLE_CLOCK_ON_PORT_GPIOG;
 
         LL_GPIO_InitTypeDef gpio_InitStruct = {0};
         gpio_InitStruct.Pin = LED3_RED | LED2_BLUE;
@@ -46,11 +41,11 @@ void Initialize_Board_LEDS_And_Buttons()
         gpio_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
         gpio_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
         gpio_InitStruct.Pull = LL_GPIO_PULL_UP;
-        LL_GPIO_Init(LED_GPIO_PORT, &gpio_InitStruct);
+        LL_GPIO_Init(GPIOG, &gpio_InitStruct);
     }
     // Turn them off
-    LL_GPIO_SetOutputPin(LED_GPIO_PORT, LED3_RED);
-    LL_GPIO_SetOutputPin(LED_GPIO_PORT, LED2_BLUE);
+    LL_GPIO_SetOutputPin(GPIOG, LED3_RED);
+    LL_GPIO_SetOutputPin(GPIOG, LED2_BLUE);
 
     // USER button
     {
@@ -116,23 +111,23 @@ void Initialize_64bit_timer()
     LL_TIM_EnableCounter(TIM2);
     LL_TIM_EnableCounter(TIM5);
 }
-void BoardLed_ON(uint32_t led)
+void BoardLed_OFF(GPIO_TypeDef *gpio_port, uint32_t led)
 {
-    LL_GPIO_ResetOutputPin(LED_GPIO_PORT, led);
+    LL_GPIO_ResetOutputPin(gpio_port, led);
 };
-void BoardLed_OFF(uint32_t led)
+void BoardLed_ON(GPIO_TypeDef *gpio_port, uint32_t led)
 {
-    LL_GPIO_SetOutputPin(LED_GPIO_PORT, led);
+    LL_GPIO_SetOutputPin(gpio_port, led);
 };
-void BoardLed_Toggle(uint32_t led)
+void BoardLed_Toggle(GPIO_TypeDef *gpio_port, uint32_t led)
 {
-    if ((LED_GPIO_PORT->ODR & led) == led)
+    if ((gpio_port->ODR & led) == led)
     {
-        LED_GPIO_PORT->BSRR = led << 16;
+        gpio_port->BSRR = led << 16;
     }
     else
     {
-        LED_GPIO_PORT->BSRR = led;
+        gpio_port->BSRR = led;
     }
 }
 bool BoardUserButton_Pressed()

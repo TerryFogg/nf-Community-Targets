@@ -30,9 +30,11 @@ uint8_t wpUSART_DMA_Receive_Buffer[wpUSART_DMA_Receive_Buffer_size];
 static_assert((sizeof(wpUSART_DMA_Receive_Buffer) % 32) == 0, "Must be a multiple by 32");
 
 CircularBuffer_t ReceiveCircularBuffer;
+__attribute__((section(".dma_buffer"))) __attribute__((aligned(32))) 
 uint8_t wp_ReceiveData[2048];
 
 CircularBuffer_t TransmitCircularBuffer;
+__attribute__((section(".dma_buffer"))) __attribute__((aligned(32))) 
 uint8_t wp_TransmitData[2048];
 
 //  Length of currently active TX DMA transfer

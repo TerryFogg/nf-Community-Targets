@@ -1,21 +1,40 @@
 /*
-// Copyright (c) .NET Foundation and Contributors
-// See LICENSE file in the project root for full license information.
+   Copyright (c) .NET Foundation and Contributors
+   See LICENSE file in the project root for full license information.
 */
-/* Note:                                            */
-/* SYS>>   Bare metal code or RTOS                  */
-/* CLR>>   Use by Common Language Runtime           */
+/* NOTES
+   Division of internal flash is limited by the smallest erase size of 4K
+   The first sector contains a prepended bs2_default_padded_checksummed.S boot
+*/
 
-/* NOTE */
-/* Division of internal flash is limited by the smallest */
-/* erase size of 4K */
-/* Each flash write must be aligned */  
-/* to a 256-byte boundary and count */
-/* must be a multiple of 256.       */
-
-
+/* Entry point */
 ENTRY(_entry_point)
-  
+
+/* Define the availability of FLASH */
+/* Minimum flash erase size is define as a page for RP2040 series*/
+flash_block_1 = 0x10000000;
+flash_block_1_size = 2048K;
+flash_page_size = 4096; 
+
+block_size = flash_page_size;
+total_blocks = 512;
+
+stage2_boot_block_start = 0;
+stage2_boot_block_end = 0;
+blocks_reserved_for_stage2_boot = 1;
+
+clr_block_start = 1;
+clr_block_end = 159;
+blocks_reserved_for_clr = (clr_block_end - clr_block_start) + 1;
+
+deployment_block_start = 161;
+deployment_block_end = 511;
+blocks_reserved_for_deployment = (deployment_block_end - deployment_block_start) + 1;
+
+config_block_start = 160;
+config_block_end = 160;
+blocks_reserved_for_config = 1;
+
 flash_sector_size  = 4096 ; 
 flash_page_size    = 256;
 Total_flash_page_count   = 512;
@@ -28,8 +47,6 @@ number_sectors_total = 8;
 total_flash_size = number_sectors_total * sector_size;
 ram_total = 192K + 128K;
 native_ram_size = 20k;
-config_size = 20k;
-
 
 
 MEMORY
@@ -40,119 +57,76 @@ MEMORY
   /* =============== */
 
     /* ============== */
-    /* RP2040 - PICO */
+    /* RP2040 - PICO  */
     /* ============== */
 
-   FACTORY_SYSTEM_MEMORY (RX) : ORIGIN = 0x00000000, LENGHT = 16KB
+     FACTORY_SYSTEM_MEMORY (rx):ORIGIN = 0x00000000, LENGTH = 16K
+     FLASH             (rx) :ORIGIN = 0x10000000,LENGTH = 2048K
+     RAM_STRIPED       (rxw):ORIGIN = 0x20000000,LENGTH = 256K  
+     RAM_NONSTRIPED_0  (rxw):ORIGIN = 0x21000000,LENGTH = 64K  
+     RAM_NONSTRIPED_1  (rxw):ORIGIN = 0x21010000,LENGTH = 64K  
+     RAM_NONSTRIPED_2  (rxw):ORIGIN = 0x21020000,LENGTH = 64K  
+     RAM_NONSTRIPED_3  (rxw):ORIGIN = 0x21030000,LENGTH = 64K  
+     SCRATCH_X         (rxw):ORIGIN = 0x20040000,LENGTH = 4K  
+     SCRATCH_Y         (rxw):ORIGIN = 0x20041000,LENGTH = 4K  
+     XIP_CACHING       (rxw):ORIGIN = 0x15000000,LENGTH = 16K
+     DPRAM             (rxw):ORIGIN = 0x50100000,LENGTH = 4K
 
-   /* RAM can be addressed as striped or non-striped
+  /* ============================= */
+  /* Memory usage by nanoFramework */
+  /* ============================= */
+     
+     STAGE2_BOOT  (rx):ORIGIN = ORIGIN(FLASH), LENGTH = 252 + 4
+     nanoCLR      (rx):ORIGIN = ORIGIN(STAGE2_BOOT) + LENGTH(STAGE2_BOOT), LENGTH = (blocks_reserved_for_clr*block_size)
+     config       (rx):ORIGIN = ORIGIN(nanoCLR)     + LENGTH(nanoCLR)    , LENGTH = (blocks_reserved_for_config*block_size)
+     deployment   (rx):ORIGIN = ORIGIN(config)      + LENGTH(config)     , LENGTH = (blocks_reserved_for_deployment*block_size)
 
-/*       |------------------------------------|     */
-/*       | SRAM 256KB addressed as striped    |     */
-/*       | memory OR non striped memory       |     */   
-/*       |....................................|     */
-/*       | STRIPED Bank     : 256KB           |SYS>>*/  RAM_STRIPED (xrw) : ORIGIN = 0x20000000, LENGTH = 256k  
-/*       |      OR                            |     */ 
-/*       | Non striped memory                 |     */   
-/*       |....................................|     */
-/*       | NON STRIPED Bank : 64KB            |SYS>>*/  RAM_NONSTRIPED_0  (xrw) : ORIGIN = 0x21000000, LENGTH = 64k  
-/*       | NON STRIPED Bank : 64KB            |SYS>>*/  RAM_NONSTRIPED_1  (xrw) : ORIGIN = 0x21010000, LENGTH = 64k  
-/*       | NON STRIPED Bank : 64KB            |SYS>>*/  RAM_NONSTRIPED_2  (xrw) : ORIGIN = 0x21020000, LENGTH = 64k  
-/*       | NON STRIPED Bank : 64KB            |SYS>>*/  RAM_NONSTRIPED_3  (xrw) : ORIGIN = 0x21030000, LENGTH = 64k  
-/*       |                                    |     */ 
-/*       | Additional 4kB regions             |     */   
-/*       | Software may choose to use these   |     */   
-/*       | for per-core purposes,stack and    |     */   
-/*       | frequently-executed code           |     */   
-/*       | Bank : 4KB                         |SYS>>*/  SCRATCH_X   (xrw) : ORIGIN = 0x20040000, LENGTH = 4k  
-/*       | Bank : 4KB                         |SYS>>*/  SCRATCH_Y   (xrw) : ORIGIN = 0x20041000, LENGTH = 4k  
-/*       |                                    |     */   
-/*       |------------------------------------|     */
-/*       | Dedicated RAM blocks that may be   |     */
-/*       | used in some circumstances:        |     */   
-/*       |                                    |     */   
-/*       | If flash XIP caching is disabled   |     */   
-/*       | 0x15000000 : 16kB                  |SYS>>*/  XIP_CACHING (xrw) : ORIGIN = 0x15000000,   LENGTH = 16k
-/*       |                                    |     */   
-/*       | If USB is not used                 |     */   
-/*       | 0x50100000 : 4kB                   |SYS>>*/  DPRAM       (xrw) : ORIGIN = 0x50100000,   LENGTH = 4k
-/*       |                                    |     */   
-/*       |------------------------------------|     */
-/*       | External Flash                     |     */
-/*       | accessed via the QSPI interface    |     */
-/*       | with address space to 16MB.        |     */   
-/*       | Typical Pico has 2048K             |     */   
-/*       |                                    |     */   
-/*       | 0x10000000 :                       |SYS>>*/  FLASH        (rx) : ORIGIN = 0x10000000,   LENGTH = 2048k
-/*       | Flash has 512 pages of 4096 Bytes  |     */   
-/*       | on the RP2040, smallest erase 1    |     */ 
-/*       | Sector,4096 bytes aligned on       |     */ 
-/*       | 4096 byte boundary                 |     */ 
-/*       |------------------------------------|     */
-/*       |                                    |     */
-/*       | nanoFramework                      |     */
-/*       |====================================|     */
-/*       |                                    |     */
-/*       | FLASH LAYOUT                       |     */
-/*       |------------------------------------|     */
-/*       | Stage 2 boot is prepended at the   |     */   
-/*       | start                              |     */   
-/*       | .................................. |     */
-/*       | Sectors counting from 0            |     */
-/*       | .................................. |     */
-/*       | Sector    0 (First 256 bytes)      |SYS>>*/  STAGE2_BOOT  (rx)  : ORIGIN = ORIGIN(FLASH), LENGTH = 252 + 4  /* contains prepended bs2_default_padded_checksummed.S */
-/*       | Sectors   0 - 159                  |CLR>>*/  nanoCLR      (rx)  : ORIGIN = ORIGIN(STAGE2_BOOT) + LENGTH(STAGE2_BOOT), LENGTH = 160*flash_sector_size - LENGTH(STAGE2_BOOT)
-/*       | Sectors 160 - 160                  |CLR>>*/  config       (rx)  : ORIGIN = ORIGIN(nanoCLR)     + LENGTH(nanoCLR)    , LENGTH = config_size*flash_sector_size
-/*       | Sectors 161 - 511                  |CLR>>*/  deployment   (rx)  : ORIGIN = ORIGIN(config)      + LENGTH(config)     , LENGTH = Total_flash_page_count*flash_page_size - LENGTH(STAGE2_BOOT) - LENGTH(nanoCLR) - LENGTH(config)
-/*       |                                    |     */
-/*       |------------------------------------|     */
-/*       |                                    |     */
-/*       | RAM LAYOUT                         |     */
-/*       |------------------------------------|     */
-/*       |                                    |     */
-/*       | Native code ram (Azure, nativeCLR) |CLR>>*/  RAM            (xrw) : ORIGIN = ORIGIN(RAM_STRIPED), LENGTH = 75k
-/*       | CLR managed heap ram               |CLR>>*/  CLR_RAM        (xrw) : ORIGIN = ORIGIN(RAM) + LENGTH(RAM), LENGTH = 90k
-/*       | nanoCLR graphics bitmaps,          |CLR>>*/  graphics_ram   (xrw) : ORIGIN = ORIGIN(CLR_RAM) + LENGTH(CLR_RAM), LENGTH = LENGTH(RAM_STRIPED) - ( LENGTH(RAM) + LENGTH(CLR_RAM) )
-/*       | drawing surfaces                   |     */
-/*       |                                    |     */
-/*       | Video frame buffer                 |CLR>>*/  /* NO FRAME BUFFER - use SPI local buffer to transfer graphics */
-/*       \------------------------------------/     */
+     NATIVE_RAM   (rxw):ORIGIN = ORIGIN(RAM_STRIPED), LENGTH = 75k
+     CLR_RAM      (rxw):ORIGIN = ORIGIN(NATIVE_RAM) + LENGTH(NATIVE_RAM), LENGTH = 90k
+     graphics_ram (rxw):ORIGIN = ORIGIN(CLR_RAM) + LENGTH(CLR_RAM), LENGTH = LENGTH(RAM_STRIPED) - LENGTH(NATIVE_RAM) - LENGTH(CLR_RAM)
+     /* NO FRAME BUFFER - use SPI local buffer to transfer graphics */
+     
 }
-        
-/*       /------------------------------------\     */
-/*       |  VARIABLES REFERENCED BY C/C++     |     */   
-/*       | ================================== |     */
-/*       | The CLR managed heap for CLR       |CLR>>*/  HeapBegin             = ORIGIN(CLR_RAM); 
-/*       | objects                            |CLR>>*/  HeapEnd               = ORIGIN(CLR_RAM) + LENGTH(CLR_RAM); 
-/*       |------------------------------------|     */   
-/*       | CLR Image                          |CLR>>*/  __nanoImage_start__   = ORIGIN(nanoCLR); 
-/*       |                                    |CLR>>*/  __nanoImage_end__     = ORIGIN(nanoCLR) + LENGTH(nanoCLR); 
-/*       |------------------------------------|     */   
-/*       | Flash region where the C#          |CLR>>*/  __deployment_start__  = ORIGIN(deployment); 
-/*       | Portable Executable (PE) file      |CLR>>*/  __deployment_end__    = ORIGIN(deployment) + LENGTH(deployment); 
-/*       | is stored                          |CLR>>*/  __deployment_size__   = LENGTH(deployment); 
-/*       |------------------------------------|     */   
-/*       | Small area of persistent storage   |     */  __nanoConfig_start__  = ORIGIN(config);
-/*       |                                    |     */  __nanoConfig_end__    = ORIGIN(config) + LENGTH(config);
-/*       |------------------------------------|     */   
-/*       | Bit pixel copy of the screen       |CLR>>*/  Graphics_frame_buffer = graphics_Frame_Buffer_not_used;
-/*       | Updated by DMA                     |     */    
-/*       |------------------------------------|     */   
-/*       | Bitmap objects created by C#       |CLR>>*/  Graphics_managed_heap = ORIGIN(graphics_ram); 
-/*       | and drawn into                     |CLR>>*/  Graphics_managed_end  = ORIGIN(graphics_ram) + LENGTH(graphics_ram);   
-/*       \------------------------------------/     */
+  
+/* =============== */
+/* VARIABLES USED  */
+/* =============== */
 
+/* Stack and heap size */
+_Min_Heap_Size = 0x200; 
+_Min_Stack_Size = 0x400; 
 
+/* The CLR managed heap for CLR */
+HeapBegin             = ORIGIN(CLR_RAM); 
+HeapEnd               = ORIGIN(CLR_RAM) + LENGTH(CLR_RAM); 
+
+/* The CLR native Image */
+__nanoImage_start__   = ORIGIN(nanoCLR); 
+__nanoImage_end__     = ORIGIN(nanoCLR) + LENGTH(nanoCLR); 
+
+/*  C# Portable Executable (PE) file is stored */
+__deployment_start__  = ORIGIN(deployment); 
+__deployment_end__    = ORIGIN(deployment) + LENGTH(deployment); 
+
+/* Small area of persistent storage */
+__nanoConfig_start__  = ORIGIN(config);
+__nanoConfig_end__    = ORIGIN(config) + LENGTH(config);
+
+/* Bit pixel copy of the screen */
+Graphics_frame_buffer = 0;
+
+/*  Bitmap objects */
+Graphics_managed_heap = ORIGIN(graphics_ram); 
+Graphics_managed_end  = ORIGIN(graphics_ram) + LENGTH(graphics_ram);   
 
 /* Define output sections */
 SECTIONS
 {
-
   /* ----------------------------------------*/
   /* The startup code goes first into FLASH  */
   /* ----------------------------------------*/
   /* Second stage bootloader is prepended to the image. It must be 256 bytes   */
-  /* and check summed. It is usually built by the boot_stage2 target           */
+  /* and have a checksum. It is usually built by the boot_stage2 target        */
   /* in the Raspberry Pi Pico SDK                                              */
 
     .flash_begin : {
@@ -253,7 +227,7 @@ __exidx_start = .;
 
    .ram_vector_table (COPY): {
         *(.ram_vector_table)
-    } > RAM
+    } > NATIVE_RAM
 
   /* -----------------------------------------------------------------------*/
   /* Holds initialized data that contributes to the program's memory image  */
@@ -314,12 +288,12 @@ __exidx_start = .;
         . = ALIGN(4);
         /* All data end */
         __data_end__ = .;
-    } > RAM AT> FLASH
+    } > NATIVE_RAM AT> FLASH
 
      .uninitialized_data (COPY): {
         . = ALIGN(4);
         *(.uninitialized_data*)
-    } > RAM
+    } > NATIVE_RAM
 
     /* Start and end symbols must be word-aligned */
     .scratch_x : {
@@ -350,7 +324,7 @@ __exidx_start = .;
         *(COMMON)
         . = ALIGN(4);
         __bss_end__ = .;
-    } > RAM
+    } > NATIVE_RAM
 
     .heap (COPY):
     {
@@ -358,7 +332,7 @@ __exidx_start = .;
         end = __end__;
         *(.heap*)
         __HeapLimit = .;
-    } > RAM
+    } > NATIVE_RAM
 
 /* -----------------------------------------------------------------*/
 /* Not using "DYNAMIC_MEMORY" so no need for a ._threadx_heap here.
@@ -389,16 +363,15 @@ __exidx_start = .;
     } > FLASH
 
     /* stack limit is poorly named, but historically is maximum heap ptr */
-    __StackLimit = ORIGIN(RAM) + LENGTH(RAM);
+    __StackLimit = ORIGIN(NATIVE_RAM) + LENGTH(NATIVE_RAM);
     __StackOneTop = ORIGIN(SCRATCH_X) + LENGTH(SCRATCH_X);
     __StackTop = ORIGIN(SCRATCH_Y) + LENGTH(SCRATCH_Y);
     __StackOneBottom = __StackOneTop - SIZEOF(.stack1_dummy);
     __StackBottom = __StackTop - SIZEOF(.stack_dummy);
     PROVIDE(__stack = __StackTop);
 
-    /* Check if data + heap + stack exceeds RAM limit */
-    ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed")
+    /* Check if data + heap + stack exceeds NATIVE_RAM limit */
+    ASSERT(__StackLimit >= __HeapLimit, "region NATIVE_RAM overflowed")
 
     ASSERT( __binary_info_header_end - __logical_binary_start <= 256, "Binary info must be in first 256 bytes of the binary")
 }
-

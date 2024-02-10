@@ -58,13 +58,40 @@ void DisplayInterface::Initialize(DisplayInterfaceConfig &config)
     LTDCClock_Config();
 
     ENABLE_LTDC;
+
+#ifdef USE_GPIOA
     ENABLE_CLOCK_ON_PORT_GPIOA;
+#endif
+#ifdef USE_GPIOB
     ENABLE_CLOCK_ON_PORT_GPIOB;
+#endif
+#ifdef USE_GPIOC
     ENABLE_CLOCK_ON_PORT_GPIOC;
+#endif
+#ifdef USE_GPIOD
     ENABLE_CLOCK_ON_PORT_GPIOD;
+#endif
+#ifdef USE_GPIOE
     ENABLE_CLOCK_ON_PORT_GPIOE;
+#endif
+#ifdef USE_GPIOF
+    ENABLE_CLOCK_ON_PORT_GPIOF;
+#endif
+#ifdef USE_GPIOG
     ENABLE_CLOCK_ON_PORT_GPIOG;
+#endif
+#ifdef USE_GPIOH
     ENABLE_CLOCK_ON_PORT_GPIOH;
+#endif
+#ifdef USE_GPIOI
+    ENABLE_CLOCK_ON_PORT_GPIOI;
+#endif
+#ifdef USE_GPIOJ
+    ENABLE_CLOCK_ON_PORT_GPIOJ;
+#endif
+#ifdef USE_GPIOK
+    ENABLE_CLOCK_ON_PORT_GPIOK;
+#endif
 
     // LTDC Pins configuration
     SetLcdPin(LCD_R0_PORT, LCD_R0, LL_GPIO_AF_14,LL_GPIO_MODE_ALTERNATE); // lcd r0
@@ -252,7 +279,7 @@ void DisplayInterface::WriteToFrameBuffer(
     LL_DMA2D_SetMode(DMA2D, LL_DMA2D_MODE_M2M);
     LL_DMA2D_FGND_SetMemAddr(DMA2D, (uint32_t)data);
     LL_DMA2D_SetOutputMemAddr(DMA2D, (uint32_t)&Graphics_frame_buffer);
-    LL_DMA2D_ConfigSize(DMA2D, 272, 480);
+    LL_DMA2D_ConfigSize(DMA2D, Height, Width);
     LL_DMA2D_SetLineOffset(DMA2D, 0);
 
     // Enable the transfer complete

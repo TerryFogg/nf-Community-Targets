@@ -15,5 +15,8 @@
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H735G_DK/startup_stm32h735xx.s
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H735G_DK/target_common.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H735G_DK/tx_initialize_low_level.s
- )
+    
+    )
+
+
 

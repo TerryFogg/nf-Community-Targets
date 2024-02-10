@@ -9,13 +9,13 @@
 /* Entry point */
 ENTRY(Reset_Handler)
 
-/* _sidata is used in ThreadX to copy the data segment from ROM to RAM during initialization */
-_sidata = LOADADDR(.data);
-
 /* _estack is used in ThreadX to define the end of the stack memory for the main thread */
 _estack = ORIGIN(RAM_D1) + LENGTH(RAM_D1);
 
-/* Stack and heap size */
+/* _sidata is used in ThreadX to copy the data segment from ROM to RAM during initialization */
+_sidata = LOADADDR(.data);
+
+ /* Stack and heap size */
 _Min_Heap_Size = 0x200; 
 _Min_Stack_Size = 0x400; 
 
@@ -48,9 +48,9 @@ MEMORY
   /* PHYSICAL MEMORY*/
   /* ===============*/
 
-    /* ==============*/
-    /* STM32H735IGK6U*/
-    /* ==============*/
+    /* ============== */
+    /* STM32H735IGK6U */
+    /* ============== */
 
      ITCM_SRAM  (rxw):ORIGIN = 0x00000000,LENGTH = 64K 
      FLASH      (rx) :ORIGIN = 0x08000000,LENGTH = 1024K
@@ -73,7 +73,7 @@ MEMORY
      deployment (rx) : ORIGIN = ORIGIN(nanoCLR) + LENGTH(nanoCLR), LENGTH = (blocks_reserved_for_deployment*block_size)
      config     (rx) : ORIGIN = ORIGIN(OCTOSPI1_FLASH), LENGTH = (blocks_reserved_for_config*block_size)
 
-     /* Native code ram (Azure, nativeCLR) */
+     /* Native code ram (Threadx, nativeCLR) */
      NATIVE_RAM   (rxw) : ORIGIN = ORIGIN(RAM_D1), LENGTH = LENGTH(RAM_D1)
 
      /* RAM accessible by the DMA controller */
@@ -81,7 +81,6 @@ MEMORY
 
      graphics_vfb (rxw) : ORIGIN = ORIGIN(OCTOSPI2_RAM), LENGTH = 255K
      graphics_ram (rxw) : ORIGIN = ORIGIN(graphics_vfb) + LENGTH(graphics_vfb), LENGTH = 4M
-     /* CLR managed heap ram */
      CLR_RAM  (rxw) : ORIGIN = ORIGIN(graphics_ram)+ LENGTH(graphics_ram), LENGTH =  LENGTH(OCTOSPI2_RAM) - LENGTH(graphics_ram) - LENGTH(graphics_vfb)
 }
 

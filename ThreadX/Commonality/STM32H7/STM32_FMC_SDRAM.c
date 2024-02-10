@@ -24,8 +24,33 @@
 
 void Initialize_SDRAM(uint32_t sdram_base_address, uint32_t sdram_region_size)
 {
-    (void)sdram_base_address;
-    (void)sdram_region_size;
+#pragma region MPU config
+    LL_MPU_Disable();
+    {
+        // Configure the MPU as Strongly ordered for undefined regions
+        // With the subregion value 0x87, the MPU will be enabled only for specific areas:
+        // - On - chip peripheral address space
+        // - External RAM
+        // - Shared device space
+        LL_MPU_ConfigRegion(
+            LL_MPU_REGION_NUMBER0,
+            0x87,
+            0x00,
+            LL_MPU_REGION_SIZE_4GB | LL_MPU_REGION_NO_ACCESS | LL_MPU_ACCESS_NOT_BUFFERABLE |
+                LL_MPU_ACCESS_NOT_CACHEABLE | LL_MPU_ACCESS_SHAREABLE | LL_MPU_TEX_LEVEL0 |
+                LL_MPU_INSTRUCTION_ACCESS_DISABLE);
+
+        // Configure SDRAM as region 16MB for write through
+        LL_MPU_ConfigRegion(
+            LL_MPU_REGION_NUMBER1,
+            0x00,
+            sdram_base_address,
+            sdram_region_size | LL_MPU_REGION_FULL_ACCESS | LL_MPU_ACCESS_NOT_BUFFERABLE | LL_MPU_ACCESS_CACHEABLE |
+                LL_MPU_ACCESS_NOT_SHAREABLE | LL_MPU_TEX_LEVEL0 | LL_MPU_INSTRUCTION_ACCESS_ENABLE);
+    }
+    LL_MPU_Enable(LL_MPU_CTRL_PRIVILEGED_DEFAULT);
+#pragma endregion
+
 #pragma region Setup the FMC pin definitions
     LL_GPIO_InitTypeDef gpio_init_structure;
 
@@ -74,45 +99,13 @@ void Initialize_SDRAM(uint32_t sdram_base_address, uint32_t sdram_region_size)
 
 #pragma endregion
 
-#pragma region MPU config
-
-    // Disable MPU
-    LL_MPU_Disable();
-    {
-            // Configure the MPU as Strongly ordered for undefined regions
-        LL_MPU_ConfigRegion(
-            LL_MPU_REGION_NUMBER0,
-            0x87,
-            0x00,
-            LL_MPU_REGION_SIZE_4GB | LL_MPU_REGION_NO_ACCESS | LL_MPU_ACCESS_NOT_BUFFERABLE |
-                LL_MPU_ACCESS_NOT_CACHEABLE | LL_MPU_ACCESS_SHAREABLE | LL_MPU_TEX_LEVEL0 |
-                LL_MPU_INSTRUCTION_ACCESS_DISABLE);
-
-        // Configure SDRAM as region 16MB
-        LL_MPU_ConfigRegion(
-            LL_MPU_REGION_NUMBER1,
-            0x00,
-            sdram_base_address,
-            sdram_region_size | LL_MPU_REGION_FULL_ACCESS | LL_MPU_ACCESS_NOT_BUFFERABLE | LL_MPU_ACCESS_CACHEABLE |
-                LL_MPU_ACCESS_NOT_SHAREABLE | LL_MPU_TEX_LEVEL0 | LL_MPU_INSTRUCTION_ACCESS_ENABLE);
-    }
-    // Enable MPU (any access not covered by any enabled region will cause a fault)
-    LL_MPU_Enable(LL_MPU_CTRL_PRIVILEGED_DEFAULT);
-#pragma endregion
-
 #pragma region SDRAM Timing
 
-    FMC_SDRAM_TimingTypeDef SDRAM_Timing;
-    SDRAM_Timing.LoadToActiveDelay = 2;
-    SDRAM_Timing.ExitSelfRefreshDelay = 7;
-    SDRAM_Timing.SelfRefreshTime = 4;
-    SDRAM_Timing.RowCycleDelay = 7;
-    SDRAM_Timing.WriteRecoveryTime = 2;
-    SDRAM_Timing.RPDelay = 2;
-    SDRAM_Timing.RCDDelay = 2;
-
     SDRAM_HandleTypeDef hsdram;
+    FMC_SDRAM_TimingTypeDef SDRAM_Timing;
+
     hsdram.Instance = FMC_SDRAM_DEVICE;
+
     hsdram.Init.SDBank = FMC_SDRAM_BANK2;
     hsdram.Init.ColumnBitsNumber = FMC_SDRAM_COLUMN_BITS_NUM_9;
     hsdram.Init.RowBitsNumber = FMC_SDRAM_ROW_BITS_NUM_12;
@@ -124,6 +117,15 @@ void Initialize_SDRAM(uint32_t sdram_base_address, uint32_t sdram_region_size)
     hsdram.Init.ReadBurst = FMC_SDRAM_RBURST_ENABLE;
     hsdram.Init.ReadPipeDelay = FMC_SDRAM_RPIPE_DELAY_2;
 
+    SDRAM_Timing.LoadToActiveDelay = 2;
+    SDRAM_Timing.ExitSelfRefreshDelay = 7;
+    SDRAM_Timing.SelfRefreshTime = 4;
+    SDRAM_Timing.RowCycleDelay = 7;
+    SDRAM_Timing.WriteRecoveryTime = 2;
+    SDRAM_Timing.RPDelay = 2;
+    SDRAM_Timing.RCDDelay = 2;
+
+
     FMC_SDRAM_Init(hsdram.Instance, &(hsdram.Init));
     FMC_SDRAM_Timing_Init(hsdram.Instance, &SDRAM_Timing, hsdram.Init.SDBank);
     __FMC_ENABLE();
@@ -131,39 +133,54 @@ void Initialize_SDRAM(uint32_t sdram_base_address, uint32_t sdram_region_size)
 #pragma endregion
 
 #pragma region Setup attached SDRAM device
+    
+    // Enable SDRAM clock
     FMC_SDRAM_CommandTypeDef Command;
-    Command.CommandMode = FMC_SDRAM_CMD_CLK_ENABLE;
-    Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK2;
-    ;
-    Command.AutoRefreshNumber = 1;
-    Command.ModeRegisterDefinition = 0;
-    FMC_SDRAM_SendCommand(FMC_SDRAM_DEVICE, &Command, SDRAM_TIMEOUT);
-
-    // TODO: Replace with proper delay tick code later
-    // Insert a 100us delay, assuming a nop on 280Mhz executes in 4.57 nanoSeconds
-    for (volatile uint32_t i = 0; i < 21000; i++)
     {
-        __ASM("nop");
+        Command.CommandMode = FMC_SDRAM_CMD_CLK_ENABLE;
+        Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK2;
+        Command.AutoRefreshNumber = 1;
+        Command.ModeRegisterDefinition = 0;
+        FMC_SDRAM_SendCommand(FMC_SDRAM_DEVICE, &Command, SDRAM_TIMEOUT);
+    }
+    //Insert 100 us minimum delay 
+    {
+        for (volatile uint32_t i = 0; i < 21000; i++)
+        {
+            __ASM("nop");
+        }
+    }
+    // Configure a precharge all
+    {
+        Command.CommandMode = FMC_SDRAM_CMD_PALL;
+        Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK2;
+        Command.AutoRefreshNumber = 1;
+        Command.ModeRegisterDefinition = 0;
+        FMC_SDRAM_SendCommand(FMC_SDRAM_DEVICE, &Command, SDRAM_TIMEOUT);
+    }
+    // Configure Refresh
+    {
+        Command.CommandMode = FMC_SDRAM_CMD_AUTOREFRESH_MODE;
+        Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK2;
+        Command.AutoRefreshNumber = 8;
+        Command.ModeRegisterDefinition = 0;
+        FMC_SDRAM_SendCommand(FMC_SDRAM_DEVICE, &Command, SDRAM_TIMEOUT);
+    }
+    // Program the external memory mode register
+    {
+        Command.CommandMode = FMC_SDRAM_CMD_LOAD_MODE;
+        Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK2;
+        Command.AutoRefreshNumber = 1;
+        Command.ModeRegisterDefinition = SDRAM_MODEREG_BURST_LENGTH_1 | SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL |
+                                         SDRAM_MODEREG_CAS_LATENCY_2 | SDRAM_MODEREG_OPERATING_MODE_STANDARD |
+                                         SDRAM_MODEREG_WRITEBURST_MODE_SINGLE;
+        FMC_SDRAM_SendCommand(FMC_SDRAM_DEVICE, &Command, SDRAM_TIMEOUT);
+    }
+    //Set the refresh rate counter 
+    {
+        FMC_SDRAM_ProgramRefreshRate(FMC_SDRAM_DEVICE, REFRESH_COUNT);
     }
 
-    Command.CommandMode = FMC_SDRAM_CMD_PALL;
-    Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK2;
-    Command.AutoRefreshNumber = 1;
-    Command.ModeRegisterDefinition = 0;
-    FMC_SDRAM_SendCommand(FMC_SDRAM_DEVICE, &Command, SDRAM_TIMEOUT);
-    Command.CommandMode = FMC_SDRAM_CMD_AUTOREFRESH_MODE;
-    Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK2;
-    Command.AutoRefreshNumber = 8;
-    Command.ModeRegisterDefinition = 0;
-    FMC_SDRAM_SendCommand(FMC_SDRAM_DEVICE, &Command, SDRAM_TIMEOUT);
-    Command.CommandMode = FMC_SDRAM_CMD_LOAD_MODE;
-    Command.CommandTarget = FMC_SDRAM_CMD_TARGET_BANK2;
-    Command.AutoRefreshNumber = 1;
-    Command.ModeRegisterDefinition = (uint32_t)SDRAM_MODEREG_BURST_LENGTH_1 | SDRAM_MODEREG_BURST_TYPE_SEQUENTIAL |
-                                     SDRAM_MODEREG_CAS_LATENCY_2 | SDRAM_MODEREG_OPERATING_MODE_STANDARD |
-                                     SDRAM_MODEREG_WRITEBURST_MODE_SINGLE;
-    FMC_SDRAM_SendCommand(FMC_SDRAM_DEVICE, &Command, SDRAM_TIMEOUT);
-    FMC_SDRAM_ProgramRefreshRate(FMC_SDRAM_DEVICE, REFRESH_COUNT);
-
 #pragma endregion
+
 }

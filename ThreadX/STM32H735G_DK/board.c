@@ -30,7 +30,7 @@ void CPU_CACHE_Enable(void)
 void Initialize_Board_LEDS_And_Buttons()
 {
     // LED's
-    LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOC);
+    ENABLE_CLOCK_ON_PORT_GPIOC;
     LL_GPIO_InitTypeDef gpio_InitStruct = {0};
     gpio_InitStruct.Pin = LED_GREEN | LED_RED;
     gpio_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
@@ -44,7 +44,7 @@ void Initialize_Board_LEDS_And_Buttons()
     LL_GPIO_SetOutputPin(LED_GPIO_PORT, LED_RED);
 
     // USER button
-    //-- Same port clock, already enabled
+    ENABLE_CLOCK_ON_PORT_GPIOC;
     gpio_InitStruct.Pin = BUTTON_USER_PIN;
     gpio_InitStruct.Mode = LL_GPIO_MODE_INPUT;
     gpio_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
@@ -107,23 +107,23 @@ void Initialize_64bit_timer()
     LL_TIM_EnableCounter(TIM2);
     LL_TIM_EnableCounter(TIM5);
 }
-void BoardLed_ON(uint32_t led)
+void BoardLed_OFF(GPIO_TypeDef *gpio_port, uint32_t led)
 {
-    LL_GPIO_ResetOutputPin(LED_GPIO_PORT, led);
+    LL_GPIO_ResetOutputPin(gpio_port, led);
 };
-void BoardLed_OFF(uint32_t led)
+void BoardLed_ON(GPIO_TypeDef *gpio_port, uint32_t led)
 {
-    LL_GPIO_SetOutputPin(LED_GPIO_PORT, led);
+    LL_GPIO_SetOutputPin(gpio_port, led);
 };
-void BoardLed_Toggle(uint32_t led)
+void BoardLed_Toggle(GPIO_TypeDef *gpio_port, uint32_t led)
 {
-    if ((LED_GPIO_PORT->ODR & led) == led)
+    if ((gpio_port->ODR & led) == led)
     {
-        LED_GPIO_PORT->BSRR = led << 16;
+        gpio_port->BSRR = led << 16;
     }
     else
     {
-        LED_GPIO_PORT->BSRR = led;
+        gpio_port->BSRR = led;
     }
 }
 bool BoardUserButton_Pressed()

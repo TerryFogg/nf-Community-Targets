@@ -17,15 +17,6 @@
     
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/DeviceIO/cpu_System.Device.I2c.cpp
 
-
-                             
-
-                ${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_Hal_Driver/Src/stm32h7xx_hal.c
-                ${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_Hal_Driver/Src/stm32h7xx_hal_cortex.c
-                ${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_Hal_Driver/Src/stm32h7xx_hal_rcc.c
-                ${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_Hal_Driver/Src/stm32h7xx_hal_pwr.c
                 
      )
-
-    set_source_files_properties(${STM32H7_CUBE_SOURCE}/Drivers/STM32H7xx_Hal_Driver/src/stm32h7xx_hal_pwr.c COMPILE_FLAGS -Wno-unused-parameter)
    

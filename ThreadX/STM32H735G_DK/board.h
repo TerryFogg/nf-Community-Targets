@@ -26,7 +26,7 @@
 #define RECEIVER_THREAD_STACK_SIZE 4096
 #pragma endregion
 
-#pragma region Peripheral clocks
+#pragma region Peripheral clocks definitions
 #define ENABLE_CLOCK_ON_PORT_GPIOA LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOA)
 #define ENABLE_CLOCK_ON_PORT_GPIOB LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOB)
 #define ENABLE_CLOCK_ON_PORT_GPIOC LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOC)
@@ -41,7 +41,7 @@
 
 #pragma region Wire protocol USART
 #define wpUSART_DMA_Receive_Buffer_size 2048
-#define wpBAUD_RATE 921600
+#define wpBAUD_RATE                     921600
 
 #define wpUSART                         USART3
 #define wpUSART_IRQn                    USART3_IRQn
@@ -75,6 +75,15 @@
 #define DMA2D_ENABLE        LL_AHB3_GRP1_EnableClock(LL_AHB3_GRP1_PERIPH_DMA2D)
 #define DMA2D_RESET         LL_AHB3_GRP1_ForceReset(LL_AHB3_GRP1_PERIPH_DMA2D)
 #define DMA2D_RELEASE_RESET LL_AHB3_GRP1_ReleaseReset(LL_AHB3_GRP1_PERIPH_DMA2D)
+
+
+#define USE_GPIOA
+#define USE_GPIOB
+#define USE_GPIOC
+#define USE_GPIOD
+#define USE_GPIOE
+#define USE_GPIOG
+#define USE_GPIOH
 
 // LCD 16-bit interface pins
 #define LCD_R0      LL_GPIO_PIN_0
@@ -234,9 +243,9 @@ void Initialize_64bit_timer();
 void CPU_CACHE_Enable(void);
 void MPU_Config(void);
 void SystemClock_Config();
-void BoardLed_ON(uint32_t led);
-void BoardLed_OFF(uint32_t led);
-void BoardLed_Toggle(uint32_t led);
+void BoardLed_ON(GPIO_TypeDef *gpio_port, uint32_t led);
+void BoardLed_OFF(GPIO_TypeDef *gpio_port, uint32_t led);
+void BoardLed_Toggle(GPIO_TypeDef *gpio_port, uint32_t led);
 bool BoardUserButton_Pressed();
 static inline uint32_t Get_SYSTICK();
 

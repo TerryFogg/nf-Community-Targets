@@ -35,13 +35,16 @@
 #define ENABLE_CLOCK_ON_PORT_GPIOF LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOF)
 #define ENABLE_CLOCK_ON_PORT_GPIOG LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOG)
 #define ENABLE_CLOCK_ON_PORT_GPIOH LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOH)
+#define ENABLE_CLOCK_ON_PORT_GPIOI LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOI)
+#define ENABLE_CLOCK_ON_PORT_GPIOJ LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOJ)
+#define ENABLE_CLOCK_ON_PORT_GPIOK LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOK)
 #define ENABLE_CLOCK_ON_USART1     LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_USART1)
 #define ENABLE_CLOCK_ON_DMA1       LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1)
 #pragma endregion
 
 #pragma region Wire protocol USART
 #define wpUSART_DMA_Receive_Buffer_size 2048
-#define wpBAUD_RATE 921600
+#define wpBAUD_RATE                     921600
 
 #define wpUSART                         USART1
 #define wpUSART_IRQn                    USART1_IRQn
@@ -76,6 +79,12 @@
 #define DMA2D_RESET         LL_AHB3_GRP1_ForceReset(LL_AHB3_GRP1_PERIPH_DMA2D)
 #define DMA2D_RELEASE_RESET LL_AHB3_GRP1_ReleaseReset(LL_AHB3_GRP1_PERIPH_DMA2D)
 
+
+#define USE_GPIOA
+#define USE_GPIOI
+#define USE_GPIOJ
+#define USE_GPIOK
+
 // LCD 16-bit interface pins
 #define LCD_R0      LL_GPIO_PIN_15
 #define LCD_R0_PORT GPIOI
@@ -86,14 +95,13 @@
 #define LCD_R3      LL_GPIO_PIN_2
 #define LCD_R3_PORT GPIOJ
 #define LCD_R4      LL_GPIO_PIN_3
-#define LCD_R4_PORT GPIOH
+#define LCD_R4_PORT GPIOJ
 #define LCD_R5      LL_GPIO_PIN_4
 #define LCD_R5_PORT GPIOJ
 #define LCD_R6      LL_GPIO_PIN_5
 #define LCD_R6_PORT GPIOJ
 #define LCD_R7      LL_GPIO_PIN_6
 #define LCD_R7_PORT GPIOJ
-
 #define LCD_G0      LL_GPIO_PIN_7
 #define LCD_G0_PORT GPIOJ
 #define LCD_G1      LL_GPIO_PIN_8
@@ -110,7 +118,6 @@
 #define LCD_G6_PORT GPIOK
 #define LCD_G7      LL_GPIO_PIN_2
 #define LCD_G7_PORT GPIOK
-
 #define LCD_B0      LL_GPIO_PIN_12
 #define LCD_B0_PORT GPIOJ
 #define LCD_B1      LL_GPIO_PIN_13
@@ -127,15 +134,14 @@
 #define LCD_B6_PORT GPIOK
 #define LCD_B7      LL_GPIO_PIN_6
 #define LCD_B7_PORT GPIOK
-
 #define LCD_CLK            LL_GPIO_PIN_14
 #define LCD_CLK_PORT       GPIOI
 #define LCD_HSYNC          LL_GPIO_PIN_12
 #define LCD_HSYNC_PORT     GPIOI
 #define LCD_VSYNC          LL_GPIO_PIN_13
 #define LCD_VSYNC_PORT     GPIOI
-#define LCD_DISP_CTRL_PIN  LL_GPIO_PIN_10
-#define LCD_DISP_CTRL_PORT GPIOD
+#define LCD_DISP_CTRL_PIN  LL_GPIO_PIN_2
+#define LCD_DISP_CTRL_PORT GPIOA
 #define LCD_DISP_EN_PIN    LL_GPIO_PIN_7
 #define LCD_DISP_EN_PORT   GPIOK
 #define LCD_BL_CTRL_PIN    LL_GPIO_PIN_1
@@ -153,12 +159,11 @@
 #pragma endregion
 
 #pragma region Local board buttons and leds
-#define LED_GPIO_PORT GPIOG
-#define LED3_RED     LL_GPIO_PIN_11
+#define LED3_RED      LL_GPIO_PIN_11
 #define LED2_BLUE     LL_GPIO_PIN_2
 
-#define BUTTON_USER_GPIO_PORT GPIOC
 #define BUTTON_USER_PIN       LL_GPIO_PIN_13
+#define BUTTON_USER_GPIO_PORT GPIOC
 
 #pragma endregion
 
@@ -174,7 +179,6 @@
 //
 
 // Flash program/erase by 64 bits
-#define FLASH_VOLTAGE_RANGE_4 FLASH_CR_PSIZE
 #define FLASH_ERASE_SIZE      FLASH_VOLTAGE_RANGE_4
 
 // End Of Program on Bank 1 flag
@@ -308,9 +312,9 @@ void Initialize_SDRAM(uint32_t base_address, uint32_t sdram_region_size);
 void Initialize_64bit_timer();
 void CPU_CACHE_Enable(void);
 void SystemClock_Config();
-void BoardLed_ON(uint32_t led);
-void BoardLed_OFF(uint32_t led);
-void BoardLed_Toggle(uint32_t led);
+void BoardLed_ON(GPIO_TypeDef *gpio_port, uint32_t led);
+void BoardLed_OFF(GPIO_TypeDef *gpio_port, uint32_t led);
+void BoardLed_Toggle(GPIO_TypeDef *gpio_port, uint32_t led);
 bool BoardUserButton_Pressed();
 static inline uint32_t Get_SYSTICK();
 

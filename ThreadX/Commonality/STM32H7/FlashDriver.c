@@ -4,7 +4,6 @@
 //
 
 #include "FlashDriver.h"
-#include "stm32h7xx_hal_flash.h"
 
 bool FlashDriver_InitializeDevice(void *context)
 {
@@ -33,6 +32,7 @@ bool FlashDriver_Read(void *context, ByteAddress startAddress, unsigned int numB
     }
     return true;
 }
+
 bool FlashDriver_Write(
     void *context,
     ByteAddress startAddress,
@@ -51,78 +51,78 @@ bool FlashDriver_Write(
     int remaining_bytes = numBytes % (FLASH_NB_32BITWORD_IN_FLASHWORD * 4U);
 
     FlashUnlock();
-
-    switch (bank)
     {
-        case 1:
-            SET_BIT(FLASH->CR1, FLASH_CR_PG);
-            break;
-#if defined(DUAL_BANK)
-        case 2:
-            SET_BIT(FLASH->CR2, FLASH_CR_PG);
-            break;
-#endif
-    }
-    if (number_of_flash_words != 0) // Program the full flash word
-    {
-        for (int flash_word_index = 0; flash_word_index < number_of_flash_words; flash_word_index++)
+        switch (bank)
         {
+            case 1:
+                SET_BIT(FLASH->CR1, FLASH_CR_PG);
+                break;
+#if defined(DUAL_BANK)
+            case 2:
+                SET_BIT(FLASH->CR2, FLASH_CR_PG);
+                break;
+#endif
+        }
+        if (number_of_flash_words != 0) // Program the full flash word
+        {
+            for (int flash_word_index = 0; flash_word_index < number_of_flash_words; flash_word_index++)
+            {
+                WaitForLastOperation(bank);
+                int row_index = FLASH_NB_32BITWORD_IN_FLASHWORD;
+                __ISB();
+                __DSB();
+                do
+                {
+                    *dest_addr = *src_addr;
+                    dest_addr++;
+                    src_addr++;
+                    row_index--;
+                } while (row_index != 0);
+                __ISB();
+                __DSB();
+            }
+        }
+        if (remaining_bytes != 0)
+        {
+            __IO uint8_t *dest_addr_8_bit = (__IO uint8_t *)(dest_addr);
+            __IO uint8_t *src_addr_8_bit = (__IO uint8_t *)(src_addr);
             WaitForLastOperation(bank);
-            int row_index = FLASH_NB_32BITWORD_IN_FLASHWORD;
             __ISB();
             __DSB();
             do
             {
-                *dest_addr = *src_addr;
-                dest_addr++;
-                src_addr++;
-                row_index--;
-            } while (row_index != 0);
+                *dest_addr_8_bit = *src_addr_8_bit;
+                dest_addr_8_bit++;
+                src_addr_8_bit++;
+                remaining_bytes--;
+            } while (remaining_bytes != 0);
             __ISB();
             __DSB();
-        }
-    }
-    if (remaining_bytes != 0)
-    {
-        __IO uint8_t *dest_addr_8_bit = (__IO uint8_t *)(dest_addr);
-        __IO uint8_t *src_addr_8_bit = (__IO uint8_t *)(src_addr);
-        WaitForLastOperation(bank);
-        __ISB();
-        __DSB();
-        do
-        {
-            *dest_addr_8_bit = *src_addr_8_bit;
-            dest_addr_8_bit++;
-            src_addr_8_bit++;
-            remaining_bytes--;
-        } while (remaining_bytes != 0);
-        __ISB();
-        __DSB();
 
+            switch (bank)
+            {
+                case 1:
+                    SET_BIT(FLASH->CR1, FLASH_CR_FW);
+                    break;
+#if defined(DUAL_BANK)
+                case 2:
+                    SET_BIT(FLASH->CR2, FLASH_CR_FW);
+                    break;
+#endif
+            }
+        }
         switch (bank)
         {
             case 1:
-                SET_BIT(FLASH->CR1, FLASH_CR_FW);
+                CLEAR_BIT(FLASH->CR1, FLASH_CR_PG);
                 break;
 #if defined(DUAL_BANK)
             case 2:
-                SET_BIT(FLASH->CR2, FLASH_CR_FW);
+                CLEAR_BIT(FLASH->CR2, FLASH_CR_PG);
                 break;
 #endif
         }
     }
-    switch (bank)
-    {
-        case 1:
-            CLEAR_BIT(FLASH->CR1, FLASH_CR_PG);
-            break;
-#if defined(DUAL_BANK)
-        case 2:
-            CLEAR_BIT(FLASH->CR2, FLASH_CR_PG);
-            break;
-#endif
-    }
-
     FlashLock();
 
     return true;
@@ -153,37 +153,37 @@ bool FlashDriver_EraseBlock(void *context, ByteAddress address)
     uint32_t sector = GetSector(address);
     uint32_t bank = GetBank(address);
 
-    FlashUnlock();
+  //  FlashUnlock();
     {
         success = WaitForLastOperation(bank);
-        if (success) // Flash unlocked?
+        if (success)
         {
             switch (bank)
             {
                 case 1:
+                {
 #if defined(FLASH_CR_PSIZE)
                     FLASH->CR1 &= ~(FLASH_CR_PSIZE | FLASH_CR_SNB);
                     FLASH->CR1 |= (FLASH_CR_SER | FLASH_ERASE_SIZE | (sector << FLASH_CR_SNB_Pos) | FLASH_CR_START);
-                    success = WaitForLastOperation(bank);
 #else
-                    // Reset Sector Number for Bank1 and disable SER when complete
                     FLASH->CR1 &= ~(FLASH_CR_SNB);
                     FLASH->CR1 |= (FLASH_CR_SER | (sector << FLASH_CR_SNB_Pos) | FLASH_CR_START);
 #endif
-                    FLASH->CR1 &= (~(FLASH_CR_SER | FLASH_CR_SNB));
+                }
+                    success = WaitForLastOperation(bank);
+                    FLASH->CR1 &= ~(FLASH_CR_SER | FLASH_CR_SNB);
                     break;
 #if defined(DUAL_BANK)
                 case 2:
 #if defined(FLASH_CR_PSIZE)
-                    /* Reset Program/erase VoltageRange=>(Sets erase size) and Sector Number for Bank2 */
                     FLASH->CR2 &= ~(FLASH_CR_PSIZE | FLASH_CR_SNB);
                     FLASH->CR2 |= (FLASH_CR_SER | FLASH_ERASE_SIZE | (sector << FLASH_CR_SNB_Pos) | FLASH_CR_START);
 #else
-                    // Reset Sector Number for Bank2 and disable SER when complete
                     FLASH->CR2 &= ~(FLASH_CR_SNB);
                     FLASH->CR2 |= (FLASH_CR_SER | (sector << FLASH_CR_SNB_Pos) | FLASH_CR_START);
 #endif
-                    FLASH->CR2 &= (~(FLASH_CR_SER | FLASH_CR_SNB));
+                    success = WaitForLastOperation(bank);
+                    FLASH->CR2 &= ~(FLASH_CR_SER | FLASH_CR_SNB);
                     break;
 #endif
             }
@@ -193,7 +193,7 @@ bool FlashDriver_EraseBlock(void *context, ByteAddress address)
             success = false;
         }
     }
-    FlashLock();
+ //   FlashLock();
     return success;
 }
 bool FlashUnlock()
@@ -206,8 +206,6 @@ bool FlashUnlock()
         // Authorize the FLASH Bank1 Registers access
         WRITE_REG(FLASH->KEYR1, FLASH_KEY1);
         WRITE_REG(FLASH->KEYR1, FLASH_KEY2);
-
-        // Verify Flash Bank1 is unlocked
         if (READ_BIT(FLASH->CR1, FLASH_CR_LOCK) != 0U)
         {
             return false;
@@ -219,11 +217,9 @@ bool FlashUnlock()
         // Authorize the FLASH Bank2 Registers access
         WRITE_REG(FLASH->KEYR2, FLASH_KEY1);
         WRITE_REG(FLASH->KEYR2, FLASH_KEY2);
-
-        // Verify Flash Bank2 is unlocked
         if (READ_BIT(FLASH->CR2, FLASH_CR_LOCK) != 0U)
         {
-            return HAL_ERROR;
+            return false;
         }
     }
 #endif
@@ -231,14 +227,16 @@ bool FlashUnlock()
 }
 bool FlashLock()
 {
-    SET_BIT(FLASH->CR1, FLASH_CR_LOCK);            // Lock FLASH Bank1 Control Register access
-    if (READ_BIT(FLASH->CR1, FLASH_CR_LOCK) == 0U) // Verify Flash Bank1 is locked
+    // Set the LOCK Bit to lock the FLASH Bank1 Control Register access */
+    SET_BIT(FLASH->CR1, FLASH_CR_LOCK);
+    if (READ_BIT(FLASH->CR1, FLASH_CR_LOCK) == 0U)
     {
         return false;
     }
 #if defined(DUAL_BANK)
-    SET_BIT(FLASH->CR2, FLASH_CR_LOCK);            // Lock FLASH Bank1 Control Register access
-    if (READ_BIT(FLASH->CR2, FLASH_CR_LOCK) == 0U) // Verify Flash Bank1 is locked
+    // Set the LOCK Bit to lock the FLASH Bank2 Control Register access
+    SET_BIT(FLASH->CR2, FLASH_CR_LOCK);
+    if (READ_BIT(FLASH->CR2, FLASH_CR_LOCK) == 0U)
     {
         return false;
     }
@@ -320,37 +318,41 @@ bool WaitForLastOperation(uint32_t bank)
     switch (bank)
     {
         case 1:
+            while (READ_BIT(FLASH->SR1, FLASH_FLAG_QW_BANK1) == FLASH_FLAG_QW_BANK1)
+            {
+                // TODO : (timeout code here) is this necessary?
+            }
             errorflag = FLASH->SR1 & FLASH_FLAG_ALL_ERRORS_BANK1;
-            while (READ_BIT(FLASH->SR1, FLASH_FLAG_QW_BANK1))
-            {
-                // TODO : (timeout code here) is this necessary?
-            }
-            if ((errorflag & 0x7FFFFFFFU) != 0U) // In case of error reported in Flash SR1 or SR2 register
-            {
-                WRITE_REG(FLASH->CCR1, errorflag); // Clear error programming flags
-                return false;
-            }
-            WRITE_REG(FLASH->CCR1, FLASH_SR_CRCRDERR); // Clear FLASH End of Operation pending bit
-            break;
-#if defined(DUAL_BANK)
-        case 2:
-            errorflag = FLASH->SR2 & FLASH_FLAG_ALL_ERRORS_BANK2;
-            while (READ_BIT(FLASH->SR2, FLASH_FLAG_QW_BANK2))
-            {
-                // TODO : (timeout code here) is this necessary?
-            }
-            // In case of error reported in Flash SR1 or SR2 register
             if ((errorflag & 0x7FFFFFFFU) != 0U)
             {
                 // Clear error programming flags
-                WRITE_REG(FLASH->CCR2, errorflag);
+                WRITE_REG(FLASH->CCR1, errorflag);
                 return false;
             }
-            // Clear FLASH End of Operation pending bit
-            WRITE_REG(FLASH->CCR2, (FLASH_SR_CRCRDERR | 0x80000000U));
+            if (READ_BIT(FLASH->SR1, FLASH_FLAG_EOP_BANK1) == FLASH_FLAG_EOP_BANK1)
+            {
+                WRITE_REG(FLASH->CCR1, FLASH_FLAG_EOP_BANK1);
+            }
+            break;
+#if defined(DUAL_BANK)
+        case 2:
+            while (READ_BIT(FLASH->SR2, FLASH_FLAG_QW_BANK2 & 0x7FFFFFFFU) == FLASH_FLAG_QW_BANK2)
+            {
+                // TODO : (timeout code here) is this necessary?
+            }
+            errorflag = (FLASH->SR2 & FLASH_FLAG_ALL_ERRORS_BANK2) | 0x80000000U;
+            if ((errorflag & 0x7FFFFFFFU) != 0U)
+            {
+                // Clear error programming flags
+                WRITE_REG(FLASH->CCR2, errorflag & 0x7FFFFFFFU);
+                return false;
+            }
+            if (READ_BIT(FLASH->SR2, FLASH_FLAG_EOP_BANK2 & 0x7FFFFFFFU) == (FLASH_FLAG_EOP_BANK2 & 0x7FFFFFFFU))
+            {
+                WRITE_REG(FLASH->CCR2, FLASH_FLAG_EOP_BANK2 & 0x7FFFFFFFU);
+            }
             break;
 #endif
     }
-
     return true;
 }

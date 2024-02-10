@@ -239,3 +239,15 @@ void Time_SetCompare(uint64_t compareValueTicks)
         }
     }
 }
+
+// implementation required for STM Cube package
+// Provides a tick value in millisecond.
+extern "C"
+{
+
+    uint32_t HAL_GetTick(void)
+    {
+        // TODO
+        return 0; // TIME_I2MS(chVTGetSystemTimeX());
+    }
+}

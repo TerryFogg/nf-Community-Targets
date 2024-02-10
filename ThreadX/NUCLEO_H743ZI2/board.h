@@ -12,8 +12,9 @@
 #include <nanoCLR_Headers.h>
 
 #include "stm32h743xx.h"
-#include "stm32h7xx_ll.h"
 #include "stm32h7xx.h"
+#include "stm32h7xx_ll.h"
+#include "stm32h7xx_hal_pwr.h"
 #include "tx_api.h"
 #include "tx_port.h"
 
@@ -25,12 +26,60 @@
 #define RECEIVER_THREAD_STACK_SIZE 4096
 #pragma endregion
 
+#pragma region Peripheral clocks definitions
+#define ENABLE_CLOCK_ON_PORT_GPIOA LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOA)
+#define ENABLE_CLOCK_ON_PORT_GPIOB LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOB)
+#define ENABLE_CLOCK_ON_PORT_GPIOC LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOC)
+#define ENABLE_CLOCK_ON_PORT_GPIOD LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOD)
+#define ENABLE_CLOCK_ON_PORT_GPIOE LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOE)
+#define ENABLE_CLOCK_ON_PORT_GPIOF LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOF)
+#define ENABLE_CLOCK_ON_PORT_GPIOG LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOG)
+#define ENABLE_CLOCK_ON_PORT_GPIOH LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOH)
+#define ENABLE_CLOCK_ON_USART3     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART3)
+#define ENABLE_CLOCK_ON_DMA1       LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1)
+#pragma endregion
+
+#pragma region Wire protocol USART
+#define wpUSART_DMA_Receive_Buffer_size 2048
+#define wpBAUD_RATE                     921600
+
+#define wpUSART                         USART3
+#define wpUSART_IRQn                    USART3_IRQn
+#define wpUSART_IRQHANDLER()            void USART3_IRQHandler(void)
+#define wpUSART_PERIPHERAL_CLOCK_ENABLE ENABLE_CLOCK_ON_USART3
+
+#define wpUSART_GPIO_PORT                    GPIOD
+#define wpUSART_RX_PIN                       LL_GPIO_PIN_8
+#define wpUSART_TX_PIN                       LL_GPIO_PIN_9
+#define wpUSART_GPIO_PERIPHERAL_CLOCK_ENABLE ENABLE_CLOCK_ON_PORT_GPIOD
+
+#define wpDMA                               DMA1
+#define wpDMA_ReceiveStreamInterrupt        DMA1_Stream0_IRQn
+#define wpDMA_TransmitStreamInterrupt       DMA1_Stream1_IRQn
+#define wpUSART_DMA_PERIPHERAL_CLOCK_ENABLE ENABLE_CLOCK_ON_DMA1
+
+#define wpDMA_ReceiveStream              LL_DMA_STREAM_0
+#define wpDMA_ReceiveMux                 LL_DMAMUX1_REQ_USART3_RX
+#define wpDMA_ReceiveStream_IRQHandler() void DMA1_Stream0_IRQHandler(void)
+
+#define wpDMA_TransmitStream              LL_DMA_STREAM_1
+#define wpDMA_TransmitMux                 LL_DMAMUX1_REQ_USART3_TX
+#define wpDMA_TransmitStream_IRQHandler() void DMA1_Stream1_IRQHandler(void)
+
+#pragma endregion
+
 #pragma region Local board buttons and leds
-#define LED_GPIO_PORT         GPIOC
-#define LED_GREEN             LL_GPIO_PIN_3
-#define LED_RED               LL_GPIO_PIN_2
-#define BUTTON_USER_GPIO_PORT GPIOC
+// GPIOB
+#define LED1_GREEN LL_GPIO_PIN_0
+#define LED3_RED   LL_GPIO_PIN_14
+
+// GPIOE
+#define LED2_YELLOW LL_GPIO_PIN_1
+
+// GPIOC
 #define BUTTON_USER_PIN       LL_GPIO_PIN_13
+#define BUTTON_USER_GPIO_PORT GPIOC
+
 #pragma endregion
 
 #pragma region Flash SOC parameters and onboard external flash parameters
@@ -87,21 +136,17 @@ static inline uint32_t Get_SYSTICK()
 
 void Startup_Rtos();
 void Initialize_Board();
-void Initialize_OCTOSPI2_Hyperam();
-void Initialize_RTC();
 void Initialize_DWT_Counter();
-void USBD_Clock_Config(void);
 void Initialize_Board_LEDS_And_Buttons();
+void Initialize_SDRAM(uint32_t base_address, uint32_t sdram_region_size);
 void Initialize_64bit_timer();
 void CPU_CACHE_Enable(void);
-void MPU_Config(void);
 void SystemClock_Config();
-void BoardLed_ON(uint32_t led);
-void BoardLed_OFF(uint32_t led);
-void BoardLed_Toggle(uint32_t led);
+void BoardLed_ON(GPIO_TypeDef *gpio_port, uint32_t led);
+void BoardLed_OFF(GPIO_TypeDef *gpio_port, uint32_t led);
+void BoardLed_Toggle(GPIO_TypeDef *gpio_port, uint32_t led);
 bool BoardUserButton_Pressed();
 static inline uint32_t Get_SYSTICK();
-
 
 #ifdef __cplusplus
 extern "C"

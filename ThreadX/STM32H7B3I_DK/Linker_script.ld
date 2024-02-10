@@ -11,7 +11,7 @@ ENTRY(Reset_Handler)
 
 
 /* _estack is used in ThreadX to define the end of the stack memory for the main thread */
-_estack = 0x20010000;
+_estack = ORIGIN(DTCM_SRAM) + LENGTH(DTCM_SRAM);
 
 /* _sidata is used in ThreadX to copy the data segment from ROM to RAM during initialization */
 _sidata = LOADADDR(.data);
@@ -78,10 +78,10 @@ MEMORY
      config     (rx) : ORIGIN = ORIGIN(OCTOSPI1_FLASH), LENGTH = (blocks_reserved_for_config*block_size)
 
      /* Native code ram (Azure, nativeCLR) */
-     /* NATIVE_RAM   (rxw) : ORIGIN = ORIGIN(AXI_RAM), LENGTH = LENGTH(AXI_RAM) */
+     /* NATIVE_RAM   (rxw) : ORIGIN = ORIGIN(DTCM_SRAM), LENGTH = LENGTH(DTCM_SRAM) */
   
-  NATIVE_RAM   (rxw) : ORIGIN = ORIGIN(AXI_RAM1), LENGTH = LENGTH(AXI_RAM1)
-  CLR_RAM  (rxw) : ORIGIN = ORIGIN(AXI_RAM2), LENGTH =  LENGTH(AXI_RAM2) + LENGTH(AXI_RAM3)
+     NATIVE_RAM   (rxw) : ORIGIN = ORIGIN(AXI_RAM1), LENGTH = LENGTH(AXI_RAM1)
+     CLR_RAM  (rxw) : ORIGIN = ORIGIN(AXI_RAM2), LENGTH =  LENGTH(AXI_RAM2) + LENGTH(AXI_RAM3) 
 
      /* RAM accessible by the DMA controller */
      RAM_DMA      (rxw) : ORIGIN = ORIGIN(AHB_RAM), LENGTH = LENGTH(AHB_RAM)
@@ -89,11 +89,9 @@ MEMORY
      graphics_vfb (rxw) : ORIGIN = ORIGIN(FMC_SDRAM), LENGTH = 255K
      graphics_ram (rxw) : ORIGIN = ORIGIN(graphics_vfb) + LENGTH(graphics_vfb), LENGTH = 4M
  
- 
  /* CLR managed heap ram */
  /*    CLR_RAM  (rxw) : ORIGIN = ORIGIN(graphics_ram)+ LENGTH(graphics_ram), LENGTH =  LENGTH(FMC_SDRAM) - LENGTH(graphics_ram) - LENGTH(graphics_vfb) */
 }
-
 
 /* The CLR managed heap for CLR */
 HeapBegin             = ORIGIN(CLR_RAM); 

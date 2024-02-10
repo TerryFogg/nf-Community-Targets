@@ -5,7 +5,6 @@
 //
 #include "board.h"
 
-//
 //  System Clock Configuration
 //          The system Clock is configured as follow :
 //             System Clock source            = PLL (HSE)
@@ -68,22 +67,22 @@ void SystemClock_Config(void)
     LL_RCC_SetAPB3Prescaler(LL_RCC_APB3_DIV_2);
     LL_RCC_SetAPB4Prescaler(LL_RCC_APB4_DIV_2);
 
-    /* Set PLL1 as System Clock Source */
+    // Set PLL1 as System Clock Source
     LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_PLL1);
     while (LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_PLL1)
     {
     }
 
-//    
-// Note : The activation of the I/O Compensation Cell is recommended with communication  interfaces
-//         (GPIO, SPI, FMC, OSPI ...)  when  operating at  high frequencies (please refer to product datasheet)
-//         The I/O Compensation Cell activation  procedure requires :
-// - The activation of the CSI clock
-// - The activation of the SYSCFG clock
-// - Enabling the I/O Compensation Cell : setting bit[0] of register SYSCFG_CCCSR
-//
-//   To do this please uncomment the following code
-// 
+    //
+    // Note : The activation of the I/O Compensation Cell is recommended with communication  interfaces
+    //         (GPIO, SPI, FMC, OSPI ...)  when  operating at  high frequencies (please refer to product datasheet)
+    //         The I/O Compensation Cell activation  procedure requires :
+    // - The activation of the CSI clock
+    // - The activation of the SYSCFG clock
+    // - Enabling the I/O Compensation Cell : setting bit[0] of register SYSCFG_CCCSR
+    //
+    //   To do this please uncomment the following code
+    //
 
     LL_RCC_CSI_Enable();
     LL_APB4_GRP1_EnableClock(LL_APB4_GRP1_PERIPH_SYSCFG); // System clock enable

@@ -26,6 +26,39 @@
 #define RECEIVER_THREAD_STACK_SIZE 4096
 #pragma endregion
 
+#pragma region Device Input/output
+enum ArduinoPin : int
+{
+    Analog_0 = 33,  // PC0
+    Analog_1 = 115, // PH2
+    Analog_2 = 252, // PA0_C
+    Analog_3 = 253, // PA1_C
+    Analog_4 = 254, // PC2_C
+    Analog_5 = 255, // PC3_C
+    D0 = 32,        // PB15
+    D1 = 31,        // PB14
+    D2 = 100,       // PG3
+    D3 = 1,         // PA0
+    D4 = 101,       // PG4
+    D5 = 79,        // PE14
+    D6 = 64,        // PD15
+    D7 = 102,       // PG5
+    D8 = 68,        // PE3
+    D9 = 24,        // PB7
+    D10 = 87,       // PF6
+    D11 = 90,       // PF9 - SPI5_MOSI
+    D12 = 89,       // PF8 - SPI5_MISO
+    D13 = 88,       // PF7 - SPI5_SCK
+    D14 = 96,       // PF15 - I2C4_SDA
+    D15 = 95        // PF14 - I2C4_SCL
+};
+#define PINS_PER_PORT  16
+#define GPIO_MAX_PIN   sizeof(GpioPorts) * PINS_PER_PORT
+#define GPIO_PORT(pin) (GpioPorts[pin / PINS_PER_PORT])
+#define GPIO_PIN(pin)  (pin - (pin % PINS_PER_PORT) * PINS_PER_PORT)
+
+#pragma endregion
+
 #pragma region Peripheral clocks definitions
 #define ENABLE_CLOCK_ON_PORT_GPIOA LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOA)
 #define ENABLE_CLOCK_ON_PORT_GPIOB LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOB)
@@ -35,7 +68,11 @@
 #define ENABLE_CLOCK_ON_PORT_GPIOF LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOF)
 #define ENABLE_CLOCK_ON_PORT_GPIOG LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOG)
 #define ENABLE_CLOCK_ON_PORT_GPIOH LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOH)
+#define ENABLE_CLOCK_ON_PORT_GPIOI LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOI)
+#define ENABLE_CLOCK_ON_PORT_GPIOJ LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOJ)
+#define ENABLE_CLOCK_ON_PORT_GPIOK LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOK)
 #define ENABLE_CLOCK_ON_USART3     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART3)
+
 #define ENABLE_CLOCK_ON_DMA1       LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1)
 #pragma endregion
 
@@ -49,8 +86,8 @@
 #define wpUSART_PERIPHERAL_CLOCK_ENABLE ENABLE_CLOCK_ON_USART3
 
 #define wpUSART_GPIO_PORT                    GPIOD
-#define wpUSART_RX_PIN                       LL_GPIO_PIN_8
-#define wpUSART_TX_PIN                       LL_GPIO_PIN_9
+#define wpUSART_RX_PIN                       LL_GPIO_PIN_9
+#define wpUSART_TX_PIN                       LL_GPIO_PIN_8
 #define wpUSART_GPIO_PERIPHERAL_CLOCK_ENABLE ENABLE_CLOCK_ON_PORT_GPIOD
 
 #define wpDMA                               DMA1
@@ -68,13 +105,22 @@
 
 #pragma endregion
 
-#pragma region Local board buttons and leds
-// GPIOB
-#define LED1_GREEN LL_GPIO_PIN_0
-#define LED3_RED   LL_GPIO_PIN_14
+#pragma region Display interface and controller setup parameters
+#define LCD_WIDTH  480
+#define LCD_HEIGHT 272
+#pragma endregion
 
-// GPIOE
-#define LED2_YELLOW LL_GPIO_PIN_1
+
+#pragma region Local board buttons and leds
+
+#define LD1_PIN  LL_GPIO_PIN_0
+#define LD1_PORT GPIOB
+
+#define LD2_PIN  LL_GPIO_PIN_1
+#define LD2_PORT GPIOE
+
+#define LD3_PIN  LL_GPIO_PIN_14
+#define LD3_PORT GPIOB
 
 // GPIOC
 #define BUTTON_USER_PIN       LL_GPIO_PIN_13
@@ -125,16 +171,8 @@ static inline uint32_t Get_SYSTICK()
 
 #define INVALIDATE_DCACHE SCB_CleanInvalidateDCache()
 
-#define NANOCLR_AUDIO    FALSE
-#define NANOCLR_ETHERNET FALSE
-#define NANOCLR_FDCAN    FALSE
 
-#define NANOCLR_GRAPHICS_USING_SPI FALSE
-#define NANOCLR_MICROSD            FALSE
-#define NANOCLR_RTC                FALSE
-#define NANOCLR_USB                FALSE
-
-void Startup_Rtos();
+void Startup_Rtos(bool debuggerRequested);
 void Initialize_Board();
 void Initialize_DWT_Counter();
 void Initialize_Board_LEDS_And_Buttons();
@@ -148,11 +186,3 @@ void BoardLed_Toggle(GPIO_TypeDef *gpio_port, uint32_t led);
 bool BoardUserButton_Pressed();
 static inline uint32_t Get_SYSTICK();
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-    void LTDCClock_Config(void);
-#ifdef __cplusplus
-}
-#endif

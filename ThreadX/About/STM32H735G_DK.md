@@ -1,118 +1,4 @@
-# Welcome to .NET **nanoFramework** community targets port of STM32H7 boards
-
-## Note: This is not an official port, you can ask questions about it on Discord .
-
-
-##### Development environment : Visual Studio 2022 version 17.7.6
-> This code was developed and debugged with CMake under Visual Studio 2022, and *__should__* also be able to be used with VsCode *(not tested)*  .
-> 
-
-The development environment was setup as follows. The nf-interpreter repository is cloned to __C:\nf-intepreter__
-The additional support code is cloned to __C:\nfTools__
-
-The following table outlines the additional sources required for the STM32H7 series builds using __ThreadX__ *(formerly AzureRTOS)* as the real-time operating system (RTOS).
-
-
-
-| C:\nfTools\ |                            |                |                      |
-| ----------- | :------------------------- | :------------- | :------------------- |
-|             | **GNU_Tools_ARM_Embedded** | 12.3.rel       | arm-none-eabi        |
-|             |                            |                | bin                  |
-|             |                            |                | include              |
-|             |                            |                | libexec              |
-|             | **ThreadX**                | cmake          |                      |
-|             |                            | common         |                      |
-|             |                            | common_modules |                      |
-|             |                            | common_smp     |                      |
-|             |                            | docs           |                      |
-|             |                            | out            |                      |
-|             |                            | ports          |                      |
-|             |                            | ports_module   |                      |
-|             |                            | ports_smp      |                      |
-|             |                            | sample         |                      |
-|             |                            | utility        |                      |
-|             | **STM32CubeH7**            | Driver         | BSP                  |
-|             |                            |                | CMSIS                |
-|             |                            |                | STM32H7xx_HAL_Driver |
-
-
-
-The following Visual Studio file are required 
-
-**tasks.json**
-
-```json
-{
-  "version": "0.2.1",
-  "tasks": [
-    {
-      "taskLabel": "Flash nanoCLR on STM32H7",
-      "default": null,
-      "appliesTo": "*.*",
-      "command": "${env.COMSPEC}",
-      "args": [
-        "openocd -f interface/stlink.cfg  -f target/stm32h7x.cfg -c \"program build/nanoCLR.elf verify\" -c \"reset halt\" -c shutdown"
-      ],
-      "windows": {
-        "options": {
-          "shell": {
-            "executable": "cmd.exe",
-            "args": [ "/c" ]
-          }
-        }
-      }
-    }
-  ]
-}
-```
-
-
-
-launch.json
-
-```json
-{
-  "version": "0.2.1",
-  "configurations": [
-    {
-      "type": "cppdbg",
-      "name": "STM32H735G_DISCOVERY",
-      "program": "build/nanoCLR.elf",
-      "projectTarget": "nanoCLR.elf",
-      "project": "CMakeLists.txt",
-      "request": "launch",
-      "cwd": "${workspaceRoot}",
-      "processName": "STM32H735G_DISCOVERY",
-      "MIMode": "gdb",
-      "miDebuggerPath": "c:/nfTools/GNU_Tools_ARM_Embedded/12.3.rel1/bin/arm-none-eabi-gdb.exe",
-      "miDebuggerServerAddress": "localhost:3333",
-      "debugServerPath": "C:/nftools/OpenOCD-20230621/bin/openocd.exe",
-      "debugServerArgs": "-s \"c:/nfTools/openocd/scripts/\" -f interface/stlink.cfg -f board/stm32h735g-disco.cfg",
-      "serverStarted": "Listening on port 3333 for gdb connections",
-      "stopOnEntry": false,
-      "postRemoteConnectCommands": [
-        { "text": "monitor reset init" },
-        { "text": "load" }
-      ],
-      "launchCompleteCommand": "exec-run",
-      "filterStderr": true,
-      "filterStdout": true,
-      "logging": {
-        "engineLogging": true,
-        "trace": true,
-        "traceResponse": true
-      }
-    }
-  ]
-}
-```
-
-
-
-
-
-
-# STM32H735G-DK Discovery
+# Welcome to .NET **nanoFramework** community targets port of STM32H735G_DK
 
 ## Overview
 
@@ -136,28 +22,42 @@ More information about the board can be found at the [STM32H735G-DISCO website](
 
 The current STM32H735G_DK board configuration supports the following hardware features:
 
-| Interface | Controller | Driver/Component                           |
-| --------- | ---------- | ------------------------------------------ |
-| NVIC      | on-chip    | nested vector interrupt controller         |
-| UART      | on-chip    | serial port-polling; serial port-interrupt |
-| PINMUX    | on-chip    | pinmux                                     |
-| GPIO      | on-chip    | gpio                                       |
-| FLASH     | on-chip    | flash memory                               |
-| ETHERNET  | on-chip    | ethernet                                   |
-| RNG       | on-chip    | True Random number generator               |
-| FMC       | on-chip    | memc (SDRAM)                               |
-| ADC       | on-chip    | ADC Controller                             |
-
-### Pin Mapping
-
-For mode details please refer to [STM32H735G-DISCO website](https://www.st.com/en/evaluation-tools/stm32h735g-dk.html).
+| Interface | Controller | Driver/Component |
+| --------- | ---------- | ---------------- |
+| NVIC      | on-chip    | In Development   |
+| UART      | on-chip    | In Development   |
+| GPIO      | on-chip    | In Development   |
+| FLASH     | on-chip    | In Development   |
+| ETHERNET  | on-chip    | In Development   |
+| RNG       | on-chip    | In Development   |
+| FMC       | on-chip    | In Development   |
+| ADC       | on-chip    | In Development   |
 
 #### Peripheral Mapping:
 
-- UART_3 TX/RX : PD8/PD9 (ST-Link Virtual Port Com)
-- UART_7 TX/RX : PF7/PF6 (Arduino Serial)
-- LD1 : PC2
-- LD2 : PC3
+##### Serial Ports
+
+##### UART_3 - (ST-Link Virtual Port Com)
+
+TX - PD8
+
+RX - PD9
+
+##### UART_7 - (Arduino Serial)
+
+TX - PF7
+
+RX - PF6
+
+##### LEDS
+
+LED1 : PC3 (__HAL_RCC_GPIOC_CLK_ENABLE())
+
+LED2 : PC2
+
+##### Buttons
+
+User Pin : PC13
 
 ### System Clock
 
@@ -173,3 +73,50 @@ The STM32H735G Discovery kit has up to 6 UARTs, UART3 which connected to the onb
 
 Flashing operation will depend on the target to be flashed and the SoC option bytes configuration. It is advised to use [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html) to check and update option bytes configuration and flash the `stm32h735g_disco` target.
 
+# STM32H736NI
+
+The **STM32H736NI** is a high-performance microcontroller from STMicroelectronics. It is based on the **ARM Cortex-M7** core and is part of the **STM32H7** series of microcontrollers. Here are some of its features:
+
+- **CPU**: ARM Cortex-M7 core running at up to 400 MHz
+
+- **Memory**: 1 MB of Flash memory, 564 KB of RAM
+
+- Peripherals
+
+  :
+
+  - 2 x USB OTG FS/HS
+  - 2 x CAN FD
+  - 3 x I2C
+  - 4 x USART
+  - 4 x SPI
+  - 2 x SAI
+  - 2 x I2S
+  - 2 x SDMMC
+  - 2 x DFSDM
+  - 2 x ADC (16-bit)
+  - 2 x DAC (12-bit)
+  - 2 x RNG
+  - 2 x HASH
+  - 2 x CRYP
+  - 2 x FMC/SDRAM
+  - 1 x QSPI
+  - 1 x Ethernet MAC
+  - 1 x LCD-TFT controller
+  - 1 x JPEG codec
+  - 1 x Chrom-ART graphic accelerator
+
+- Operating conditions
+
+  :
+
+  - Voltage range: 1.71 V to 3.6 V
+  - Temperature range: -40°C to +125°C
+
+- Security
+
+  :
+
+  - AES-256 hardware encryption
+  - Secure boot and secure firmware update
+  - TrustZone and STSAFE secure elements

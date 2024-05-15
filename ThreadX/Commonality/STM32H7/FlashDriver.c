@@ -153,47 +153,41 @@ bool FlashDriver_EraseBlock(void *context, ByteAddress address)
     uint32_t sector = GetSector(address);
     uint32_t bank = GetBank(address);
 
-  //  FlashUnlock();
+    switch (bank)
     {
-        success = WaitForLastOperation(bank);
-        if (success)
+        case 1:
         {
-            switch (bank)
-            {
-                case 1:
-                {
+            // Clear error flag if any
+            uint32_t errorflag = FLASH->SR1 & FLASH_FLAG_ALL_ERRORS_BANK1;
+            WRITE_REG(FLASH->CCR1, errorflag);
 #if defined(FLASH_CR_PSIZE)
-                    FLASH->CR1 &= ~(FLASH_CR_PSIZE | FLASH_CR_SNB);
-                    FLASH->CR1 |= (FLASH_CR_SER | FLASH_ERASE_SIZE | (sector << FLASH_CR_SNB_Pos) | FLASH_CR_START);
+            FLASH->CR1 &= ~(FLASH_CR_PSIZE | FLASH_CR_SNB);
+            FLASH->CR1 |= (FLASH_CR_SER | FLASH_ERASE_SIZE | (sector << FLASH_CR_SNB_Pos) | FLASH_CR_START);
 #else
-                    FLASH->CR1 &= ~(FLASH_CR_SNB);
-                    FLASH->CR1 |= (FLASH_CR_SER | (sector << FLASH_CR_SNB_Pos) | FLASH_CR_START);
+            FLASH->CR1 &= ~(FLASH_CR_SNB);
+            FLASH->CR1 |= (FLASH_CR_SER | (sector << FLASH_CR_SNB_Pos) | FLASH_CR_START);
 #endif
-                }
-                    success = WaitForLastOperation(bank);
-                    FLASH->CR1 &= ~(FLASH_CR_SER | FLASH_CR_SNB);
-                    break;
+        }
+            success = WaitForLastOperation(bank);
+            FLASH->CR1 &= ~(FLASH_CR_SER | FLASH_CR_SNB);
+            break;
 #if defined(DUAL_BANK)
-                case 2:
+        case 2:
+            // Clear error flag if any
+            uint32_t errorflag = (FLASH->SR2 & FLASH_FLAG_ALL_ERRORS_BANK2) | 0x80000000U;
+            WRITE_REG(FLASH->CCR2, errorflag & 0x7FFFFFFFU);
 #if defined(FLASH_CR_PSIZE)
-                    FLASH->CR2 &= ~(FLASH_CR_PSIZE | FLASH_CR_SNB);
-                    FLASH->CR2 |= (FLASH_CR_SER | FLASH_ERASE_SIZE | (sector << FLASH_CR_SNB_Pos) | FLASH_CR_START);
+            FLASH->CR2 &= ~(FLASH_CR_PSIZE | FLASH_CR_SNB);
+            FLASH->CR2 |= (FLASH_CR_SER | FLASH_ERASE_SIZE | (sector << FLASH_CR_SNB_Pos) | FLASH_CR_START);
 #else
-                    FLASH->CR2 &= ~(FLASH_CR_SNB);
-                    FLASH->CR2 |= (FLASH_CR_SER | (sector << FLASH_CR_SNB_Pos) | FLASH_CR_START);
+            FLASH->CR2 &= ~(FLASH_CR_SNB);
+            FLASH->CR2 |= (FLASH_CR_SER | (sector << FLASH_CR_SNB_Pos) | FLASH_CR_START);
 #endif
-                    success = WaitForLastOperation(bank);
-                    FLASH->CR2 &= ~(FLASH_CR_SER | FLASH_CR_SNB);
-                    break;
+            success = WaitForLastOperation(bank);
+            FLASH->CR2 &= ~(FLASH_CR_SER | FLASH_CR_SNB);
+            break;
 #endif
-            }
-        }
-        else
-        {
-            success = false;
-        }
     }
- //   FlashLock();
     return success;
 }
 bool FlashUnlock()

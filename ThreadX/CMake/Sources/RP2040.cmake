@@ -1,11 +1,26 @@
 #
 # Copyright (c) .NET Foundation and Contributors
 # See LICENSE file in the project root for full license information.
-#
-# RP2040 series
 
+# Check and find source repository
+     if(IS_DIRECTORY ${PICO_SDK_SOURCE})
+         message(STATUS "Source code for Pico support is local folder ${PICO_SDK_SOURCE}")
+         FetchContent_Declare(
+             rp-pico
+             SOURCE_DIR ${PICO_SDK_SOURCE}
+         )
+     else()
+           message(STATUS "Source code for STM32H7 support from GitHub repo version ${CUBE_VERSION}")
+         FetchContent_Declare(
+             rp-pico
+             GIT_REPOSITORY https://github.com/raspberrypi/pico-sdk.git
+             GIT_TAG ${CUBE_VERSION}
+         )
+     endif()
+     FetchContent_Populate(rp-pico)
 
- list(APPEND RP2040_INCLUDES 
+ # Common
+     list(APPEND RP2040_INCLUDES 
              ${PICO_SDK_SOURCE}
              ${PICO_SDK_SOURCE}/src/boards/include
              ${PICO_SDK_SOURCE}/src/common/pico_base/include
@@ -62,14 +77,13 @@
              ${PICO_SDK_SOURCE}/src/rp2040/hardware_regs/include
              ${PICO_SDK_SOURCE}/src/rp2040/hardware_structs/include
 
-
              ${PICO_SDK_SOURCE}/lib/tinyusb/src
              ${PICO_SDK_SOURCE}/lib/tinyusb/src/class/cdc
              ${PICO_SDK_SOURCE}/lib/tinyusb/src/common
              ${PICO_SDK_SOURCE}/lib/tinyusb/src/device
              ${PICO_SDK_SOURCE}/lib/tinyusb/src/portable/raspberrypi/rp2040
- )
- list(APPEND RP2040_SOURCES
+     )
+     list(APPEND RP2040_SOURCES
              ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RP2040/bs2_default_padded_checksummed.s
 
              ${PICO_SDK_SOURCE}/src/common/pico_sync/critical_section.c
@@ -137,4 +151,8 @@
              ${PICO_SDK_SOURCE}/lib/tinyusb/src/device/usbd_control.c
              ${PICO_SDK_SOURCE}/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.c
              ${PICO_SDK_SOURCE}/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.c
- )                    
+     )                    
+
+# Overide compile flags on selected files
+  set_source_files_properties(${PICO_SDK_SOURCE}/src/rp2_common/pico_platform/include/pico/platform.h COMPILE_FLAGS -std=gnu++17)
+  set_source_files_properties(${PICO_SDK_SOURCE}/src/common/pico_sync/sem.c COMPILE_FLAGS -std=gnu++17)

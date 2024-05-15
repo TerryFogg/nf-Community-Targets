@@ -1,175 +1,103 @@
 # Welcome to .NET **nanoFramework** community targets port of STM32H7 boards
 
-## Note: This is not an official port, you can ask questions about it on Discord .
 
 
-##### Development environment : Visual Studio 2022 version 17.7.6
-> This code was developed and debugged with CMake under Visual Studio 2022, and *__should__* also be able to be used with VsCode *(not tested)*  .
-> 
-
-The development environment was setup as follows. The nf-interpreter repository is cloned to __C:\nf-intepreter__
-The additional support code is cloned to __C:\nfTools__
-
-The following table outlines the additional sources required for the STM32H7 series builds using __ThreadX__ *(formerly AzureRTOS)* as the real-time operating system (RTOS).
-
-
-
-| C:\nfTools\ |                            |                |                      |
-| ----------- | :------------------------- | :------------- | :------------------- |
-|             | **GNU_Tools_ARM_Embedded** | 12.3.rel       | arm-none-eabi        |
-|             |                            |                | bin                  |
-|             |                            |                | include              |
-|             |                            |                | libexec              |
-|             | **ThreadX**                | cmake          |                      |
-|             |                            | common         |                      |
-|             |                            | common_modules |                      |
-|             |                            | common_smp     |                      |
-|             |                            | docs           |                      |
-|             |                            | out            |                      |
-|             |                            | ports          |                      |
-|             |                            | ports_module   |                      |
-|             |                            | ports_smp      |                      |
-|             |                            | sample         |                      |
-|             |                            | utility        |                      |
-|             | **STM32CubeH7**            | Driver         | BSP                  |
-|             |                            |                | CMSIS                |
-|             |                            |                | STM32H7xx_HAL_Driver |
-
-
-
-The following Visual Studio file are required 
-
-**tasks.json**
-
-```json
-{
-  "version": "0.2.1",
-  "tasks": [
-    {
-      "taskLabel": "Flash nanoCLR on STM32H7",
-      "default": null,
-      "appliesTo": "*.*",
-      "command": "${env.COMSPEC}",
-      "args": [
-        "openocd -f interface/stlink.cfg  -f target/stm32h7x.cfg -c \"program build/nanoCLR.elf verify\" -c \"reset halt\" -c shutdown"
-      ],
-      "windows": {
-        "options": {
-          "shell": {
-            "executable": "cmd.exe",
-            "args": [ "/c" ]
-          }
-        }
-      }
-    }
-  ]
-}
-```
-
-
-
-launch.json
-
-```json
-{
-  "version": "0.2.1",
-  "configurations": [
-    {
-      "type": "cppdbg",
-      "name": "STM32H735G_DISCOVERY",
-      "program": "build/nanoCLR.elf",
-      "projectTarget": "nanoCLR.elf",
-      "project": "CMakeLists.txt",
-      "request": "launch",
-      "cwd": "${workspaceRoot}",
-      "processName": "STM32H735G_DISCOVERY",
-      "MIMode": "gdb",
-      "miDebuggerPath": "c:/nfTools/GNU_Tools_ARM_Embedded/12.3.rel1/bin/arm-none-eabi-gdb.exe",
-      "miDebuggerServerAddress": "localhost:3333",
-      "debugServerPath": "C:/nftools/OpenOCD-20230621/bin/openocd.exe",
-      "debugServerArgs": "-s \"c:/nfTools/openocd/scripts/\" -f interface/stlink.cfg -f board/stm32h735g-disco.cfg",
-      "serverStarted": "Listening on port 3333 for gdb connections",
-      "stopOnEntry": false,
-      "postRemoteConnectCommands": [
-        { "text": "monitor reset init" },
-        { "text": "load" }
-      ],
-      "launchCompleteCommand": "exec-run",
-      "filterStderr": true,
-      "filterStdout": true,
-      "logging": {
-        "engineLogging": true,
-        "trace": true,
-        "traceResponse": true
-      }
-    }
-  ]
-}
-```
-
-
-
-
-
-
-# STM32H735G-DK Discovery
+# Raspberry Pi Pico
 
 ## Overview
 
-The STM32H735G-DK Discovery kit is a complete demonstration and development platform for Arm® Cortex®-M7 core-based STM32H735IGK6U microcontroller, with 1 Mbyte of Flash memory and 564 Kbytes of SRAM.
+The Raspberry Pi Pico and Pico W are small, low-cost, versatile boards from Raspberry Pi. They are equipped with an RP2040 SoC, an on-board LED, a USB connector, and an SWD interface. The Pico W additionally contains an Infineon CYW43439 2.4 GHz Wi-Fi/Bluetoth module. The USB bootloader allows the ability to flash without any adapter, in a drag-and-drop manner. It is also possible to flash and debug the boards with their SWD interface, using an external adapter.
 
-The STM32H735G-DK Discovery kit is used as a reference design for user application development before porting to the final product, thus simplifying the application development.
+### RP2040 Device
 
-The full range of hardware features available on the board helps users to enhance their application development by an evaluation of all the peripherals (such as USB OTG FS, Ethernet, microSD™ card, USART, CAN FD, SAI audio DAC stereo with audio jack input and output, MEMS digital microphone, HyperRAM™, Octo-SPI Flash memory, RGB interface LCD with capacitive touch panel, and others). ARDUINO® Uno V3, Pmod™ and STMod+ connectors provide easy connection to extension shields or daughterboards for specific applications.
+- [RP2040 Datasheet](https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf)
+- [Hardware design with RP2040](https://datasheets.raspberrypi.com/rp2040/hardware-design-with-rp2040.pdf)
+- [Raspberry Pi Pico Datasheet](https://datasheets.raspberrypi.com/pico/pico-datasheet.pdf)
+- [Getting started with Raspberry Pi Pico](https://datasheets.raspberrypi.com/pico/getting-started-with-pico.pdf)
+- [Raspberry Pi Pico W Datasheet](https://datasheets.raspberrypi.com/picow/pico-w-datasheet.pdf)
+- [Connecting to the Internet with Raspberry Pi Pico W](https://datasheets.raspberrypi.com/picow/connecting-to-the-internet-with-pico-w.pdf)
+- [Connecting to the Internet with Raspberry Pi Pico W](https://datasheets.raspberrypi.com/picow/connecting-to-the-internet-with-pico-w.pdf) book.
+- [Raspberry Pi Pico C/C++ SDK](https://datasheets.raspberrypi.com/pico/raspberry-pi-pico-c-sdk.pdf)
+- [Pico tool Github repository](https://github.com/raspberrypi/picotool).
 
-STLINK-V3E is integrated into the board, as the embedded in-circuit debugger and programmer for the STM32 MCU and USB Virtual COM port bridge. STM32H735G-DK board comes with the STM32CubeH7 MCU Package, which provides an STM32 comprehensive software HAL library as well as various software examples.
+## Hardware
 
-![STM32H735G-DISCO](../1.nanoFramework/assets/stm32h735g_disco.jpg)
+- Dual core Arm Cortex-M0+ processor running up to 133MHz
+- 264KB on-chip SRAM
+- 2MB on-board QSPI flash with XIP capabilities
+- 26 GPIO pins
+- 3 Analog inputs
+- 2 UART peripherals
+- 2 SPI controllers
+- 2 I2C controllers
+- 16 PWM channels
+- USB 1.1 controller (host/device)
+- 8 Programmable I/O (PIO) for custom peripherals
+- On-board LED
+- 1 Watchdog timer peripheral
+- Infineon CYW43439 2.4 GHz Wi-Fi chip (Pico W only)
 
-More information about the board can be found at the [STM32H735G-DISCO website](https://www.st.com/en/evaluation-tools/stm32h735g-dk.html). More information about STM32H735 can be found here:
+![Raspberry Pi Pico](https://docs.zephyrproject.org/latest/_images/rpi_pico.jpg)
 
-- [STM32H725/735 on www.st.com](https://www.st.com/en/microcontrollers-microprocessors/stm32h725-735.html)
-- [STM32H735xx reference manual](https://www.st.com/resource/en/reference_manual/dm00603761-stm32h723733-stm32h725735-and-stm32h730-value-line-advanced-armbased-32bit-mcus-stmicroelectronics.pdf)
-- [STM32H735xx datasheet](https://www.st.com/resource/en/datasheet/stm32h735ag.pdf)
+![Raspberry Pi Pico W](https://docs.zephyrproject.org/latest/_images/rpi_pico_w.jpg)
+
+*Raspberry Pi Pico (above) and Pico W (below) (Images courtesy of Raspberry Pi)*
 
 ### Supported Features
 
-The current STM32H735G_DK board configuration supports the following hardware features:
+The rpi_pico board configuration supports the following hardware features:
 
-| Interface | Controller | Driver/Component                           |
-| --------- | ---------- | ------------------------------------------ |
-| NVIC      | on-chip    | nested vector interrupt controller         |
-| UART      | on-chip    | serial port-polling; serial port-interrupt |
-| PINMUX    | on-chip    | pinmux                                     |
-| GPIO      | on-chip    | gpio                                       |
-| FLASH     | on-chip    | flash memory                               |
-| ETHERNET  | on-chip    | ethernet                                   |
-| RNG       | on-chip    | True Random number generator               |
-| FMC       | on-chip    | memc (SDRAM)                               |
-| ADC       | on-chip    | ADC Controller                             |
+| Peripheral           | STATUS         |
+| -------------------- | -------------- |
+| NVIC                 | N/A            |
+| UART                 | In Development |
+| GPIO                 | In Development |
+| ADC                  | In Development |
+| I2C                  | In Development |
+| SPI                  | In Development |
+| USB Device           | In Development |
+| HWINFO               | In Development |
+| Watchdog Timer (WDT) | In Development |
+| PWM                  | In Development |
+| Flash                | In Development |
+| UART (PIO)           | In Development |
+| SPI (PIO)            | In Development |
+
+
 
 ### Pin Mapping
 
-For mode details please refer to [STM32H735G-DISCO website](https://www.st.com/en/evaluation-tools/stm32h735g-dk.html).
+The peripherals of the RP2040 SoC can be routed to various pins on the board. The configuration of these routes can be modified through DTS. Please refer to the datasheet to see the possible routings for each peripheral.
 
-#### Peripheral Mapping:
+External pin mapping on the Pico W is identical to the Pico, but note that internal RP2040 GPIO lines 23, 24, 25, and 29 are routed to the Infineon module on the W. Since GPIO 25 is routed to the on-board LED on the Pico, but to the Infineon module on the Pico W, the “blinky” sample program does not work on the W (use hello_world for a simple test program instead).
 
-- UART_3 TX/RX : PD8/PD9 (ST-Link Virtual Port Com)
-- UART_7 TX/RX : PF7/PF6 (Arduino Serial)
-- LD1 : PC2
-- LD2 : PC3
+#### Default Peripheral Mapping:
 
-### System Clock
+- UART0_TX : P0
+- UART0_RX : P1
+- I2C0_SDA : P4
+- I2C0_SCL : P5
+- I2C1_SDA : P14
+- I2C1_SCL : P15
+- SPI0_RX : P16
+- SPI0_CSN : P17
+- SPI0_SCK : P18
+- SPI0_TX : P19
+- ADC_CH0 : P26
+- ADC_CH1 : P27
+- ADC_CH2 : P28
+- ADC_CH3 : P29
 
-The STM32H735G System Clock can be driven by an internal or external oscillator, as well as by the main PLL clock. By default, the System clock is driven by the PLL clock at 550MHz. PLL clock is feed by a 25MHz high speed external clock.
+## Programmable I/O (PIO)
 
-### Serial Port
+The RP2040 SoC comes with two PIO periherals. These are two simple co-processors that are designed for I/O operations. The PIOs run a custom instruction set, generated from a custom assembly language. PIO programs are assembled using pioasm, a tool provided by Raspberry Pi.
 
-The STM32H735G Discovery kit has up to 6 UARTs, UART3 which connected to the onboard ST-LINK/V3.0. Virtual COM port interface.
+Future use
 
-## Programming and Debugging
+## Programming
 
-### Flashing
+#### UF2
 
-Flashing operation will depend on the target to be flashed and the SoC option bytes configuration. It is advised to use [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html) to check and update option bytes configuration and flash the `stm32h735g_disco` target.
+You can flash the Raspberry Pi Pico with a UF2 file.  If the Pico is powered on with the BOOTSEL button pressed, it will appear on the host as a mass storage device. The nanoCLR.uf2  file should be drag-and-dropped to the device, which will flash the nanoCLR onto the device.
 
+ 

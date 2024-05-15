@@ -6,6 +6,7 @@
 //
 
 #include "wp_CircularBuffer.h"
+#include "tx_adaption.h"
 
 CLR_UINT8 wp_InitializeBuffer(CircularBuffer_t *buffer, void *data, CLR_INT32 size)
 {
@@ -135,4 +136,37 @@ CLR_INT32 wp_BufferBytesWaiting(CircularBuffer_t *buffer)
         size = buffer->size - (r - w);
     }
     return size;
+}
+bool wp_ReadLine(CircularBuffer_t *buffer, const char *newLineCharacter, int newLineLength, uint8_t *line)
+{
+    bool waitingForLineTerminator;
+    char character;
+    char testCharacter;
+
+    waitingForLineTerminator = true;
+    testCharacter = *newLineCharacter;
+    while (wp_ReadBuffer(buffer, &character, 1) > 0 && waitingForLineTerminator)
+    {
+        if (character == testCharacter)
+        {
+            // Retrieve the next new line character
+            if (--newLineLength > 0)
+            {
+                newLineCharacter++;
+                testCharacter = *newLineCharacter;
+            }
+            else
+            {
+                waitingForLineTerminator = false;
+            }
+        }
+        else
+        {
+            *line = character;
+            line++;
+        }
+    }
+    line++;
+    *line = 0x00;
+    return !waitingForLineTerminator;
 }

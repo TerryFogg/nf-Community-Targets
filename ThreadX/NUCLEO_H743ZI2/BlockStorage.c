@@ -17,7 +17,7 @@ const BlockRange BlockRange1[] = {
 
 const BlockRegionInfo BlockRegions[] = {
     {
-        (BlockRegionAttribute_ProgramWidthIs128bits),
+        (BlockRegionAttribute_ProgramWidthIs256bits),
         (uint32_t)(uint32_t *)&flash_block_1, // start address for block region
         (uint32_t)(uint32_t *)&total_blocks, // total number of blocks in this region
         (uint32_t)(uint32_t *)&block_size,   // total number of bytes per block

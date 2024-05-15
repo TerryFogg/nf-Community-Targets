@@ -34,13 +34,13 @@ void SystemClock_Config(void)
     {
     }
 
-   // LL_RCC_HSE_EnableBypass();
+    // LL_RCC_HSE_EnableBypass();
     LL_RCC_HSE_Enable();
     while (LL_RCC_HSE_IsReady() != 1)
     {
     }
 
-    LL_FLASH_SetLatency(LL_FLASH_LATENCY_7);
+    LL_FLASH_SetLatency(FLASH_LATENCY_6);
 
     // Main PLL configuration and activation
     LL_RCC_PLL_SetSource(LL_RCC_PLLSOURCE_HSE);
@@ -87,7 +87,31 @@ void SystemClock_Config(void)
     LL_APB4_GRP1_EnableClock(LL_APB4_GRP1_PERIPH_SYSCFG); // System clock enable
     LL_SYSCFG_EnableCompensationCell();
 }
-
+void PeriphCommonClock_Config(void)
+{
+    LL_RCC_PLL2_Disable();
+    {
+        while (LL_RCC_PLL2_IsReady() != 0U)
+        {
+        };
+        LL_RCC_PLL2_SetM(24);
+        LL_RCC_PLL2_SetN(200);
+        LL_RCC_PLL2_SetP(0);
+        LL_RCC_PLL2_SetQ(0);
+        LL_RCC_PLL2_SetR(2);
+        LL_RCC_PLL2FRACN_Enable();
+        {
+            LL_RCC_PLL2_SetFRACN(0);
+        }
+        LL_RCC_PLL2FRACN_Disable();
+        LL_RCC_PLL2_SetVCOOutputRange(LL_RCC_PLLVCORANGE_MEDIUM);
+        LL_RCC_PLL2_SetVCOInputRange(LL_RCC_PLLINPUTRANGE_2_4);
+    }
+    LL_RCC_PLL2_Enable();
+    while (LL_RCC_PLL2_IsReady() == 0U)
+    {
+    };
+}
 void LTDCClock_Config(void)
 {
     // RK043FN48H LCD clock configuration
@@ -97,14 +121,25 @@ void LTDCClock_Config(void)
     // PLLLCDCLK = PLL3_VCO Output/PLL3R = 800/83 = 9.63 Mhz
     // LTDC clock frequency = PLLLCDCLK = 9.63 Mhz
     LL_RCC_PLL3_Disable();
-    LL_RCC_PLL3_SetM(6);
-    LL_RCC_PLL3_SetN(200);
-    LL_RCC_PLL3_SetP(10);
-    LL_RCC_PLL3_SetQ(10);
-    LL_RCC_PLL3_SetR(83);
-    LL_RCC_PLL3_SetFRACN(0);
-    LL_RCC_PLL3_SetVCOOutputRange(LL_RCC_PLLVCORANGE_WIDE);
-    LL_RCC_PLL3_SetVCOInputRange(LL_RCC_PLLINPUTRANGE_1_2);
+    {
+        while (LL_RCC_PLL3_IsReady() != 0U)
+        {
+        };
+        LL_RCC_PLL3_SetM(6);
+        LL_RCC_PLL3_SetN(200);
+        LL_RCC_PLL3_SetP(10);
+        LL_RCC_PLL3_SetQ(10);
+        LL_RCC_PLL3_SetR(83);
+        LL_RCC_PLL3FRACN_Enable();
+        {
+            LL_RCC_PLL3_SetFRACN(0);
+        }
+        LL_RCC_PLL3FRACN_Disable();
+        LL_RCC_PLL3_SetVCOOutputRange(LL_RCC_PLLVCORANGE_WIDE);
+        LL_RCC_PLL3_SetVCOInputRange(LL_RCC_PLLINPUTRANGE_1_2);
+    }
     LL_RCC_PLL3_Enable();
+    while (LL_RCC_PLL3_IsReady() == 0U)
+    {
+    };
 }
-

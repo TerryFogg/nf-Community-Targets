@@ -5,9 +5,10 @@
 // See LICENSE file in the project root for full license information.
 //
 
+
 #include "stm32h7xx_hal_flash.h"
 #include "stm32h7xx_hal_flash_ex.h"
-
+#include "stm32h7xx_hal_pwr.h"
 
 #include "stm32h7xx_ll_adc.h"
 #include "stm32h7xx_ll_bdma.h"

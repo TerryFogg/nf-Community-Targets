@@ -8,11 +8,39 @@ target_link_options(nanoCLR.elf PUBLIC "-T${CMAKE_SOURCE_DIR}/targets-community/
 # detect when linker changes so a re-link is executed
 set_target_properties(nanoCLR.elf PROPERTIES LINK_DEPENDS "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_BOARD}/Linker_script.ld")
 
+
+if(FILE_SYSTEM_SD OR FILE_SYSTEM_NAND OR FILE_SYSTEM_NOR OR FILE_SYSTEM_RAM)
+      target_compile_definitions(nanoCLR.elf PUBLIC -DFILEX=TRUE)
+    if(FILEX_SD)
+          target_compile_definitions(nanoCLR.elf PUBLIC -DFILE_SYSTEM_SD=TRUE)
+    endif()
+    if(FILEX_NAND)
+          target_compile_definitions(nanoCLR.elf PUBLIC -DFILE_SYSTEM_NAND=TRUE)
+    endif()
+    if(FILE_SYSTEM_NOR)
+          target_compile_definitions(nanoCLR.elf PUBLIC -DFILE_SYSTEM_NOR=TRUE)
+    endif()
+    if(FILE_SYSTEM_RAM)
+          target_compile_definitions(nanoCLR.elf PUBLIC -DFILE_SYSTEM_RAM=TRUE)
+    endif()
+endif()
+
+if(HAS_A_USER_BUTTON)
+      target_compile_definitions(nanoCLR.elf PUBLIC -DUSER_BUTTON=TRUE)
+else()
+      target_compile_definitions(nanoCLR.elf PUBLIC -DUSER_BUTTON=FALSE)
+endif()
+
+
 if(GRAPHICS_SUPPORT)
       target_compile_definitions(nanoCLR.elf PUBLIC -DNANOCLR_GRAPHICS=TRUE)
 else()
       target_compile_definitions(nanoCLR.elf PUBLIC -DNANOCLR_GRAPHICS=FALSE)
 endif()
+
+target_compile_definitions(nanoCLR.elf PUBLIC -DNANOCLR_REFLECTION=TRUE)
+
+target_compile_definitions(nanoCLR.elf PUBLIC -DTARGET_HAS_NANOBOOTER=FALSE)
 
 target_compile_definitions(nanoCLR.elf PUBLIC -D${TARGET_SERIES})
 target_compile_definitions(nanoCLR.elf PUBLIC -DDEBUG)
@@ -21,13 +49,11 @@ target_compile_definitions(nanoCLR.elf PUBLIC -DNANOCLR_LIGHT_MATH=FALSE)
 target_compile_definitions(nanoCLR.elf PUBLIC -DDP_FLOATINGPOINT=TRUE)
 target_compile_definitions(nanoCLR.elf PUBLIC -DHAS_CONFIG_BLOCK=TRUE)
 target_compile_definitions(nanoCLR.elf PUBLIC -DNANOCLR_SYSTEM_COLLECTIONS=TRUE)
-target_compile_definitions(nanoCLR.elf PUBLIC -DNANOCLR_REFLECTION=TRUE)
 target_compile_definitions(nanoCLR.elf PUBLIC -DHAL_USE_RTC=FALSE)
 target_compile_definitions(nanoCLR.elf PUBLIC -DHAL_USE_WDG=FALSE)
 target_compile_definitions(nanoCLR.elf PUBLIC -DPLATFORM_HAS_RNG=${RANDOM_NUMBER_GENERATOR})
 target_compile_definitions(nanoCLR.elf PUBLIC -DPLATFORM_NO_CLR_TRACE)
 
-target_compile_definitions(nanoCLR.elf PUBLIC -DTARGET_HAS_NANOBOOTER=FALSE)
 
 target_compile_definitions(nanoCLR.elf PUBLIC -DNANOCLR_GRAPHICS=${GRAPHICS_SUPPORT})
 

@@ -37,6 +37,7 @@ extern "C"
 
 void nanoHAL_Initialize()
 {
+
     // initialize global mutex
     // chMtxObjectInit(&interpreterGlobalMutex);
 

@@ -13,11 +13,12 @@
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/startup_stm32h743xx.s
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/target_common.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/tx_initialize_low_level.s
-    
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/DeviceIO/cpu_System.Device.I2c.cpp
 
-
-                
+               
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/Initialize_Graphics.cpp
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/Generic_SPI.cpp
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/Spi_To_Display.cpp
      )
 
-   
+
+      set_source_files_properties(${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/Generic_SPI.cpp COMPILE_FLAGS -Wno-unused-parameter)

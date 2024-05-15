@@ -1,24 +1,21 @@
 #pragma once
-//
-// Copyright (c) .NET Foundation and Contributors
-// Portions Copyright (c) Microsoft Corporation.  All rights reserved.
-// See LICENSE file in the project root for full license information.
-//
-// Copyright (c) .NET Foundation and Contributors
-// Portions Copyright (c) Microsoft Corporation.  All rights reserved.
-// See LICENSE file in the project root for full license information.
-//
-#include <nanoHAL_v2.h>
-#include <nanoCLR_Headers.h>
 
-#include "stm32h7b3xxq.h"
-#include "stm32h7xx.h"
-#include "stm32h7xx_ll.h"
-#include "stm32h7xx_hal_pwr.h"
+// Copyright (c) .NET Foundation and Contributors
+// Portions Copyright (c) Microsoft Corporation.  All rights reserved.
+// See LICENSE file in the project root for full license information.
+#include <stdbool.h>
+
 #include "tx_api.h"
 #include "tx_port.h"
+#include "tx_adaption.h"
+#include "stm32h7xx.h"
+#include "stm32h7xx_ll.h"
 
-#define TARGET_BLOCKSTORAGE_COUNT 1
+#include "stm32h7b3xxq.h"
+#include "PinNumbering.h"
+
+// #define TARGET_BLOCKSTORAGE_COUNT 1
+#define ARRAY_LEN(x) (sizeof(x) / sizeof((x)[0]))
 
 #pragma region Byte pool configuration and definitions
 #define DEFAULT_BYTE_POOL_SIZE     16000
@@ -72,85 +69,126 @@
 #pragma endregion
 
 #pragma region Display interface and controller setup parameters
-#define ENABLE_LTDC         LL_APB3_GRP1_EnableClock(LL_APB3_GRP1_PERIPH_LTDC)
-#define LTDC_FORCE_RESET    LL_APB3_GRP1_ForceReset(LL_APB3_GRP1_PERIPH_LTDC)
-#define LTDC_RELEASE_RESET  LL_APB3_GRP1_ReleaseReset(LL_APB3_GRP1_PERIPH_LTDC)
+#define LCD_WIDTH  480
+#define LCD_HEIGHT 272
+
+#define FRAME_BUFFER_ADDRESS 0xD0000000
+#define ENABLE_LTDC          LL_APB3_GRP1_EnableClock(LL_APB3_GRP1_PERIPH_LTDC)
+#define LTDC_FORCE_RESET     LL_APB3_GRP1_ForceReset(LL_APB3_GRP1_PERIPH_LTDC)
+#define LTDC_RELEASE_RESET   LL_APB3_GRP1_ReleaseReset(LL_APB3_GRP1_PERIPH_LTDC)
+
 #define DMA2D_ENABLE        LL_AHB3_GRP1_EnableClock(LL_AHB3_GRP1_PERIPH_DMA2D)
 #define DMA2D_RESET         LL_AHB3_GRP1_ForceReset(LL_AHB3_GRP1_PERIPH_DMA2D)
 #define DMA2D_RELEASE_RESET LL_AHB3_GRP1_ReleaseReset(LL_AHB3_GRP1_PERIPH_DMA2D)
 
-
 #define USE_GPIOA
+#define USE_GPIOB
+#define USE_GPIOC
+#define USE_GPIOD
+#define USE_GPIOE
+#define USE_GPIOF
+#define USE_GPIOG
+#define USE_GPIOH
 #define USE_GPIOI
 #define USE_GPIOJ
 #define USE_GPIOK
 
 // LCD 16-bit interface pins
-#define LCD_R0      LL_GPIO_PIN_15
-#define LCD_R0_PORT GPIOI
-#define LCD_R1      LL_GPIO_PIN_0
-#define LCD_R1_PORT GPIOJ
-#define LCD_R2      LL_GPIO_PIN_1
-#define LCD_R2_PORT GPIOJ
-#define LCD_R3      LL_GPIO_PIN_2
-#define LCD_R3_PORT GPIOJ
-#define LCD_R4      LL_GPIO_PIN_3
-#define LCD_R4_PORT GPIOJ
-#define LCD_R5      LL_GPIO_PIN_4
-#define LCD_R5_PORT GPIOJ
-#define LCD_R6      LL_GPIO_PIN_5
-#define LCD_R6_PORT GPIOJ
-#define LCD_R7      LL_GPIO_PIN_6
-#define LCD_R7_PORT GPIOJ
-#define LCD_G0      LL_GPIO_PIN_7
-#define LCD_G0_PORT GPIOJ
-#define LCD_G1      LL_GPIO_PIN_8
-#define LCD_G1_PORT GPIOJ
-#define LCD_G2      LL_GPIO_PIN_9
-#define LCD_G2_PORT GPIOJ
-#define LCD_G3      LL_GPIO_PIN_10
-#define LCD_G3_PORT GPIOJ
-#define LCD_G4      LL_GPIO_PIN_11
-#define LCD_G4_PORT GPIOJ
-#define LCD_G5      LL_GPIO_PIN_0
-#define LCD_G5_PORT GPIOK
-#define LCD_G6      LL_GPIO_PIN_1
-#define LCD_G6_PORT GPIOK
-#define LCD_G7      LL_GPIO_PIN_2
-#define LCD_G7_PORT GPIOK
-#define LCD_B0      LL_GPIO_PIN_12
-#define LCD_B0_PORT GPIOJ
-#define LCD_B1      LL_GPIO_PIN_13
-#define LCD_B1_PORT GPIOJ
-#define LCD_B2      LL_GPIO_PIN_14
-#define LCD_B2_PORT GPIOJ
-#define LCD_B3      LL_GPIO_PIN_15
-#define LCD_B3_PORT GPIOJ
-#define LCD_B4      LL_GPIO_PIN_3
-#define LCD_B4_PORT GPIOK
-#define LCD_B5      LL_GPIO_PIN_4
-#define LCD_B5_PORT GPIOK
-#define LCD_B6      LL_GPIO_PIN_5
-#define LCD_B6_PORT GPIOK
-#define LCD_B7      LL_GPIO_PIN_6
-#define LCD_B7_PORT GPIOK
-#define LCD_CLK            LL_GPIO_PIN_14
-#define LCD_CLK_PORT       GPIOI
-#define LCD_HSYNC          LL_GPIO_PIN_12
-#define LCD_HSYNC_PORT     GPIOI
-#define LCD_VSYNC          LL_GPIO_PIN_13
-#define LCD_VSYNC_PORT     GPIOI
-#define LCD_DISP_CTRL_PIN  LL_GPIO_PIN_2
-#define LCD_DISP_CTRL_PORT GPIOA
-#define LCD_DISP_EN_PIN    LL_GPIO_PIN_7
-#define LCD_DISP_EN_PORT   GPIOK
-#define LCD_BL_CTRL_PIN    LL_GPIO_PIN_1
-#define LCD_BL_CTRL_PORT   GPIOA
+#define LCD_R0_PORT           GPIOI
+#define LCD_R0                LL_GPIO_PIN_15
+#define LCD_R0_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_R1_PORT           GPIOJ
+#define LCD_R1                LL_GPIO_PIN_0
+#define LCD_R1_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_R2_PORT           GPIOJ
+#define LCD_R2                LL_GPIO_PIN_1
+#define LCD_R2_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_R3_PORT           GPIOJ
+#define LCD_R3                LL_GPIO_PIN_2
+#define LCD_R3_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_R4_PORT           GPIOJ
+#define LCD_R4                LL_GPIO_PIN_3
+#define LCD_R4_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_R5_PORT           GPIOJ
+#define LCD_R5                LL_GPIO_PIN_4
+#define LCD_R5_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_R6_PORT           GPIOJ
+#define LCD_R6                LL_GPIO_PIN_5
+#define LCD_R6_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_R7_PORT           GPIOJ
+#define LCD_R7                LL_GPIO_PIN_6
+#define LCD_R7_ALTERNATE_MODE LL_GPIO_AF_14
 
-#define LCD_INT_Port    GPIOH
-#define LCD_INT_Pin     LL_GPIO_PIN_2
-#define LCD_ON_OFF_Port GPIOA
-#define LCD_ON_OFF_Pin  LL_GPIO_PIN_2
+#define LCD_G0_PORT           GPIOJ
+#define LCD_G0                LL_GPIO_PIN_7
+#define LCD_G0_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_G1_PORT           GPIOJ
+#define LCD_G1                LL_GPIO_PIN_8
+#define LCD_G1_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_G2_PORT           GPIOJ
+#define LCD_G2                LL_GPIO_PIN_9
+#define LCD_G2_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_G3_PORT           GPIOJ
+#define LCD_G3                LL_GPIO_PIN_10
+#define LCD_G3_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_G4_PORT           GPIOJ
+#define LCD_G4                LL_GPIO_PIN_11
+#define LCD_G4_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_G5_PORT           GPIOK
+#define LCD_G5                LL_GPIO_PIN_0
+#define LCD_G5_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_G6_PORT           GPIOK
+#define LCD_G6                LL_GPIO_PIN_1
+#define LCD_G6_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_G7_PORT           GPIOK
+#define LCD_G7                LL_GPIO_PIN_2
+#define LCD_G7_ALTERNATE_MODE LL_GPIO_AF_14
+
+#define LCD_B0_PORT           GPIOJ
+#define LCD_B0                LL_GPIO_PIN_12
+#define LCD_B0_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_B1_PORT           GPIOJ
+#define LCD_B1                LL_GPIO_PIN_13
+#define LCD_B1_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_B2_PORT           GPIOJ
+#define LCD_B2                LL_GPIO_PIN_14
+#define LCD_B2_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_B3_PORT           GPIOJ
+#define LCD_B3                LL_GPIO_PIN_15
+#define LCD_B3_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_B4_PORT           GPIOK
+#define LCD_B4                LL_GPIO_PIN_3
+#define LCD_B4_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_B5_PORT           GPIOK
+#define LCD_B5                LL_GPIO_PIN_4
+#define LCD_B5_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_B6_PORT           GPIOK
+#define LCD_B6                LL_GPIO_PIN_5
+#define LCD_B6_ALTERNATE_MODE LL_GPIO_AF_14
+#define LCD_B7_PORT           GPIOK
+#define LCD_B7                LL_GPIO_PIN_6
+#define LCD_B7_ALTERNATE_MODE LL_GPIO_AF_14
+
+#define LCD_BL_CTRL_PORT GPIOA
+#define LCD_BL_CTRL_PIN  LL_GPIO_PIN_1
+
+#define LCD_DISP_EN_PORT GPIOK
+#define LCD_DISP_EN_PIN  LL_GPIO_PIN_7
+
+#define LCD_DISP_CTRL_PORT GPIOA
+#define LCD_DISP_CTRL_PIN  LL_GPIO_PIN_2
+
+#define LCD_HSYNC_PORT GPIOI
+#define LCD_HSYNC      LL_GPIO_PIN_12
+
+#define LCD_VSYNC_PORT GPIOI
+#define LCD_VSYNC      LL_GPIO_PIN_13
+
+#define LCD_CLK_PORT GPIOI
+#define LCD_CLK      LL_GPIO_PIN_14
+
+#define LCD_INT_Port // GPIOH
+#define LCD_INT_Pin  // LL_GPIO_PIN_2
 
 // Low level I2C for Display touch controller
 #define I2C_ENABLE_TOUCH_CLOCK        LL_APB4_GRP1_EnableClock(LL_APB4_GRP1_PERIPH_I2C4)
@@ -159,6 +197,7 @@
 #pragma endregion
 
 #pragma region Local board buttons and leds
+#define LED_GPIO_PORT GPIOG
 #define LED3_RED      LL_GPIO_PIN_11
 #define LED2_BLUE     LL_GPIO_PIN_2
 
@@ -179,7 +218,7 @@
 //
 
 // Flash program/erase by 64 bits
-#define FLASH_ERASE_SIZE      FLASH_VOLTAGE_RANGE_4
+#define FLASH_ERASE_SIZE FLASH_VOLTAGE_RANGE_4
 
 // End Of Program on Bank 1 flag
 // #define FLASH_FLAG_EOP_BANK1 FLASH_SR_EOP
@@ -187,7 +226,7 @@
 
 #pragma region SDRAM setup
 #define SDRAM_BANK_ADDR       ((uint32_t)0xD0000000)
-#define SDRAM_RAM_REGION_SIZE LL_MPU_REGION_SIZE_16MB
+#define SDRAM_RAM_REGION_SIZE LL_MPU_REGION_SIZE_32MB
 
 #define A0_GPIO_Port  GPIOF
 #define A0_Pin        LL_GPIO_PIN_0
@@ -257,72 +296,71 @@
 
 #pragma endregion
 
-#pragma region Inline functions
-// DWT is connected to the system clock
-static inline void DWT_Delay_us(volatile uint32_t microsecond_delay)
-{
-
-    // TODO - At boot time not relevant, but Important  WRAP AROUND counter !!!! to fix
-    LL_RCC_ClocksTypeDef RCC_Clocks;
-    LL_RCC_GetSystemClocksFreq(&RCC_Clocks);
-    uint32_t initial_microseconds = DWT->CYCCNT;
-    uint32_t tick_rate = RCC_Clocks.SYSCLK_Frequency / 1000000;
-    microsecond_delay *= tick_rate;
-    while ((DWT->CYCCNT - initial_microseconds) < microsecond_delay - tick_rate)
-        ;
-}
-
-static inline uint32_t Get_SYSTICK()
-{
-    return tx_time_get();
-}
-
-static inline bool OSPI2_WaitUntilState(uint32_t Flag, FlagStatus State)
-{
-    int loopCounter = 10;                         // 10 loops, 10 microseconds maximum
-    while (READ_BIT(OCTOSPI2->SR, Flag) != State) // Wait until flag is in expected state
-    {
-        DWT_Delay_us(1); // Wait a microsecond;
-        loopCounter--;
-        if (loopCounter == 0)
-        {
-            return false;
-        }
-    }
-    return true;
-}
-#pragma endregion
-
-#define INVALIDATE_DCACHE SCB_CleanInvalidateDCache()
-
-#define NANOCLR_AUDIO    FALSE
-#define NANOCLR_ETHERNET FALSE
-#define NANOCLR_FDCAN    FALSE
-
-#define NANOCLR_GRAPHICS_USING_SPI FALSE
-#define NANOCLR_MICROSD            FALSE
-#define NANOCLR_RTC                FALSE
-#define NANOCLR_USB                FALSE
-
-void Startup_Rtos();
-void Initialize_Board();
-void Initialize_DWT_Counter();
-void Initialize_Board_LEDS_And_Buttons();
-void Initialize_SDRAM(uint32_t base_address, uint32_t sdram_region_size);
-void Initialize_64bit_timer();
-void CPU_CACHE_Enable(void);
-void SystemClock_Config();
-void BoardLed_ON(GPIO_TypeDef *gpio_port, uint32_t led);
-void BoardLed_OFF(GPIO_TypeDef *gpio_port, uint32_t led);
-void BoardLed_Toggle(GPIO_TypeDef *gpio_port, uint32_t led);
-bool BoardUserButton_Pressed();
-static inline uint32_t Get_SYSTICK();
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+#pragma region Inline functions
+    // DWT is connected to the system clock
+    static inline void DWT_Delay_us(volatile uint32_t microsecond_delay)
+    {
+        // TODO - At boot time not relevant, but Important  WRAP AROUND counter !!!! to fix
+        LL_RCC_ClocksTypeDef RCC_Clocks;
+        LL_RCC_GetSystemClocksFreq(&RCC_Clocks);
+        uint32_t initial_microseconds = DWT->CYCCNT;
+        uint32_t tick_rate = RCC_Clocks.SYSCLK_Frequency / 1000000;
+        microsecond_delay *= tick_rate;
+        while ((DWT->CYCCNT - initial_microseconds) < microsecond_delay - tick_rate)
+            ;
+    }
+    static inline uint32_t Get_SYSTICK()
+    {
+        return tx_time_get();
+    }
+// static inline bool OSPI2_WaitUntilState(uint32_t Flag, FlagStatus State)
+//{
+//     int loopCounter = 10;                         // 10 loops, 10 microseconds maximum
+//     while (READ_BIT(OCTOSPI2->SR, Flag) != State) // Wait until flag is in expected state
+//     {
+//         DWT_Delay_us(1); // Wait a microsecond;
+//         loopCounter--;
+//         if (loopCounter == 0)
+//         {
+//             return false;
+//         }
+//     }
+//     return true;
+// }
+#pragma endregion
+
+#pragma region Prototypes
+
+#define INVALIDATE_DCACHE SCB_CleanInvalidateDCache()
+    void Startup_Rtos(bool debuggerRequested);
+    void Initialize_Board();
+    void MPU_Config(uint32_t sdram_base_address, uint32_t sdram_region_size);
+    void Initialize_DWT_Counter();
+    void Initialize_Board_LEDS_And_Buttons();
+    void Initialize_SDRAM(uint32_t base_address, uint32_t sdram_region_size);
+    void Initialize_64bit_timer();
+    void CPU_CACHE_Enable(void);
+    void SystemClock_Config();
+    void BoardLed_ON(GPIO_TypeDef *gpio_port, uint32_t led);
+    void BoardLed_OFF(GPIO_TypeDef *gpio_port, uint32_t led);
+    void BoardLed_Toggle(GPIO_TypeDef *gpio_port, uint32_t led);
+    bool BoardUserButton_Pressed();
+    void PeriphCommonClock_Config(void);
     void LTDCClock_Config(void);
+
+    int GetCurrentMilliseconds();
+    void InitOneMillisecondTick();
+    void DelayMilliseconds(int milliseconds);
+
 #ifdef __cplusplus
 }
 #endif
+// static inline uint32_t Get_SYSTICK();
+
+#pragma endregion

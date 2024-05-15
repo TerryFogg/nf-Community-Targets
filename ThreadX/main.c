@@ -4,10 +4,16 @@
 //
 #include "board.h"
 
-bool g_waitForDebuggerRequested = false;
+    void test(void);
+
+bool debuggerRequested = false;
 int main(void)
 {
     Initialize_Board();
-    g_waitForDebuggerRequested = BoardUserButton_Pressed();
-    Startup_Rtos();
+
+#if defined(USER_BUTTON)
+    debuggerRequested = BoardUserButton_Pressed();
+#endif
+
+    Startup_Rtos(debuggerRequested);
 }

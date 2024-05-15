@@ -3,20 +3,21 @@
    See LICENSE file in the project root for full license information.
 */
 
+
 /* NOTE */
 /* Division of internal flash is limited by the smallest erase size of 8K */
 
 /* Entry point */
 ENTRY(Reset_Handler)
 
-/* _estack is used in startup_stm32h743xx.s to define the end of the stack memory for the main thread */
+/* _estack is used in ThreadX to define the end of the stack memory for the main thread */
 _estack = ORIGIN(DTCM_SRAM) + LENGTH(DTCM_SRAM);
 
-/* _sidata is used in startup_stm32h743xx.s to copy the data segment from ROM to RAM during initialization */
+/* _sidata is used in ThreadX to copy the data segment from ROM to RAM during initialization */
 _sidata = LOADADDR(.data);
 
 /* Stack and heap size */
-_Min_Heap_Size = 0x200; 
+_Min_Heap_Size  = 0x200; 
 _Min_Stack_Size = 0x400; 
 
 /* Define the availability of FLASH */
@@ -53,32 +54,38 @@ MEMORY
     /* =============== */
 
      ITCM_SRAM  (rxw):ORIGIN = 0x00000000,LENGTH = 64K 
-     FLASH      (rx) :ORIGIN = 0x08000000,LENGTH = 2048k
-
      DTCM_SRAM  (rxw):ORIGIN = 0x20000000,LENGTH = 128K 
+
+     FLASH      (rx) :ORIGIN = 0x08000000,LENGTH = 2048k
      AXI_RAM    (rxw):ORIGIN = 0x24000000,LENGTH = 512K
-     SRAM1      (rxw):ORIGIN = 0x30000000,LENGTH = 288K 
+     SRAM1      (rxw):ORIGIN = 0x30000000,LENGTH = 128K 
+     SRAM2      (rxw):ORIGIN = 0x30020000,LENGTH = 128K 
+     SRAM3      (rxw):ORIGIN = 0x30040000,LENGTH = 32K
      SRAM4      (rxw):ORIGIN = 0x38000000,LENGTH = 64K
      BACKUP_RAM (rxw):ORIGIN = 0x38800000,LENGTH = 4k
 
 
+ 
+ 
   /* ============================= */
   /* Memory usage by nanoFramework */
   /* ============================= */
 
-     nanoCLR    (rx) : ORIGIN = ORIGIN(FLASH), LENGTH = (blocks_reserved_for_clr*block_size)
+     nanoCLR    (rx) : ORIGIN = ORIGIN(FLASH),                     LENGTH = (blocks_reserved_for_clr*block_size)
      deployment (rx) : ORIGIN = ORIGIN(nanoCLR) + LENGTH(nanoCLR), LENGTH = (blocks_reserved_for_deployment*block_size)
      config     (rx) : ORIGIN = 0, LENGTH = 0
 
-     /* Native code ram (Azure, nativeCLR) */
-      NATIVE_RAM   (rxw) : ORIGIN = ORIGIN(DTCM_SRAM), LENGTH = LENGTH(DTCM_SRAM)
-      CLR_RAM  (rxw) : ORIGIN = ORIGIN(AXI_RAM), LENGTH =  LENGTH(AXI_RAM)
+     /* Native code ram (ThreadX, nativeCLR) */
+     NATIVE_RAM (rxw) : ORIGIN = ORIGIN(DTCM_SRAM),LENGTH = LENGTH(DTCM_SRAM)
+     CLR_RAM    (rxw) : ORIGIN = ORIGIN(AXI_RAM),  LENGTH = LENGTH(AXI_RAM)
 
      /* RAM accessible by the DMA controller */
-     RAM_DMA      (rxw) : ORIGIN = ORIGIN(SRAM1), LENGTH = LENGTH(SRAM1)
+     RAM_DMA    (rxw) : ORIGIN = ORIGIN(SRAM1), LENGTH = LENGTH(SRAM1)
+
+
+
 
 }
-
 
 /* The CLR managed heap for CLR */
 HeapBegin             = ORIGIN(CLR_RAM); 

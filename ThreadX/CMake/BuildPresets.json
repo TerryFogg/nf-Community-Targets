@@ -1,0 +1,93 @@
+{
+    "version": 4,
+    "buildPresets": [
+        // Hidden presets to be inherited
+        {
+            "name": "Debug",
+            "description": "Build preset for use by other build presets",
+            "hidden": true,
+            "configurePreset": "DEBUG",
+            "varible" : ""
+        },
+        {
+            "name": "Release",
+            "description": "Build preset for use by other build presets",
+            "hidden": true,
+            "configurePreset": "RELEASE"
+        },
+        {
+            "name": "MinimumSize",
+            "description": "Build preset for use by other build presets",
+            "hidden": true,
+            "configurePreset": "RELEASE_MINIMUM_SIZE"
+        },
+        {
+            "name": "RelWithDebInfo",
+            "description": "Build preset for use by other build presets",
+            "hidden": true,
+            "configurePreset": "RELEASE_WITH_DEBUG_INFO"
+        },
+        // Visible build presets
+        {
+            "name": "STM32H735G_DK-Debug",
+            "hidden": false,
+            "inherits": "Debug",
+            "configurePreset": "STM32H735G_DK"
+        },
+        {
+            "name": "STM32H735G_DK-Release",
+            "hidden": false,
+            "inherits": "Release",
+            "configurePreset": "STM32H735G_DK"
+        },
+        {
+            "name": "STM32H7B3I_DK-Debug",
+            "hidden": false,
+            "inherits": "Debug",
+            "configurePreset": "STM32H7B3I_DK"
+        },
+        {
+            "name": "STM32H7B3I_DK-Release",
+            "hidden": false,
+            "inherits": "Release",
+            "configurePreset": "STM32H7B3I_DK"
+        },
+        {
+            "name": "NUCLEO-H743ZI2-Debug",
+            "hidden": false,
+            "inherits": "Debug",
+            "configurePreset": "NUCLEO_H743ZI2"
+        },
+        {
+            "name": "NUCLEO-H743ZI2-Release",
+            "hidden": false,
+            "inherits": "Release",
+            "configurePreset": "NUCLEO_H743ZI2"
+        },
+        {
+            "name": "STM32U5A9J_DK-Debug",
+            "hidden": false,
+            "inherits": "Debug",
+            "configurePreset": "STM32U5A9J_DK"
+        },
+        {
+            "name": "STM32U5A9J_DK-Release",
+            "hidden": false,
+            "inherits": "Release",
+            "configurePreset": "STM32U5A9J_DK"
+        },
+        {
+            "name": "RP2040-Debug",
+            "hidden": false,
+            "inherits": "Debug",
+            "configurePreset": "RP2040"
+        },
+        {
+            "name": "RP2040-Release",
+            "hidden": false,
+            "inherits": "Release",
+            "configurePreset": "RP2040"
+        }
+
+    ]
+}

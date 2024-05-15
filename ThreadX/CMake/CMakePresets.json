@@ -1,287 +1,207 @@
 {
-  "version": 4,
-  "configurePresets": [
-    {
-      "name": "LOCAL_SOURCES",
-      "description": "Configuration for setting up locations where external source repositories have been copied to local disk",
-      "hidden": true,
-      // $env{<variable-name>}
-      "cacheVariables": {
-        "THREADX_SOURCE": "C:/nftools/ThreadX",
-        "NETXDUO_SOURCE_FOLDER": "C:/nftools/NetxDuo",
-        "STM32H7_CUBE_SOURCE": "C:/nftools/STM32CubeH7",
-        "STM32U5_CUBE_SOURCE": "C:/nftools/STM32CubeU5",
-        "PICO_SDK_SOURCE": "C:/nftools/pico-sdk",
-        "ELF2UF2_EXECUTABLE": "C:/nftools/Utilities/elf2uf2.exe"
-      }
-    },
-    {
-      "name": "DEBUG",
-      "description": "This is non-optimized and contains all the debug symbols",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
-    },
-    {
-      "name": "RELEASE",
-      "description": "This is optimized for speed without debugging symbols and with asserts disabled.",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
-    },
-    {
-      "name": "RELEASE_WITH_DEBUG_INFO",
-      "description": "This provides optimized code and includes debug symbols but with asserts disabled",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
-      }
-    },
-    {
-      "name": "RELEASE_MINIMUM_SIZE",
-      "description": "This is the same as Release but optimized for a small binary size instead of speed",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "MinSizeRel"
-      }
-    },
-    {
-      "name": "FULL_MATHEMATICS",
-      "description": "Configuration for setting up what hardware/software support for mathematics",
-      "hidden": true,
-      "cacheVariables": {
-        "NF_FEATURE_LIGHT_MATH": "false",
-        "DP_FLOATINGPOINT": "true"
-      }
-    },
-    {
-      "name": "GCC_ARM_COMMON_BUILD",
-      "inherits": "general-preset",
-      "description": "Configuration common to all arm series processors",
-      "hidden": true,
-      "generator": "Ninja",
-      "cacheVariables": {
-        "RTOS": "ThreadX",
-        "COMMUNITY_TARGET": "ThreadX",
-        "CMAKE_SYSTEM_NAME": "Generic",
-        "CMAKE_SYSTEM_PROCESSOR": "ARM",
-        "CMAKE_TRY_COMPILE_TARGET_TYPE": "STATIC_LIBRARY",
-        "CMAKE_C_COMPILER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc.exe",
-        "CMAKE_CXX_COMPILER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-g++.exe",
-        "CMAKE_ASM_COMPILER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc.exe",
-        "CMAKE_LINKER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc.exe",
-        "CMAKE_SIZE_UTIL": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-size.exe",
-        "CMAKE_OBJCOPY": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-objcopy.exe",
-        "CMAKE_OBJDUMP": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-objdump.exe",
-        "CMAKE_NM_UTIL": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-nm.exe",
-        "CMAKE_AR": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc-ar",
-        "CMAKE_RANLIB": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-ranlib.exe"
-      }
-    },
-    {
-      "name": "STM32H735G_DK",
-      "description": "Configuration for the STM32H735G_DK (Cortex M-7) discovery board from STMicroelectronics",
-      "inherits": [
-        "LOCAL_SOURCES",
-        "GCC_ARM_COMMON_BUILD",
-        "FULL_MATHEMATICS"
-      ],
-      "cacheVariables": {
-        "TARGET_BOARD": "STM32H735G_DK",
-        "TARGET_FAMILY": "STM32H7",
-        "TARGET_SERIES": "STM32H735xx",
-        "ARM_PROCESSOR": "Cortex-M7",
-        "BUILD_VERSION": "1.0.0.0",
-        "INFOSTRING": "Built with ThreadX 6.1.12",
-        "GRAPHICS_SUPPORT": "TRUE",
-        "TOUCH_DISPLAY_SUPPORT": "TRUE",
-        "RANDOM_NUMBER_GENERATOR": "TRUE",
-        "DISPLAY_CONTROLLER": "VideoMode.cpp",
-        "DISPLAY_INTERFACE": "LTDC_PARALLEL_DMA2D_To_Video.cpp",
-        "TOUCH_INTERFACE": "I2C_To_Touch_STM32.c"
-      },
-      "hidden": false
-    },
-    {
-      "name": "STM32H7B3I_DK",
-      "description": "Configuration for the STM32H7B3I_DK (Cortex M-7) discovery board from STMicroelectronics",
-      "inherits": [
-        "LOCAL_SOURCES",
-        "GCC_ARM_COMMON_BUILD",
-        "FULL_MATHEMATICS"
-      ],
-      "cacheVariables": {
-        "TARGET_BOARD": "STM32H7B3I_DK",
-        "TARGET_FAMILY": "STM32H7",
-        "TARGET_SERIES": "STM32H7B3xxQ",
-        "ARM_PROCESSOR": "Cortex-M7",
-        "SDRAM": true,
-        "BUILD_VERSION": "1.0.0.0",
-        "INFOSTRING": "Built with ThreadX 6.1.12",
-        "GRAPHICS_SUPPORT": true,
-        "TOUCH_DISPLAY_SUPPORT": true,
-        "RANDOM_NUMBER_GENERATOR": true,
-        "DISPLAY_CONTROLLER": "VideoMode.cpp",
-        "DISPLAY_INTERFACE": "LTDC_PARALLEL_DMA2D_To_Video.cpp",
-        "TOUCH_INTERFACE": "I2C_To_Touch_STM32.c"
-      },
-      "hidden": false
-    },
-    {
-      "name": "NUCLEO_H743ZI2",
-      "description": "Configuration for the NUCLEO-H743ZI2 (Cortex M-7) nucleo board from STMicroelectronics",
-      "inherits": [
-        "LOCAL_SOURCES",
-        "GCC_ARM_COMMON_BUILD",
-        "FULL_MATHEMATICS"
-      ],
-      "cacheVariables": {
-        "TARGET_BOARD": "NUCLEO_H743ZI2",
-        "TARGET_FAMILY": "STM32H7",
-        "TARGET_SERIES": "STM32H743xx",
-        "ARM_PROCESSOR": "Cortex-M7",
-        "BUILD_VERSION": "1.0.0.0",
-        "INFOSTRING": "Built with ThreadX 6.1.12",
-        "GRAPHICS_SUPPORT": "FALSE",
-        "TOUCH_DISPLAY_SUPPORT": "FALSE",
-        "RANDOM_NUMBER_GENERATOR": "TRUE"
-      },
-      "hidden": false
-    },
-    {
-      "name": "STM32U5A9J_DK",
-      "description": "Configuration for the STM32U5A9J_DK (Cortex-M33) from STMicroelectronics",
-      "inherits": [
-        "LOCAL_SOURCES",
-        "GCC_ARM_COMMON_BUILD",
-        "FULL_MATHEMATICS"
-      ],
-      "cacheVariables": {
-        "TARGET_BOARD": "STM32U5A9J_DK",
-        "TARGET_FAMILY": "STM32U5",
-        "TARGET_SERIES": "STM32U5A9xx",
-        "ARM_PROCESSOR": "Cortex-M33",
-        "BUILD_VERSION": "1.0.0.0",
-        "INFOSTRING": "Built with ThreadX 6.1.12",
-        "GRAPHICS_SUPPORT": "TRUE",
-        "TOUCH_DISPLAY_SUPPORT": "TRUE",
-        "RANDOM_NUMBER_GENERATOR": "TRUE",
-        "DISPLAY_CONTROLLER": "VideoMode.cpp",
-        "DISPLAY_INTERFACE": "LTDC_DSI_DMA2D_Video.cpp",
-        "TOUCH_INTERFACE": "I2C_To_Touch_STM32.c"
-      },
-      "hidden": false
-    },
-    {
-      "name": "RP2040",
-      "description": "Configuration for the Raspberry Pi Pico",
-      "inherits": [
-        "LOCAL_SOURCES",
-        "GCC_ARM_COMMON_BUILD",
-        "FULL_MATHEMATICS"
-      ],
-      "cacheVariables": {
-        "TARGET_BOARD": "RP2040",
-        "TARGET_FAMILY": "RP2040",
-        "TARGET_SERIES": "RP2040",
-        "ARM_PROCESSOR": "Cortex-M0",
-        "BUILD_VERSION": "1.0.0.0",
-        "INFOSTRING": "Built with ThreadX 6.1.12",
-        "GRAPHICS_SUPPORT": "TRUE",
-        "RANDOM_NUMBER_GENERATOR": "TRUE",
-        "DISPLAY_CONTROLLER": "pico-LCD-1.14V2-ST7789VW.cpp",
-        "DISPLAY_INTERFACE": "Spi_To_Display_Pico.cpp"
-      },
-      "hidden": false
-    }
-  ],
-  "buildPresets": [
-    {
-      "name": "Debug",
-      "description": "Build preset for use by other build presets",
-      "hidden": true,
-      "configurePreset": "DEBUG"
-    },
-    {
-      "name": "Release",
-      "description": "Build preset for use by other build presets",
-      "hidden": true,
-      "configurePreset": "RELEASE"
-    },
-    {
-      "name": "MinimumSize",
-      "description": "Build preset for use by other build presets",
-      "hidden": true,
-      "configurePreset": "RELEASE_MINIMUM_SIZE"
-    },
-    {
-      "name": "RelWithDebInfo",
-      "description": "Build preset for use by other build presets",
-      "hidden": true,
-      "configurePreset": "RELEASE_WITH_DEBUG_INFO"
-    },
-    {
-      "name": "STM32H735G_DK-Debug",
-      "hidden": false,
-      "inherits": "Debug",
-      "configurePreset": "STM32H735G_DK"
-    },
-    {
-      "name": "STM32H735G_DK-Release",
-      "hidden": false,
-      "inherits": "Release",
-      "configurePreset": "STM32H735G_DK"
-    },
-    {
-      "name": "STM32H7B3I_DK-Debug",
-      "hidden": false,
-      "inherits": "Debug",
-      "configurePreset": "STM32H7B3I_DK"
-    },
-    {
-      "name": "STM32H7B3I_DK-Release",
-      "hidden": false,
-      "inherits": "Release",
-      "configurePreset": "STM32H7B3I_DK"
-    },
-    {
-      "name": "NUCLEO-H743ZI2-Debug",
-      "hidden": false,
-      "inherits": "Debug",
-      "configurePreset": "NUCLEO_H743ZI2"
-    },
-    {
-      "name": "NUCLEO-H743ZI2-Release",
-      "hidden": false,
-      "inherits": "Release",
-      "configurePreset": "NUCLEO_H743ZI2"
-    },
-    {
-      "name": "STM32U5A9J_DK-Debug",
-      "hidden": false,
-      "inherits": "Debug",
-      "configurePreset": "STM32U5A9J_DK"
-    },
-    {
-      "name": "STM32U5A9J_DK-Release",
-      "hidden": false,
-      "inherits": "Release",
-      "configurePreset": "STM32U5A9J_DK"
-    },
-    {
-      "name": "RP2040-Debug",
-      "hidden": false,
-      "inherits": "Debug",
-      "configurePreset": "RP2040"
-    },
-    {
-      "name": "RP2040-Release",
-      "hidden": false,
-      "inherits": "Release",
-      "configurePreset": "RP2040"
-    }
+    "version": 4,
+    "configurePresets": [
+        {
+            "name": "LOCAL_SOURCES",
+            "description": "Configuration for setting up locations where external source repositories have been copied to local disk",
+            "hidden": true,
+            // $env{<variable-name>}
+            "cacheVariables": {
+                "THREADX_SOURCE": "C:/nftools/ThreadX",
+                "FILEX_SOURCE": "C:/nftools/FileX",
+                "USBX_SOURCE": "C:/nftools/UsbX",
+                "NETXDUO_SOURCE": "C:/nftools/netxduo",
+                "LEVELX_SOURCE": "C:/nftools/levelx",
+                "STM32H7_CUBE_SOURCE": "C:/nftools/STM32CubeH7",
+                "STM32U5_CUBE_SOURCE": "C:/nftools/STM32CubeU5",
+                "PICO_SDK_SOURCE": "C:/nftools/pico-sdk",
+                "ELF2UF2_EXECUTABLE": "C:/nftools/Utilities/elf2uf2.exe"
+            }
+        },
+        {
+            "name": "DEBUG",
+            "description": "This is non-optimized and contains all the debug symbols",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "RELEASE",
+            "description": "This is optimized for speed without debugging symbols and with asserts disabled.",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "RELEASE_WITH_DEBUG_INFO",
+            "description": "This provides optimized code and includes debug symbols but with asserts disabled",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        },
+        {
+            "name": "RELEASE_MINIMUM_SIZE",
+            "description": "This is the same as Release but optimized for a small binary size instead of speed",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "MinSizeRel"
+            }
+        },
+        {
+            "name": "FULL_MATHEMATICS",
+            "description": "Configuration for setting up what hardware/software support for mathematics",
+            "hidden": true,
+            "cacheVariables": {
+                "NF_FEATURE_LIGHT_MATH": "false",
+                "DP_FLOATINGPOINT": "true"
+            }
+        },
+        {
+            "name": "GCC_ARM_COMMON_BUILD",
+            "inherits": "general-preset",
+            "description": "Configuration common to all arm series processors",
+            "hidden": true,
+            "generator": "Ninja",
+            "cacheVariables": {
+                "RTOS": "ThreadX",
+                "COMMUNITY_TARGET": "ThreadX",
+                "CMAKE_SYSTEM_NAME": "Generic",
+                "CMAKE_SYSTEM_PROCESSOR": "ARM",
+                "CMAKE_TRY_COMPILE_TARGET_TYPE": "STATIC_LIBRARY",
+                "CMAKE_C_COMPILER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc.exe",
+                "CMAKE_CXX_COMPILER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-g++.exe",
+                "CMAKE_ASM_COMPILER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc.exe",
+                "CMAKE_LINKER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc.exe",
+                "CMAKE_SIZE_UTIL": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-size.exe",
+                "CMAKE_OBJCOPY": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-objcopy.exe",
+                "CMAKE_OBJDUMP": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-objdump.exe",
+                "CMAKE_NM_UTIL": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-nm.exe",
+                "CMAKE_AR": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc-ar",
+                "CMAKE_RANLIB": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-ranlib.exe"
+            }
+        },
+        {
+            "name": "STM32H735G_DK",
+            "description": "Configuration for the STM32H735G_DK (Cortex M-7) discovery board from STMicroelectronics",
+            "inherits": [
+                "LOCAL_SOURCES",
+                "GCC_ARM_COMMON_BUILD",
+                "FULL_MATHEMATICS"
+            ],
+            "cacheVariables": {
+                "TARGET_BOARD": "STM32H735G_DK",
+                "TARGET_FAMILY": "STM32H7",
+                "TARGET_SERIES": "STM32H735xx",
+                "ARM_PROCESSOR": "Cortex-M7",
+                "BUILD_VERSION": "1.0.0.0",
+                "INFOSTRING": "Built with ThreadX 6.1.12",
+                "HAS_A_USER_BUTTON": true,
+                "GRAPHICS_SUPPORT": "TRUE",
+                "TOUCH_DISPLAY_SUPPORT": "TRUE",
+                "RANDOM_NUMBER_GENERATOR": "TRUE"
+            },
+            "hidden": false
+        },
+        {
+            "name": "STM32H7B3I_DK",
+            "description": "Configuration for the STM32H7B3I_DK (Cortex M-7) discovery board from STMicroelectronics",
+            "inherits": [
+                "LOCAL_SOURCES",
+                "GCC_ARM_COMMON_BUILD",
+                "FULL_MATHEMATICS"
+            ],
+            "cacheVariables": {
+                "TARGET_BOARD": "STM32H7B3I_DK",
+                "TARGET_FAMILY": "STM32H7",
+                "TARGET_SERIES": "STM32H7B3xxQ",
+                "ARM_PROCESSOR": "Cortex-M7",
+                "BUILD_VERSION": "1.0.0.0",
+                "INFOSTRING": "Built with ThreadX 6.1.12",
+                "HAS_A_USER_BUTTON": true,
+                "GRAPHICS_SUPPORT": true,
+                "TOUCH_DISPLAY_SUPPORT": true,
+                "RANDOM_NUMBER_GENERATOR": true,
 
-  ]
+                "FILE_SYSTEM_SD": true,
+                "FILE_SYSTEM_NAND": false,
+                "FILE_SYSTEM_NOR": false,
+                "FILE_SYSTEM_RAM": false,
+
+                "USB_DEVICE": true,
+                "USB_HOST": true,
+                "USB_HOST_CONTROLLER": true,
+                "USB_NETWORK": true,
+                "USB_PICTBRIDGE": true,
+                "NETWORKING": true,
+                "FLASH_LEVELLING": true
+            },
+            "hidden": false
+        },
+        {
+            "name": "NUCLEO_H743ZI2",
+            "description": "Configuration for the NUCLEO-H743ZI2 (Cortex M-7) nucleo board from STMicroelectronics",
+            "inherits": [
+                "LOCAL_SOURCES",
+                "GCC_ARM_COMMON_BUILD",
+                "FULL_MATHEMATICS"
+            ],
+            "cacheVariables": {
+                "TARGET_BOARD": "NUCLEO_H743ZI2",
+                "TARGET_FAMILY": "STM32H7",
+                "TARGET_SERIES": "STM32H743xx",
+                "ARM_PROCESSOR": "Cortex-M7",
+                "BUILD_VERSION": "1.0.0.0",
+                "INFOSTRING": "Built with ThreadX 6.1.12",
+                "HAS_A_USER_BUTTON": true,
+                "GRAPHICS_SUPPORT": true,
+                "TOUCH_DISPLAY_SUPPORT": true
+            },
+            "hidden": false
+        },
+        {
+            "name": "STM32U5A9J_DK",
+            "description": "Configuration for the STM32U5A9J_DK (Cortex-M33) from STMicroelectronics",
+            "inherits": [
+                "LOCAL_SOURCES",
+                "GCC_ARM_COMMON_BUILD",
+                "FULL_MATHEMATICS"
+            ],
+            "cacheVariables": {
+                "TARGET_BOARD": "STM32U5A9J_DK",
+                "TARGET_FAMILY": "STM32U5",
+                "TARGET_SERIES": "STM32U5A9xx",
+                "ARM_PROCESSOR": "Cortex-M33",
+                "BUILD_VERSION": "1.0.0.0",
+                "INFOSTRING": "Built with ThreadX 6.1.12",
+                "GRAPHICS_SUPPORT": "TRUE",
+                "TOUCH_DISPLAY_SUPPORT": "TRUE",
+                "RANDOM_NUMBER_GENERATOR": "TRUE"
+            },
+            "hidden": false
+        },
+        {
+            "name": "RP2040",
+            "description": "Configuration for the Raspberry Pi Pico",
+            "inherits": [
+                "LOCAL_SOURCES",
+                "GCC_ARM_COMMON_BUILD",
+                "FULL_MATHEMATICS"
+            ],
+            "cacheVariables": {
+                "TARGET_BOARD": "RP2040",
+                "TARGET_FAMILY": "RP2040",
+                "TARGET_SERIES": "RP2040",
+                "ARM_PROCESSOR": "Cortex-M0",
+                "BUILD_VERSION": "1.0.0.0",
+                "INFOSTRING": "Built with ThreadX 6.1.12",
+                "GRAPHICS_SUPPORT": "TRUE",
+                "RANDOM_NUMBER_GENERATOR": "TRUE"
+            },
+            "hidden": false
+        }
+    ],
+    "include": [ "BuildPresets.json" ]
 }

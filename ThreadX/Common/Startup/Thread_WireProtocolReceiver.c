@@ -14,7 +14,7 @@ __attribute__((noreturn)) void ReceiverThread_entry(uint32_t parameter)
 {
     (void)parameter;
 
-    // NOTE: Don't call  Scheduler type calls in this module
+    // NOTE: Don't call scheduler type calls in this module
     InitWireProtocolCommunications(); 
     tx_thread_sleep(50);
 

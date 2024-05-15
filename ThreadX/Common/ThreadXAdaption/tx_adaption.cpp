@@ -245,9 +245,8 @@ void Time_SetCompare(uint64_t compareValueTicks)
 extern "C"
 {
 
-    uint32_t HAL_GetTick(void)
-    {
-        // TODO
-        return 0; // TIME_I2MS(chVTGetSystemTimeX());
-    }
+    //uint32_t HAL_GetTick(void)
+    //{
+    //    return tx_time_get();
+    //}
 }

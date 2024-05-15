@@ -9,16 +9,14 @@
 /* Entry point */
 ENTRY(Reset_Handler)
 
-
 /* _estack is used in ThreadX to define the end of the stack memory for the main thread */
 _estack = ORIGIN(DTCM_SRAM) + LENGTH(DTCM_SRAM);
 
 /* _sidata is used in ThreadX to copy the data segment from ROM to RAM during initialization */
 _sidata = LOADADDR(.data);
 
-
 /* Stack and heap size */
-_Min_Heap_Size = 0x200; 
+_Min_Heap_Size  = 0x200; 
 _Min_Stack_Size = 0x400; 
 
 /* Define the availability of FLASH */
@@ -55,9 +53,10 @@ MEMORY
     /* ===============*/
 
      ITCM_SRAM  (rxw):ORIGIN = 0x00000000,LENGTH = 64K 
+     DTCM_SRAM  (rxw):ORIGIN = 0x20000000,LENGTH = 128K 
+
      FLASH      (rx) :ORIGIN = 0x08000000,LENGTH = 2048k
      OTP        (rx) :ORIGIN = 0x08000000,LENGTH = 1024
-     DTCM_SRAM  (rxw):ORIGIN = 0x20000000,LENGTH = 64K 
      AXI_RAM1   (rxw):ORIGIN = 0x24000000,LENGTH = 256K
      AXI_RAM2   (rxw):ORIGIN = 0x24040000,LENGTH = 384K
      AXI_RAM3   (rxw):ORIGIN = 0x240A0000,LENGTH = 384K
@@ -77,9 +76,7 @@ MEMORY
      deployment (rx) : ORIGIN = ORIGIN(nanoCLR) + LENGTH(nanoCLR), LENGTH = (blocks_reserved_for_deployment*block_size)
      config     (rx) : ORIGIN = ORIGIN(OCTOSPI1_FLASH), LENGTH = (blocks_reserved_for_config*block_size)
 
-     /* Native code ram (Azure, nativeCLR) */
-     /* NATIVE_RAM   (rxw) : ORIGIN = ORIGIN(DTCM_SRAM), LENGTH = LENGTH(DTCM_SRAM) */
-  
+     /* Native code ram (ThreadX, nativeCLR) */
      NATIVE_RAM   (rxw) : ORIGIN = ORIGIN(AXI_RAM1), LENGTH = LENGTH(AXI_RAM1)
      CLR_RAM  (rxw) : ORIGIN = ORIGIN(AXI_RAM2), LENGTH =  LENGTH(AXI_RAM2) + LENGTH(AXI_RAM3) 
 
@@ -88,9 +85,7 @@ MEMORY
 
      graphics_vfb (rxw) : ORIGIN = ORIGIN(FMC_SDRAM), LENGTH = 255K
      graphics_ram (rxw) : ORIGIN = ORIGIN(graphics_vfb) + LENGTH(graphics_vfb), LENGTH = 4M
- 
- /* CLR managed heap ram */
- /*    CLR_RAM  (rxw) : ORIGIN = ORIGIN(graphics_ram)+ LENGTH(graphics_ram), LENGTH =  LENGTH(FMC_SDRAM) - LENGTH(graphics_ram) - LENGTH(graphics_vfb) */
+
 }
 
 /* The CLR managed heap for CLR */

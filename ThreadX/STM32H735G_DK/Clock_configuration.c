@@ -41,19 +41,22 @@ void SystemClock_Config(void)
 
     LL_FLASH_SetLatency(LL_FLASH_LATENCY_3);
 
-    // Main PLL configuration and activation
-    LL_RCC_PLL_SetSource(LL_RCC_PLLSOURCE_HSE);
-    LL_RCC_PLL1P_Enable();
-    LL_RCC_PLL1Q_Enable();
-    LL_RCC_PLL1R_Enable();
-    LL_RCC_PLL1FRACN_Disable();
-    LL_RCC_PLL1_SetVCOInputRange(LL_RCC_PLLINPUTRANGE_1_2);
-    LL_RCC_PLL1_SetVCOOutputRange(LL_RCC_PLLVCORANGE_WIDE);
-    LL_RCC_PLL1_SetM(5);
-    LL_RCC_PLL1_SetN(104);
-    LL_RCC_PLL1_SetP(1);
-    LL_RCC_PLL1_SetQ(4);
-    LL_RCC_PLL1_SetR(2);
+    LL_RCC_PLL1_Disable();
+    {
+        // Main PLL configuration and activation
+        LL_RCC_PLL_SetSource(LL_RCC_PLLSOURCE_HSE);
+        LL_RCC_PLL1P_Enable();
+        LL_RCC_PLL1Q_Enable();
+        LL_RCC_PLL1R_Enable();
+        LL_RCC_PLL1FRACN_Disable();
+        LL_RCC_PLL1_SetVCOInputRange(LL_RCC_PLLINPUTRANGE_1_2);
+        LL_RCC_PLL1_SetVCOOutputRange(LL_RCC_PLLVCORANGE_WIDE);
+        LL_RCC_PLL1_SetM(5);
+        LL_RCC_PLL1_SetN(104);
+        LL_RCC_PLL1_SetP(1);
+        LL_RCC_PLL1_SetQ(4);
+        LL_RCC_PLL1_SetR(2);
+    }
     LL_RCC_PLL1_Enable();
     while (LL_RCC_PLL1_IsReady() != 1)
     {
@@ -108,4 +111,3 @@ void LTDCClock_Config(void)
     LL_RCC_PLL3_SetVCOInputRange(LL_RCC_PLLINPUTRANGE_1_2);
     LL_RCC_PLL3_Enable();
 }
-

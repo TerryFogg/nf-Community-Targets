@@ -8,16 +8,27 @@
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
 // See LICENSE file in the project root for full license information.
 //
+
 #include <nanoHAL_v2.h>
 #include <nanoCLR_Headers.h>
 
 #include "stm32u5a9xx.h"
-#include "stm32u5xx_ll.h"
-#include "stm32u5xx_hal_conf.h"
 #include "stm32u5xx.h"
+#include "core_cm33.h"
+#include "stm32u5xx_ll.h"
 #include "tx_api.h"
 #include "tx_port.h"
+#include "core_cm33.h"
+#include "stm32u5xx_hal_cortex.h"
 #include "tx_adaption.h"
+
+//#include <stdarg.h>
+//#include <stdio.h>
+//#include <nanoCLR_Interop.h>
+////#include "stm32u5xx_hal_conf.h"
+//#include "stm32u5xx_hal.h"
+
+
 
 #define TARGET_BLOCKSTORAGE_COUNT 1
 
@@ -29,8 +40,35 @@
 #define ENABLE_CLOCK_ON_PORT_GPIOE LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOE)
 #define ENABLE_CLOCK_ON_PORT_GPIOF LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOF)
 #define ENABLE_CLOCK_ON_PORT_GPIOG LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOG)
-#define ENABLE_PORT_CLOCK_ON_GPIOH LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOH)
-#define ENABLE_PORT_GPIOI LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOI)
+#define ENABLE_CLOCK_ON_PORT_GPIOH LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOH)
+#define ENABLE_CLOCK_ON_PORT_GPIOI LL_AHB2_GRP1_EnableClock(LL_AHB2_GRP1_PERIPH_GPIOI)
+#pragma endregion
+
+#pragma region Wire protocol USART
+#define wpUSART_DMA_Receive_Buffer_size 2048
+
+#define wpBAUD_RATE 921600
+
+#define wpUSART                         USART1
+#define wpUSART_IRQn                    USART1_IRQn
+#define wpUSART_IRQHANDLER()            USART1_IRQHandler(void)
+#define wpUSART_PERIPHERAL_CLOCK_ENABLE LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_USART1)
+
+#define wpUSART_GPIO_PORT                    GPIOA
+#define wpUSART_RX_PIN                       LL_GPIO_PIN_10
+#define wpUSART_TX_PIN                       LL_GPIO_PIN_9
+#define wpUSART_GPIO_PERIPHERAL_CLOCK_ENABLE ENABLE_CLOCK_ON_PORT_GPIOA
+
+#define wpGPDMA                       GPDMA1
+#define wpGDMA_TRANSMIT_CHANNEL       LL_DMA_CHANNEL_0
+#define wpGPDMA_TRANSMIT_IRQ          GPDMA1_Channel0_IRQn
+#define wpGPDMA_TRANSMIT_IRQHANDLER() GPDMA1_Channel0_IRQHandler()
+#define wpGDMA_RECEIVE_CHANNEL        LL_DMA_CHANNEL_1
+#define wpGPDMA_RECEIVE_IRQ           GPDMA1_Channel1_IRQn
+#define wpGPDMA_RECEIVE_IRQHANDLER()  GPDMA1_Channel1_IRQHandler()
+
+#define wpGPDMA_REQUEST LL_GPDMA1_REQUEST_USART1_TX
+
 #pragma endregion
 
 #pragma region Byte pool configuration and definitions
@@ -40,13 +78,27 @@
 #pragma endregion
 
 #pragma region Display interface and controller setup parameters
-#define DSI_RESET_PORT GPIOD
-#define DSI_BACKLIGHT_CONTROL GPIOI
+#define LCD_WIDTH  320
+#define LCD_HEIGHT 240
 
-// Use the non secure DSI 
-#define DSI DSI_NS
+#define DSI_RESET_PIN      LL_GPIO_PIN_5
+#define DSI_RESET_PIN_PORT         GPIOD
 
+#define DSI_BackLight_PIN          LL_GPIO_PIN_6
+#define DSI_BackLight_PIN_PORT     GPIOI
 
+#define LCD_WIDTH                  480
+#define LCD_HEIGHT                 481
+#define LCD_FRAME_BUFFER           0x200D0000
+#define UTIL_LCD_COLOR_YELLOW      0xFFFFFF00UL
+#define UTIL_LCD_COLOR_DARKRED     0xFF800000UL
+#define UTIL_LCD_COLOR_BLACK       0xFF000000UL
+#define UTIL_LCD_COLOR_BROWN       0xFFA52A2AUL
+#define UTIL_LCD_COLOR_ORANGE      0xFFFFA500UL
+
+#define DSI_DCS_SHORT_PKT_WRITE_P0 0x00000005U
+#define DSI_DCS_SHORT_PKT_WRITE_P1 0x00000015U
+#define DSI_DCS_LONG_PKT_WRITE     0x00000039U
 
 
 #define ENABLE_LTDC LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_LTDC)
@@ -142,12 +194,11 @@
 #define LED_GPIO_PORT         GPIOE
 #define LED_GREEN             LL_GPIO_PIN_0
 #define LED_RED               LL_GPIO_PIN_1
-#define BUTTON_USER_PIN                GPIO_PIN_13
+#define BUTTON_USER_PIN                LL_GPIO_PIN_13
 #define BUTTON_USER_GPIO_PORT          GPIOC
-#define BUTTON_USER_GPIO_CLK_ENABLE()  __HAL_RCC_GPIOC_CLK_ENABLE()
-#define BUTTON_USER_GPIO_CLK_DISABLE() __HAL_RCC_GPIOC_CLK_DISABLE()
+#define BUTTON_USER_GPIO_CLK_ENABLE()  ENABLE_CLOCK_ON_PORT_GPIOC
 #define BUTTON_USER_EXTI_IRQn          EXTI13_IRQn
-#define BUTTON_USER_EXTI_LINE          EXTI_LINE_13
+
 #pragma endregion
 
 #pragma region Flash SOC parameters and onboard external flash parameters
@@ -205,31 +256,29 @@ static inline bool OSPI2_WaitUntilState(uint32_t Flag, FlagStatus State)
 
 #define INVALIDATE_DCACHE
 
-#define NANOCLR_AUDIO    FALSE
-#define NANOCLR_ETHERNET FALSE
-#define NANOCLR_FDCAN    FALSE
-
-#define NANOCLR_GRAPHICS_USING_SPI FALSE
-#define NANOCLR_MICROSD            FALSE
-#define NANOCLR_RTC                FALSE
-#define NANOCLR_USB                FALSE
-
-void Startup_Rtos();
-void Initialize_Board();
-void Initialize_OCTOSPI2_Hyperam();
-void Initialize_OPSPI_Flash();
-void Initialize_RTC();
-void Initialize_DWT_Counter();
-void USBD_Clock_Config(void);
-void Initialize_Board_LEDS_And_Buttons();
-void Initialize_64bit_timer();
-void CPU_CACHE_Enable(void);
-void MPU_Config(void);
-void SystemClock_Config();
 void BoardLed_ON(uint32_t led);
 void BoardLed_OFF(uint32_t led);
 void BoardLed_Toggle(uint32_t led);
 bool BoardUserButton_Pressed();
+void CPU_CACHE_Enable(void);
+void Initialize_Board();
+void Initialize_Board_LEDS_And_Buttons();
+void Initialize_DWT_Counter();
+void Initialize_OCTOSPI2_Hyperam();
+void Initialize_OPSPI_Flash();
+void Initialize_RTC();
+void MPU_Config(void);
+void Startup_Rtos(bool debuggerRequested);
+void USBD_Clock_Config(void);
+void Initialize_64bit_timer();
+
+
+
+void SystemClock_Config();
+void SystemPower_Config(void);
+void PeriphCommonClock_Config(void);
+
+
 static inline uint32_t Get_SYSTICK();
 
 #ifdef __cplusplus
@@ -237,6 +286,10 @@ extern "C"
 {
 #endif
     void LTDCClock_Config(void);
+    int GetCurrentMilliseconds();
+    void InitOneMillisecondTick();
+    void DelayMilliseconds(int milliseconds);
+
 #ifdef __cplusplus
 }
 #endif

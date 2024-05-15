@@ -128,7 +128,6 @@ void wp_InitializeUsart(void)
     USART_InitStruct.HardwareFlowControl = LL_USART_HWCONTROL_NONE;
     USART_InitStruct.OverSampling = LL_USART_OVERSAMPLING_16;
 
-    // Required to make changes, LL_USART_Init doesn't work unless disabled
     LL_USART_Disable(wpUSART);
     {
         LL_USART_Init(wpUSART, &USART_InitStruct);

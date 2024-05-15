@@ -385,7 +385,7 @@ bool CPU_GPIO_EnableOutputPin(GPIO_PIN pinNumber, GpioPinValue InitialState, Pin
     return true;
 }
 
-void CPU_GPIO_DisablePin(GPIO_PIN pinNumber, PinMode driveMode, uint32_t alternateFunction)
+void CPU_GPIO_DisablePin(GPIO_PIN pinNumber, PinMode driveMode, DevicePinFunction alternateFunction)
 {
     DeleteInputState(pinNumber);
 

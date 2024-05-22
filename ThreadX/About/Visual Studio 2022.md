@@ -19,7 +19,7 @@ So we need additional copies of openocd from STMicroelectronics and RaspberryPi.
 
 ### Debugging with Visual Studio 17.7.6 requires the following files in the ```C:\nf-interpreter\.vs```  directory.
 
-**Tasks.vs.json**
+## **Tasks.vs.json**
 ```json
  {
   "version": "0.2.1",
@@ -138,7 +138,7 @@ So we need additional copies of openocd from STMicroelectronics and RaspberryPi.
 ```
 
 
-**launch.vs.json**
+## **launch.vs.json**
 ```json
 {
   "version": "0.2.1",
@@ -377,7 +377,7 @@ So we need additional copies of openocd from STMicroelectronics and RaspberryPi.
 
 
 
-#### Diagnosing problems with the debug and launch.vs.json
+### Diagnosing problems with the debug and launch.vs.json
 
 You can get a better understanding of problems that may be occuring with the gdb/openocd debug setup.
 In Visual Studio select the Command Window Ctrl+Alt+A, and turn on debug logging with the following command.

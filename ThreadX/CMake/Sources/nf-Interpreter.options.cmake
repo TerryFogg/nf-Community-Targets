@@ -122,7 +122,6 @@
              ${FILEX_INCLUDES}
              ${CMAKE_SOURCE_DIR}/src/System.IO.FileSystem
              ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem
-             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/FileXDrivers
         )
         list(APPEND OPTIONAL_SOURCES
              ${FILEX_SOURCES}
@@ -138,22 +137,22 @@
     endif()
     if(FILE_SYSTEM_SD)
         list(APPEND OPTIONAL_SOURCES
-             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/FileXDrivers/Sd_driver.c
+             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/Sd_driver.c
         )
     endif()
     if(FILE_SYSTEM_NAND)
         list(APPEND OPTIONAL_SOURCES
-             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/FileXDrivers/Nand_driver.c
+             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/Nand_driver.c
         )
     endif()
     if(FILE_SYSTEM_NOR)
         list(APPEND OPTIONAL_SOURCES
-             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/FileXDrivers/Nor_driver.c
+             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/Nor_driver.c
         )
     endif()
     if(FILE_SYSTEM_RAM)
         list(APPEND OPTIONAL_SOURCES
-             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/FileXDrivers/Ram_driver.c
+             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/Ram_driver.c
         )
     endif()
 
@@ -165,9 +164,21 @@
         list(APPEND OPTIONAL_SOURCES
              ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/STM32H7/DeviceIO/SD_DoubleBufferedDMA.cpp
         )
-    elseif( ${TARGET_FAMILY} = "RP2040")
     endif()
-             
+    if( "${TARGET_FAMILY}" STREQUAL "STM32U5")
+        list(APPEND OPTIONAL_INCLUDES
+             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/STM32H7/DeviceIO
+        )
+        list(APPEND OPTIONAL_SOURCES
+             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/STM32H7/DeviceIO/SD_DoubleBufferedDMA.cpp
+        )
+    endif()
+    if( "${TARGET_FAMILY}" STREQUAL "RP2040")
+        list(APPEND OPTIONAL_INCLUDES
+        )
+        list(APPEND OPTIONAL_SOURCES
+        )
+    endif()
 
 # Usb
     if(USB_DEVICE OR USB_HOST OR USB_HOST_CONTROLLER OR USB_NETWORK OR USB_PICTBRIDGE)

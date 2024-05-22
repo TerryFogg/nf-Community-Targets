@@ -13,7 +13,7 @@
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RP2040/tx_initialize_low_level.s
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RP2040/usb_descriptors.c
 
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/Initialize_Graphics.cpp
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RP2040/Initialize_Graphics.cpp
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/RP2040/pico-LCD-1.14V2-ST7789VW.cpp
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/RP2040/Spi_To_Display_Pico.cpp
   )

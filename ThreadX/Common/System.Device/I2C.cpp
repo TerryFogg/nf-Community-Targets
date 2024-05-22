@@ -11,10 +11,18 @@ typedef Library_sys_dev_i2c_native_System_Device_I2c_I2cTransferResult I2cTransf
 typedef Library_corlib_native_System_SpanByte SpanByte;
 
 struct I2C_Buses IC2_Bus[] = {
+#if defined(I2C1)
     {I2C1, I2C_BUSSPEED_NOT_SET, {0}, 0},
+    #endif
+#if defined(I2C2)
     {I2C2, I2C_BUSSPEED_NOT_SET, {0}, 0},
+#endif
+#if defined(I2C3)
     {I2C3, I2C_BUSSPEED_NOT_SET, {0}, 0},
+#endif
+#if defined(I2C4)
     {I2C4, I2C_BUSSPEED_NOT_SET, {0}, 0},
+#endif
 #if defined(I2C5)
     {I2C5, I2C_BUSSPEED_NOT_SET, {0}, 0},
 #endif

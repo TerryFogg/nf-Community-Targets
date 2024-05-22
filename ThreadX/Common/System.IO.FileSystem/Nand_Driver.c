@@ -5,6 +5,7 @@
 
 #include "File_Drivers.h"
 #include "board.h"
+#include "lx_api.h"
 
 struct fx_lx_nand_driver_instance
 {

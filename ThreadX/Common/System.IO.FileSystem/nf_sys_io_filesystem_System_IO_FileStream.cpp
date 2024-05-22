@@ -12,14 +12,16 @@ HRESULT Library_nf_sys_io_filesystem_System_IO_FileStream::OpenFileNative___VOID
 {
     NANOCLR_HEADER();
     {
-        const char *filePath = stack.Arg1().RecoverString();
-        const char *fileName = stack.Arg2().RecoverString();
+        char *folderPath = (char *)stack.Arg1().RecoverString();
+        char *fileName = (char *)stack.Arg2().RecoverString();
         FileMode mode = (FileMode)(stack.Arg3().NumericByRef().s4);
+        char *FolderAndFile = NULL;
 
-        FAULT_ON_NULL(filePath);
+        FAULT_ON_NULL(folderPath);
         FAULT_ON_NULL(fileName);
 
-        if (OpenFile((char *)filePath, (char *)fileName, mode))
+        CombinePathAndName(FolderAndFile, folderPath, fileName);
+        if (OpenFile(FolderAndFile, mode))
         {
             NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_MEMORY);
         }
@@ -32,17 +34,19 @@ HRESULT Library_nf_sys_io_filesystem_System_IO_FileStream::ReadNative___I4__STRI
 {
     NANOCLR_HEADER();
     {
-        const char *filePath = stack.Arg1().RecoverString();
-        const char *fileName = stack.Arg2().RecoverString();
+        char *folderPath = (char *)stack.Arg1().RecoverString();
+        char *fileName = (char *)stack.Arg2().RecoverString();
         CLR_INT64 position = stack.Arg3().NumericByRef().s8;
         CLR_INT32 length = stack.Arg5().NumericByRef().s4;
         CLR_RT_HeapBlock_Array *pArray = stack.Arg4().DereferenceArray();
+        char *FolderAndFile = NULL;
 
-        FAULT_ON_NULL(filePath);
+        FAULT_ON_NULL(folderPath);
         FAULT_ON_NULL(fileName);
         FAULT_ON_NULL_ARG(pArray);
         uint8_t *buffer = pArray->GetFirstElement();
-        int readCount = ReadFile(filePath, fileName, buffer, position, length);
+        CombinePathAndName(FolderAndFile, folderPath, fileName);
+        int readCount = ReadFile(FolderAndFile, buffer, position, length);
         stack.SetResult_I4(readCount);
     }
     NANOCLR_NOCLEANUP();
@@ -53,17 +57,19 @@ HRESULT Library_nf_sys_io_filesystem_System_IO_FileStream::WriteNative___VOID__S
 {
     NANOCLR_HEADER();
     {
-        const char *filePath = stack.Arg1().RecoverString();
-        const char *fileName = stack.Arg2().RecoverString();
+        char *folderPath = (char *)stack.Arg1().RecoverString();
+        char *fileName = (char *)stack.Arg2().RecoverString();
         CLR_INT64 position = stack.Arg3().NumericByRef().s8;
         CLR_RT_HeapBlock_Array *pArray = stack.Arg4().DereferenceArray();
-        const CLR_INT32 length = stack.Arg5().NumericByRef().s4;
+        CLR_INT32 length = stack.Arg5().NumericByRef().s4;
+        char *FolderAndFile = NULL;
 
-        FAULT_ON_NULL(filePath);
+        FAULT_ON_NULL(folderPath);
         FAULT_ON_NULL(fileName);
         FAULT_ON_NULL_ARG(pArray);
         uint8_t *buffer = pArray->GetFirstElement();
-        int writeCount = WriteFile(filePath, fileName, buffer, position, length);
+        CombinePathAndName(FolderAndFile, folderPath, fileName);
+        int writeCount = WriteFile(FolderAndFile, buffer, position, length);
         stack.SetResult_I4(writeCount);
     }
     NANOCLR_NOCLEANUP();
@@ -74,12 +80,15 @@ HRESULT Library_nf_sys_io_filesystem_System_IO_FileStream::GetLengthNative___I8_
 {
     NANOCLR_HEADER();
     {
-        const char *filePath = stack.Arg1().RecoverString();
-        const char *fileName = stack.Arg2().RecoverString();
+        char *folderPath = (char *)stack.Arg1().RecoverString();
+        char *fileName = (char *)stack.Arg2().RecoverString();
+        char *FolderAndFile = NULL;
+        ULONG fileSize;
 
-        FAULT_ON_NULL(filePath);
+        FAULT_ON_NULL(folderPath);
         FAULT_ON_NULL(fileName);
-        int64_t length = GetFileLength(filePath,fileName);
+        CombinePathAndName(FolderAndFile, folderPath, fileName);
+        int64_t length = GetFileLength(FolderAndFile, &fileSize);
         stack.SetResult_I8(length);
     }
     NANOCLR_NOCLEANUP();

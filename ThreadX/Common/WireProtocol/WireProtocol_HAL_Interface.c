@@ -11,11 +11,16 @@ WP_Message inboundMessage;
 
 void WP_ReceiveBytes(uint8_t **ptr, uint32_t *size)
 {
-    if (*size != 0) // Required for the PING case where payload is 0
+    if (*size != 0) 
     {
         size_t read = wp_ReadBytes(ptr, size, TX_WAIT_FOREVER);
         *ptr += read;
         *size -= read;
+    }
+    else
+    {
+        // Do nothing
+        // Required for the PING case where payload is 0
     }
 }
 uint8_t WP_TransmitMessage(WP_Message *message)

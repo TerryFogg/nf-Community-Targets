@@ -7,16 +7,21 @@
 #include <nanoHAL_Windows_Storage.h>
 #include "FileSystem.h"
 
+
 HRESULT Library_nf_sys_io_filesystem_System_IO_File::ExistsNative___STATIC__BOOLEAN__STRING__STRING(
     CLR_RT_StackFrame &stack)
 {
     NANOCLR_HEADER();
     {
-        const char *folderPath = stack.Arg0().RecoverString();
-        const char *fileName = stack.Arg0().RecoverString();
+        char *folderPath = (char *)stack.Arg0().RecoverString();
+        char *fileName = (char *)stack.Arg0().RecoverString();
+        char *FolderAndfile = NULL;
+
         FAULT_ON_NULL_ARG(folderPath);
         FAULT_ON_NULL_ARG(fileName);
-        bool exists = FileExists(folderPath, fileName);
+
+        CombinePathAndName(FolderAndfile, folderPath, fileName);
+        bool exists = FileExists(FolderAndfile);
         stack.SetResult_Boolean(exists);
     }
     NANOCLR_CLEANUP();
@@ -27,8 +32,8 @@ HRESULT Library_nf_sys_io_filesystem_System_IO_File::MoveNative___STATIC__VOID__
 {
     NANOCLR_HEADER();
     {
-        const char *filePathSrc = stack.Arg0().RecoverString();
-        const char *filePathDest = stack.Arg1().RecoverString();
+        char *filePathSrc = (char *)stack.Arg0().RecoverString();
+        char *filePathDest = (char *)stack.Arg1().RecoverString();
         FAULT_ON_NULL_ARG(filePathDest);
         FAULT_ON_NULL_ARG(filePathSrc);
 
@@ -46,10 +51,10 @@ HRESULT Library_nf_sys_io_filesystem_System_IO_File::DeleteNative___STATIC__VOID
 {
     NANOCLR_HEADER();
     {
-        const char *filePathAndfileName = stack.Arg0().RecoverString();
-        FAULT_ON_NULL_ARG(filePathAndfileName);
+        char *FolderAndfile = (char *)stack.Arg0().RecoverString();
+        FAULT_ON_NULL_ARG(FolderAndfile);
 
-        if (!DeleteFile(filePathAndfileName))
+        if (!DeleteFile(FolderAndfile))
         {
             NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
         }
@@ -62,11 +67,11 @@ HRESULT Library_nf_sys_io_filesystem_System_IO_File::GetAttributesNative___STATI
 {
     NANOCLR_HEADER();
     {
+        char *FolderAndfile = (char *)stack.Arg0().RecoverString();
+        FAULT_ON_NULL_ARG(FolderAndfile);
         CLR_UINT8 attributes = 0xFF;
-        const char *filePathAndfileName = stack.Arg0().RecoverString();
-        FAULT_ON_NULL_ARG(filePathAndfileName);
 
-        if (!GetFileAttributes(filePathAndfileName, &attributes))
+        if (!GetFileAttributes(FolderAndfile, &attributes))
         {
             NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
         }
@@ -81,11 +86,11 @@ HRESULT Library_nf_sys_io_filesystem_System_IO_File::SetAttributesNative___STATI
 {
     NANOCLR_HEADER();
     {
-        const char *filePathAndfileName = stack.Arg0().RecoverString();
+        char *FolderAndfile = (char *)stack.Arg0().RecoverString();
         CLR_UINT8 attributes = stack.Arg1().NumericByRef().u1;
-        FAULT_ON_NULL_ARG(filePathAndfileName);
+        FAULT_ON_NULL_ARG(FolderAndfile);
 
-        if (!SetFileAttributes(filePathAndfileName, &attributes))
+        if (!SetFileAttributes(FolderAndfile, attributes))
         {
             NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
         }
@@ -100,18 +105,14 @@ HRESULT Library_nf_sys_io_filesystem_System_IO_File::GetLastWriteTimeNative___ST
 {
     NANOCLR_HEADER();
     {
-        const char *filePathAndfileName = stack.Arg0().RecoverString();
-        FAULT_ON_NULL_ARG(filePathAndfileName);
-
-        // get the date time details and return it on Stack as DateTime object
-        SYSTEMTIME fileInfoTime = GetFileWriteTime(filePathAndfileName);
-
+        SYSTEMTIME fileTime;
+        char *FolderAndfile = (char *)stack.Arg0().RecoverString();
+        FAULT_ON_NULL_ARG(FolderAndfile);
+        GetFileWriteTime(&fileTime, FolderAndfile);
         CLR_RT_HeapBlock &ref = stack.PushValue();
-
         CLR_INT64 *pRes = Library_corlib_native_System_DateTime::NewObject(ref);
         FAULT_ON_NULL(pRes);
-
-        *pRes = HAL_Time_ConvertFromSystemTime(&fileInfoTime);
+        *pRes = HAL_Time_ConvertFromSystemTime(&fileTime);
     }
     NANOCLR_CLEANUP();
     NANOCLR_CLEANUP_END();

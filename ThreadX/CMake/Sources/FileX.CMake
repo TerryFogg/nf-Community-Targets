@@ -54,7 +54,7 @@
             ${FILEX_SOURCE}/common/src/fx_directory_long_name_get.c
             ${FILEX_SOURCE}/common/src/fx_directory_long_name_get_extended.c
             ${FILEX_SOURCE}/common/src/fx_directory_name_extract.c
-            ${FILEX_SOURCE}/common/src/fx_directory_name_test.c
+#            ${FILEX_SOURCE}/common/src/fx_directory_name_test.c
             ${FILEX_SOURCE}/common/src/fx_directory_next_entry_find.c
             ${FILEX_SOURCE}/common/src/fx_directory_next_full_entry_find.c
             ${FILEX_SOURCE}/common/src/fx_directory_rename.c
@@ -187,7 +187,7 @@
             ${FILEX_SOURCE}/common/src/fxe_directory_local_path_set.c
             ${FILEX_SOURCE}/common/src/fxe_directory_long_name_get.c
             ${FILEX_SOURCE}/common/src/fxe_directory_long_name_get_extended.c
-            ${FILEX_SOURCE}/common/src/fxe_directory_name_test.c
+#            ${FILEX_SOURCE}/common/src/fxe_directory_name_test.c
             ${FILEX_SOURCE}/common/src/fxe_directory_next_entry_find.c
             ${FILEX_SOURCE}/common/src/fxe_directory_next_full_entry_find.c
             ${FILEX_SOURCE}/common/src/fxe_directory_rename.c

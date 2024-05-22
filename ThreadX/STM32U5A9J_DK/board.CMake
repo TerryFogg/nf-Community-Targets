@@ -14,9 +14,8 @@
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/startup_stm32u5a9njhxq.s
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/target_common.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/tx_initialize_low_level.S
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/one_millisecond_tick.c
 
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/Initialize_Graphics.cpp
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/Initialize_Graphics.cpp
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/LTDC_DSI_DMA2D_Controller.cpp
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/Stm32U5a9_Video_Controller.cpp
                                        

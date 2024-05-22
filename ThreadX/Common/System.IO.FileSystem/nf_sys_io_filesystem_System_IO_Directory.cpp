@@ -11,9 +11,9 @@ HRESULT Library_nf_sys_io_filesystem_System_IO_Directory::ExistsNative___STATIC_
 {
     NANOCLR_HEADER();
     {
-        const char *folderPath = stack.Arg0().RecoverString();
-        FAULT_ON_NULL_ARG(folderPath);
-        bool exists = FolderExists(folderPath);
+        char *DeviceAndDirectoryPath = (char *)stack.Arg0().RecoverString();
+        FAULT_ON_NULL_ARG(DeviceAndDirectoryPath);
+        bool exists = DirectoryExists(DeviceAndDirectoryPath);
         stack.SetResult_Boolean(exists);
     }
     NANOCLR_CLEANUP();
@@ -25,12 +25,11 @@ HRESULT Library_nf_sys_io_filesystem_System_IO_Directory::MoveNative___STATIC__V
 {
     NANOCLR_HEADER();
     {
-        const char *filePathSrc = stack.Arg0().RecoverString();
-        const char *filePathDest = stack.Arg1().RecoverString();
-        FAULT_ON_NULL_ARG(filePathDest);
-        FAULT_ON_NULL_ARG(filePathSrc);
-
-        if (!MoveFolder(filePathSrc, filePathDest))
+        char *folderPathSrc = (char *)stack.Arg0().RecoverString();
+        char *folderPathDest = (char *)stack.Arg1().RecoverString();
+        FAULT_ON_NULL_ARG(folderPathSrc);
+        FAULT_ON_NULL_ARG(folderPathDest);
+        if (!MoveDirectory(folderPathSrc, folderPathDest))
         {
             NANOCLR_SET_AND_LEAVE(CLR_E_DIRECTORY_NOT_FOUND);
         }
@@ -43,9 +42,9 @@ HRESULT Library_nf_sys_io_filesystem_System_IO_Directory::DeleteNative___STATIC_
 {
     NANOCLR_HEADER();
     {
-        const char *folderPath = stack.Arg0().RecoverString();
-        FAULT_ON_NULL_ARG(folderPath);
-        if (!DeleteFolder(folderPath))
+         char *directoryPath = (char *)stack.Arg0().RecoverString();
+        FAULT_ON_NULL_ARG(directoryPath);
+         if (!DeleteDirectory(directoryPath))
         {
             NANOCLR_SET_AND_LEAVE(CLR_E_DIRECTORY_NOT_EMPTY);
             // Test for not found? and what else?
@@ -59,9 +58,9 @@ HRESULT Library_nf_sys_io_filesystem_System_IO_Directory::CreateNative___STATIC_
 {
     NANOCLR_HEADER();
     {
-        const char *folderPath = stack.Arg0().RecoverString();
-        FAULT_ON_NULL_ARG(folderPath);
-        if (CreateFolder(folderPath))
+        char *directoryPath = (char *)stack.Arg0().RecoverString();
+        FAULT_ON_NULL_ARG(directoryPath);
+        if (CreateDirectory(directoryPath))
         {
             NANOCLR_SET_AND_LEAVE(CLR_E_PATH_ALREADY_EXISTS);
             // CLR_E_DIRECTORY_NOT_FOUND?
@@ -77,22 +76,21 @@ HRESULT Library_nf_sys_io_filesystem_System_IO_Directory::GetFilesNative___STATI
     NANOCLR_HEADER();
     {
         CLR_RT_HeapBlock *filePathEntry;
-        const char *folderPath = stack.Arg0().RecoverString();
+        char *directoryPath = (char *)stack.Arg0().RecoverString();
         CLR_RT_HeapBlock &filePaths = stack.PushValue();
-        FAULT_ON_NULL_ARG(folderPath);
+        FAULT_ON_NULL_ARG(directoryPath);
 
-
-        int folderCount = GetFolderCount(folderPath);
-        (void)folderCount;
+        int directoryCount = 0;
+         //GetFileCount(directoryPath);
         int fileCount = 0;
         if (fileCount > 0)
         {
             NANOCLR_CHECK_HRESULT(
                 CLR_RT_HeapBlock_Array::CreateInstance(filePaths, fileCount, g_CLR_RT_WellKnownTypes.m_String));
             filePathEntry = (CLR_RT_HeapBlock *)filePaths.DereferenceArray()->GetFirstElement();
-            for (int iFolder = 0; iFolder < fileCount; iFolder++)
+            for (int iDirectoryEntryNumber = 0; iDirectoryEntryNumber < directoryCount; iDirectoryEntryNumber++)
             {
-                char *str = GetFolders(folderPath, iFolder);
+                char *str = GetDirectories(directoryPath, iDirectoryEntryNumber);
                 NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance(*filePathEntry, str));
             }
         }
@@ -106,10 +104,24 @@ HRESULT Library_nf_sys_io_filesystem_System_IO_Directory::GetDirectoriesNative__
 {
     NANOCLR_HEADER();
     {
-        const char *folderPath = stack.Arg0().RecoverString();
-        FAULT_ON_NULL_ARG(folderPath);
-        char *str = GetFolders(folderPath, 1);
-        (void)str;
+        CLR_RT_HeapBlock *filePathEntry;
+        char *directoryPath = (char *)stack.Arg0().RecoverString();
+        CLR_RT_HeapBlock &filePaths = stack.PushValue();
+        FAULT_ON_NULL_ARG(directoryPath);
+
+        int directoryCount = GetDirectoryCount(directoryPath);
+        int fileCount = 0;
+        if (fileCount > 0)
+        {
+            NANOCLR_CHECK_HRESULT(
+                CLR_RT_HeapBlock_Array::CreateInstance(filePaths, fileCount, g_CLR_RT_WellKnownTypes.m_String));
+            filePathEntry = (CLR_RT_HeapBlock *)filePaths.DereferenceArray()->GetFirstElement();
+            for (int iDirectoryEntryNumber = 0; iDirectoryEntryNumber < directoryCount; iDirectoryEntryNumber++)
+            {
+                char *str = GetDirectories(directoryPath, iDirectoryEntryNumber);
+                NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance(*filePathEntry, str));
+            }
+        }
     }
     NANOCLR_CLEANUP();
     NANOCLR_CLEANUP_END();
@@ -120,14 +132,18 @@ HRESULT Library_nf_sys_io_filesystem_System_IO_Directory::GetLogicalDrivesNative
 {
     NANOCLR_HEADER();
     {
-        CLR_RT_HeapBlock &filePaths = stack.PushValue();
-        (void)filePaths;
-        const char *logicalDriveName = stack.Arg0().RecoverString();
-        FAULT_ON_NULL_ARG(logicalDriveName);
-
-        char *str = GetLogicalDrives(logicalDriveName, 1);
-        (void)str;
-        (void)logicalDriveName;
+        CLR_RT_HeapBlock *storageFolder;
+        CLR_RT_HeapBlock &top = stack.PushValueAndClear();
+        int NumberOfLogicalDrives = GetNumberOfLogicalDrives();
+        storageFolder = (CLR_RT_HeapBlock *)top.DereferenceArray()->GetFirstElement();
+        NANOCLR_CHECK_HRESULT(
+            CLR_RT_HeapBlock_Array::CreateInstance(top, NumberOfLogicalDrives, g_CLR_RT_WellKnownTypes.m_String));
+        for (int iRequestedDrive = 0; iRequestedDrive < NumberOfLogicalDrives; iRequestedDrive++)
+        {
+            char *LogicalDriveUnit = GetLogicalDrive(iRequestedDrive);
+            NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance(*storageFolder, LogicalDriveUnit));
+            storageFolder++;
+        }
     }
     NANOCLR_CLEANUP();
     NANOCLR_CLEANUP_END();
@@ -138,11 +154,12 @@ HRESULT Library_nf_sys_io_filesystem_System_IO_Directory::GetLastWriteTimeNative
 {
     NANOCLR_HEADER();
     {
-        const char *folderPath = stack.Arg0().RecoverString();
+        char *folderPath = (char *)stack.Arg0().RecoverString();
         FAULT_ON_NULL_ARG(folderPath);
 
         // get the date time details and return it on Stack as DateTime object
-        SYSTEMTIME fileInfoTime = GetFolderWriteTime(folderPath);
+        SYSTEMTIME fileInfoTime;
+        //= GetFolderWriteTime(folderPath);
 
         CLR_RT_HeapBlock &ref = stack.PushValue();
 

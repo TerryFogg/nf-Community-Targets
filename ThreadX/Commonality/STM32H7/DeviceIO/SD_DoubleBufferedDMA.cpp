@@ -4,6 +4,9 @@
 // See LICENSE file in the project root for full license information.
 //
 
+// No general propose DMA Configuration is needed, an Internal DMA for SDMMC Peripheral are used.
+
+
 #include "SD_DoubleBufferedDMA.h"
 
 extern SDPin *SDChannels;
@@ -28,18 +31,6 @@ uint32_t *pSD2DataBuffer0 = &SD2DmaReadWriteBuffer0[0];
 uint32_t *pSD2DataBuffer1 = &SD2DmaReadWriteBuffer1[0];
 static_assert((sizeof(SD2DmaReadWriteBuffer0) % 512) == 0, "Must be a multiple by 512");
 static_assert((sizeof(SD2DmaReadWriteBuffer1) % 512) == 0, "Must be a multiple by 512");
-
-// Initialize the SDMMC low level resources
-// Enable the SDMMC interface clock
-// SDMMC pins configuration for SD card
-// Enable the clock for the SDMMC GPIOs
-// SDMMC pins as alternate function pull-up using
-//            (+++) SDMMC interrupts are managed using the macros __HAL_SD_ENABLE_IT()
-//                  and __HAL_SD_DISABLE_IT() inside the communication process.
-//            (+++) SDMMC interrupts pending bits are managed using the macros __HAL_SD_GET_IT()
-//                  and __HAL_SD_CLEAR_IT()
-// No general propose DMA Configuration is needed, an Internal DMA for SDMMC Peripheral are used.
-
 
 void InitializeSD_Bus(
     int SDBus_index,
@@ -103,7 +94,6 @@ void InitializeSD_Bus(
 
     return;
 }
-
 void SDMMC1_IRQHandler(void)
 {
     SD_IRQHandler(0);
@@ -112,7 +102,6 @@ void SDMMC2_IRQHandler(void)
 {
     SD_IRQHandler(1);
 }
-
 File_Status STM32ErrorToFileStatus(uint32_t status)
 {
     File_Status return_value;
@@ -163,7 +152,6 @@ File_Status STM32ErrorToFileStatus(uint32_t status)
     }
     return return_value;
 }
-
 bool GetCardState(int SDBus_index)
 {
     uint32_t resp1 = 0;
@@ -179,7 +167,6 @@ bool GetCardState(int SDBus_index)
     uint32_t cardstate = ((resp1 >> 9U) & 0x0FU);
     return cardstate == SD_CARD_TRANSFER ? true : false;
 }
-
 void SD_TxCpltCallback(int SDBUS_index)
 {
 
@@ -199,7 +186,6 @@ void SDWrite_DMACallback(int SDBUS_index, int bufferIndex)
     UNUSED(SDBUS_index);
     UNUSED(bufferIndex);
 }
-
 bool ReadSD(int SDBUS_index, SD_Card_Type card_type, int total_blocks, int start_block, int number_of_blocks)
 {
     uint32_t stm32Error;
@@ -260,8 +246,6 @@ bool ReadSD(int SDBUS_index, SD_Card_Type card_type, int total_blocks, int start
     SDChannels[SDBUS_index].status = File_Status::FILE_SUCCESS;
     return true;
 }
-
-// Write data buffer into the uSD
 bool WriteSD(int SDBUS_index, SD_Card_Type card_type, int total_blocks, int start_block, int number_of_blocks)
 {
     uint32_t add = start_block;
@@ -318,7 +302,6 @@ bool WriteSD(int SDBUS_index, SD_Card_Type card_type, int total_blocks, int star
     SDChannels[SDBUS_index].status = File_Status::FILE_SUCCESS;
     return true;
 }
-
 void SD_IRQHandler(int SDBUS_index)
 {
     SDMMC_TypeDef *SDMMCx = SDChannels[SDBUS_index].controllerId;
@@ -449,4 +432,21 @@ void SD_IRQHandler(int SDBUS_index)
             }
         }
     }
+}
+
+
+/**
+ * @brief  EXTI line detection callback.
+ * @param  GPIO_Pin: Specifies the port pin connected to corresponding EXTI line.
+ * @retval None
+ */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    (void)GPIO_Pin;
+    //ULONG s_msg = CARD_STATUS_CHANGED;
+
+    //if (GPIO_Pin == SD_DETECT_Pin)
+    //{
+    //    tx_queue_send(&tx_msg_queue, &s_msg, TX_NO_WAIT);
+    //}
 }

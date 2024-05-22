@@ -25,7 +25,7 @@ endif()
 
 ### Directory layout for targets-community/ThreadX
 
- 
+
     ├── About                        # Documentation relating to maintaining and building
     ├── CMake                        # All common CMake related files other than the specific board CMake file.
     │   ├── BuildParameters          # Common build parameters for GCC compiler
@@ -41,7 +41,7 @@ endif()
     └── STM32H735G_DK                # Development board from STMicroelectronics based on the STM32H735 MCU
     └── STM32U5A9J_DK                # Development board from STMicroelectronics based on the STM32U5A9 MCU
     └── main.c                       # main entry point
-    
+
 
 ---
 
@@ -69,6 +69,14 @@ Download version 13.2.rel1 of GNU_Tools_ARM_Embedded from ```https://developer.a
 
  # RTOS
  [ThreadX and components](https://github.com/eclipse-threadx/rtos-docs/tree/main)
+
+
+
+FileX
+
+[rtos-docs/rtos-docs/filex/appendix-a.md at main · eclipse-threadx/rtos-docs (github.com)](https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/filex/appendix-a.md)
+
+
 
  
 

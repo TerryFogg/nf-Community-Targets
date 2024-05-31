@@ -19,9 +19,9 @@ bool FlashDriver_Write(void *, ByteAddress startAddress,
 bool FlashDriver_IsBlockErased(void*, ByteAddress blockAddress, unsigned int length);
 bool FlashDriver_EraseBlock(void *, ByteAddress address);
 
-bool EmbeddedFlashUnlock(void);
-bool EmbeddedFlashLock(void);
-bool EmbeddedFlash_DeploymentErase();
+//bool EmbeddedFlashUnlock(void);
+//bool EmbeddedFlashLock(void);
+//bool EmbeddedFlash_DeploymentErase();
 
 #ifdef __cplusplus
 }

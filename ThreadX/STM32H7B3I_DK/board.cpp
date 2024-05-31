@@ -3,104 +3,101 @@
 // Portions Copyright (c) 2021 STMicroelectronics.  All rights reserved.
 // See LICENSE file in the project root for full license information.
 //
-#include "PinNumbering.h"
+#include "PinNames.h"
 #include "DeviceIO.h"
 #include "DeviceRegistration.h"
 #include "board.h"
 #include "SD_DoubleBufferedDMA.h"
+#include "File_Drivers.h"
 
 static DevicePin mcuPins[] = {
     // Arduino connector
-    {PA0, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PA0, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // Arduino connector
-    {PA1, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PA1, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // STMOD+ connector P1/ Arduino connector
-    {PA4, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PA4, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // EXT_I2C connector CN16
-    {PA6, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PA6, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // STMOD+ connector P1
-    {PA11, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PA11, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // STMOD+ connector P1/ Arduino connector
-    {PA12, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PA12, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // Audio connector CN3
-    {PB0, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PB0, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // STMOD+ connector P1 (I2C1_SCL,AF4)
-    {PB8, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PB8, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // STMOD+ connector P1  (I2C1_SDA,AF4)/Audio connector CN3
-    {PB9, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PB9, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // Audio connector CN3
-    {PB12, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PB12, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // STMOD+ connector P1/ Arduino connector
-    {PB14, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PB14, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // STMOD+ connector P1/ Arduino connector
-    {PB15, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PB15, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // STMOD+ connector P1/ Arduino connector
-    {PC2, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PC2, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // STMOD+ connector P1/ Arduino connector
-    {PC3, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PC3, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // Arduino connector
-    {PC4, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PC4, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // STMOD+ connector P1
-    {PC6, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PC6, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // STMOD+ connector P1/ Audio connector CN3
-    {PC7, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PC7, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // STMOD+ connector P1
-    {PD3, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PD3, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // STMOD+ connector P1/(I2C4_SCL) connector CN16/ Arduino connector
-    {PD12, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PD12, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // STMOD+ connector P1/(I2C4_SDA) connector CN16/ Arduino connector
-    {PD13, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PD13, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // Arduino connector
-    {PE2, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PE2, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // STMOD+ connector P1
-    {PF8, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PF8, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // Arduino connector
-    {PF10, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PF10, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // User Led LED2 - Blue
-    {PG2, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PG2, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // User Led LED1 - Red
-    {PG11, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PG11, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // STMOD+ connector P1
-    {PH8, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PH8, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // Arduino connector
-    {PH9, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PH9, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // Arduino connector
-    {PH10, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PH10, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // Arduino connector
-    {PH11, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PH11, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // Arduino connector
-    {PH13, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PH13, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // Arduino connector
-    {PH14, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PH14, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // Audio connector CN3
-    {PH15, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PH15, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // Arduino connector/ Arduino connector
-    {PI0, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PI0, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // Audio connector CN3
-    {PI6, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PI6, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // Arduino connector
-    {PI7, false, NULL, NULL, DevicePinFunction::NONE, 0},
+    {PI7, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
     // Arduino connector
-    {PI9, false, NULL, NULL, DevicePinFunction::NONE, 0}};
+    {PI9, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, 0},
 
-#pragma endregion
-
-static DevicePin sdmmcPins[] = {
     // SDMMC D0
-    {PC8, true, NULL, NULL, DevicePinFunction::SD, 0},
+    {PC8, true, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::SD, 0},
     // SDMMC D1
-    {PC9, true, NULL, NULL, DevicePinFunction::SD, 0},
+    {PC9, true, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::SD, 0},
     // SDMMC D2
-    {PC10, true, NULL, NULL, DevicePinFunction::SD, 0},
+    {PC10, true, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::SD, 0},
     // SDMMC D3
-    {PC11, true, NULL, NULL, DevicePinFunction::SD, 0},
+    {PC11, true, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::SD, 0},
     // SDMMC CLK
-    {PC12, true, NULL, NULL, DevicePinFunction::SD, 0},
+    {PC12, true, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::SD, 0},
     // SDMMC CMD
-    {PC2, true, NULL, NULL, DevicePinFunction::SD, 0},
+    {PC2, true, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::SD, 0},
     // SDMMC uSD detect
-    {PI8, true, NULL, NULL, DevicePinFunction::GPIO_INPUT, 0}};
-// Arduino connector
+    {PI8, true, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::GPIO, 0}};
 
 AdcPin BoardADCChannels[] = {{ADC1, 1, 1}, {ADC1, 11, 2}};
 DacPin BoardDACChannels[] = {{DAC1, 1, 1}, {DAC2, 2, 2}};
@@ -111,7 +108,6 @@ SpiPin BoardSPIChannels[] = {{SPI1, 1, 1}, {SPI2, 1, 2}};
 static TX_SEMAPHORE txs;
 static TX_SEMAPHORE rxs;
 
-
 SDPin BoardSDChannels[] = {
     {.controllerId = SDMMC1,
      .controllerNumber = 1,
@@ -120,7 +116,6 @@ SDPin BoardSDChannels[] = {
      .status = File_Status::FILE_READY,
      .RX_semaphore = rxs,
      .TX_semaphore = txs}};
-
 
 SerialPin BoardSerialChannels[] = {{USART1, 1, 1}, {USART2, 2, 2}};
 
@@ -140,25 +135,21 @@ void Initialize_Board()
 
     InitializeSD_Bus(
         SD1_BUSIndex,
-        sdmmcPins[0],
-        sdmmcPins[1],
-        sdmmcPins[2],
-        sdmmcPins[3],
-        sdmmcPins[4],
-        sdmmcPins[5],
-        sdmmcPins[6]);
+        PC8,  // SDMMC D0
+        PC9,  // SDMMC D1
+        PC10, // SDMMC D2
+        PC11, // SDMMC D3
+        PC12, // SDMMC CLK
+        PC2,  // SDMMC CMD
+        PI8); // SDMMC uSD detect
 }
 void CPU_CACHE_Enable(void)
 {
-    // Enable I-Cache
     SCB_EnableICache();
-
-    // Enable D-Cache
     SCB_EnableDCache();
 }
 void Initialize_Board_LEDS_And_Buttons()
 {
-    // LED's
     {
         ENABLE_CLOCK_ON_PORT_GPIOG;
 
@@ -170,7 +161,6 @@ void Initialize_Board_LEDS_And_Buttons()
         gpio_InitStruct.Pull = LL_GPIO_PULL_UP;
         LL_GPIO_Init(GPIOG, &gpio_InitStruct);
     }
-    // Turn them off
     LL_GPIO_SetOutputPin(GPIOG, LED3_RED);
     LL_GPIO_SetOutputPin(GPIOG, LED2_BLUE);
 
@@ -270,7 +260,7 @@ bool BoardUserButton_Pressed()
 }
 void InitializeDevicePins()
 {
-    CreatePinList(mcuPins, ARRAY_LEN(mcuPins));
+    CreatePinList(&mcuPins[0], ARRAY_LEN(mcuPins));
     CreateADCChannelList(BoardADCChannels, ARRAY_LEN(BoardADCChannels));
     CreateDACChannelList(BoardDACChannels, ARRAY_LEN(BoardDACChannels));
     CreateI2CChannelList(BoardI2CChannels, ARRAY_LEN(BoardI2CChannels));
@@ -279,75 +269,3 @@ void InitializeDevicePins()
     CreateSerialChannelList(BoardSerialChannels, ARRAY_LEN(BoardSerialChannels));
     CreateSDChannelList(BoardSDChannels, ARRAY_LEN(BoardSDChannels));
 };
-int GetI2CPin_AlternateFunctionNumber(GPIO_PIN GPIOPortByNumber, int pinNumber, DevicePinFunction dpf)
-{
-    uint32_t alternate = -1;
-    switch (dpf)
-    {
-        case NONE:
-        case GPIO:
-        case GPIO_INPUT:
-        case GPIO_OUTPUT:
-        case ADC:
-        case CAN:
-        case FDCAN:
-        case DAC:
-        case SPI:
-        case COUNTER:
-        case PWM:
-        case TIMER:
-        case TIMER_LOW_POWER:
-        case I2C_SCL:
-        case I2C_SDA:
-            if (GPIOPortByNumber == 2 && pinNumber == 8)
-            {
-                // PB8 - I2C1_SCL,AF4
-                alternate = LL_GPIO_AF_4;
-            }
-            else if (GPIOPortByNumber == 2 && pinNumber == 9)
-            {
-                // PB9 - I2C1_SDA,AF4
-                alternate = LL_GPIO_AF_4;
-            }
-            else if (GPIOPortByNumber == 4 && pinNumber == 12)
-            {
-                // PD12 - I2C4_SCL,AF4
-                alternate = LL_GPIO_AF_4;
-            }
-            else if (GPIOPortByNumber == 4 && pinNumber == 13)
-            {
-                // PD13 - I2C4_SCL,AF4
-                alternate = LL_GPIO_AF_4;
-            }
-            break;
-        case I2S:
-        case SD:
-        case USART_TX:
-        case USART_RX:
-        case USART_LOW_POWER_TX:
-        case USART_LOW_POWER_RX:
-        case WAKEUP:
-            break;
-    }
-    return alternate;
-}
-uint32_t I2C_GetTiming(I2cBusSpeed busSpeed)
-{
-    uint32_t timing;
-    switch (busSpeed)
-    {
-        case I2cBusSpeed_StandardMode:
-            timing = 0x20B0CCFF;
-            break;
-        case I2cBusSpeed_FastMode:
-            timing = 0x00D04BFF;
-            break;
-        case I2cBusSpeed_FastModePlus:
-            timing = 0x00601C5C;
-            break;
-        default:
-            timing = -1;
-            break;
-    }
-    return timing;
-}

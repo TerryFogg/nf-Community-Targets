@@ -1,7 +1,7 @@
 {
     "version": 4,
     "buildPresets": [
-        // Hidden presets to be inherited
+// Hidden presets to be inherited
         {
             "name": "Debug",
             "description": "Build preset for use by other build presets",
@@ -27,7 +27,7 @@
             "hidden": true,
             "configurePreset": "RELEASE_WITH_DEBUG_INFO"
         },
-        // Visible build presets
+// Visible build presets
         {
             "name": "STM32H735G_DK-Debug",
             "hidden": false,
@@ -88,6 +88,5 @@
             "inherits": "Release",
             "configurePreset": "RP2040"
         }
-
     ]
 }

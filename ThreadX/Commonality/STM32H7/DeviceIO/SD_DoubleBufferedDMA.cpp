@@ -6,7 +6,6 @@
 
 // No general propose DMA Configuration is needed, an Internal DMA for SDMMC Peripheral are used.
 
-
 #include "SD_DoubleBufferedDMA.h"
 
 extern SDPin *SDChannels;
@@ -34,16 +33,25 @@ static_assert((sizeof(SD2DmaReadWriteBuffer1) % 512) == 0, "Must be a multiple b
 
 void InitializeSD_Bus(
     int SDBus_index,
-    DevicePin SDMMC_D0,
-    DevicePin SDMMC_D1,
-    DevicePin SDMMC_D2,
-    DevicePin SDMMC_D3,
-    DevicePin SDMMC_CLK,
-    DevicePin SDMMC_CMD,
-    DevicePin SDMMC_DETECT)
+    PinNameValue SDMMC_D0,
+    PinNameValue SDMMC_D1,
+    PinNameValue SDMMC_D2,
+    PinNameValue SDMMC_D3,
+    PinNameValue SDMMC_CLK,
+    PinNameValue SDMMC_CMD,
+    PinNameValue SDMMC_DETECT)
 {
     SDMMC_TypeDef *SDMMC;
     SDMMC_InitTypeDef SDMMCInit;
+
+    SetPinFunction(SDMMC_D0, DevicePinFunction::SD);
+    SetPinFunction(SDMMC_D1, DevicePinFunction::SD);
+    SetPinFunction(SDMMC_D2, DevicePinFunction::SD);
+    SetPinFunction(SDMMC_D3, DevicePinFunction::SD);
+    SetPinFunction(SDMMC_CLK, DevicePinFunction::SD);
+    SetPinFunction(SDMMC_CMD, DevicePinFunction::SD);
+    SetPinFunction(SDMMC_DETECT, DevicePinFunction::GPIO);
+
     switch (SDBus_index)
     {
         case 1:
@@ -78,20 +86,10 @@ void InitializeSD_Bus(
             NVIC_EnableIRQ(SDMMC2_IRQn);
             break;
     }
-
-    SetPinFunction(SDMMC_D0.pinNumber, DevicePinFunction::SD,SDBus_index);
-    SetPinFunction(SDMMC_D1.pinNumber, DevicePinFunction::SD,SDBus_index);
-    SetPinFunction(SDMMC_D2.pinNumber, DevicePinFunction::SD,SDBus_index);
-    SetPinFunction(SDMMC_D3.pinNumber, DevicePinFunction::SD,SDBus_index);
-    SetPinFunction(SDMMC_CLK.pinNumber, DevicePinFunction::SD,SDBus_index);
-    SetPinFunction(SDMMC_CMD.pinNumber, DevicePinFunction::SD,SDBus_index);
-    SetPinFunction(SDMMC_DETECT.pinNumber, DevicePinFunction::GPIO_INPUT);
-
     SDMMC_Init(SDMMC, SDMMCInit);
     SDMMC_PowerState_ON(SDMMC);
 
     //  At this stage, you can perform SD read/write/erase operations after SD card initialization
-
     return;
 }
 void SDMMC1_IRQHandler(void)
@@ -158,7 +156,7 @@ bool GetCardState(int SDBus_index)
     uint32_t errorstate = 0;
     const int SD_CARD_TRANSFER = 4;
 
-    SDMMC_TypeDef *SDMMCx = SDChannels[SDBus_index].controllerId;
+    SDMMC_TypeDef *SDMMCx = (SDMMC_TypeDef *)SDChannels[SDBus_index].controllerId;
     if ((errorstate = SDMMC_CmdSendStatus(SDMMCx, resp1)) != SDMMC_ERROR_NONE)
     {
         SDChannels[SDBus_index].status = File_Status::FILE_ERROR;
@@ -189,7 +187,7 @@ void SDWrite_DMACallback(int SDBUS_index, int bufferIndex)
 bool ReadSD(int SDBUS_index, SD_Card_Type card_type, int total_blocks, int start_block, int number_of_blocks)
 {
     uint32_t stm32Error;
-    SDMMC_TypeDef *SDMMCx = SDChannels[SDBUS_index].controllerId;
+    SDMMC_TypeDef *SDMMCx = (SDMMC_TypeDef *)SDChannels[SDBUS_index].controllerId;
 
     if (start_block + number_of_blocks > total_blocks)
     {
@@ -250,7 +248,7 @@ bool WriteSD(int SDBUS_index, SD_Card_Type card_type, int total_blocks, int star
 {
     uint32_t add = start_block;
     uint32_t stm32Error;
-    SDMMC_TypeDef *SDMMCx = SDChannels[SDBUS_index].controllerId;
+    SDMMC_TypeDef *SDMMCx = (SDMMC_TypeDef *)SDChannels[SDBUS_index].controllerId;
 
     // Write block(s) from a specified address in a card. The Data transfer is managed by DMA mode.
     if ((start_block + number_of_blocks) > total_blocks)
@@ -304,7 +302,7 @@ bool WriteSD(int SDBUS_index, SD_Card_Type card_type, int total_blocks, int star
 }
 void SD_IRQHandler(int SDBUS_index)
 {
-    SDMMC_TypeDef *SDMMCx = SDChannels[SDBUS_index].controllerId;
+    SDMMC_TypeDef *SDMMCx = (SDMMC_TypeDef *)SDChannels[SDBUS_index].controllerId;
     uint32_t stm32Error = 0;
     File_Read_Type current_read_type = SDChannels[SDBUS_index].readType;
 
@@ -434,7 +432,6 @@ void SD_IRQHandler(int SDBUS_index)
     }
 }
 
-
 /**
  * @brief  EXTI line detection callback.
  * @param  GPIO_Pin: Specifies the port pin connected to corresponding EXTI line.
@@ -443,10 +440,10 @@ void SD_IRQHandler(int SDBUS_index)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     (void)GPIO_Pin;
-    //ULONG s_msg = CARD_STATUS_CHANGED;
+    // ULONG s_msg = CARD_STATUS_CHANGED;
 
-    //if (GPIO_Pin == SD_DETECT_Pin)
+    // if (GPIO_Pin == SD_DETECT_Pin)
     //{
-    //    tx_queue_send(&tx_msg_queue, &s_msg, TX_NO_WAIT);
-    //}
+    //     tx_queue_send(&tx_msg_queue, &s_msg, TX_NO_WAIT);
+    // }
 }

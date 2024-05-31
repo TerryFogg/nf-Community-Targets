@@ -1,43 +1,14 @@
 //
 // Copyright (c) .NET Foundation and Contributors
-// Portions Copyright (c) Microsoft Corporation.  All rights reserved.
 // See LICENSE file in the project root for full license information.
 //
-
-#include "board.h"
 #include "DeviceIO.h"
-#include "DeviceRegistration.h"
-#include "wp_CircularBuffer.h"
+#include "board.h"
 
-#define MAXIMUM_NUMBER_OF_ACTIVE_USARTS 5
+#pragma region STM32 definitions
 
-#pragma region USART BUFFERS
-
-int CircularBufferAssignments[]{
-    -1, // Index 0 not used
-    0,  // Usart1 - CircularBuffer[0]
-    1,  // Usart2 - CircularBuffer[0]
-    2,  // Usart3 - CircularBuffer[0]
-    -1, // Usart4 - Not used
-    -1, // Usart5 - Not used
-    3,  // Usart6 - CircularBuffer[0]
-    -1, // Usart7 - Not used
-    -1, // Usart8 - Not used
-    -1, // Usart9 - Not used
-    4   // Usart10 - CircularBuffer[0]
-};
-CircularBuffer_t DeviceReceiveCircularBuffer[MAXIMUM_NUMBER_OF_ACTIVE_USARTS];
-CircularBuffer_t DeviceTransmitCircularBuffer[MAXIMUM_NUMBER_OF_ACTIVE_USARTS];
-
-__attribute__((section(".dma_buffer")))
-__attribute__((aligned(32)))
-uint8_t UsartDmaReceiveBuffer[512][MAXIMUM_NUMBER_OF_ACTIVE_USARTS];
-__attribute__((section(".dma_buffer"))) __attribute__((aligned(32)))
-uint8_t UsartTransmitData[512][MAXIMUM_NUMBER_OF_ACTIVE_USARTS];
-//  Length of currently active TX DMA transfer
-volatile size_t device_usart_tx_dma_current_len[MAXIMUM_NUMBER_OF_ACTIVE_USARTS];
-
-#pragma endregion
+GPIO_INTERRUPT_SERVICE_ROUTINE *SavedInterruptCallBack[16];
+int16_t SavedInterruptPinNumber[16];
 
 uint32_t GpioPortClockEnable[] = {
     LL_AHB4_GRP1_PERIPH_GPIOA,
@@ -271,678 +242,613 @@ uint32_t DmaStreamNumber[] = {
     LL_DMA_STREAM_6,
     LL_DMA_STREAM_7};
 
-GPIO_INTERRUPT_SERVICE_ROUTINE SavedInterruptCallBack[16];
-int16_t SavedInterruptPinNumber[16];
+int GetI2CPin_AlternateFunctionNumber(GPIO_PIN GPIOPortByNumber, int pinNumber, DevicePinFunction dpf);
 
-#pragma region GPIO Pins
-bool SetPinLowPower(GPIO_PIN pinNumber)
+int GetI2CPin_AlternateFunctionNumber(GPIO_PIN GPIOPortByNumber, int pinNumber, DevicePinFunction dpf)
 {
-    bool status = false;
-    if (IsValidPin(pinNumber))
+    uint32_t alternate = -1;
+    switch (dpf)
     {
-        int GPIOPortByNumber = pinNumber / 16;
-        uint32_t pin = pinNumber % 16;
+        case NONE:
+        case GPIO:
+        case ADC:
+        case CAN:
+        case DAC:
+        case SPI:
+        case COUNTER:
+        case PWM:
+        case TIMER:
+        case I2C:
+            if (GPIOPortByNumber == 2 && pinNumber == 8)
+            {
+                // PB8 - I2C1_SCL,AF4
+                alternate = LL_GPIO_AF_4;
+            }
+            else if (GPIOPortByNumber == 2 && pinNumber == 9)
+            {
+                // PB9 - I2C1_SDA,AF4
+                alternate = LL_GPIO_AF_4;
+            }
+            else if (GPIOPortByNumber == 4 && pinNumber == 12)
+            {
+                // PD12 - I2C4_SCL,AF4
+                alternate = LL_GPIO_AF_4;
+            }
+            else if (GPIOPortByNumber == 4 && pinNumber == 13)
+            {
+                // PD13 - I2C4_SCL,AF4
+                alternate = LL_GPIO_AF_4;
+            }
+            break;
+        case I2S:
+        case SD:
+        case USART:
+        case WAKEUP:
+            break;
+    }
+    return alternate;
+}
+uint32_t I2C_GetTiming(I2cBusSpeed busSpeed)
+{
+    uint32_t timing;
+    switch (busSpeed)
+    {
+        case I2cBusSpeed_StandardMode:
+            timing = 0x20B0CCFF;
+            break;
+        case I2cBusSpeed_FastMode:
+            timing = 0x00D04BFF;
+            break;
+        case I2cBusSpeed_FastModePlus:
+            timing = 0x00601C5C;
+            break;
+        default:
+            timing = -1;
+            break;
+    }
+    return timing;
+}
 
-        // Set the unused pins as input(floating) to minimize current consumption.
-        LL_GPIO_SetPinMode(Port[GPIOPortByNumber], PinMask[pin], LL_GPIO_MODE_INPUT);
-        LL_GPIO_SetPinPull(Port[GPIOPortByNumber], PinMask[pin], LL_GPIO_PULL_NO);
-        status = true;
-    }
-    return status;
-}
-bool SetGpioDriveMode(GPIO_PIN pinNumber, PinMode driveMode)
-{
-    int GPIOPortByNumber = pinNumber / 16;
-    uint32_t pin = pinNumber % 16;
-    bool status = false;
-    if (IsValidPin(pinNumber))
-    {
-        LL_AHB4_GRP1_EnableClock(GpioPortClockEnable[GPIOPortByNumber]);
-        switch (driveMode)
-        {
-            case PinMode_Input:
-                LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[pin], LL_GPIO_MODE_INPUT);
-                LL_GPIO_SetPinPull(Port[GPIOPortByNumber], PinMask[pin], LL_GPIO_PULL_NO);
-                status = true;
-                break;
-            case PinMode_InputPullDown:
-                LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[pin], LL_GPIO_MODE_INPUT);
-                LL_GPIO_SetPinPull(Port[GPIOPortByNumber], PinMask[pin], LL_GPIO_PULL_DOWN);
-                status = true;
-                break;
-            case PinMode_InputPullUp:
-                LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[pin], LL_GPIO_MODE_INPUT);
-                LL_GPIO_SetPinPull(Port[GPIOPortByNumber], PinMask[pin], LL_GPIO_PULL_UP);
-                status = true;
-                break;
-            case PinMode_Output:
-                LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[pin], LL_GPIO_OUTPUT_PUSHPULL);
-                status = true;
-                break;
-            case PinMode_OutputOpenDrain:
-                LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[pin], LL_GPIO_OUTPUT_OPENDRAIN);
-                status = true;
-                break;
-            default:
-                status = false;
-                break;
-        }
-    }
-    return status;
-}
-bool SetPinState(GPIO_PIN pinNumber, GpioPinValue pinState)
-{
-    bool status = false;
-    if (IsValidPin(pinNumber))
-    {
-        int GPIOPortByNumber = pinNumber / 16;
-        uint32_t pin = pinNumber % 16;
-
-        if (pinState == GpioPinValue_Low)
-        {
-            LL_GPIO_ResetOutputPin(Port[GPIOPortByNumber], PinMask[pin]);
-            status = true;
-        }
-        else if (GpioPinValue_High)
-        {
-            LL_GPIO_SetOutputPin(Port[GPIOPortByNumber], PinMask[pin]);
-            status = true;
-        }
-    }
-    return status;
-}
-bool SetPinFunction(GPIO_PIN pinNumber, DevicePinFunction alternateFunction, int optional)
-{
-    bool status = false;
-    if (IsValidPin(pinNumber))
-    {
-        int GPIOPortByNumber = pinNumber / 16;
-        uint32_t pin = pinNumber % 16;
-        LL_GPIO_InitTypeDef GPIO_InitStruct;
-
-        int AlternateFunctionNumber = GetI2CPin_AlternateFunctionNumber(GPIOPortByNumber, pin, alternateFunction);
-        switch ((DevicePinFunction)alternateFunction)
-        {
-            case NONE:
-                status = true;
-                break;
-            case ADC:
-                // Enable ADC gpio
-                LL_AHB1_GRP1_EnableClock(GpioPortClockEnable[GPIOPortByNumber]);
-                LL_GPIO_SetPinMode(Port[GPIOPortByNumber], pin, LL_GPIO_MODE_ANALOG);
-                status = true;
-                break;
-            case CAN:
-                status = true;
-                break;
-            case DAC:
-                status = true;
-                break;
-            case FDCAN:
-                status = true;
-                break;
-            case GPIO_OUTPUT:
-                status = true;
-                break;
-            case GPIO_INPUT:
-                status = true;
-                break;
-            case SPI:
-                status = true;
-                break;
-            case COUNTER:
-                status = true;
-                break;
-            case PWM:
-                status = true;
-                break;
-            case SD:
-                // Enable the clock for SD1 or SD2 on different AHB buses
-                if (optional == 1)
-                {
-                    LL_AHB3_GRP1_EnableClock(GpioPortClockEnable[GPIOPortByNumber]);
-                }
-                else
-                {
-                    LL_AHB2_GRP1_EnableClock(GpioPortClockEnable[GPIOPortByNumber]);
-                }
-                GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-                GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-                GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_VERY_HIGH;
-                GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-                GPIO_InitStruct.Alternate = LL_GPIO_AF_12;
-                LL_GPIO_Init(Port[GPIOPortByNumber], &GPIO_InitStruct);
-                status = true;
-                break;
-            case TIMER:
-                status = true;
-                break;
-            case TIMER_LOW_POWER:
-                status = true;
-                break;
-            case I2C_SCL:
-                LL_AHB4_GRP1_EnableClock(GpioPortClockEnable[GPIOPortByNumber]);
-                LL_GPIO_SetPinMode(Port[GPIOPortByNumber], pin, LL_GPIO_MODE_ALTERNATE);
-                if (pin <= 7)
-                {
-                    LL_GPIO_SetAFPin_8_15(Port[GPIOPortByNumber], pin, AlternateFunctionNumber);
-                }
-                if (pin >= 8)
-                {
-                    LL_GPIO_SetAFPin_8_15(Port[GPIOPortByNumber], pin, AlternateFunctionNumber);
-                }
-                LL_GPIO_SetPinSpeed(Port[GPIOPortByNumber], pin, LL_GPIO_SPEED_FREQ_HIGH);
-                LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], pin, LL_GPIO_OUTPUT_OPENDRAIN);
-                status = true;
-                break;
-            case I2C_SDA:
-                LL_AHB4_GRP1_EnableClock(GpioPortClockEnable[GPIOPortByNumber]);
-                LL_GPIO_SetPinMode(Port[GPIOPortByNumber], pin, LL_GPIO_MODE_ALTERNATE);
-                if (pin <= 7)
-                {
-                    LL_GPIO_SetAFPin_8_15(Port[GPIOPortByNumber], pin, AlternateFunctionNumber);
-                }
-                if (pinNumber >= 8)
-                {
-                    LL_GPIO_SetAFPin_8_15(Port[GPIOPortByNumber], pin, AlternateFunctionNumber);
-                }
-                LL_GPIO_SetPinSpeed(Port[GPIOPortByNumber], pin, LL_GPIO_SPEED_FREQ_HIGH);
-                LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], pin, LL_GPIO_OUTPUT_OPENDRAIN);
-                status = true;
-                break;
-            case I2S:
-                status = true;
-                break;
-            case USART_TX:
-            case USART_RX:
-                LL_AHB4_GRP1_EnableClock(GpioPortClockEnable[GPIOPortByNumber]);
-                GPIO_InitStruct.Alternate = AlternateFunctionNumber;
-                GPIO_InitStruct.Pin = pin;
-                GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-                GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
-                GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-                GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
-                LL_GPIO_Init(Port[GPIOPortByNumber], &GPIO_InitStruct);
-                status = true;
-                break;
-            case USART_LOW_POWER_TX:
-                status = true;
-                break;
-            case USART_LOW_POWER_RX:
-                status = true;
-                break;
-            case WAKEUP:
-                status = true;
-                break;
-            default:
-                status = false;
-                break;
-        }
-    }
-    return status;
-}
-GpioPinValue GetPinState(GPIO_PIN pinNumber)
-{
-    GpioPinValue pin_state = (GpioPinValue)-1;
-    if (IsValidPin(pinNumber))
-    {
-        int GPIOPortByNumber = pinNumber / 16;
-        uint32_t pin = pinNumber % 16;
-        pin_state = (GpioPinValue)LL_GPIO_IsInputPinSet(Port[GPIOPortByNumber], PinMask[pin]);
-    }
-    return pin_state;
-}
-bool TogglePinState(GPIO_PIN pinNumber)
-{
-    bool status = false;
-    if (IsValidPin(pinNumber))
-    {
-        int GPIOPortByNumber = pinNumber / 16;
-        uint32_t pin = pinNumber % 16;
-        LL_GPIO_TogglePin(Port[GPIOPortByNumber], PinMask[pin]);
-        status = true;
-    }
-    return status;
-}
-bool PinHasInterrupt(int pin)
-{
-    bool status = false;
-    for (int i = 0; i < 15; i++)
-    {
-        if (SavedInterruptPinNumber[i] == pin)
-        {
-            return true;
-        }
-    }
-    return status;
-}
 #pragma endregion
 
-#pragma region GPIO Interrupt
-bool EnablePinInterrupt(int pinNumber, GpioParameter *gpioParameter)
+#pragma region GPIO
+bool GpioIO::Initialize(PinNameValue pinNameValue)
+{
+    int GPIOPortByNumber = pinNameValue / 16;
+    if (!LL_AHB4_GRP1_IsEnabledClock(GpioPortClockEnable[GPIOPortByNumber]))
+    {
+        LL_AHB4_GRP1_EnableClock(GpioPortClockEnable[GPIOPortByNumber]);
+    }
+    return true;
+}
+bool GpioIO::Dispose(PinNameValue pinNameValue)
+{
+    GpioIO::InterruptRemove(pinNameValue);
+    GpioIO::SetLowPower(pinNameValue);
+    return true;
+}
+bool GpioIO::Read(PinNameValue pinNameValue)
+{
+    int GPIOPortByNumber = pinNameValue / 16;
+    uint32_t gpioPortPinNumber = pinNameValue % 16;
+    return (bool)LL_GPIO_IsInputPinSet(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber]);
+}
+bool GpioIO::Write(PinNameValue pinNameValue, bool pinState)
+{
+    // true == 1
+    // false == 0
+    int GPIOPortByNumber = pinNameValue / 16;
+    uint32_t gpioPortPinNumber = pinNameValue % 16;
+
+    if (pinState == GpioPinValue_Low)
+    {
+        LL_GPIO_ResetOutputPin(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber]);
+    }
+    else if (GpioPinValue_High)
+    {
+        LL_GPIO_SetOutputPin(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber]);
+    }
+    return true;
+}
+bool GpioIO::Toggle(PinNameValue pinNameValue)
+{
+    bool status = false;
+    int GPIOPortByNumber = pinNameValue / 16;
+    uint32_t gpioPortPinNumber = pinNameValue % 16;
+    LL_GPIO_TogglePin(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber]);
+    status = true;
+    return status;
+}
+bool GpioIO::SetFunction(PinNameValue pinNameValue, DevicePinFunction PinFunction, int alternateFunctionNumber)
+{
+    int GPIOPortByNumber = pinNameValue / 16;
+    uint32_t gpioPortPinNumber = pinNameValue % 16;
+    bool status = false;
+    switch (PinFunction)
+    {
+        case DevicePinFunction::NONE:
+            status = true;
+            break;
+        case DevicePinFunction::ADC:
+            LL_GPIO_InitTypeDef GPIO_InitStruct;
+            LL_GPIO_SetPinMode(Port[GPIOPortByNumber], gpioPortPinNumber, LL_GPIO_MODE_ANALOG);
+            break;
+        case DevicePinFunction::CAN:
+            // Not supported on this MCU
+            status = false;
+            break;
+        case DevicePinFunction::DAC:
+            status = false;
+            break;
+        case DevicePinFunction::GPIO:
+            status = true;
+            break;
+        case DevicePinFunction::SPI:
+            status = true;
+            break;
+        case DevicePinFunction::COUNTER:
+            status = true;
+            break;
+        case DevicePinFunction::PWM:
+            status = true;
+            break;
+        case DevicePinFunction::SD:
+            status = true;
+            break;
+        case DevicePinFunction::TIMER:
+            status = true;
+            break;
+        case DevicePinFunction::I2C:
+        {
+            LL_AHB4_GRP1_EnableClock(GpioPortClockEnable[GPIOPortByNumber]);
+            LL_GPIO_SetPinMode(Port[GPIOPortByNumber], gpioPortPinNumber, LL_GPIO_MODE_ALTERNATE);
+            if (gpioPortPinNumber <= 7)
+            {
+                LL_GPIO_SetAFPin_8_15(Port[GPIOPortByNumber], gpioPortPinNumber, alternateFunctionNumber);
+            }
+            if (gpioPortPinNumber >= 8)
+            {
+                LL_GPIO_SetAFPin_8_15(Port[GPIOPortByNumber], gpioPortPinNumber, alternateFunctionNumber);
+            }
+            LL_GPIO_SetPinSpeed(Port[GPIOPortByNumber], gpioPortPinNumber, LL_GPIO_SPEED_FREQ_HIGH);
+            LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], gpioPortPinNumber, LL_GPIO_OUTPUT_OPENDRAIN);
+        }
+            status = true;
+            break;
+        case DevicePinFunction::I2S:
+            status = true;
+            break;
+        case DevicePinFunction::USART:
+            LL_AHB4_GRP1_EnableClock(GpioPortClockEnable[GPIOPortByNumber]);
+            GPIO_InitStruct.Alternate = alternateFunctionNumber;
+            GPIO_InitStruct.Pin = gpioPortPinNumber;
+            GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+            GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
+            GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+            GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+            LL_GPIO_Init(Port[GPIOPortByNumber], &GPIO_InitStruct);
+            status = true;
+            break;
+        case DevicePinFunction::WAKEUP:
+            status = true;
+            break;
+        default:
+            status = false;
+            break;
+    }
+    return status;
+}
+bool GpioIO::SetLowPower(PinNameValue pinNumber)
+{
+    int GPIOPortByNumber = pinNumber / 16;
+    uint32_t gpioPortPinNumber = pinNumber % 16;
+
+    // Set the unused pins as input(floating) to minimize current consumption.
+    LL_GPIO_SetPinMode(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_MODE_INPUT);
+    LL_GPIO_SetPinPull(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_PULL_NO);
+
+    return true;
+}
+bool GpioIO::SetMode(PinNameValue pinNameValue, PinMode pinMode)
+{
+    bool status = false;
+    int GPIOPortByNumber = pinNameValue / 16;
+    uint32_t gpioPortPinNumber = pinNameValue % 16;
+    switch (pinMode)
+    {
+        case PinMode_Input:
+            LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_MODE_INPUT);
+            LL_GPIO_SetPinPull(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_PULL_NO);
+            status = true;
+            break;
+        case PinMode_InputPullDown:
+            LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_MODE_INPUT);
+            LL_GPIO_SetPinPull(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_PULL_DOWN);
+            status = true;
+            break;
+        case PinMode_InputPullUp:
+            LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_MODE_INPUT);
+            LL_GPIO_SetPinPull(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_PULL_UP);
+            status = true;
+            break;
+        case PinMode_Output:
+            LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_OUTPUT_PUSHPULL);
+            status = true;
+            break;
+        case PinMode_OutputOpenDrain:
+            LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_OUTPUT_OPENDRAIN);
+            status = true;
+            break;
+        case PinMode_OutputOpenDrainPullUp:
+            LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_OUTPUT_OPENDRAIN);
+            status = true;
+            break;
+        case PinMode_OutputOpenSource:
+            LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_OUTPUT_OPENDRAIN);
+            status = true;
+            break;
+        case PinMode_OutputOpenSourcePullDown:
+            LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_OUTPUT_OPENDRAIN);
+            status = true;
+            break;
+        default:
+            status = false;
+            break;
+    }
+    return status;
+}
+bool GpioIO::InterruptEnable(
+    PinNameValue pinNameValue,
+    GPIO_INT_EDGE events,
+    GPIO_INTERRUPT_SERVICE_ROUTINE gpioIsrPtr)
 {
     // NOTE: There is a limitation of 16 external interrupts on the GPIO lines with one 1 interrupt per line number.
     //      One interrupt on (PA0 or PB0 or PC0 or PD0...) and one interrupt on (PA1, or PB1 or PC1 ...) etc.
+    bool expectedState = false;
+    int GPIOPortByNumber = pinNameValue / 16;
+    uint32_t gpioPortPinNumber = pinNameValue % 16;
+    uint32_t priority = 0;
+    SavedInterruptCallBack[gpioPortPinNumber] = &gpioIsrPtr;
+    LL_SYSCFG_SetEXTISource(SyscfgPorts[GPIOPortByNumber], PinMask[gpioPortPinNumber]);
+    switch (events)
+    {
+        case GPIO_INT_NONE:
+            LL_EXTI_DisableFallingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
+            LL_EXTI_DisableRisingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
+            expectedState = false;
+            break;
+        case GPIO_INT_EDGE_LOW:
+            LL_EXTI_EnableFallingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
+            LL_EXTI_DisableRisingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
+            expectedState = false;
+            break;
+        case GPIO_INT_LEVEL_LOW:
+            LL_EXTI_EnableFallingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
+            LL_EXTI_DisableRisingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
+            expectedState = false;
+            break;
+        case GPIO_INT_EDGE_HIGH:
+            LL_EXTI_EnableRisingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
+            LL_EXTI_DisableFallingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
+            expectedState = false;
+            break;
+        case GPIO_INT_LEVEL_HIGH:
+            LL_EXTI_EnableRisingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
+            LL_EXTI_DisableFallingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
+            expectedState = false;
+            break;
+            LL_EXTI_EnableFallingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
+            LL_EXTI_EnableRisingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
+            expectedState = false;
+            break;
+        case GPIO_INT_EDGE_BOTH:
+            LL_EXTI_EnableFallingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
+            LL_EXTI_EnableRisingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
+            expectedState = false;
+            break;
+    }
+    switch (gpioPortPinNumber)
+    {
+        case 0:
+            NVIC_SetPriority(EXTI0_IRQn, priority);
+            NVIC_EnableIRQ(EXTI0_IRQn);
+            break;
+        case 1:
+            NVIC_SetPriority(EXTI1_IRQn, priority);
+            NVIC_EnableIRQ(EXTI1_IRQn);
+            break;
+        case 2:
+            NVIC_SetPriority(EXTI2_IRQn, priority);
+            NVIC_EnableIRQ(EXTI2_IRQn);
+            break;
+        case 3:
+            NVIC_SetPriority(EXTI3_IRQn, priority);
+            NVIC_EnableIRQ(EXTI3_IRQn);
+            break;
+        case 4:
+            NVIC_SetPriority(EXTI4_IRQn, priority);
+            NVIC_EnableIRQ(EXTI4_IRQn);
+            break;
+        case 5:
+            NVIC_SetPriority(EXTI9_5_IRQn, priority);
+            NVIC_EnableIRQ(EXTI9_5_IRQn);
+            break;
+        case 6:
+            NVIC_SetPriority(EXTI9_5_IRQn, priority);
+            NVIC_EnableIRQ(EXTI9_5_IRQn);
+            break;
+        case 7:
+            NVIC_SetPriority(EXTI9_5_IRQn, priority);
+            NVIC_EnableIRQ(EXTI9_5_IRQn);
+            break;
+        case 8:
+            NVIC_SetPriority(EXTI9_5_IRQn, priority);
+            NVIC_EnableIRQ(EXTI9_5_IRQn);
+            break;
+        case 9:
+            NVIC_SetPriority(EXTI9_5_IRQn, priority);
+            NVIC_EnableIRQ(EXTI9_5_IRQn);
+            break;
+        case 10:
+            NVIC_SetPriority(EXTI15_10_IRQn, priority);
+            NVIC_EnableIRQ(EXTI15_10_IRQn);
+            break;
+        case 11:
+            NVIC_SetPriority(EXTI15_10_IRQn, priority);
+            NVIC_EnableIRQ(EXTI15_10_IRQn);
+            break;
+        case 12:
+            NVIC_SetPriority(EXTI15_10_IRQn, priority);
+            NVIC_EnableIRQ(EXTI15_10_IRQn);
+            break;
+        case 13:
+            NVIC_SetPriority(EXTI15_10_IRQn, priority);
+            NVIC_EnableIRQ(EXTI15_10_IRQn);
+            break;
+        case 14:
+            NVIC_SetPriority(EXTI15_10_IRQn, priority);
+            NVIC_EnableIRQ(EXTI15_10_IRQn);
+            break;
+        case 15:
+            NVIC_SetPriority(EXTI15_10_IRQn, priority);
+            NVIC_EnableIRQ(EXTI15_10_IRQn);
+            break;
+    }
+    LL_EXTI_EnableIT_0_31(EXTI_Line[gpioPortPinNumber]);
+    LL_EXTI_ClearFlag_0_31(EXTI_Line[gpioPortPinNumber]);
 
-    bool status = false;
-    if (IsValidPin(pinNumber))
-    {
-        int GPIOPortByNumber = pinNumber / 16;
-        uint32_t pin = pinNumber % 16;
+    return expectedState;
+}
+bool GpioIO::InterruptDisable(PinNameValue pinNameValue)
+{
+    uint32_t gpioPortPinNumber = pinNameValue % 16;
+    LL_D3_EXTI_DisablePendMask_0_31(EXTI_Line[gpioPortPinNumber]);
+    LL_EXTI_DisableIT_0_31(EXTI_Line[gpioPortPinNumber]);
+    LL_EXTI_DisableFallingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
+    LL_EXTI_DisableRisingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
+    SYSCFG->EXTICR[EXTI_Line[gpioPortPinNumber] & 0x3U] |= ~(EXTI_Line[gpioPortPinNumber] >> 16U);
+    return true;
+}
+bool GpioIO::InterruptRemove(PinNameValue pinNameValue)
+{
+    uint32_t gpioPortPinNumber = pinNameValue % 16;
+    // Clear the External Interrupt or Event for the current IO
+    LL_D3_EXTI_DisablePendMask_0_31(EXTI_Line[gpioPortPinNumber]);
+    LL_EXTI_DisableIT_0_31(EXTI_Line[gpioPortPinNumber]);
+    LL_EXTI_DisableFallingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
+    LL_EXTI_DisableRisingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
 
-        uint32_t priority = 0;
-        if (!PinHasInterrupt(pin))
-        {
-            SavedInterruptCallBack[pin] = gpioParameter->isrPtr;
-            LL_SYSCFG_SetEXTISource(SyscfgPorts[GPIOPortByNumber], PinMask[pin]);
-            switch ((GPIO_INT_EDGE)gpioParameter->edgeTrigger)
-            {
-                case GPIO_INT_EDGE_LOW:
-                case GPIO_INT_LEVEL_LOW:
-                    gpioParameter->expectedState = false;
-                    LL_EXTI_EnableFallingTrig_0_31(EXTI_Line[pin]);
-                    LL_EXTI_DisableRisingTrig_0_31(EXTI_Line[pin]);
-                    status = true;
-                    break;
-                case GPIO_INT_EDGE_HIGH:
-                case GPIO_INT_LEVEL_HIGH:
-                    LL_EXTI_EnableRisingTrig_0_31(EXTI_Line[pin]);
-                    LL_EXTI_DisableFallingTrig_0_31(EXTI_Line[pin]);
-                    gpioParameter->expectedState = true;
-                    status = true;
-                    break;
-                case GPIO_INT_EDGE_BOTH:
-                    LL_EXTI_EnableFallingTrig_0_31(EXTI_Line[pin]);
-                    LL_EXTI_EnableRisingTrig_0_31(EXTI_Line[pin]);
-                    gpioParameter->expectedState = true;
-                    status = true;
-                    break;
-                default:
-                    status = false;
-                    break;
-            }
-            switch (pin)
-            {
-                case 0:
-                    NVIC_SetPriority(EXTI0_IRQn, priority);
-                    NVIC_EnableIRQ(EXTI0_IRQn);
-                    status = true;
-                    break;
-                case 1:
-                    NVIC_SetPriority(EXTI1_IRQn, priority);
-                    NVIC_EnableIRQ(EXTI1_IRQn);
-                    status = true;
-                    break;
-                case 2:
-                    NVIC_SetPriority(EXTI2_IRQn, priority);
-                    NVIC_EnableIRQ(EXTI2_IRQn);
-                    status = true;
-                    break;
-                case 3:
-                    NVIC_SetPriority(EXTI3_IRQn, priority);
-                    NVIC_EnableIRQ(EXTI3_IRQn);
-                    status = true;
-                    break;
-                case 4:
-                    NVIC_SetPriority(EXTI4_IRQn, priority);
-                    NVIC_EnableIRQ(EXTI4_IRQn);
-                    status = true;
-                    break;
-                case 5:
-                    NVIC_SetPriority(EXTI9_5_IRQn, priority);
-                    NVIC_EnableIRQ(EXTI9_5_IRQn);
-                    status = true;
-                    break;
-                case 6:
-                    NVIC_SetPriority(EXTI9_5_IRQn, priority);
-                    NVIC_EnableIRQ(EXTI9_5_IRQn);
-                    status = true;
-                    break;
-                case 7:
-                    NVIC_SetPriority(EXTI9_5_IRQn, priority);
-                    NVIC_EnableIRQ(EXTI9_5_IRQn);
-                    status = true;
-                    break;
-                case 8:
-                    NVIC_SetPriority(EXTI9_5_IRQn, priority);
-                    NVIC_EnableIRQ(EXTI9_5_IRQn);
-                    status = true;
-                    break;
-                case 9:
-                    NVIC_SetPriority(EXTI9_5_IRQn, priority);
-                    NVIC_EnableIRQ(EXTI9_5_IRQn);
-                    status = true;
-                    break;
-                case 10:
-                    NVIC_SetPriority(EXTI15_10_IRQn, priority);
-                    NVIC_EnableIRQ(EXTI15_10_IRQn);
-                    status = true;
-                    break;
-                case 11:
-                    NVIC_SetPriority(EXTI15_10_IRQn, priority);
-                    NVIC_EnableIRQ(EXTI15_10_IRQn);
-                    status = true;
-                    break;
-                case 12:
-                    NVIC_SetPriority(EXTI15_10_IRQn, priority);
-                    NVIC_EnableIRQ(EXTI15_10_IRQn);
-                    status = true;
-                    break;
-                case 13:
-                    NVIC_SetPriority(EXTI15_10_IRQn, priority);
-                    NVIC_EnableIRQ(EXTI15_10_IRQn);
-                    status = true;
-                    break;
-                case 14:
-                    NVIC_SetPriority(EXTI15_10_IRQn, priority);
-                    NVIC_EnableIRQ(EXTI15_10_IRQn);
-                    status = true;
-                    break;
-                case 15:
-                    NVIC_SetPriority(EXTI15_10_IRQn, priority);
-                    NVIC_EnableIRQ(EXTI15_10_IRQn);
-                    status = true;
-                    break;
-                default:
-                    status = false;
-                    break;
-            }
-            LL_EXTI_EnableIT_0_31(EXTI_Line[pin]);
-            LL_EXTI_ClearFlag_0_31(EXTI_Line[pin]);
-            status = true;
-        }
-    }
-    return status;
-}
-bool RemovePinInterrupt(GPIO_PIN pinNumber)
-{
-    bool status = false;
-    if (IsValidPin(pinNumber))
-    {
-        uint32_t pin = pinNumber % 16;
-        // Clear the External Interrupt or Event for the current IO
-        LL_D3_EXTI_DisablePendMask_0_31(EXTI_Line[pin]);
-        LL_EXTI_DisableIT_0_31(EXTI_Line[pin]);
-        LL_EXTI_DisableFallingTrig_0_31(EXTI_Line[pin]);
-        LL_EXTI_DisableRisingTrig_0_31(EXTI_Line[pin]);
+    // Clear the config of the line
+    SYSCFG->EXTICR[EXTI_Line[gpioPortPinNumber] & 0x3U] |= ~(EXTI_Line[gpioPortPinNumber] >> 16U);
 
-        // Clear the config of the line
-        SYSCFG->EXTICR[EXTI_Line[pin] & 0x3U] |= ~(EXTI_Line[pin] >> 16U);
-        status = true;
-    }
-    return status;
-}
-void EXTI0_IRQHandler(void)
-{
-    if (SavedInterruptCallBack[0] != NULL)
-    {
-        SavedInterruptCallBack[0](SavedInterruptPinNumber[0], true, NULL);
-        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_0);
-    }
-}
-void EXTI1_IRQHandler(void)
-{
-    if (SavedInterruptCallBack[1] != NULL)
-    {
-        SavedInterruptCallBack[1](SavedInterruptPinNumber[1], true, NULL);
-        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_1);
-    }
-}
-void EXTI2_IRQHandler(void)
-{
-    if (SavedInterruptCallBack[2] != NULL)
-    {
-        SavedInterruptCallBack[2](SavedInterruptPinNumber[2], true, NULL);
-        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_2);
-    }
-}
-void EXTI3_IRQHandler(void)
-{
-    if (SavedInterruptCallBack[3] != NULL)
-    {
-        SavedInterruptCallBack[3](SavedInterruptPinNumber[3], true, NULL);
-        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_3);
-    }
-}
-void EXTI4_IRQHandler(void)
-{
-    if (SavedInterruptCallBack[4] != NULL)
-    {
-        SavedInterruptCallBack[4](SavedInterruptPinNumber[4], true, NULL);
-        LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_4);
-    }
-}
-void EXTI9_5_IRQHandler(void)
-{
-    if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_5))
-    {
-        if (SavedInterruptCallBack[5] != NULL)
-        {
-            SavedInterruptCallBack[5](SavedInterruptPinNumber[5], true, NULL);
-            LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_5);
-        }
-    }
-    if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_6))
-    {
-        if (SavedInterruptCallBack[6] != NULL)
-        {
-            SavedInterruptCallBack[6](SavedInterruptPinNumber[6], true, NULL);
-            LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_6);
-        }
-    }
-    if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_7))
-    {
-        if (SavedInterruptCallBack[7] != NULL)
-        {
-            SavedInterruptCallBack[7](SavedInterruptPinNumber[7], true, NULL);
-            LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_7);
-        }
-    }
-    if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_8))
-    {
-        if (SavedInterruptCallBack[8] != NULL)
-        {
-            SavedInterruptCallBack[8](SavedInterruptPinNumber[8], true, NULL);
-            LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_8);
-        }
-    }
-    if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_9))
-    {
-        if (SavedInterruptCallBack[9] != NULL)
-        {
-            SavedInterruptCallBack[9](SavedInterruptPinNumber[9], true, NULL);
-            LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_9);
-        }
-    }
-}
-void EXTI15_10_IRQHandler(void)
-{
-    if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_10))
-    {
-        if (SavedInterruptCallBack[10] != NULL)
-        {
-            SavedInterruptCallBack[10](SavedInterruptPinNumber[10], true, NULL);
-            LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_10);
-        }
-    }
-    if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_11))
-    {
-        if (SavedInterruptCallBack[11] != NULL)
-        {
-            SavedInterruptCallBack[11](SavedInterruptPinNumber[11], true, NULL);
-            LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_11);
-        }
-    }
-    if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_12))
-    {
-        if (SavedInterruptCallBack[12] != NULL)
-        {
-            SavedInterruptCallBack[12](SavedInterruptPinNumber[12], true, NULL);
-            LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_12);
-        }
-    }
-    if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_13))
-    {
-        if (SavedInterruptCallBack[13] != NULL)
-        {
-            SavedInterruptCallBack[13](SavedInterruptPinNumber[13], true, NULL);
-            LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_13);
-        }
-    }
-    if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_14))
-    {
-        if (SavedInterruptCallBack[14] != NULL)
-        {
-            SavedInterruptCallBack[14](SavedInterruptPinNumber[14], true, NULL);
-            LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_14);
-        }
-    }
-    if (LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_15))
-    {
-        if (SavedInterruptCallBack[15] != NULL)
-        {
-            SavedInterruptCallBack[15](SavedInterruptPinNumber[15], true, NULL);
-            LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_15);
-        }
-    }
+    return true;
 }
 #pragma endregion
 
 #pragma region ADC
 
-// STM32H7 Series
-
-// ADC input multiplexer
-// The ADC has an input multiplexer that selects one of 20 channels to sample.
-// There are 6 fast channels characterized with low input resistance.
-// The other 14 channels have higher input resistances that require longer sampling times.
-// These are hence referred to as slow channels.
+// 2× ADCs with 16-bit max. resolution (up to 24 channels, up to 3.6 MSPS)
+// 1× Analog and 1x Digital temperature sensors
+// 3x Channels (1 single channel + 1 dual-channel interfaces)
+// Analog temperature sensor generates a voltage that varies linearly with the temperature.
+// This temperature sensor is internally connected to ADC2_IN18.
+// The conversion range is between 1.7 V and 3.6 V.It can measure
+// the device junction temperature ranging from ?40 to + 125 °C.bool
 //
-// IO analog switch
-// Connection between an IO pin and ADC is made through an analog switch, which increases
-// the total ADC channel input resistance.Direct channels are essentially fast channels on
-// the ADC input multiplexer side,but specifically bypass the analog switch on IO side
 
-void InitADC()
+CLR_INT32 AdcIO::MaximumValue()
 {
-    LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_ADC12);
-#ifdef ADC3
-    LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_ADC3);
-#endif
-    LL_ADC_SetCommonClock(__LL_ADC_COMMON_INSTANCE(ADC1), LL_ADC_CLOCK_SYNC_PCLK_DIV2);
-    LL_ADC_SetCommonClock(__LL_ADC_COMMON_INSTANCE(ADC2), LL_ADC_CLOCK_SYNC_PCLK_DIV2);
-#ifdef ADC3
-    LL_ADC_SetCommonClock(__LL_ADC_COMMON_INSTANCE(ADC3), LL_ADC_CLOCK_SYNC_PCLK_DIV2);
-#endif
-    LL_ADC_REG_SetTriggerSource(ADC1, LL_ADC_REG_TRIG_SOFTWARE);
-    LL_ADC_REG_SetTriggerSource(ADC2, LL_ADC_REG_TRIG_SOFTWARE);
-#ifdef ADC3
-    LL_ADC_REG_SetTriggerSource(ADC3, LL_ADC_REG_TRIG_SOFTWARE);
-#endif
-    LL_ADC_REG_SetContinuousMode(ADC1, LL_ADC_REG_CONV_SINGLE);
-    LL_ADC_REG_SetContinuousMode(ADC2, LL_ADC_REG_CONV_SINGLE);
-#ifdef ADC3
-    LL_ADC_REG_SetContinuousMode(ADC3, LL_ADC_REG_CONV_SINGLE);
-#endif
-    LL_ADC_REG_SetSequencerLength(ADC1, LL_ADC_REG_SEQ_SCAN_DISABLE);
-    LL_ADC_REG_SetSequencerLength(ADC2, LL_ADC_REG_SEQ_SCAN_DISABLE);
-#ifdef ADC3
-    LL_ADC_REG_SetSequencerLength(ADC3, LL_ADC_REG_SEQ_SCAN_DISABLE);
-#endif
-
-    NVIC_SetPriority(ADC_IRQn, 0);
-    NVIC_EnableIRQ(ADC_IRQn);
-
-    LL_ADC_EnableIT_OVR(ADC1);
-    LL_ADC_EnableIT_OVR(ADC2);
-#ifdef ADC3
-    LL_ADC_EnableIT_OVR(ADC3);
-#endif
+    return 65535;
 }
-void OpenAdcChannel(int channel)
-{
-
-    LL_ADC_REG_SetSequencerRanks(ADC1, LL_ADC_REG_RANK_1, AdcChannelNumber[channel]);
-    LL_ADC_REG_SetSequencerRanks(ADC2, LL_ADC_REG_RANK_1, AdcChannelNumber[channel]);
-#ifdef ADC3
-    LL_ADC_REG_SetSequencerRanks(ADC3, LL_ADC_REG_RANK_1, AdcChannelNumber[channel]);
-#endif
-    LL_ADC_SetChannelSamplingTime(ADC1, AdcChannelNumber[channel], LL_ADC_SAMPLINGTIME_64CYCLES_5);
-    LL_ADC_SetChannelSamplingTime(ADC2, AdcChannelNumber[channel], LL_ADC_SAMPLINGTIME_64CYCLES_5);
-#ifdef ADC3
-    LL_ADC_SetChannelSamplingTime(ADC3, AdcChannelNumber[channel], LL_ADC_SAMPLINGTIME_64CYCLES_5);
-#endif
-
-    LL_ADC_Enable(ADC_Channel[channel]);
-}
-int GetAdcChannelCount()
-{
-    return 1;
-}
-int ConvertChannelIndexToAdcInstance(int channelIndex)
-{
-    (void)channelIndex;
-    return 1;
-}
-uint16_t AdcReadValue(int channelIndex)
-{
-    int AdcChannel = ConvertChannelIndexToAdcInstance(channelIndex);
-    // Perform ADC group regular conversion start, poll for conversion completion.
-    LL_ADC_REG_StartConversion(ADC_Channel[AdcChannel]);
-    while (LL_ADC_IsActiveFlag_EOC(ADC_Channel[AdcChannel]) == 0)
-    {
-    }
-    LL_ADC_ClearFlag_EOC(ADC_Channel[AdcChannel]);
-
-    // Retrieve ADC conversion data  (data scale corresponds to ADC resolution: 16 bits)
-    return LL_ADC_REG_ReadConversionData16(ADC_Channel[AdcChannel]);
-}
-int GetAdcSupportedMaxValue()
-{
-    // LL_ADC_RESOLUTION_16B
-    // LL_ADC_RESOLUTION_14B
-    // LL_ADC_RESOLUTION_12B
-    // LL_ADC_RESOLUTION_10B
-    // LL_ADC_RESOLUTION_8B
-
-    return __LL_ADC_DIGITAL_SCALE(LL_ADC_RESOLUTION_16B);
-}
-int GetAdcSupportedMinValue()
+int AdcIO::MinimumValue()
 {
     return 0;
 }
-int GetAdcSupportedResolution()
+int AdcIO::Resolution()
 {
-    int AdcChannel = 0;
-    return LL_ADC_GetResolution(ADC_Channel[AdcChannel]);
+    return 16;
 }
-bool IsAdcModeSupported(AdcChannelMode mode)
+int AdcIO::ChannelCount()
 {
-    bool status = false;
-    switch (mode)
+    return 3;
+}
+bool AdcIO::Initialize()
+{
     {
-        case AdcChannelMode::AdcChannelMode_SingleEnded:
-            status = true;
-            break;
-        case AdcChannelMode::AdcChannelMode_Differential:
-            status = true;
-            break;
-    }
-    return status;
-}
+        //int GPIOPortByNumber = pinNameValue / 16;
+        //if (!LL_AHB1_GRP1_EnableClock(GpioPortClockEnable[GPIOPortByNumber]))
+        //{
+        //    LL_AHB1_GRP1_EnableClock(GpioPortClockEnable[GPIOPortByNumber]);
+        //}
+        //return true;
 
+        //// Enable ADC gpio
+        //LL_AHB1_GRP1_EnableClock(GpioPortClockEnable[GPIOPortByNumber]);
+
+
+
+        // #define POT1_CLK_ENABLE()  __HAL_RCC_ADC12_CLK_ENABLE()
+        // GPIO_InitTypeDef gpio_init_structure;
+        // POT1_CLK_ENABLE();
+        // POT1_CHANNEL_GPIO_CLK_ENABLE();
+        //
+        // /* ADC Channel GPIO pin configuration */
+        // gpio_init_structure.Pin = POT1_CHANNEL_GPIO_PIN;
+        // gpio_init_structure.Mode = GPIO_MODE_ANALOG;
+        // gpio_init_structure.Pull = GPIO_NOPULL;
+        // HAL_GPIO_Init(POT1_CHANNEL_GPIO_PORT, &gpio_init_structure);
+    }
+
+    return true;
+}
+bool AdcIO::Dispose(CLR_INT32 adc_channel_number)
+{
+  //  PinNameValue pinNameValue = GetAdcPinNameValueFromChannelNumber(adc_channel_number);
+
+    (void)adc_channel_number;
+    {
+        // #define POT1_CLK_DISABLE() __HAL_RCC_ADC12_CLK_DISABLE()
+        // GPIO_InitTypeDef gpio_init_structure;
+        //
+        //
+        // /* POT GPIO pin configuration */
+        // gpio_init_structure.Pin = POT1_CHANNEL_GPIO_PIN;
+        // HAL_GPIO_DeInit(POT1_CHANNEL_GPIO_PORT, gpio_init_structure.Pin);
+        //
+        // /* Disable ADC clock */
+        // POT1_CLK_DISABLE();
+    }
+    return true;
+}
+bool AdcIO::Open(CLR_INT32 adc_channel_number)
+{
+    (void)adc_channel_number;
+    {
+
+
+
+
+       
+            
+            // ADC1_MspInit(&hpot_adc[POT]);
+        // if (MX_ADC1_Init(&hpot_adc[POT]) != HAL_OK)
+        // {
+        //     ret = BSP_ERROR_PERIPH_FAILURE;
+        // }
+    }
+    return true;
+}
+CLR_UINT16 AdcIO::Read(CLR_INT32 adc_channel_number)
+{
+    (void)adc_channel_number;
+    {
+        // if (HAL_ADC_Start(&hpot_adc[POT]) == HAL_OK)
+        // {
+        //     if (HAL_ADC_PollForConversion(&hpot_adc[POT], POT_ADC_POLL_TIMEOUT) == HAL_OK)
+        //     {
+        //         if (HAL_ADC_GetValue(&hpot_adc[POT]) <= (uint32_t)0xFFF)
+        //         {
+        //             ret = (int32_t)POT_CONVERT2PERC((uint16_t)HAL_ADC_GetValue(&hpot_adc[POT]));
+        //         }
+        //     }
+        // }
+    }
+    return 1;
+}
+//__weak HAL_StatusTypeDef MX_ADC1_Init(ADC_HandleTypeDef *hadc)
+//{
+//    HAL_StatusTypeDef ret = HAL_OK;
+//    ADC_ChannelConfTypeDef sConfig;
+//
+//    /* ADC configuration */
+//    hadc->Instance = POT1_ADC;
+//    hadc->Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+//    hadc->Init.Resolution = ADC_RESOLUTION_12B;
+//    hadc->Init.ScanConvMode = (uint32_t)DISABLE;
+// #if defined(ADC_EOC_SINGLE_CONV)
+//    hadc->Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+// #endif
+//    hadc->Init.ContinuousConvMode = DISABLE;
+//    hadc->Init.NbrOfConversion = 1;
+//    hadc->Init.DiscontinuousConvMode = DISABLE;
+//    hadc->Init.NbrOfDiscConversion = 0;
+//    hadc->Init.ExternalTrigConv = ADC_EXTERNALTRIG_T1_CC1;
+//    hadc->Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+//
+//    if (HAL_ADC_Init(hadc) != HAL_OK)
+//    {
+//        ret = HAL_ERROR;
+//    }
+//    else
+//    {
+//        /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample
+//        time.
+//         */
+//        sConfig.Channel = POT1_ADC_CHANNEL;
+//        sConfig.Rank = 1;
+//        sConfig.SamplingTime = POT1_SAMPLING_TIME;
+//        sConfig.Offset = 0;
+// #if defined(ADC_SINGLE_ENDED)
+//        sConfig.SingleDiff = ADC_SINGLE_ENDED;
+// #endif
+// #if defined(ADC_OFFSET_NONE)
+//        sConfig.OffsetNumber = ADC_OFFSET_NONE;
+// #endif
+//        if (HAL_ADC_ConfigChannel(hadc, &sConfig) != HAL_OK)
+//        {
+//            ret = HAL_ERROR;
+//        }
+//    }
+//
+//    return ret;
+//}
+PinNameValue AdcIO::ChannelToPin(CLR_INT32 adc_channel_number)
+{
+    (void)adc_channel_number;
+    return (PinNameValue)1;
+}
+CLR_UINT16 AdcIO::IsModeSupported(AdcChannelMode requestedMode)
+{
+    bool modeSupported = false;
+    if (requestedMode == AdcChannelMode::AdcChannelMode_SingleEnded)
+    {
+        modeSupported = true;
+    }
+    if (requestedMode == AdcChannelMode::AdcChannelMode_Differential)
+    {
+        modeSupported = false;
+    }
+    return modeSupported;
+}
 #pragma endregion
 
 #pragma region DAC
-void InitDacChannel(int dacIndex)
+// 1× 12-bit single-channel DAC (in SRD domain)
+// 1× 12-bit dual-channel DAC
+bool DacIO::Initialize(CLR_INT32 dac_channel_number)
 {
-    (void)dacIndex;
-    return;
+    (void)dac_channel_number;
+    return true;
 }
-void OpenDacChannel(int dacIndex, int dacChannel)
+bool DacIO::Dispose(CLR_INT32 dac_channel_number)
 {
-    uint32_t llDACChannel;
-    if (dacChannel == 1)
+    (void)dac_channel_number;
+    return true;
+}
+CLR_INT32 DacIO::Resolution()
+{
+    return 1;
+}
+CLR_INT32 DacIO::ChannelCount()
+{
+    return 1;
+}
+bool DacIO::Open(CLR_INT32 controllerId, CLR_INT32 dac_channel_number)
+{
+    (void)dac_channel_number;
+
+    CLR_INT32 llDACChannel = __LL_DAC_DECIMAL_NB_TO_CHANNEL(controllerId);
+    if (dac_channel_number == 1)
     {
         llDACChannel = LL_DAC_CHANNEL_1;
     }
@@ -961,178 +867,100 @@ void OpenDacChannel(int dacIndex, int dacChannel)
     DAC_InitStruct.OutputBuffer = LL_DAC_OUTPUT_BUFFER_ENABLE;
     DAC_InitStruct.OutputConnection = LL_DAC_OUTPUT_CONNECT_GPIO;
     DAC_InitStruct.OutputMode = LL_DAC_OUTPUT_MODE_NORMAL;
-    LL_DAC_Init(DAC_Channel[dacIndex], llDACChannel, &DAC_InitStruct);
+    LL_DAC_Init(DAC_Channel[dac_channel_number], llDACChannel, &DAC_InitStruct);
+    return false;
 }
-void WriteDacValue(int dacIndex, int channel, uint16_t value)
+char *DacIO::DeviceSelector(int controllerId)
 {
-    LL_DAC_ConvertData12RightAligned(DAC_Channel[dacIndex], channel, value);
-}
-void StopDac(int dacIndex, int channel)
-{
-    if (IsValidI2CBus(dacIndex))
+    CLR_INT32 llDACChannel = __LL_DAC_DECIMAL_NB_TO_CHANNEL(controllerId);
+    static char DeviceNameDummy[] = "NotSupported\0";
+    switch (llDACChannel)
     {
-        LL_DAC_Disable(DAC_Channel[dacIndex], channel);
-    }
-}
-void DAC_Start_SoftwareTriggered(int channel)
-{
-    DAC_TypeDef *DACx = DAC1;
-    uint32_t DAC_Channel = channel;
-    if (DAC_Channel == 1)
-    {
-        LL_DAC_Enable(DACx, DAC_Channel);
-        SET_BIT(DACx->SWTRIGR, DAC_SWTRIGR_SWTRIG1);
-    }
-    else
-    {
-        LL_DAC_Enable(DACx, DAC_Channel);
-        SET_BIT(DACx->SWTRIGR, DAC_SWTRIGR_SWTRIG2);
-    }
-}
-int GetDacChannelCount(int dacIndex)
-{
-    int channelCount = 0;
-    switch (dacIndex)
-    {
+        case 0:
         case 1:
-            channelCount = 20;
-            break;
         case 2:
-            channelCount = 20;
-            break;
         case 3:
-            channelCount = 20;
             break;
-        default:
-            channelCount = 0;
     }
-    return channelCount;
+    return DeviceNameDummy;
 }
-int GetDacSupportedResolution(int dacIndex)
+void DacIO::Write(CLR_INT32 dac_channel_number, CLR_INT32 value)
 {
-    int resolution = 0;
-    switch (dacIndex)
-    {
-        case 1:
-            resolution = 16;
-            break;
-        case 2:
-            resolution = 16;
-            break;
-        case 3:
-            resolution = 12;
-            break;
-        default:
-            resolution = 0;
-    }
-    return resolution;
+    (void)dac_channel_number;
+    (void)value;
 }
-
+PinNameValue DacIO::ChannelToPin(CLR_INT32 dac_channel_number)
+{
+    (void)dac_channel_number;
+    return (PinNameValue)1;
+}
 #pragma endregion
 
 #pragma region I2C
-bool Initialize_Native_I2C(int busIndex, I2cBusSpeed busSpeed, I2c_Bus_Type busType, uint8_t SlaveAddress)
+bool I2cIO::Initialize(CLR_INT32 I2C_deviceId, I2cBusSpeed I2C_speed)
 {
-
     LL_RCC_ClocksTypeDef RCC_Clocks;
     LL_RCC_GetSystemClocksFreq(&RCC_Clocks);
 
-    bool status = false;
-    switch (busIndex)
+    switch (I2C_deviceId)
     {
         case 1:
             LL_APB4_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_I2C1);
             LL_RCC_SetI2CClockSource(LL_RCC_I2C123_CLKSOURCE_PCLK1);
-            status = true;
             break;
         case 2:
             LL_APB4_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_I2C2);
             LL_RCC_SetI2CClockSource(LL_RCC_I2C123_CLKSOURCE_PCLK1);
-            status = true;
             break;
         case 3:
             LL_APB4_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_I2C3);
             LL_RCC_SetI2CClockSource(LL_RCC_I2C123_CLKSOURCE_PCLK1);
-            status = true;
             break;
         case 4:
             LL_APB4_GRP1_EnableClock(LL_APB4_GRP1_PERIPH_I2C4);
             LL_RCC_SetI2CClockSource(LL_RCC_I2C4_CLKSOURCE_PCLK4);
-            status = true;
             break;
 #ifdef I2C5
         case 5:
             LL_APB4_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_I2C5);
             // LL_RCC_SetI2CClockSource(LL_RCC_I2C5_CLKSOURCE_PCLK1);
-            status = true;
-            break;
-#else
-        case 5:
-            status = false;
             break;
 #endif
-        default:
-            status = false;
     }
-
-    if (status)
+    LL_I2C_Disable(I2C_Channel[I2C_deviceId]);
     {
-        LL_I2C_Disable(I2C_Channel[busIndex]);
-        {
-            LL_I2C_ConfigFilters(I2C_Channel[busIndex], LL_I2C_ANALOGFILTER_ENABLE, 0);
-            LL_I2C_SetTiming(I2C_Channel[busIndex], I2C_GetTiming(busSpeed));
-            LL_I2C_SetMode(I2C_Channel[busIndex], LL_I2C_MODE_I2C);
-            LL_I2C_DisableClockStretching(I2C_Channel[busIndex]);
-            LL_I2C_DisableGeneralCall(I2C_Channel[busIndex]);
+        LL_I2C_ConfigFilters(I2C_Channel[I2C_deviceId], LL_I2C_ANALOGFILTER_ENABLE, 0);
+        LL_I2C_SetTiming(I2C_Channel[I2C_deviceId], I2C_GetTiming(I2C_speed));
+        LL_I2C_SetMode(I2C_Channel[I2C_deviceId], LL_I2C_MODE_I2C);
+        LL_I2C_DisableClockStretching(I2C_Channel[I2C_deviceId]);
+        LL_I2C_DisableGeneralCall(I2C_Channel[I2C_deviceId]);
 
-            switch (busType)
-            {
-                case Master:
-                    LL_I2C_SetOwnAddress1(I2C_Channel[busIndex], 0, LL_I2C_OWNADDRESS1_7BIT);
-                    LL_I2C_SetMasterAddressingMode(I2C_Channel[busIndex], LL_I2C_ADDRESSING_MODE_7BIT);
-                    LL_I2C_AcknowledgeNextData(I2C_Channel[busIndex], LL_I2C_ACK);
-                    LL_I2C_DisableOwnAddress1(I2C_Channel[busIndex]);
-                    LL_I2C_DisableOwnAddress2(I2C_Channel[busIndex]);
-                    status = true;
-                    break;
-                case Slave:
-                    // Reset Value is Clock stretching enabled
-                    LL_I2C_SetOwnAddress1(I2C_Channel[busIndex], SlaveAddress, LL_I2C_OWNADDRESS1_7BIT);
-                    LL_I2C_SetOwnAddress2(I2C_Channel[busIndex], 0x00, LL_I2C_OWNADDRESS2_NOMASK);
-                    LL_I2C_EnableOwnAddress1(I2C_Channel[busIndex]);
-                    LL_I2C_DisableOwnAddress2(I2C_Channel[busIndex]);
-                    LL_I2C_AcknowledgeNextData(I2C_Channel[busIndex], LL_I2C_NACK);
-                    status = true;
-                    break;
-                default:
-                    status = false;
-                    break;
-            }
+        LL_I2C_SetOwnAddress1(I2C_Channel[I2C_deviceId], 0, LL_I2C_OWNADDRESS1_7BIT);
+        LL_I2C_SetMasterAddressingMode(I2C_Channel[I2C_deviceId], LL_I2C_ADDRESSING_MODE_7BIT);
+        LL_I2C_AcknowledgeNextData(I2C_Channel[I2C_deviceId], LL_I2C_ACK);
+        LL_I2C_DisableOwnAddress1(I2C_Channel[I2C_deviceId]);
+        LL_I2C_DisableOwnAddress2(I2C_Channel[I2C_deviceId]);
 
-            // Interrupt versions ( TO BE CONTINUED )
-            //// Enable Receive Interrupt
-            // LL_I2C_EnableIT_RX(I2C_Channel[busIndex]);
-            //// Enable Not acknowledge received interrupt
-            // LL_I2C_EnableIT_NACK(I2C_Channel[busIndex]);
-            //// Enable Error interrupts
-            // LL_I2C_EnableIT_ERR(I2C_Channel[busIndex]);
-            //// Enable Stop interrupt
-            // LL_I2C_EnableIT_STOP(I2C_Channel[busIndex]);
-        }
-        LL_I2C_Enable(I2C_Channel[busIndex]);
-
-        if (status)
-        {
-            NVIC_SetPriority(I2C_Interrupt_Channel[busIndex], 0);
-            NVIC_EnableIRQ(I2C_Interrupt_Channel[busIndex]);
-        }
+        // Interrupt versions ( TO BE CONTINUED )
+        //// Enable Receive Interrupt
+        // LL_I2C_EnableIT_RX(I2C_Channel[busIndex]);
+        //// Enable Not acknowledge received interrupt
+        // LL_I2C_EnableIT_NACK(I2C_Channel[busIndex]);
+        //// Enable Error interrupts
+        // LL_I2C_EnableIT_ERR(I2C_Channel[busIndex]);
+        //// Enable Stop interrupt
+        // LL_I2C_EnableIT_STOP(I2C_Channel[busIndex]);
     }
-    return status;
+    LL_I2C_Enable(I2C_Channel[I2C_deviceId]);
+    NVIC_SetPriority(I2C_Interrupt_Channel[I2C_deviceId], 0);
+    NVIC_EnableIRQ(I2C_Interrupt_Channel[I2C_deviceId]);
+
+    return true;
 }
-bool DeInitialize_Native_I2C(int busIndex)
+bool I2cIO::Dispose(CLR_INT32 I2C_deviceId)
 {
     bool status = false;
-    switch (busIndex)
+    switch (I2C_deviceId)
     {
         case 1:
             LL_APB4_GRP1_ReleaseReset(LL_APB1_GRP1_PERIPH_I2C1);
@@ -1167,230 +995,465 @@ bool DeInitialize_Native_I2C(int busIndex)
     }
     if (status)
     {
-        int pinNumberSCL = FindPinWithFunctionAndChannel(DevicePinFunction::I2C_SCL, busIndex);
-        int pinNumberSDA = FindPinWithFunctionAndChannel(DevicePinFunction::I2C_SDA, busIndex);
-        SetPinLowPower(pinNumberSDA);
-        SetPinLowPower(pinNumberSCL);
+        PinNameValue pinNameValueSCL = FindPinWithFunctionAndChannel(DevicePinFunction::I2C, I2C_deviceId);
+        PinNameValue pinNameValueSDA = FindPinWithFunctionAndChannel(DevicePinFunction::I2C, I2C_deviceId);
+        GpioIO::SetLowPower(pinNameValueSCL);
+        GpioIO::SetLowPower(pinNameValueSDA);
     }
     return status;
 }
-bool I2CWriteData(int busIndex, uint8_t *writeData, int writeSize, uint8_t slaveAddress)
+CLR_INT32 I2cIO::Write(
+    CLR_INT32 I2C_deviceId,
+    CLR_INT32 slaveAddress,
+    CLR_UINT8 *writeBuffer,
+    CLR_INT32 writeSize,
+    CLR_INT32 *transferResult)
 {
     bool status = false;
-    if (IsValidI2CBus(busIndex))
+    LL_I2C_HandleTransfer(
+        I2C_Channel[I2C_deviceId],
+        slaveAddress,
+        LL_I2C_ADDRSLAVE_7BIT,
+        writeSize,
+        LL_I2C_MODE_SOFTEND,
+        LL_I2C_GENERATE_START_WRITE);
+    LL_I2C_TransmitData8(I2C_Channel[I2C_deviceId], 0);
+    while (!LL_I2C_IsActiveFlag_TXE(I2C_Channel[I2C_deviceId]))
+        ;
+    // sending the data
+    for (uint8_t i = 0; i < writeSize; i++)
     {
-        LL_I2C_HandleTransfer(
-            I2C_Channel[busIndex],
-            slaveAddress,
-            LL_I2C_ADDRSLAVE_7BIT,
-            writeSize,
-            LL_I2C_MODE_SOFTEND,
-            LL_I2C_GENERATE_START_WRITE);
-        LL_I2C_TransmitData8(I2C_Channel[busIndex], 0);
-        while (!LL_I2C_IsActiveFlag_TXE(I2C_Channel[busIndex]))
+        LL_I2C_TransmitData8(I2C_Channel[I2C_deviceId], writeBuffer[i]);
+        while (!LL_I2C_IsActiveFlag_TXE(I2C_Channel[I2C_deviceId]))
+            writeBuffer++;
+    }
+    status = true;
+    *transferResult = 1;
+    return status;
+}
+
+bool I2cIO::Read(
+    CLR_INT32 I2C_deviceId,
+    CLR_INT32 slaveAddress,
+    CLR_UINT8 *readBuffer,
+    CLR_INT32 readSize,
+    CLR_INT32 *transferResult)
+{
+    (void)transferResult;
+
+    bool status = false;
+    LL_I2C_AcknowledgeNextData(I2C_Channel[I2C_deviceId], LL_I2C_ACK);
+    LL_I2C_HandleTransfer(
+        I2C_Channel[I2C_deviceId],
+        (slaveAddress | 1),
+        LL_I2C_ADDRSLAVE_7BIT,
+        readSize,
+        LL_I2C_MODE_AUTOEND,
+        LL_I2C_GENERATE_START_READ);
+    for (uint8_t i = 0; i < readSize; i++)
+    {
+        if (i < readSize - 1)
+            LL_I2C_AcknowledgeNextData(I2C_Channel[I2C_deviceId], LL_I2C_ACK);
+        else
+            LL_I2C_AcknowledgeNextData(I2C_Channel[I2C_deviceId], LL_I2C_NACK);
+        while (LL_I2C_IsActiveFlag_RXNE(I2C_Channel[I2C_deviceId]) == 0)
             ;
-        // sending the data
-        for (uint8_t i = 0; i < writeSize; i++)
-        {
-            LL_I2C_TransmitData8(I2C_Channel[busIndex], writeData[i]);
-            while (!LL_I2C_IsActiveFlag_TXE(I2C_Channel[busIndex]))
-                writeData++;
-        }
-        status = true;
+        readBuffer[i] = LL_I2C_ReceiveData8(I2C_Channel[I2C_deviceId]);
     }
-    return status;
-}
-bool I2CReadData(int busIndex, uint8_t *readData, int readSize, uint8_t slaveAddress)
-{
-    bool status = false;
-    if (IsValidI2CBus(busIndex))
-    {
-        LL_I2C_AcknowledgeNextData(I2C_Channel[busIndex], LL_I2C_ACK);
-        LL_I2C_HandleTransfer(
-            I2C_Channel[busIndex],
-            (slaveAddress | 1),
-            LL_I2C_ADDRSLAVE_7BIT,
-            readSize,
-            LL_I2C_MODE_AUTOEND,
-            LL_I2C_GENERATE_START_READ);
-        for (uint8_t i = 0; i < readSize; i++)
-        {
-            if (i < readSize - 1)
-                LL_I2C_AcknowledgeNextData(I2C_Channel[busIndex], LL_I2C_ACK);
-            else
-                LL_I2C_AcknowledgeNextData(I2C_Channel[busIndex], LL_I2C_NACK);
-            while (LL_I2C_IsActiveFlag_RXNE(I2C_Channel[busIndex]) == 0)
-                ;
-            readData[i] = LL_I2C_ReceiveData8(I2C_Channel[busIndex]);
-        }
-        status = true;
-    }
+    status = true;
     // Optional?
     // LL_I2C_GenerateStopCondition(I2C_Channel[busIndex]);
     return status;
 }
 #pragma endregion
 
-#pragma region Pwm
-int SetDesiredFrequency(int pwmID, int desiredFrequency)
+#pragma region I2c_Slave
+CLR_INT32 I2cIO_Slave::TimeoutMaximum()
 {
-    (void)pwmID;
+    return 10000;
+}
+CLR_INT32 I2cIO_Slave::Timeout()
+{
+    return 100;
+}
+bool I2cIO_Slave::Initialize(CLR_INT32 I2C_deviceId, CLR_INT32 deviceAddress)
+{
+    LL_RCC_ClocksTypeDef RCC_Clocks;
+    LL_RCC_GetSystemClocksFreq(&RCC_Clocks);
+
+    switch (I2C_deviceId)
+    {
+        case 1:
+            LL_APB4_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_I2C1);
+            LL_RCC_SetI2CClockSource(LL_RCC_I2C123_CLKSOURCE_PCLK1);
+            break;
+        case 2:
+            LL_APB4_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_I2C2);
+            LL_RCC_SetI2CClockSource(LL_RCC_I2C123_CLKSOURCE_PCLK1);
+            break;
+        case 3:
+            LL_APB4_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_I2C3);
+            LL_RCC_SetI2CClockSource(LL_RCC_I2C123_CLKSOURCE_PCLK1);
+            break;
+        case 4:
+            LL_APB4_GRP1_EnableClock(LL_APB4_GRP1_PERIPH_I2C4);
+            LL_RCC_SetI2CClockSource(LL_RCC_I2C4_CLKSOURCE_PCLK4);
+            break;
+#ifdef I2C5
+        case 5:
+            LL_APB4_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_I2C5);
+            // LL_RCC_SetI2CClockSource(LL_RCC_I2C5_CLKSOURCE_PCLK1);
+            break;
+#endif
+    }
+
+    I2cBusSpeed TODOSPEED = I2cBusSpeed::I2cBusSpeed_StandardMode;
+    LL_I2C_Disable(I2C_Channel[I2C_deviceId]);
+    {
+        LL_I2C_ConfigFilters(I2C_Channel[I2C_deviceId], LL_I2C_ANALOGFILTER_ENABLE, 0);
+        LL_I2C_SetTiming(I2C_Channel[I2C_deviceId], I2C_GetTiming(TODOSPEED));
+        LL_I2C_SetMode(I2C_Channel[I2C_deviceId], LL_I2C_MODE_I2C);
+        LL_I2C_DisableClockStretching(I2C_Channel[I2C_deviceId]);
+        LL_I2C_DisableGeneralCall(I2C_Channel[I2C_deviceId]);
+
+        // Reset Value is Clock stretching enabled
+        LL_I2C_SetOwnAddress1(I2C_Channel[I2C_deviceId], deviceAddress, LL_I2C_OWNADDRESS1_7BIT);
+        LL_I2C_SetOwnAddress2(I2C_Channel[I2C_deviceId], 0x00, LL_I2C_OWNADDRESS2_NOMASK);
+        LL_I2C_EnableOwnAddress1(I2C_Channel[I2C_deviceId]);
+        LL_I2C_DisableOwnAddress2(I2C_Channel[I2C_deviceId]);
+        LL_I2C_AcknowledgeNextData(I2C_Channel[I2C_deviceId], LL_I2C_NACK);
+
+        // Interrupt versions ( TO BE CONTINUED )
+        //// Enable Receive Interrupt
+        // LL_I2C_EnableIT_RX(I2C_Channel[busIndex]);
+        //// Enable Not acknowledge received interrupt
+        // LL_I2C_EnableIT_NACK(I2C_Channel[busIndex]);
+        //// Enable Error interrupts
+        // LL_I2C_EnableIT_ERR(I2C_Channel[busIndex]);
+        //// Enable Stop interrupt
+        // LL_I2C_EnableIT_STOP(I2C_Channel[busIndex]);
+    }
+    LL_I2C_Enable(I2C_Channel[I2C_deviceId]);
+    NVIC_SetPriority(I2C_Interrupt_Channel[I2C_deviceId], 0);
+    NVIC_EnableIRQ(I2C_Interrupt_Channel[I2C_deviceId]);
+
+    return true;
+}
+bool I2cIO_Slave::Dispose(CLR_INT32 I2C_deviceId)
+{
+    (void)I2C_deviceId;
+    return true;
+}
+bool I2cIO_Slave::Write(
+    CLR_INT32 I2C_deviceId,
+    CLR_UINT8 *writeBuffer,
+    CLR_INT32 writeSize,
+    CLR_INT32 timeoutMilliseconds,
+    CLR_INT32 *readCount,
+    CLR_INT32 *transferResult)
+{
+    (void)I2C_deviceId;
+    (void)writeBuffer;
+    (void)writeSize;
+    (void)timeoutMilliseconds;
+    (void)readCount;
+    (void)transferResult;
+    return true;
+}
+bool I2cIO_Slave::Read(
+    CLR_INT32 I2C_deviceId,
+    CLR_UINT8 *readBuffer,
+    CLR_INT32 readSize,
+    CLR_INT32 timeoutMilliseconds,
+    CLR_INT32 *readCount,
+    CLR_INT32 *transferResult)
+{
+    (void)I2C_deviceId;
+    (void)readBuffer;
+    (void)readSize;
+    (void)timeoutMilliseconds;
+    (void)readCount;
+    (void)transferResult;
+    return true;
+}
+#pragma endregion
+
+#pragma region PWM
+bool PwmIO::Initialize(
+    CLR_INT32 channelId,
+    CLR_INT32 timerId,
+    CLR_INT32 pinNumber,
+    CLR_INT32 polarity,
+    CLR_INT32 desiredFrequency,
+    CLR_INT32 dutyCycle)
+{
+    (void)channelId;
+    (void)timerId;
+    (void)pinNumber;
+    (void)polarity;
+    (void)desiredFrequency;
+    (void)dutyCycle;
+    return true;
+}
+bool PwmIO::Dispose(CLR_INT32 I2C_deviceId)
+{
+    // TODO: Deactive PWM, set pins to low power
+    // Get each pin and set to low power function
+    (void)I2C_deviceId;
+    return true;
+}
+CLR_UINT32 PwmIO::SetDutyCycle(CLR_INT32 pinNumber, CLR_INT32 desiredFrequency)
+{
+    (void)pinNumber;
     (void)desiredFrequency;
     return 1;
 }
-double SetDutyCycle(int pwmID, int channelId, double dutyCycle)
+CLR_UINT32 PwmIO::Start(CLR_INT32 pinNumber, CLR_INT32 timerId)
 {
-    (void)pwmID;
-    (void)channelId;
-    (void)dutyCycle;
-    return 1.0;
-}
-void StartPwm(int pwmID, double dutyCycle, int channelId, int pinNumber)
-{
-    (void)pwmID;
-    (void)dutyCycle;
-    (void)channelId;
     (void)pinNumber;
-    return;
+    (void)timerId;
+    return 1;
 }
-void StopPwm(int pwmID, int channelId)
+CLR_UINT32 PwmIO::Stop(CLR_INT32 pinNumber, CLR_INT32 timerId)
 {
-    (void)pwmID;
-    (void)channelId;
-    return;
+    (void)pinNumber;
+    (void)timerId;
+    return 1;
 }
-bool CheckChannel(int pwmID, int channelId)
+CLR_UINT32 PwmIO::DesiredFrequency(CLR_INT32 timerId, CLR_INT32 desiredFrequency)
 {
-    (void)pwmID;
-    (void)channelId;
-    return true;
+    (void)timerId;
+    (void)desiredFrequency;
+    return 1;
 }
-
+CLR_UINT32 PwmIO::GetChannel(CLR_INT32 timerId, CLR_INT32 pinNumber)
+{
+    (void)timerId;
+    (void)pinNumber;
+    return 1;
+}
 #pragma endregion
 
-#pragma region Serial
+#pragma region Serial IO
+#include "wp_CircularBuffer.h"
+
+#define MAXIMUM_NUMBER_OF_ACTIVE_USARTS 5
+
+int CircularBufferAssignments[]{
+    -1, // Index 0 not used
+    0,  // Usart1 - CircularBuffer[0]
+    1,  // Usart2 - CircularBuffer[0]
+    2,  // Usart3 - CircularBuffer[0]
+    -1, // Usart4 - Not used
+    -1, // Usart5 - Not used
+    3,  // Usart6 - CircularBuffer[0]
+    -1, // Usart7 - Not used
+    -1, // Usart8 - Not used
+    -1, // Usart9 - Not used
+    4   // Usart10 - CircularBuffer[0]
+};
+CircularBuffer_t DeviceReceiveCircularBuffer[MAXIMUM_NUMBER_OF_ACTIVE_USARTS];
+CircularBuffer_t DeviceTransmitCircularBuffer[MAXIMUM_NUMBER_OF_ACTIVE_USARTS];
+
+__attribute__((section(".dma_buffer"))) __attribute__((aligned(32)))
+uint8_t UsartDmaReceiveBuffer[512][MAXIMUM_NUMBER_OF_ACTIVE_USARTS];
+__attribute__((section(".dma_buffer"))) __attribute__((aligned(32)))
+uint8_t UsartTransmitData[512][MAXIMUM_NUMBER_OF_ACTIVE_USARTS];
+//  Length of currently active TX DMA transfer
+volatile size_t device_usart_tx_dma_current_len[MAXIMUM_NUMBER_OF_ACTIVE_USARTS];
 __attribute__((section(".dma_buffer"))) __attribute__((aligned(32))) uint8_t DmaReceiveBuffer[1024];
 static_assert((sizeof(DmaReceiveBuffer) % 32) == 0, "Must be a multiple by 32");
 
-void InitUSART(int UsartDeviceNumber)
-{
-    USART_TypeDef *USARTx = Serial_Channel[UsartDeviceNumber].controllerId;
-    LL_USART_InitTypeDef USART_InitStruct;
-
-    switch (UsartDeviceNumber)
-    {
-        case 1:
-        case 6:
-        case 10:
-            LL_APB2_GRP1_EnableClock(UsartPortClockEnable[UsartDeviceNumber]);
-            break;
-        case 2:
-        case 3:
-            LL_APB1_GRP1_EnableClock(UsartPortClockEnable[UsartDeviceNumber]);
-        default:
-            return;
-            break;
-    }
-
-    LL_AHB1_GRP1_EnableClock(DmaClockEnable[UsartDeviceNumber]);
-    DMA_TypeDef *DMAx = DMA_Channel[UsartDeviceNumber];
-
-    // wpUSART Receive Initialize
-    LL_DMA_SetPeriphRequest(DMAx, wpDMA_ReceiveStream, wpDMA_ReceiveMux);
-    LL_DMA_SetDataTransferDirection(DMAx, wpDMA_ReceiveStream, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
-    LL_DMA_SetStreamPriorityLevel(DMAx, wpDMA_ReceiveStream, LL_DMA_PRIORITY_LOW);
-    LL_DMA_SetMode(DMAx, wpDMA_ReceiveStream, LL_DMA_MODE_CIRCULAR);
-    LL_DMA_SetPeriphIncMode(DMAx, wpDMA_ReceiveStream, LL_DMA_PERIPH_NOINCREMENT);
-    LL_DMA_SetMemoryIncMode(DMAx, wpDMA_ReceiveStream, LL_DMA_MEMORY_INCREMENT);
-    LL_DMA_SetMemorySize(DMAx, wpDMA_ReceiveStream, LL_DMA_MDATAALIGN_BYTE);
-    LL_DMA_SetPeriphSize(DMAx, wpDMA_ReceiveStream, LL_DMA_PDATAALIGN_BYTE);
-    LL_DMA_DisableFifoMode(DMAx, wpDMA_ReceiveStream);
-    LL_DMA_SetPeriphAddress(DMAx, wpDMA_ReceiveStream, LL_USART_DMA_GetRegAddr(USARTx, LL_USART_DMA_REG_DATA_RECEIVE));
-    LL_DMA_SetMemoryAddress(DMAx, wpDMA_ReceiveStream, (uint32_t)DmaReceiveBuffer);
-    LL_DMA_SetDataLength(DMAx, wpDMA_ReceiveStream, ARRAY_LEN(DmaReceiveBuffer));
-
-    // wpUSART Transmit Initialize
-    LL_DMA_SetPeriphRequest(DMAx, wpDMA_TransmitStream, wpDMA_TransmitMux);
-    LL_DMA_SetDataTransferDirection(DMAx, wpDMA_TransmitStream, LL_DMA_DIRECTION_MEMORY_TO_PERIPH);
-    LL_DMA_SetStreamPriorityLevel(DMAx, wpDMA_TransmitStream, LL_DMA_PRIORITY_LOW);
-    LL_DMA_SetMode(DMAx, wpDMA_TransmitStream, LL_DMA_MODE_NORMAL);
-    LL_DMA_SetPeriphIncMode(DMAx, wpDMA_TransmitStream, LL_DMA_PERIPH_NOINCREMENT);
-    LL_DMA_SetMemoryIncMode(DMAx, wpDMA_TransmitStream, LL_DMA_MEMORY_INCREMENT);
-    LL_DMA_SetPeriphSize(DMAx, wpDMA_TransmitStream, LL_DMA_PDATAALIGN_BYTE);
-    LL_DMA_SetMemorySize(DMAx, wpDMA_TransmitStream, LL_DMA_MDATAALIGN_BYTE);
-    LL_DMA_DisableFifoMode(DMAx, wpDMA_TransmitStream);
-    LL_DMA_SetPeriphAddress(
-        DMAx,
-        wpDMA_TransmitStream,
-        LL_USART_DMA_GetRegAddr(USARTx, LL_USART_DMA_REG_DATA_TRANSMIT));
-
-    // Enable receive half transfer interrupt
-    LL_DMA_EnableIT_HT(DMAx, wpDMA_ReceiveStream);
-
-    // Enable receive transfer complete interrupt
-    LL_DMA_EnableIT_TC(DMAx, wpDMA_ReceiveStream);
-
-    // Enable transmit transfer complete interrupt
-    LL_DMA_EnableIT_TC(DMAx, wpDMA_TransmitStream);
-
-    // DMA interrupt initialize
-    NVIC_SetPriority(wpDMA_ReceiveStreamInterrupt, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
-    NVIC_EnableIRQ(wpDMA_ReceiveStreamInterrupt);
-    NVIC_SetPriority(wpDMA_TransmitStreamInterrupt, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
-    NVIC_EnableIRQ(wpDMA_TransmitStreamInterrupt);
-
-    // Configure WireProtocol wpUSART
-    USART_InitStruct.PrescalerValue = LL_USART_PRESCALER_DIV1;
-    USART_InitStruct.BaudRate = wpBAUD_RATE;
-    USART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;
-    USART_InitStruct.StopBits = LL_USART_STOPBITS_1;
-    USART_InitStruct.Parity = LL_USART_PARITY_NONE;
-    USART_InitStruct.TransferDirection = LL_USART_DIRECTION_TX_RX;
-    USART_InitStruct.HardwareFlowControl = LL_USART_HWCONTROL_NONE;
-    USART_InitStruct.OverSampling = LL_USART_OVERSAMPLING_16;
-
-    LL_USART_Disable(USARTx);
-    {
-        LL_USART_Init(USARTx, &USART_InitStruct);
-        LL_USART_SetTXFIFOThreshold(USARTx, LL_USART_FIFOTHRESHOLD_7_8);
-        LL_USART_SetRXFIFOThreshold(USARTx, LL_USART_FIFOTHRESHOLD_7_8);
-        LL_USART_EnableFIFO(USARTx);
-        LL_USART_ConfigAsyncMode(USARTx);
-        LL_USART_EnableDMAReq_RX(USARTx);
-        LL_USART_EnableDMAReq_TX(USARTx);
-        LL_USART_EnableIT_IDLE(USARTx);
-
-        // USART interrupt, same priority as DMA channel
-        NVIC_SetPriority(wpUSART_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
-        NVIC_EnableIRQ(wpUSART_IRQn);
-
-        LL_DMA_EnableStream(wpDMA, wpDMA_ReceiveStream);
-    }
-    LL_USART_Enable(USARTx);
-
-    // Polling USARTx initialization
-    while (!LL_USART_IsActiveFlag_TEACK(USARTx) || !LL_USART_IsActiveFlag_REACK(USARTx))
-    {
-    }
-}
-void DeInitUSART(int UsartDeviceNumber)
-{
-    DMA_TypeDef *DMAx = DMA_Channel[UsartDeviceNumber];
-    LL_DMA_DeInit(DMAx, DmaStreamNumber[UsartDeviceNumber]);
-}
-int SerialBytesAvailable(int UsartDeviceNumber)
-{
-    int index = GetSerialDeviceBufferIndex(UsartDeviceNumber);
-    return wp_BufferBytesWaiting(&DeviceReceiveCircularBuffer[index]);
-}
 int GetSerialDeviceBufferIndex(int UsartDeviceNumber)
 {
     return CircularBufferAssignments[UsartDeviceNumber];
 }
-void SetSerialDeviceSignalsInverted(int UsartDeviceNumber, bool InvertSignals)
+
+bool SerialIO::Initialize(CLR_INT32 usartDeviceNumber, CLR_INT32 baudrate)
 {
-    USART_TypeDef *USARTx = Serial_Channel[UsartDeviceNumber].controllerId;
-    if (InvertSignals)
+    bool status = false;
+    USART_TypeDef *USARTx = (USART_TypeDef *)Serial_Channel[usartDeviceNumber].controllerId;
+    LL_USART_InitTypeDef USART_InitStruct;
+
+    switch (usartDeviceNumber)
+    {
+        case 1:
+        case 6:
+        case 10:
+            LL_APB2_GRP1_EnableClock(UsartPortClockEnable[usartDeviceNumber]);
+            status = true;
+            break;
+        case 2:
+        case 3:
+            LL_APB1_GRP1_EnableClock(UsartPortClockEnable[usartDeviceNumber]);
+            status = true;
+            break;
+        default:
+            status = false;
+            break;
+    }
+    if (status)
+    {
+        LL_AHB1_GRP1_EnableClock(DmaClockEnable[usartDeviceNumber]);
+        DMA_TypeDef *DMAx = DMA_Channel[usartDeviceNumber];
+
+        // wpUSART Receive Initialize
+        LL_DMA_SetPeriphRequest(DMAx, wpDMA_ReceiveStream, wpDMA_ReceiveMux);
+        LL_DMA_SetDataTransferDirection(DMAx, wpDMA_ReceiveStream, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
+        LL_DMA_SetStreamPriorityLevel(DMAx, wpDMA_ReceiveStream, LL_DMA_PRIORITY_LOW);
+        LL_DMA_SetMode(DMAx, wpDMA_ReceiveStream, LL_DMA_MODE_CIRCULAR);
+        LL_DMA_SetPeriphIncMode(DMAx, wpDMA_ReceiveStream, LL_DMA_PERIPH_NOINCREMENT);
+        LL_DMA_SetMemoryIncMode(DMAx, wpDMA_ReceiveStream, LL_DMA_MEMORY_INCREMENT);
+        LL_DMA_SetMemorySize(DMAx, wpDMA_ReceiveStream, LL_DMA_MDATAALIGN_BYTE);
+        LL_DMA_SetPeriphSize(DMAx, wpDMA_ReceiveStream, LL_DMA_PDATAALIGN_BYTE);
+        LL_DMA_DisableFifoMode(DMAx, wpDMA_ReceiveStream);
+        LL_DMA_SetPeriphAddress(
+            DMAx,
+            wpDMA_ReceiveStream,
+            LL_USART_DMA_GetRegAddr(USARTx, LL_USART_DMA_REG_DATA_RECEIVE));
+        LL_DMA_SetMemoryAddress(DMAx, wpDMA_ReceiveStream, (uint32_t)DmaReceiveBuffer);
+        LL_DMA_SetDataLength(DMAx, wpDMA_ReceiveStream, ARRAY_LEN(DmaReceiveBuffer));
+
+        // wpUSART Transmit Initialize
+        LL_DMA_SetPeriphRequest(DMAx, wpDMA_TransmitStream, wpDMA_TransmitMux);
+        LL_DMA_SetDataTransferDirection(DMAx, wpDMA_TransmitStream, LL_DMA_DIRECTION_MEMORY_TO_PERIPH);
+        LL_DMA_SetStreamPriorityLevel(DMAx, wpDMA_TransmitStream, LL_DMA_PRIORITY_LOW);
+        LL_DMA_SetMode(DMAx, wpDMA_TransmitStream, LL_DMA_MODE_NORMAL);
+        LL_DMA_SetPeriphIncMode(DMAx, wpDMA_TransmitStream, LL_DMA_PERIPH_NOINCREMENT);
+        LL_DMA_SetMemoryIncMode(DMAx, wpDMA_TransmitStream, LL_DMA_MEMORY_INCREMENT);
+        LL_DMA_SetPeriphSize(DMAx, wpDMA_TransmitStream, LL_DMA_PDATAALIGN_BYTE);
+        LL_DMA_SetMemorySize(DMAx, wpDMA_TransmitStream, LL_DMA_MDATAALIGN_BYTE);
+        LL_DMA_DisableFifoMode(DMAx, wpDMA_TransmitStream);
+        LL_DMA_SetPeriphAddress(
+            DMAx,
+            wpDMA_TransmitStream,
+            LL_USART_DMA_GetRegAddr(USARTx, LL_USART_DMA_REG_DATA_TRANSMIT));
+
+        // Enable receive half transfer interrupt
+        LL_DMA_EnableIT_HT(DMAx, wpDMA_ReceiveStream);
+
+        // Enable receive transfer complete interrupt
+        LL_DMA_EnableIT_TC(DMAx, wpDMA_ReceiveStream);
+
+        // Enable transmit transfer complete interrupt
+        LL_DMA_EnableIT_TC(DMAx, wpDMA_TransmitStream);
+
+        // DMA interrupt initialize
+        NVIC_SetPriority(wpDMA_ReceiveStreamInterrupt, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
+        NVIC_EnableIRQ(wpDMA_ReceiveStreamInterrupt);
+        NVIC_SetPriority(wpDMA_TransmitStreamInterrupt, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
+        NVIC_EnableIRQ(wpDMA_TransmitStreamInterrupt);
+
+        // Configure WireProtocol wpUSART
+        USART_InitStruct.PrescalerValue = LL_USART_PRESCALER_DIV1;
+        USART_InitStruct.BaudRate = baudrate;
+        USART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;
+        USART_InitStruct.StopBits = LL_USART_STOPBITS_1;
+        USART_InitStruct.Parity = LL_USART_PARITY_NONE;
+        USART_InitStruct.TransferDirection = LL_USART_DIRECTION_TX_RX;
+        USART_InitStruct.HardwareFlowControl = LL_USART_HWCONTROL_NONE;
+        USART_InitStruct.OverSampling = LL_USART_OVERSAMPLING_16;
+
+        LL_USART_Disable(USARTx);
+        {
+            LL_USART_Init(USARTx, &USART_InitStruct);
+            LL_USART_SetTXFIFOThreshold(USARTx, LL_USART_FIFOTHRESHOLD_7_8);
+            LL_USART_SetRXFIFOThreshold(USARTx, LL_USART_FIFOTHRESHOLD_7_8);
+            LL_USART_EnableFIFO(USARTx);
+            LL_USART_ConfigAsyncMode(USARTx);
+            LL_USART_EnableDMAReq_RX(USARTx);
+            LL_USART_EnableDMAReq_TX(USARTx);
+            LL_USART_EnableIT_IDLE(USARTx);
+
+            // USART interrupt, same priority as DMA channel
+            NVIC_SetPriority(wpUSART_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(), 0, 0));
+            NVIC_EnableIRQ(wpUSART_IRQn);
+
+            LL_DMA_EnableStream(wpDMA, wpDMA_ReceiveStream);
+        }
+        LL_USART_Enable(USARTx);
+
+        // Polling USARTx initialization
+        while (!LL_USART_IsActiveFlag_TEACK(USARTx) || !LL_USART_IsActiveFlag_REACK(USARTx))
+        {
+        }
+    }
+    return status;
+}
+bool SerialIO::Dispose(CLR_INT32 usartDeviceNumber)
+{
+    DMA_TypeDef *DMAx = DMA_Channel[usartDeviceNumber];
+    LL_DMA_DeInit(DMAx, DmaStreamNumber[usartDeviceNumber]);
+    return true;
+}
+CLR_INT32 SerialIO::BytesAvailable(CLR_INT32 usartDeviceNumber)
+{
+    int index = GetSerialDeviceBufferIndex(usartDeviceNumber);
+    return wp_BufferBytesWaiting(&DeviceReceiveCircularBuffer[index]);
+}
+bool SerialIO::ReadBytes(CLR_INT32 usartDeviceNumber, CLR_UINT8 *data, CLR_INT32 bytesRequested)
+{
+    int bytesAvailableToRead = SerialIO::BytesAvailable(usartDeviceNumber);
+    if (bytesRequested > bytesAvailableToRead)
+    {
+        bytesRequested = bytesAvailableToRead;
+    }
+    int index = GetSerialDeviceBufferIndex(usartDeviceNumber);
+    ULONG read = wp_ReadBuffer(&DeviceReceiveCircularBuffer[index], data, bytesRequested);
+    return read;
+}
+bool SerialIO::ReadLine(CLR_INT32 usartDeviceNumber, char *newLine, CLR_UINT8 length, char *line)
+{
+    UNUSED(usartDeviceNumber);
+    UNUSED(newLine);
+    UNUSED(line);
+    UNUSED(length);
+    return true;
+}
+bool SerialIO::SetSignalLevels(CLR_INT32 usartDeviceNumber, bool inversion)
+{
+    UNUSED(usartDeviceNumber);
+    UNUSED(inversion);
+    return true;
+}
+bool SerialIO::GetSignalLevels(CLR_INT32 usartDeviceNumber)
+{
+    UNUSED(usartDeviceNumber);
+    return true;
+}
+bool SerialIO::WriteBytes(CLR_INT32 usartDeviceNumber, CLR_UINT8 *data, CLR_INT32 size)
+{
+    int index = GetSerialDeviceBufferIndex(usartDeviceNumber);
+    wp_WriteBuffer(&DeviceTransmitCircularBuffer[index], data, size);
+    return true;
+}
+bool SerialIO::SetWatchCharacter(CLR_INT32 usartDeviceNumber, CLR_UINT8 watch_character)
+{
+    int index = GetSerialDeviceBufferIndex(usartDeviceNumber);
+    UNUSED(index);
+    UNUSED(watch_character);
+    return true;
+}
+bool SerialIO::SetReceiveThreshold(CLR_INT32 usartDeviceNumber, CLR_INT32 threshold)
+{
+    int index = GetSerialDeviceBufferIndex(usartDeviceNumber);
+    UNUSED(threshold);
+    UNUSED(index);
+    return 1;
+}
+char *SerialIO::GetDevice(CLR_INT32 usartDeviceNumber)
+{
+    static char DeviceSelector[1];
+    int index = GetSerialDeviceBufferIndex(usartDeviceNumber);
+
+    UNUSED(index);
+    DeviceSelector[0] = ' ';
+    return DeviceSelector;
+}
+bool SerialIO::InvertSignalLevels(CLR_INT32 usartDeviceNumber, bool InvertSignal)
+{
+    USART_TypeDef *USARTx = (USART_TypeDef *)Serial_Channel[usartDeviceNumber].controllerId;
+    if (InvertSignal)
     {
         LL_USART_SetRXPinLevel(USARTx, LL_USART_RXPIN_LEVEL_INVERTED);
     }
@@ -1398,63 +1461,90 @@ void SetSerialDeviceSignalsInverted(int UsartDeviceNumber, bool InvertSignals)
     {
         LL_USART_SetRXPinLevel(USARTx, LL_USART_RXPIN_LEVEL_STANDARD);
     }
-    return;
-}
-bool IsSerialSignalInverted(int UsartDeviceNumber)
-{
-    USART_TypeDef *USARTx = Serial_Channel[UsartDeviceNumber].controllerId;
-    return (LL_USART_GetRXPinLevel(USARTx) == LL_USART_RXPIN_LEVEL_INVERTED);
-}
-int SerialReadBytes(int UsartDeviceNumber, uint8_t *data, int bytesRequested)
-{
-    int bytesAvailableToRead = SerialBytesAvailable(UsartDeviceNumber);
-    if (bytesRequested > bytesAvailableToRead)
-    {
-        bytesRequested = bytesAvailableToRead;
-    }
-    int index = GetSerialDeviceBufferIndex(UsartDeviceNumber);
-    ULONG read = wp_ReadBuffer(&DeviceReceiveCircularBuffer[index], data, bytesRequested);
-    return read;
-}
-int SerialReadLine(int UsartDeviceNumber, const char *newLineCharacters, int newLineLength, uint8_t *&line)
-{
-    int index = GetSerialDeviceBufferIndex(UsartDeviceNumber);
-    ULONG read = wp_ReadLine(&DeviceReceiveCircularBuffer[index], newLineCharacters, newLineLength, line);
-    return read;
-}
-bool SerialWriteBytes(int UsartDeviceNumber, uint8_t *data, int size)
-{
-    int index = GetSerialDeviceBufferIndex(UsartDeviceNumber);
-    wp_WriteBuffer(&DeviceTransmitCircularBuffer[index], data, size);
     return true;
 }
-void SerialSetStopBits(int UsartDeviceNumber, int RequestedStopBits)
+bool SerialIO::SetBaudRate(CLR_INT32 usartDeviceNumber, CLR_INT32 baudRate)
 {
-    (void)UsartDeviceNumber;
-    (void)RequestedStopBits;
-    return;
+    UNUSED(usartDeviceNumber);
+    UNUSED(baudRate);
+    return true;
 }
-int SerialSetThreshold(int UsartDeviceNumber, int RequestedThreshold)
+bool SerialIO::SetConfig(CLR_INT32 usartDeviceNumber, CLR_INT32 stopBits, CLR_INT32 dataBits, CLR_INT32 RequestedParity)
 {
-    (void)UsartDeviceNumber;
-    (void)RequestedThreshold;
+    UNUSED(usartDeviceNumber);
+    UNUSED(stopBits);
+    UNUSED(dataBits);
+    UNUSED(RequestedParity);
+    return true;
+}
+bool SerialIO::SetHandshake(CLR_INT32 usartDeviceNumber, Handshake handshake)
+{
+    UNUSED(usartDeviceNumber);
+
+    bool status = false;
+    switch (handshake)
+    {
+        case Handshake::Handshake_None:
+            status = true;
+            break;
+        case Handshake_XOnXOff:
+            break;
+        case Handshake::Handshake_RequestToSend:
+            status = true;
+            break;
+        case Handshake::Handshake_RequestToSendXOnXOff:
+            status = true;
+            break;
+    }
+    return status;
+}
+bool SerialIO::SetMode(CLR_INT32 usartDeviceNumber, CLR_INT32 mode)
+{
+    UNUSED(usartDeviceNumber);
+    UNUSED(mode);
+    return true;
+}
+
+CLR_INT32 SpiIO::MaximumClockFrequency(CLR_INT32 deviceId)
+{
+    UNUSED(deviceId);
     return 1;
 }
-void SerialSetBaudRate(int UsartDeviceNumber, int RequestedBaudRate)
+CLR_INT32 SpiIO::MinimumClockFrequency(CLR_INT32 deviceId)
 {
-    (void)UsartDeviceNumber;
-    (void)RequestedBaudRate;
-    return;
+    UNUSED(deviceId);
+    return 1;
 }
-void SerialSetWatchCharacter(int UsartDeviceNumber, uint8_t watchCharacter)
+bool SpiIO::Initialize()
 {
-    (void)UsartDeviceNumber;
-    (void)watchCharacter;
-    return;
+    return true;
 }
+bool SpiIO::Dispose(CLR_INT32 deviceId)
+{
+    UNUSED(deviceId);
+    return true;
+}
+bool SpiIO::WriteRead(
+    CLR_INT32 deviceId,
+    SPI_WRITE_READ_SETTINGS rws,
+    CLR_UINT8 *writeData,
+    CLR_UINT32 *writeSize,
+    CLR_UINT8 *readData,
+    CLR_UINT32 readSize)
+{
+    UNUSED(deviceId);
+    UNUSED(rws);
+    UNUSED(*writeData);
+    UNUSED(*writeSize);
+    UNUSED(*readData);
+    UNUSED(readSize);
+    return false;
+}
+bool SpiIO::Open(SPI_DEVICE_CONFIGURATION spiConfig, CLR_UINT32 handle)
+{
+    (void)spiConfig;
+    (void)handle;
 
+    return false;
+}
 #pragma endregion
-
-#pragma region Spi
-#pragma endregion
-

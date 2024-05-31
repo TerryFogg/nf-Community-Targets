@@ -13,7 +13,7 @@
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Native
         )
         list(APPEND OPTIONAL_SOURCES
-                    ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Core/Graphics.cpp>
+                    ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Core/Graphics.cpp
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Core/GraphicsDriver.cpp
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Core/GraphicsMemoryHeap.cpp
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Core/Support/Bmp/Bitmap_Decoder.cpp
@@ -80,21 +80,16 @@
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_Bitmap.cpp
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_DisplayControl.cpp
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_Font.cpp
-                   # ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_TouchCollectorConfiguration.cpp
-                   # ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_TouchEventProcessor.cpp
-                   # ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_TouchPanel.cpp
-                   # ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_Ink.cpp
-
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/Graphics_Memory.cpp
         )
-        endif()
+     endif()
 
 # Touch
      if(TOUCH_DISPLAY_SUPPORT)
         list(APPEND OPTIONAL_INCLUDES
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics
-                    #${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/TouchPanel/Core
-                    #${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/TouchPanel/Devices
+                    ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/TouchPanel/Core
+                    ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/TouchPanel/Devices
         )
         list(APPEND OPTIONAL_SOURCES
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_TouchCollectorConfiguration.cpp
@@ -105,19 +100,22 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/Ink.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/Gestures.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/TouchPanel.cpp
-
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/TouchDevice.cpp
-
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/${TOUCH_INTERFACE}
- )
+        )
+     endif()
+     if(GRAPHICS_SUPPORT AND NOT TOUCH_DISPLAY_SUPPORT)
+        # If the Graphics option is selected there are included references to touch that have to be satisfied, although they are not required.
+        # 
+        list(APPEND OPTIONAL_SOURCES
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/TouchStubs.cpp
+        )
      endif()
 
 # File System
-    if(FILE_SYSTEM_SD OR FILE_SYSTEM_NAND OR FILE_SYSTEM_NOR OR FILE_SYSTEM_RAM)
-
+    if(FILEX_SYSTEM_SD OR FILEX_SYSTEM_NAND OR FILEX_SYSTEM_NOR OR FILEX_SYSTEM_RAM)
         include( ${CMAKE_CURRENT_SOURCE_DIR}/Sources/FileX.cmake)
         include( ${CMAKE_CURRENT_SOURCE_DIR}/Sources/LevelX.cmake)
-
         list(APPEND OPTIONAL_INCLUDES
              ${FILEX_INCLUDES}
              ${CMAKE_SOURCE_DIR}/src/System.IO.FileSystem
@@ -135,28 +133,28 @@
              ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/FileSystem.cpp
         )
     endif()
-    if(FILE_SYSTEM_SD)
+    if(FILEX_SYSTEM_SD)
         list(APPEND OPTIONAL_SOURCES
              ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/Sd_driver.c
         )
     endif()
-    if(FILE_SYSTEM_NAND)
+    if(FILEX_SYSTEM_NAND)
         list(APPEND OPTIONAL_SOURCES
              ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/Nand_driver.c
         )
     endif()
-    if(FILE_SYSTEM_NOR)
+    if(FILEX_SYSTEM_NOR)
         list(APPEND OPTIONAL_SOURCES
              ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/Nor_driver.c
         )
     endif()
-    if(FILE_SYSTEM_RAM)
+    if(FILEX_SYSTEM_RAM)
         list(APPEND OPTIONAL_SOURCES
              ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/Ram_driver.c
         )
     endif()
 
-# Per Board sources    
+    # Per Board fileX sources    
     if( "${TARGET_FAMILY}" STREQUAL "STM32H7")
         list(APPEND OPTIONAL_INCLUDES
              ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/STM32H7/DeviceIO
@@ -185,9 +183,14 @@
         include( ${CMAKE_CURRENT_SOURCE_DIR}/Sources/UsbX.cmake)
 
         list(APPEND OPTIONAL_INCLUDES
+             ${CMAKE_SOURCE_DIR}/src/System.Device.UsbStream
+             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device
             ${USBX_INCLUDES}
         )
         list(APPEND OPTIONAL_SOURCES
+              ${CMAKE_SOURCE_DIR}/src/System.Device.UsbStream/sys_dev_usbstream_native.cpp
+             #${CMAKE_SOURCE_DIR}/src/System.Device.UsbStream/sys_dev_usbstream_native_System_Device_Usb_UsbStream_stubs.cpp
+              ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.UsbStream.cpp
              ${USBX_SOURCES}
         )
     endif()

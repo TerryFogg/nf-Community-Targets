@@ -99,9 +99,9 @@
                 "BUILD_VERSION": "1.0.0.0",
                 "INFOSTRING": "Built with ThreadX 6.1.12",
                 "HAS_A_USER_BUTTON": true,
-                "GRAPHICS_SUPPORT": "TRUE",
-                "TOUCH_DISPLAY_SUPPORT": "TRUE",
-                "RANDOM_NUMBER_GENERATOR": "TRUE"
+                "GRAPHICS_SUPPORT": "true",
+                "TOUCH_DISPLAY_SUPPORT": "true",
+                "RANDOM_NUMBER_GENERATOR": "true"
             },
             "hidden": false
         },
@@ -121,22 +121,22 @@
                 "BUILD_VERSION": "1.0.0.0",
                 "INFOSTRING": "Built with ThreadX 6.1.12",
                 "HAS_A_USER_BUTTON": true,
-                "GRAPHICS_SUPPORT": true,
-                "TOUCH_DISPLAY_SUPPORT": true,
                 "RANDOM_NUMBER_GENERATOR": true,
 
-                "FILE_SYSTEM_SD": true,
-                "FILE_SYSTEM_NAND": false,
-                "FILE_SYSTEM_NOR": false,
-                "FILE_SYSTEM_RAM": false,
+                "GRAPHICS_SUPPORT": true,
+                "TOUCH_DISPLAY_SUPPORT": true,
+
+                "FILEX_SYSTEM_SD": true,
+                "FILEX_SYSTEM_NAND": false,
+                "FILEX_SYSTEM_NOR": false,
+                "FILEX_SYSTEM_RAM": false,
 
                 "USB_DEVICE": true,
                 "USB_HOST": true,
                 "USB_HOST_CONTROLLER": true,
                 "USB_NETWORK": true,
                 "USB_PICTBRIDGE": true,
-                "NETWORKING": true,
-                "FLASH_LEVELLING": true
+                "NETWORKING": true
             },
             "hidden": false
         },
@@ -197,8 +197,23 @@
                 "ARM_PROCESSOR": "Cortex-M0",
                 "BUILD_VERSION": "1.0.0.0",
                 "INFOSTRING": "Built with ThreadX 6.1.12",
-                "GRAPHICS_SUPPORT": "TRUE",
-                "RANDOM_NUMBER_GENERATOR": "TRUE"
+                "HAS_A_USER_BUTTON": true,
+                "RANDOM_NUMBER_GENERATOR": true,
+
+                "GRAPHICS_SUPPORT": true,
+                "TOUCH_DISPLAY_SUPPORT": false,
+
+                "FILEX_SYSTEM_SD": false,
+                "FILEX_SYSTEM_NAND": false,
+                "FILEX_SYSTEM_NOR": false,
+                "FILEX_SYSTEM_RAM": false,
+
+                "USB_DEVICE": false,
+                "USB_HOST": false,
+                "USB_HOST_CONTROLLER": false,
+                "USB_NETWORK": false,
+                "USB_PICTBRIDGE": false,
+                "NETWORKING": false
             },
             "hidden": false
         }

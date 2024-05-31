@@ -12,7 +12,7 @@
 #include "stm32h7xx_ll.h"
 
 #include "stm32h7b3xxq.h"
-#include "PinNumbering.h"
+#include "PinNames.h"
 
 // #define TARGET_BLOCKSTORAGE_COUNT 1
 #define ARRAY_LEN(x) (sizeof(x) / sizeof((x)[0]))
@@ -340,12 +340,13 @@ extern "C"
 #define INVALIDATE_DCACHE SCB_CleanInvalidateDCache()
     void Startup_Rtos(bool debuggerRequested);
     void Initialize_Board();
-    void MPU_Config(uint32_t sdram_base_address, uint32_t sdram_region_size);
+    void InitializeDevicePins();
     void Initialize_DWT_Counter();
     void Initialize_Board_LEDS_And_Buttons();
     void Initialize_SDRAM(uint32_t base_address, uint32_t sdram_region_size);
     void Initialize_64bit_timer();
     void CPU_CACHE_Enable(void);
+    void MPU_Config(uint32_t sdram_base_address, uint32_t sdram_region_size);
     void SystemClock_Config();
     void BoardLed_ON(GPIO_TypeDef *gpio_port, uint32_t led);
     void BoardLed_OFF(GPIO_TypeDef *gpio_port, uint32_t led);

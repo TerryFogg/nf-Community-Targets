@@ -2,6 +2,7 @@
 # Copyright (c) .NET Foundation and Contributors
 # See LICENSE file in the project root for full license information.
 #
+
 # NOT USED
  #    ${CMAKE_SOURCE_DIR}/src/PAL/Lwip
  #    ${CMAKE_SOURCE_DIR}/src/PAL/COM/sockets/ssl/mbedTLS
@@ -17,8 +18,6 @@
  #    ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.Security.Cryptography/nf_sys_sec_cryptography.cpp
  #    ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.Security.Cryptography/nf_sys_sec_cryptography_System_Security_Cryptography_HMACSHA256.cpp
 
- #    ${CMAKE_SOURCE_DIR}/src/System.Device.UsbStream/sys_dev_usbstream_native.cpp
- #    ${CMAKE_SOURCE_DIR}/src/System.Device.UsbStream/sys_dev_usbstream_native_System_Device_Usb_UsbStream_stubs.cpp
 
  #    ${CMAKE_SOURCE_DIR}/src/System.IO.Ports/sys_io_ser_native.cpp
  #    ${CMAKE_SOURCE_DIR}/src/System.IO.Ports/sys_io_ser_native_System_IO_Ports_SerialPort__.cpp
@@ -51,8 +50,11 @@
                     ${CMAKE_SOURCE_DIR}/src/System.Device.Dac
                     ${CMAKE_SOURCE_DIR}/src/System.Device.Gpio
                     ${CMAKE_SOURCE_DIR}/src/System.Device.I2c
+                    ${CMAKE_SOURCE_DIR}/src/System.Device.I2c.Slave
+                    ${CMAKE_SOURCE_DIR}/src/System.Device.I2s
                     ${CMAKE_SOURCE_DIR}/src/System.Device.Pwm
                     ${CMAKE_SOURCE_DIR}/src/System.Device.Spi
+                    ${CMAKE_SOURCE_DIR}/src/System.Device.UsbStream
                     ${CMAKE_SOURCE_DIR}/src/System.IO.Ports
                     ${CMAKE_SOURCE_DIR}/src/System.IO.FileSystem
                     ${CMAKE_SOURCE_DIR}/src/System.Net
@@ -223,23 +225,25 @@
                     ${CMAKE_SOURCE_DIR}/src/System.Device.Adc/sys_dev_adc_native.cpp
                     ${CMAKE_SOURCE_DIR}/src/System.Device.Dac/sys_dev_dac_native.cpp
                     ${CMAKE_SOURCE_DIR}/src/System.Device.Gpio/sys_dev_gpio_native.cpp
-                    ${CMAKE_SOURCE_DIR}/src/System.Device.Gpio/sys_dev_gpio_native_System_Device_Gpio_GpioController.cpp
-                    ${CMAKE_SOURCE_DIR}/src/System.Device.Gpio/sys_dev_gpio_native_System_Device_Gpio_GpioPin.cpp
+                    #${CMAKE_SOURCE_DIR}/src/System.Device.Gpio/sys_dev_gpio_native_System_Device_Gpio_GpioController.cpp
+                    #${CMAKE_SOURCE_DIR}/src/System.Device.Gpio/sys_dev_gpio_native_System_Device_Gpio_GpioPin.cpp
                     ${CMAKE_SOURCE_DIR}/src/System.Device.I2c/sys_dev_i2c_native.cpp
-        #            ${CMAKE_SOURCE_DIR}/src/System.Device.I2c/sys_dev_i2c_slave_native.cpp
-        #            ${CMAKE_SOURCE_DIR}/src/System.Device.I2s/sys_dev_i2s_slave_native.cpp
-                     ${CMAKE_SOURCE_DIR}/src/System.Device.Pwm/sys_dev_pwm_native.cpp
-                     ${CMAKE_SOURCE_DIR}/src/System.Device.Spi/nanoHAL_Spi.cpp
-                     ${CMAKE_SOURCE_DIR}/src/System.Device.Spi/sys_dev_spi_native.cpp
-                     ${CMAKE_SOURCE_DIR}/src/System.Device.Spi/sys_dev_spi_native_System_Device_Spi_SpiBusInfo.cpp
-                     ${CMAKE_SOURCE_DIR}/src/System.Device.Spi/sys_dev_spi_native_System_Device_Spi_SpiDevice.cpp
-                     ${CMAKE_SOURCE_DIR}/src/System.Runtime.Serialization/nf_system_runtime_serialization.cpp
-                     ${CMAKE_SOURCE_DIR}/src/System.Runtime.Serialization/nf_system_runtime_serialization_System_Runtime_Serialization_Formatters_Binary_BinaryFormatter.cpp
-                     ${CMAKE_SOURCE_DIR}/src/Windows.Storage/win_storage_native.cpp
-                     ${CMAKE_SOURCE_DIR}/src/Windows.Storage/win_storage_native_Windows_Storage_Devices_SDCard_stubs.cpp
-                     ${CMAKE_SOURCE_DIR}/src/Windows.Storage/win_storage_native_Windows_Storage_FileIO_stubs.cpp
-                     ${CMAKE_SOURCE_DIR}/src/Windows.Storage/win_storage_native_Windows_Storage_StorageFile_stubs.cpp
-                     ${CMAKE_SOURCE_DIR}/src/Windows.Storage/win_storage_native_Windows_Storage_StorageFolder_stubs.cpp
+                    ${CMAKE_SOURCE_DIR}/src/System.Device.I2c.Slave/sys_dev_i2c_slave_native.cpp
+                    ${CMAKE_SOURCE_DIR}/src/System.Device.I2s/sys_dev_i2s_native.cpp
+                    ${CMAKE_SOURCE_DIR}/src/System.Device.Pwm/sys_dev_pwm_native.cpp
+                    ${CMAKE_SOURCE_DIR}/src/System.Device.Spi/sys_dev_spi_native.cpp
+                    #${CMAKE_SOURCE_DIR}/src/System.Device.Spi/nanoHAL_Spi.cpp
+                    #${CMAKE_SOURCE_DIR}/src/System.Device.Spi/sys_dev_spi_native_System_Device_Spi_SpiBusInfo.cpp
+                    #${CMAKE_SOURCE_DIR}/src/System.Device.Spi/sys_dev_spi_native_System_Device_Spi_SpiDevice.cpp
+
+                    ${CMAKE_SOURCE_DIR}/src/System.Runtime.Serialization/nf_system_runtime_serialization.cpp
+                    ${CMAKE_SOURCE_DIR}/src/System.Runtime.Serialization/nf_system_runtime_serialization_System_Runtime_Serialization_Formatters_Binary_BinaryFormatter.cpp
+
+                    ${CMAKE_SOURCE_DIR}/src/Windows.Storage/win_storage_native.cpp
+                    ${CMAKE_SOURCE_DIR}/src/Windows.Storage/win_storage_native_Windows_Storage_Devices_SDCard_stubs.cpp
+                    ${CMAKE_SOURCE_DIR}/src/Windows.Storage/win_storage_native_Windows_Storage_FileIO_stubs.cpp
+                    ${CMAKE_SOURCE_DIR}/src/Windows.Storage/win_storage_native_Windows_Storage_StorageFile_stubs.cpp
+                    ${CMAKE_SOURCE_DIR}/src/Windows.Storage/win_storage_native_Windows_Storage_StorageFolder_stubs.cpp
         )
 
 # Targets
@@ -253,8 +257,6 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol
-                    # need to fix the following and put it somewhere or create a subfamili
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Stm32
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/DeviceIO																																																																																																																																																																																							
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/WireProtocol)
@@ -270,14 +272,15 @@
 
                     # These device I/O are typical and have not been made optional
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/DeviceRegistration.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/Adc.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/Dac.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/Gpio.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/I2C.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/Pwm.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/Serial.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/Spi.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Adc.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Dac.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Gpio.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.I2c.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.I2c.slave.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Pwm.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Spi.cpp
 
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.Ports/System.IO.Ports.cpp
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Startup/Thread_CLRStartup.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Startup/Thread_Creation.c
@@ -288,12 +291,11 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/WireProtocol_HAL_Interface.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/wp_CircularBuffer.c
 
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/DeviceIO/DeviceIO.cpp																																																																																																																																																																																							
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/hard_fault_handler.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/one_millisecond_tick.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/targetHAL.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/FlashDriver.c
-
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/DeviceIO/DeviceIO.cpp
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/WireProtocol/wp_Communications.c)  
 

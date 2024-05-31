@@ -8,6 +8,7 @@ set(CMAKE_C_EXTENSIONS OFF CACHE INTERNAL "-std=c++17 instead of -std=gnu++17")
 set(CMAKE_CXX_STANDARD 17 CACHE INTERNAL "C++ standard for all targets")
 set(CMAKE_CXX_EXTENSIONS OFF CACHE INTERNAL "-std=c++17 instead of -std=gnu++17")
 
+
     target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:  -mthumb -mcpu=cortex-m0plus>)
     target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:-ffunction-sections -fdata-sections>)
 

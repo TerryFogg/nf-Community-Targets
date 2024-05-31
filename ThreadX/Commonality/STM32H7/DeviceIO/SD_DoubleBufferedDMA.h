@@ -17,13 +17,13 @@ extern "C"
 #endif
     void InitializeSD_Bus(
         int SDBus_index,
-        DevicePin SDMMC_D0,
-        DevicePin SDMMC_D1,
-        DevicePin SDMMC_D2,
-        DevicePin SDMMC_D3,
-        DevicePin SDMMC_CLK,
-        DevicePin SDMMC_CMD,
-        DevicePin SDMMC_DETECT);
+        PinNameValue SDMMC_D0,
+        PinNameValue SDMMC_D1,
+        PinNameValue SDMMC_D2,
+        PinNameValue SDMMC_D3,
+        PinNameValue SDMMC_CLK,
+        PinNameValue SDMMC_CMD,
+        PinNameValue SDMMC_DETECT);
 #ifdef __cplusplus
 }
 #endif

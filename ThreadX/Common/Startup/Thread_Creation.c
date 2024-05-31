@@ -3,10 +3,13 @@
 
 #include <nanoCLR_Application.h>
 #include <tx_api.h>
-#include <fx_api.h>
 #include "startup_threads.h"
 #include "board.h"
 #include "tx_adaption.h"
+#ifdef FILEX
+ #include <fx_api.h>
+#endif
+
 
 #define RECEIVER_THREAD_PRIORITY   4
 #define CLR_THREAD_PRIORITY        5

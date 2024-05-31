@@ -1,8 +1,8 @@
 //
 // Copyright (c) .NET Foundation and Contributors
-// Portions Copyright (c) Microsoft Corporation.  All rights reserved.
 // See LICENSE file in the project root for full license information.
 //
+
 #include "DeviceRegistration.h"
 
 DevicePin *GPIOPins;
@@ -20,15 +20,24 @@ static SerialPin *SerialChannels;
 static int NumberOfSerialChannels;
 static SpiPin *SpiChannels;
 static int NumberOfSpiChannels;
-static SDPin *SDChannels;
-static int NumberOfSDChannels;
 
-
-void CreatePinList(DevicePin *GPIOPins, int numberOfPins)
+void CreatePinList(DevicePin *mcuGPIOPinList, int numberOfPins)
 {
-    GPIOPins = GPIOPins;
+    GPIOPins = mcuGPIOPinList;
     NumberOfGPIOPins = numberOfPins;
 }
+bool AddPinParameters(PinNameValue pinNameValue, void *newParameters)
+{
+    bool status = false;
+    int pin = FindPin(pinNameValue);
+    if (FindPin(pinNameValue) != 0)
+    {
+        GPIOPins[pin].GpioParameterData = (GpioParameter *)newParameters;
+        status = true;
+    }
+    return status;
+}
+
 void CreateADCChannelList(AdcPin *BoardAdcChannels, int BoardnumberOfAdcChannels)
 {
     ADCChannels = BoardAdcChannels;
@@ -59,83 +68,86 @@ void CreateSerialChannelList(SerialPin *BoardSerialChannels, int BoardnumberOfSe
     SerialChannels = BoardSerialChannels;
     NumberOfSerialChannels = BoardnumberOfSerialChannels;
 }
-void CreateSDChannelList(SDPin *BoardSDChannels, int BoardnumberOfSDChannels)
+bool IsValidPin(PinNameValue pinNameValue)
 {
-    SDChannels = BoardSDChannels;
-    NumberOfSDChannels = BoardnumberOfSDChannels;
+    return (FindPin(pinNameValue) != 0);
 }
-
 int NumberOfPins()
 {
     return NumberOfGPIOPins;
 }
-bool IsValidPin(GPIO_PIN pinNumber)
+int FindPin(PinNameValue pinNameValue)
 {
-    return (FindPin(pinNumber) != 0);
-}
-int FindPin(GPIO_PIN pinNumber)
-{
-    for (int i = 0; i < NumberOfGPIOPins; i++)
+    for (int pinIndex = 0; pinIndex < NumberOfGPIOPins; pinIndex++)
     {
-        if (GPIOPins[i].pinNumber == pinNumber)
+        if (GPIOPins[pinIndex].pinNameValue == pinNameValue)
         {
-            return i;
+            return pinIndex;
         }
     }
-    return 0;
+    return -1;
 }
-int FindPinWithFunctionAndChannel(DevicePinFunction dph, int deviceChannel)
+PinNameValue FindPinWithFunctionAndChannel(DevicePinFunction dph, int deviceChannel)
 {
-    for (int i = 0; i < NumberOfPins(); i++)
+    for (int pinIndex = 0; pinIndex < NumberOfPins(); pinIndex++)
     {
-        if (GPIOPins[i].Function == dph && GPIOPins[i].DeviceFunctionChannelNumber == deviceChannel)
+        if (GPIOPins[pinIndex].CurrentFunction == dph && GPIOPins[pinIndex].DeviceFunctionChannelNumber == deviceChannel)
         {
-            return i;
+            return GPIOPins[pinIndex].pinNameValue;
         }
     }
-    return 0;
+    return (PinNameValue)0;
 }
-bool IsPinReserved(GPIO_PIN pinNumber)
+bool IsPinReserved(PinNameValue pinNameValue)
 {
     bool status = false;
-    int pin = FindPin(pinNumber);
-    if (pin != 0)
+    int pinIndex = FindPin(pinNameValue);
+    if (pinIndex != 0)
     {
-        status = GPIOPins[pin].Reserved;
+        status = GPIOPins[pinIndex].Reserved;
     }
     return status;
 }
-bool ReservePin(GPIO_PIN pinNumber, DevicePinFunction devicePinFunction, int deviceFunctionChannelNumber)
+bool ReservePin(PinNameValue pinNameValue)
 {
     bool status = false;
-    int pin = FindPin(pinNumber);
-    if (pin != 0)
+    int pinIndex = FindPin(pinNameValue);
+    if (pinIndex != 0)
     {
-        if (!IsPinReserved(pinNumber))
+        if (!IsPinReserved(pinNameValue))
         {
-            GPIOPins[pin].Reserved = true;
-            GPIOPins[pin].Function = devicePinFunction;
-            GPIOPins[pin].DeviceFunctionChannelNumber = deviceFunctionChannelNumber;
+            GPIOPins[pinIndex].Reserved = true;
+            GPIOPins[pinIndex].Mode = (PinMode)NOT_SET;
+            GPIOPins[pinIndex].CurrentFunction = DevicePinFunction::NONE;
+            GPIOPins[pinIndex].DeviceFunctionChannelNumber = 0;
             status = true;
         }
     }
     return status;
 }
-bool ReleasePin(GPIO_PIN pinNumber)
+bool ReleasePin(PinNameValue pinNameValue)
 {
     bool status = false;
-    int pin = FindPin(pinNumber);
-    if (pin != 0)
+    int pinIndex = FindPin(pinNameValue);
+    if (pinIndex != 0)
     {
-        if (IsPinReserved(pinNumber))
+        if (IsPinReserved(pinNameValue))
         {
-            GPIOPins[FindPin(pinNumber)].Reserved = false;
-            GPIOPins[pinNumber].Function = DevicePinFunction::NONE;
-            GPIOPins[pin].DeviceFunctionChannelNumber = 0;
+            GPIOPins[pinIndex].Reserved = false;
+            GPIOPins[pinIndex].CurrentFunction = DevicePinFunction::NONE;
+            GPIOPins[pinIndex].DeviceFunctionChannelNumber = 0;
             status = true;
         }
     }
     return status;
+}
+bool IsValidOutputPin(PinNameValue pinNameValue)
+{
+    return IsValidOutputDriveMode(GPIOPins[FindPin(pinNameValue)].Mode);
+}
+bool IsValidInputPin(PinNameValue pinNameValue)
+{
+    return IsValidInputDriveMode(GPIOPins[FindPin(pinNameValue)].Mode);
 }
 bool IsValidOutputDriveMode(PinMode driveMode)
 {
@@ -148,7 +160,6 @@ bool IsValidInputDriveMode(PinMode driveMode)
 {
     return (driveMode == PinMode_Input || driveMode == PinMode_InputPullDown || driveMode == PinMode_InputPullUp);
 }
-
 bool IsValidADCBus(int busIndex)
 {
     bool status = false;
@@ -162,20 +173,6 @@ bool IsValidADCBus(int busIndex)
     }
     return status;
 }
-bool IsValidSDBus(int busIndex)
-{
-    bool status = false;
-    for (int iChannel = 0; iChannel < NumberOfSDChannels; iChannel++)
-    {
-        if (SDChannels->controllerNumber == busIndex)
-        {
-            status = true;
-        }
-        SDChannels++;
-    }
-    return status;
-}
-
 bool IsValidDACBus(int busIndex)
 {
     bool status = false;
@@ -189,7 +186,7 @@ bool IsValidDACBus(int busIndex)
     }
     return status;
 }
-bool IsValidI2CBus(int busIndex)
+bool IsValidI2CDevice(int busIndex)
 {
     bool status = false;
     for (int iChannel = 0; iChannel < NumberOfI2CChannels; iChannel++)
@@ -241,39 +238,72 @@ bool IsValidSerialBus(int busIndex)
     }
     return status;
 }
-
-GpioParameter *GetPinParameters(GPIO_PIN pinNumber)
+bool SetPinMode1(PinNameValue pinNameValue, PinMode pinMode)
 {
-    GpioParameter *returnValue = {0};
-    int pin = FindPin(pinNumber);
-    if (pin != 0)
-    {
-        returnValue = (GpioParameter *)GPIOPins[pin].ParameterData;
-    }
-    return returnValue;
+    int pinIndex = FindPin(pinNameValue);
+    GPIOPins[pinIndex].Mode = pinMode;
+    return true;
 }
-bool AddPinParameters(GPIO_PIN pinNumber, void *newParameters)
+bool GetPinMode(PinNameValue pinNameValue, PinMode *pinMode)
 {
     bool status = false;
-    int pin = FindPin(pinNumber);
-    if (FindPin(pinNumber) != 0)
+    int pinIndex = FindPin(pinNameValue);
+    if (pinIndex != -1)
     {
-        GPIOPins[pin].ParameterData = newParameters;
+        *pinMode = GPIOPins[pinIndex].Mode;
         status = true;
     }
     return status;
 }
-bool RemovePinParameters(GPIO_PIN pinNumber)
+bool SetPinFunction(PinNameValue pinNameValue, DevicePinFunction devicePinFunction)
+{
+    int pinIndex = FindPin(pinNameValue);
+    GPIOPins[pinIndex].CurrentFunction = devicePinFunction;
+    return true;
+}
+bool GetPinFunction(PinNameValue pinNameValue, DevicePinFunction *devicePinFunction)
 {
     bool status = false;
-    int pin = FindPin(pinNumber);
-    if (pin != 0)
+    int pinIndex = FindPin(pinNameValue);
+    if (pinIndex != -1)
     {
-        DevicePin dp = GPIOPins[pin];
-        if (dp.ParameterData != NULL)
+        *devicePinFunction = GPIOPins[pinIndex].CurrentFunction;
+        status = true;
+    }
+    return status;
+}
+GpioParameter *GetPinParameters(PinNameValue pinNameValue)
+{
+    GpioParameter *returnValue = NULL; //{0};
+    int pinIndex = FindPin(pinNameValue);
+    if (pinIndex != 0)
+    {
+        returnValue = GPIOPins[pinIndex].GpioParameterData;
+    }
+    return returnValue;
+}
+//bool AddPinParameters(PinNameValue pinNameValue, GpioParameter *newParameters)
+//{
+//    bool status = false;
+//    int pinIndex = FindPin(pinNameValue);
+//    if (FindPin(pinNameValue) != 0)
+//    {
+//        GPIOPins[pinIndex].GpioParameterData = newParameters;
+//        status = true;
+//    }
+//    return status;
+//}
+bool RemovePinParameters(PinNameValue pinNameValue)
+{
+    bool status = false;
+    int pinIndex = FindPin(pinNameValue);
+    if (pinIndex != 0)
+    {
+        DevicePin dp = GPIOPins[pinIndex];
+        if (dp.GpioParameterData != NULL)
         {
-            platform_free(dp.ParameterData);
-            dp.ParameterData = NULL;
+            platform_free(dp.GpioParameterData);
+            dp.GpioParameterData = NULL;
         }
         status = true;
     }
@@ -289,3 +319,26 @@ unsigned int countSetBits(unsigned int num)
     }
     return count;
 }
+
+#ifdef FILEX
+static SDPin *SDChannels;
+static int NumberOfSDChannels;
+void CreateSDChannelList(SDPin *BoardSDChannels, int BoardnumberOfSDChannels)
+{
+    SDChannels = BoardSDChannels;
+    NumberOfSDChannels = BoardnumberOfSDChannels;
+}
+bool IsValidSDBus(int busIndex)
+{
+    bool status = false;
+    for (int iChannel = 0; iChannel < NumberOfSDChannels; iChannel++)
+    {
+        if (SDChannels->controllerNumber == busIndex)
+        {
+            status = true;
+        }
+        SDChannels++;
+    }
+    return status;
+}
+#endif

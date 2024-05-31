@@ -11,30 +11,20 @@
 // An Events_Get clears the event
 #define CLEAR_SERIAL_IN_EVENT Events_Get(SYSTEM_EVENT_FLAG_COM_IN)
 
-int GetUsartDeviceNumber(CLR_RT_StackFrame &stack)
-{
-    int returnValue = 0;
-    if (stack.This() != NULL)
-    {
-        bool IsDisposed =
-            stack.This()[Library_sys_io_ser_native_System_IO_Ports_SerialPort::FIELD___disposed].NumericByRef().u1 != 0;
-        if (!IsDisposed)
-        {
-            returnValue = ((int)stack.This()[Library_sys_io_ser_native_System_IO_Ports_SerialPort::FIELD___portIndex]
-                               .NumericByRef()
-                               .s4);
-        }
-    }
-    return returnValue;
-}
 HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::NativeInit___VOID(CLR_RT_StackFrame &stack)
 {
     NANOCLR_HEADER();
     {
-        int UsartDeviceNumber;
-        if ((UsartDeviceNumber = GetUsartDeviceNumber(stack)) > 0)
+        FAULT_ON_NULL(stack.This());
+        FAULT_ON_OBJECT_DISPOSED(stack.This()[FIELD___disposed].NumericByRef().u1);
+        CLR_INT32 UsartDeviceNumber =
+            stack.This()[Library_sys_io_ser_native_System_IO_Ports_SerialPort::FIELD___portIndex].NumericByRef().s4;
+        CLR_INT32 baudRate = ((int)stack.This()[Library_sys_io_ser_native_System_IO_Ports_SerialPort::FIELD___baudRate]
+                                  .NumericByRef()
+                                  .s4);
+        if (IsValidSerialBus(UsartDeviceNumber))
         {
-            InitUSART(UsartDeviceNumber);
+            SerialIO::Initialize(UsartDeviceNumber, baudRate);
         }
         else
         {
@@ -47,10 +37,13 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::NativeDispose___VO
 {
     NANOCLR_HEADER();
     {
-        int UsartDeviceNumber;
-        if ((UsartDeviceNumber = GetUsartDeviceNumber(stack)) > 0)
+        CLR_INT32 UsartDeviceNumber =
+            ((int)stack.This()[Library_sys_io_ser_native_System_IO_Ports_SerialPort::FIELD___portIndex]
+                 .NumericByRef()
+                 .s4);
+        if (UsartDeviceNumber >= 0)
         {
-            DeInitUSART(UsartDeviceNumber);
+            SerialIO::Dispose(UsartDeviceNumber);
         }
         else
         {
@@ -63,10 +56,15 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::get_BytesToRead___
 {
     NANOCLR_HEADER();
     {
-        int UsartDeviceNumber;
-        if ((UsartDeviceNumber = GetUsartDeviceNumber(stack)) > 0)
+        FAULT_ON_NULL(stack.This());
+        FAULT_ON_OBJECT_DISPOSED(stack.This()[FIELD___disposed].NumericByRef().u1);
+        CLR_INT32 UsartDeviceNumber =
+            ((int)stack.This()[Library_sys_io_ser_native_System_IO_Ports_SerialPort::FIELD___portIndex]
+                 .NumericByRef()
+                 .s4);
+        if (UsartDeviceNumber >= 0)
         {
-            int bytesAvailable = SerialBytesAvailable(UsartDeviceNumber);
+            int bytesAvailable = SerialIO::BytesAvailable(UsartDeviceNumber);
             stack.SetResult_U4(bytesAvailable);
         }
         else
@@ -81,11 +79,16 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::set_InvertSignalLe
 {
     NANOCLR_HEADER();
     {
-        int UsartDeviceNumber;
-        if ((UsartDeviceNumber = GetUsartDeviceNumber(stack)) > 0)
+        FAULT_ON_NULL(stack.This());
+        FAULT_ON_OBJECT_DISPOSED(stack.This()[FIELD___disposed].NumericByRef().u1);
+        CLR_INT32 UsartDeviceNumber =
+            ((int)stack.This()[Library_sys_io_ser_native_System_IO_Ports_SerialPort::FIELD___portIndex]
+                 .NumericByRef()
+                 .s4);
+        if (UsartDeviceNumber >= 0)
         {
-            bool InvertedSignal = (bool)stack.Arg1().NumericByRef().u1;
-            SetSerialDeviceSignalsInverted(UsartDeviceNumber, InvertedSignal);
+            bool InvertSignal = (bool)stack.Arg1().NumericByRef().u1;
+            SerialIO::InvertSignalLevels(UsartDeviceNumber, InvertSignal);
         }
         else
         {
@@ -98,10 +101,15 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::get_InvertSignalLe
 {
     NANOCLR_HEADER();
     {
-        int UsartDeviceNumber;
-        if ((UsartDeviceNumber = GetUsartDeviceNumber(stack)) > 0)
+        FAULT_ON_NULL(stack.This());
+        FAULT_ON_OBJECT_DISPOSED(stack.This()[FIELD___disposed].NumericByRef().u1);
+        CLR_INT32 UsartDeviceNumber =
+            ((int)stack.This()[Library_sys_io_ser_native_System_IO_Ports_SerialPort::FIELD___portIndex]
+                 .NumericByRef()
+                 .s4);
+        if (UsartDeviceNumber >= 0)
         {
-            bool result = IsSerialSignalInverted(UsartDeviceNumber);
+            bool result = SerialIO::GetSignalLevels(UsartDeviceNumber);
             stack.SetResult_Boolean(result);
         }
         else
@@ -123,13 +131,18 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::Read___I4__SZARRAY
         uint32_t offset = 0;
         uint32_t bytesToRead = 0;
         uint32_t bytesRead = 0;
-
         CLR_INT32 timeout;
         int64_t *timeoutTicks;
         bool eventResult;
 
-        int UsartDeviceNumber;
-        if ((UsartDeviceNumber = GetUsartDeviceNumber(stack)) > 0)
+        FAULT_ON_NULL(stack.This());
+        FAULT_ON_OBJECT_DISPOSED(stack.This()[FIELD___disposed].NumericByRef().u1);
+        CLR_INT32 UsartDeviceNumber =
+            ((int)stack.This()[Library_sys_io_ser_native_System_IO_Ports_SerialPort::FIELD___portIndex]
+                 .NumericByRef()
+                 .s4);
+
+        if (UsartDeviceNumber >= 0)
         {
             timeout = stack.This()[FIELD___readTimeout].NumericByRef().s4;
             hbTimeout.SetInteger((CLR_INT64)timeout * TIME_CONVERSION__TO_MILLISECONDS);
@@ -151,7 +164,7 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::Read___I4__SZARRAY
                 }
             }
             data = dataBuffer->GetElement(offset);
-            bytesToRead = SerialBytesAvailable(UsartDeviceNumber);
+            bytesToRead = SerialIO::BytesAvailable(UsartDeviceNumber);
             if (bytesToRead > 0)
             {
                 eventResult = false;
@@ -195,7 +208,7 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::Read___I4__SZARRAY
             if (bytesToRead > 0)
             {
                 // pop the requested bytes from the ring buffer
-                bytesRead = SerialReadBytes(UsartDeviceNumber, data, bytesToRead);
+                bytesRead = SerialIO::ReadBytes(UsartDeviceNumber, data, bytesToRead);
             }
             // pop "hbTimeout" heap block from stack
             stack.PopValue();
@@ -217,10 +230,16 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::ReadExisting___STR
         uint32_t bufferLength;
         CLR_RT_HeapBlock &top = stack.PushValue();
 
-        int UsartDeviceNumber;
-        if ((UsartDeviceNumber = GetUsartDeviceNumber(stack)) > 0)
+        FAULT_ON_NULL(stack.This());
+        FAULT_ON_OBJECT_DISPOSED(stack.This()[FIELD___disposed].NumericByRef().u1);
+
+        CLR_INT32 UsartDeviceNumber =
+            ((int)stack.This()[Library_sys_io_ser_native_System_IO_Ports_SerialPort::FIELD___portIndex]
+                 .NumericByRef()
+                 .s4);
+        if (UsartDeviceNumber >= 0)
         {
-            bufferLength = SerialBytesAvailable(UsartDeviceNumber);
+            bufferLength = SerialIO::BytesAvailable(UsartDeviceNumber);
             if (bufferLength)
             {
                 // Create a read buffer to store the input data
@@ -228,7 +247,7 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::ReadExisting___STR
                 {
                     NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_MEMORY);
                 }
-                SerialReadBytes(UsartDeviceNumber, buffer, bufferLength);
+                SerialIO::ReadBytes(UsartDeviceNumber, buffer, bufferLength);
                 NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance(top, (const char *)buffer, bufferLength));
                 platform_free(buffer);
             }
@@ -250,15 +269,20 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::ReadLine___STRING(
     NANOCLR_HEADER();
     {
         CLR_RT_HeapBlock hbTimeout;
-        uint8_t *line = NULL;
-        const char *newLine;
+        char *line = NULL;
+        char *newLine;
         uint32_t newLineLength;
         int64_t *timeoutTicks;
         bool eventResult = true;
         CLR_INT32 timeout;
+        FAULT_ON_NULL(stack.This());
+        FAULT_ON_OBJECT_DISPOSED(stack.This()[FIELD___disposed].NumericByRef().u1);
 
-        int UsartDeviceNumber;
-        if ((UsartDeviceNumber = GetUsartDeviceNumber(stack)) > 0)
+        CLR_INT32 UsartDeviceNumber =
+            ((int)stack.This()[Library_sys_io_ser_native_System_IO_Ports_SerialPort::FIELD___portIndex]
+                 .NumericByRef()
+                 .s4);
+        if (UsartDeviceNumber >= 0)
         {
             timeout = stack.This()[FIELD___readTimeout].NumericByRef().s4;
             hbTimeout.SetInteger((CLR_INT64)timeout * TIME_CONVERSION__TO_MILLISECONDS);
@@ -267,10 +291,10 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::ReadLine___STRING(
             bool ValidateParametersOnInitialCall = (stack.m_customState == 1);
             if (ValidateParametersOnInitialCall)
             {
-                newLine = stack.This()[FIELD___newLine].RecoverString();
+                newLine = (char *)stack.This()[FIELD___newLine].RecoverString();
                 newLineLength = hal_strlen_s(newLine);
 
-                bool IsLineRead = SerialReadLine(UsartDeviceNumber, newLine, newLineLength, line);
+                bool IsLineRead = SerialIO::ReadLine(UsartDeviceNumber, newLine, newLineLength, line);
 
                 if (IsLineRead)
                 {
@@ -293,7 +317,7 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::ReadLine___STRING(
                         .WaitEvents(stack.m_owningThread, *timeoutTicks, Event_SerialPortIn, eventResult));
                 if (eventResult)
                 {
-                    //GetLineFromRxBuffer(stack.This(), &(palUart->RxRingBuffer), line);
+                    // GetLineFromRxBuffer(stack.This(), &(palUart->RxRingBuffer), line);
                     break;
                 }
                 else
@@ -330,14 +354,19 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::Write___VOID__SZAR
         CLR_RT_HeapBlock hbTimeout;
         int64_t *timeoutTicks;
         bool eventResult = true;
-
         uint8_t *data;
         int32_t length = 0;
         int32_t count = 0;
         int32_t offset = 0;
 
-        int UsartDeviceNumber;
-        if ((UsartDeviceNumber = GetUsartDeviceNumber(stack)) > 0)
+        FAULT_ON_NULL(stack.This());
+        FAULT_ON_OBJECT_DISPOSED(stack.This()[FIELD___disposed].NumericByRef().u1);
+
+        CLR_INT32 UsartDeviceNumber =
+            ((int)stack.This()[Library_sys_io_ser_native_System_IO_Ports_SerialPort::FIELD___portIndex]
+                 .NumericByRef()
+                 .s4);
+        if (UsartDeviceNumber >= 0)
         {
             // setup timeout
             hbTimeout.SetInteger(
@@ -374,14 +403,15 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::Write___VOID__SZAR
                 // push onto the eval stack how many bytes are being pushed to the UART
                 stack.PushValueI4(count);
 
-                SerialWriteBytes(UsartDeviceNumber, data, count);
+                SerialIO::WriteBytes(UsartDeviceNumber, data, count);
                 // bump custom state
                 stack.m_customState = 2;
             }
 
             while (eventResult)
             {
-                // non-blocking wait allowing other threads to run while we wait for the Tx operation to complete
+                // non-blocking wait allowing other threads to run while we wait for the Tx operation to
+                // complete
                 NANOCLR_CHECK_HRESULT(
                     g_CLR_RT_ExecutionEngine
                         .WaitEvents(stack.m_owningThread, *timeoutTicks, Event_SerialPortOut, eventResult));
@@ -420,19 +450,28 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::NativeConfig___VOI
 {
     NANOCLR_HEADER();
     {
-        int UsartDeviceNumber;
-        if ((UsartDeviceNumber = GetUsartDeviceNumber(stack)) > 0)
+        FAULT_ON_NULL(stack.This());
+        FAULT_ON_OBJECT_DISPOSED(stack.This()[FIELD___disposed].NumericByRef().u1);
+
+        CLR_INT32 usartDeviceNumber =
+            (stack.This()[Library_sys_io_ser_native_System_IO_Ports_SerialPort::FIELD___portIndex].NumericByRef().s4);
+        CLR_INT32 RequestedBaudRate = stack.This()[FIELD___baudRate].NumericByRef().s4;
+        CLR_INT32 RequestedStopBits = stack.This()[FIELD___stopBits].NumericByRef().s4;
+        CLR_INT32 RequestedDataBits = stack.This()[FIELD___dataBits].NumericByRef().s4;
+        CLR_INT32 RequestedParity = stack.This()[FIELD___parity].NumericByRef().s4;
+
+        Handshake RequestedHandshake = (Handshake)stack.This()[FIELD___handshake].NumericByRef().s4;
+        SerialMode RequestedMode = (SerialMode)stack.This()[FIELD___mode].NumericByRef().s4;
+
+        if (IsValidSerialBus(usartDeviceNumber))
         {
-            // Check RS485 mode is not selected as currently not supported
-            if ((SerialMode)stack.This()[FIELD___mode].NumericByRef().s4 != SerialMode_Normal)
+            if (RequestedMode != SerialMode::SerialMode_Normal)
             {
                 NANOCLR_SET_AND_LEAVE(CLR_E_NOTIMPL);
             }
-            int RequestedStopBits = stack.This()[FIELD___stopBits].NumericByRef().s4;
-            int RequestedBaudRate = (int)stack.This()[FIELD___baudRate].NumericByRef().s4;
-
-            SerialSetStopBits(UsartDeviceNumber, RequestedStopBits);
-            SerialSetBaudRate(UsartDeviceNumber,RequestedBaudRate);
+            SerialIO::SetConfig(usartDeviceNumber, RequestedStopBits, RequestedDataBits, RequestedParity);
+            SerialIO::SetBaudRate(usartDeviceNumber, RequestedBaudRate);
+            SerialIO::SetHandshake(usartDeviceNumber, RequestedHandshake);
         }
         else
         {
@@ -445,11 +484,17 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::NativeSetWatchChar
 {
     NANOCLR_HEADER();
     {
-        int UsartDeviceNumber;
-        if ((UsartDeviceNumber = GetUsartDeviceNumber(stack)) > 0)
+        FAULT_ON_NULL(stack.This());
+        FAULT_ON_OBJECT_DISPOSED(stack.This()[FIELD___disposed].NumericByRef().u1);
+
+        CLR_INT32 UsartDeviceNumber =
+            ((int)stack.This()[Library_sys_io_ser_native_System_IO_Ports_SerialPort::FIELD___portIndex]
+                 .NumericByRef()
+                 .s4);
+        if (UsartDeviceNumber >= 0)
         {
             uint8_t watchCharacter = (uint8_t)stack.This()[FIELD___watchChar].NumericByRef().u1;
-            SerialSetWatchCharacter(UsartDeviceNumber,watchCharacter);
+            SerialIO::SetWatchCharacter(UsartDeviceNumber, watchCharacter);
         }
         else
         {
@@ -466,14 +511,19 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::NativeWriteString_
         CLR_RT_HeapBlock hbTimeout;
         int64_t *timeoutTicks;
         bool eventResult = true;
-
         bool isNewAllocation = false;
         char *buffer = NULL;
         uint32_t bufferLength = 0;
         int32_t length = 0;
 
-        int UsartDeviceNumber;
-        if ((UsartDeviceNumber = GetUsartDeviceNumber(stack)) > 0)
+        FAULT_ON_NULL(stack.This());
+        FAULT_ON_OBJECT_DISPOSED(stack.This()[FIELD___disposed].NumericByRef().u1);
+
+        CLR_INT32 UsartDeviceNumber =
+            ((int)stack.This()[Library_sys_io_ser_native_System_IO_Ports_SerialPort::FIELD___portIndex]
+                 .NumericByRef()
+                 .s4);
+        if (UsartDeviceNumber >= 0)
         {
             if (stack.Arg1().RecoverString() == NULL)
             {
@@ -492,13 +542,14 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::NativeWriteString_
                 NANOCLR_CHECK_HRESULT(SetupWriteLine(stack, &buffer, &bufferLength, &isNewAllocation));
                 stack.PushValueI4(bufferLength);
                 stack.PushValueI4(isNewAllocation ? 1 : 0);
-                SerialWriteBytes(UsartDeviceNumber, (uint8_t *)&buffer, bufferLength);
+                SerialIO::WriteBytes(UsartDeviceNumber, (uint8_t *)&buffer, bufferLength);
                 stack.m_customState = 2;
             }
 
             while (eventResult)
             {
-                // non-blocking wait allowing other threads to run while we wait for the Tx operation to complete
+                // non-blocking wait allowing other threads to run while we wait for the Tx operation to
+                // complete
                 NANOCLR_CHECK_HRESULT(
                     g_CLR_RT_ExecutionEngine
                         .WaitEvents(stack.m_owningThread, *timeoutTicks, Event_SerialPortOut, eventResult));
@@ -534,7 +585,7 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::NativeWriteString_
             // free memory, if it was allocated
             if (isNewAllocation)
             {
-                //platform_free(palUart->TxBuffer);
+                // platform_free(palUart->TxBuffer);
             }
         }
         else
@@ -549,23 +600,29 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::NativeReceivedByte
 {
     NANOCLR_HEADER();
     {
-        int UsartDeviceNumber;
-        if ((UsartDeviceNumber = GetUsartDeviceNumber(stack)) > 0)
+        FAULT_ON_NULL(stack.This());
+        FAULT_ON_OBJECT_DISPOSED(stack.This()[FIELD___disposed].NumericByRef().u1);
+
+        CLR_INT32 UsartDeviceNumber =
+            ((int)stack.This()[Library_sys_io_ser_native_System_IO_Ports_SerialPort::FIELD___portIndex]
+                 .NumericByRef()
+                 .s4);
+        if (UsartDeviceNumber >= 0)
         {
             int32_t RequestedThreshold = (int32_t)stack.Arg1().NumericByRef().s4;
             if (RequestedThreshold <= 0)
             {
                 NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_RANGE);
             }
-            int32_t thresholdSet = SerialSetThreshold(UsartDeviceNumber, RequestedThreshold);
+            int32_t thresholdSet = SerialIO::SetReceiveThreshold(UsartDeviceNumber, RequestedThreshold);
             stack.This()[FIELD___receivedBytesThreshold].NumericByRef().s4 = thresholdSet;
-        //    // fake call to event handler in case port is open and the new threshold was set
-        //    // to a value lower than the bytes that are already available
-        //    if (stack.This()[FIELD___opened].NumericByRef().u1 &&
-        //        (uint32_t)RequestedThreshold <= palUart->RxRingBuffer.Length())
-        //    {
-        //        PostManagedEvent(EVENT_SERIAL, 0, portIndex, SerialData_Chars);
-        //    }
+            //    // fake call to event handler in case port is open and the new threshold was set
+            //    // to a value lower than the bytes that are already available
+            //    if (stack.This()[FIELD___opened].NumericByRef().u1 &&
+            //        (uint32_t)RequestedThreshold <= palUart->RxRingBuffer.Length())
+            //    {
+            //        PostManagedEvent(EVENT_SERIAL, 0, portIndex, SerialData_Chars);
+            //    }
         }
         else
         {
@@ -577,28 +634,18 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::NativeReceivedByte
 HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::GetDeviceSelector___STATIC__STRING(
     CLR_RT_StackFrame &stack)
 {
+    // Return array of serial port names for the current computer
     NANOCLR_HEADER();
     {
-        // declare the device selector string whose max size is "COM1,COM2,COM3,COM4,COM5,COM6,COM7,COM8," + terminator
-        // and init with the terminator
-        static char deviceSelectorString[] = {
+        FAULT_ON_NULL(stack.This());
+        FAULT_ON_OBJECT_DISPOSED(stack.This()[FIELD___disposed].NumericByRef().u1);
 
-            "COM1,"
-            "COM2,"
-            "COM3,"
-            "COM4,"
-            "COM5,"
-            "COM6,"
-            "COM7,"
-            "COM8,"
-            "COM9,"
-            "COM10"};
-
-        if (deviceSelectorString[hal_strlen_s(deviceSelectorString) - 1] == ',')
-        {
-            deviceSelectorString[hal_strlen_s(deviceSelectorString) - 1] = '\0';
-        }
-        stack.SetResult_String(deviceSelectorString);
+        CLR_INT32 UsartDeviceNumber =
+            ((int)stack.This()[Library_sys_io_ser_native_System_IO_Ports_SerialPort::FIELD___portIndex]
+                 .NumericByRef()
+                 .s4);
+        char *deviceSelectorString = SerialIO::GetDevice(UsartDeviceNumber);
+        stack.SetResult_String((const char *)deviceSelectorString);
     }
-    NANOCLR_NOCLEANUP_NOLABEL();
+    NANOCLR_NOCLEANUP();
 }

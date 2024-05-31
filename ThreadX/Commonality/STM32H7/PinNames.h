@@ -2,7 +2,7 @@
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 
- enum
+typedef enum PinNameValues
 {
     PA0 = 0,
     PA1 = 1,
@@ -180,4 +180,4 @@
     PK13 = 173,
     PK14 = 174,
     PK15 = 175
-};
+} PinNameValue;

@@ -21,7 +21,7 @@
 
  FetchContent_Populate(stm32u5_ll)
 
-# LL Sources
+# Common
      list(APPEND STM32U5_INCLUDES 
              ${STM32U5_CUBE_SOURCE}/Drivers/BSP/Components/Common
              ${STM32U5_CUBE_SOURCE}/Drivers/CMSIS/Device/ST/STM32U5xx/Include

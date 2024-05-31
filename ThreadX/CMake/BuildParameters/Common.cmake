@@ -9,19 +9,19 @@ target_link_options(nanoCLR.elf PUBLIC "-T${CMAKE_SOURCE_DIR}/targets-community/
 set_target_properties(nanoCLR.elf PROPERTIES LINK_DEPENDS "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_BOARD}/Linker_script.ld")
 
 
-if(FILE_SYSTEM_SD OR FILE_SYSTEM_NAND OR FILE_SYSTEM_NOR OR FILE_SYSTEM_RAM)
+if(FILEX_SYSTEM_SD OR FILEX_SYSTEM_NAND OR FILEX_SYSTEM_NOR OR FILEX_SYSTEM_RAM)
       target_compile_definitions(nanoCLR.elf PUBLIC -DFILEX=TRUE)
-    if(FILEX_SD)
-          target_compile_definitions(nanoCLR.elf PUBLIC -DFILE_SYSTEM_SD=TRUE)
+    if(FILEX_SYSTEM_SD)
+          target_compile_definitions(nanoCLR.elf PUBLIC -DFILEX_SYSTEM_SD=TRUE)
     endif()
-    if(FILEX_NAND)
-          target_compile_definitions(nanoCLR.elf PUBLIC -DFILE_SYSTEM_NAND=TRUE)
+    if(FILEX_SYSTEM_NAND)
+          target_compile_definitions(nanoCLR.elf PUBLIC -DFILEX_SYSTEM_NAND=TRUE)
     endif()
-    if(FILE_SYSTEM_NOR)
-          target_compile_definitions(nanoCLR.elf PUBLIC -DFILE_SYSTEM_NOR=TRUE)
+    if(FILEX_SYSTEM_NOR)
+          target_compile_definitions(nanoCLR.elf PUBLIC -DFILEX_SYSTEM_NOR=TRUE)
     endif()
-    if(FILE_SYSTEM_RAM)
-          target_compile_definitions(nanoCLR.elf PUBLIC -DFILE_SYSTEM_RAM=TRUE)
+    if(FILEX_SYSTEM_RAM)
+          target_compile_definitions(nanoCLR.elf PUBLIC -DFILEX_SYSTEM_RAM=TRUE)
     endif()
 endif()
 
@@ -54,9 +54,7 @@ target_compile_definitions(nanoCLR.elf PUBLIC -DHAL_USE_WDG=FALSE)
 target_compile_definitions(nanoCLR.elf PUBLIC -DPLATFORM_HAS_RNG=${RANDOM_NUMBER_GENERATOR})
 target_compile_definitions(nanoCLR.elf PUBLIC -DPLATFORM_NO_CLR_TRACE)
 
-
 target_compile_definitions(nanoCLR.elf PUBLIC -DNANOCLR_GRAPHICS=${GRAPHICS_SUPPORT})
-
 
 # Split BUILD_VERSION into VERSION_MAJOR;VERSION_MINOR;VERSION_BUILD;VERSION_REVISION 
 string(REPLACE "." " " BUILD_VERSION_SPACED ${BUILD_VERSION})
@@ -77,7 +75,6 @@ target_compile_definitions(nanoCLR.elf PUBLIC -DPLATFORMNAMESTRING=\"${TARGET_FA
 SET(OEM "nanoCLR running ${TARGET_BOARD}")
 target_compile_definitions(nanoCLR.elf PUBLIC -DOEMSYSTEMINFOSTRING=\"${OEM}\")
 
-
 # !!!!!!!!!! NOTE
 # Set build type here as buildpresets, inherits in CMakePresets.json does not appear to be working
 set(CMAKE_BUILD_TYPE "Debug")
@@ -88,18 +85,12 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDe
     target_compile_definitions(nanoCLR.elf PUBLIC -DNANOCLR_ENABLE_SOURCELEVELDEBUGGING)
 endif()
 
-
-
-
 add_custom_command(TARGET nanoCLR.elf POST_BUILD
       COMMAND ${CMAKE_OBJCOPY}           $<TARGET_FILE:nanoCLR.elf>   ${CMAKE_BINARY_DIR}/nanoCLR.elf
       COMMAND ${CMAKE_OBJCOPY} -Oihex    $<TARGET_FILE:nanoCLR.elf>   nanoCLR.hex
       COMMAND ${CMAKE_OBJCOPY} -Obinary  $<TARGET_FILE:nanoCLR.elf>   nanoCLR.bin
       COMMAND ${CMAKE_OBJDUMP} -d -EL -S $<TARGET_FILE:nanoCLR.elf> > nanoCLR.lst
 )
-
-
-
 
 # --------
 # ADVANCED

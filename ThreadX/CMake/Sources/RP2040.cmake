@@ -65,6 +65,7 @@
              ${PICO_SDK_SOURCE}/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/include
              ${PICO_SDK_SOURCE}/src/rp2_common/pico_float/include
              ${PICO_SDK_SOURCE}/src/rp2_common/pico_int64_ops/include
+             ${PICO_SDK_SOURCE}/src/rp2_common/pico_i2c_slave/include
              ${PICO_SDK_SOURCE}/src/rp2_common/pico_malloc/include
              ${PICO_SDK_SOURCE}/src/rp2_common/pico_multicore/include
              ${PICO_SDK_SOURCE}/src/rp2_common/pico_platform/include
@@ -130,6 +131,7 @@
              ${PICO_SDK_SOURCE}/src/rp2_common/pico_float/float_math.c
              ${PICO_SDK_SOURCE}/src/rp2_common/pico_float/float_v1_rom_shim.S
              ${PICO_SDK_SOURCE}/src/rp2_common/pico_int64_ops/pico_int64_ops_aeabi.S
+             ${PICO_SDK_SOURCE}/src/rp2_common/pico_i2c_slave/i2c_slave.c
              ${PICO_SDK_SOURCE}/src/rp2_common/pico_malloc/pico_malloc.c
              ${PICO_SDK_SOURCE}/src/rp2_common/pico_mem_ops/mem_ops_aeabi.S
              ${PICO_SDK_SOURCE}/src/rp2_common/pico_multicore/multicore.c
@@ -155,4 +157,8 @@
 
 # Overide compile flags on selected files
   set_source_files_properties(${PICO_SDK_SOURCE}/src/rp2_common/pico_platform/include/pico/platform.h COMPILE_FLAGS -std=gnu++17)
-  set_source_files_properties(${PICO_SDK_SOURCE}/src/common/pico_sync/sem.c COMPILE_FLAGS -std=gnu++17)
+  set_source_files_properties(${PICO_SDK_SOURCE}/src/rp2_common/pico_multicore/multicore.c COMPILE_FLAGS -std=gnu17)
+  set_source_files_properties(${PICO_SDK_SOURCE}/src/common/pico_sync/sem.c COMPILE_FLAGS -std=gnu17)
+  set_source_files_properties(${PICO_SDK_SOURCE}/lib/tinyusb/src/portable/raspberrypi/rp2040/rp2040_usb.c COMPILE_FLAGS -std=gnu17)
+  set_source_files_properties(${PICO_SDK_SOURCE}/lib/tinyusb/src/portable/raspberrypi/rp2040/dcd_rp2040.c COMPILE_FLAGS -std=gnu17)
+

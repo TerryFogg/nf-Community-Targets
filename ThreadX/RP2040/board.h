@@ -8,8 +8,21 @@
 #include <nanoCLR_Headers.h>
 #include "tx_port.h"
 #include "tx_api.h"
+#include "tx_adaption.h"
+
 #include "boards/pico.h"
 
+#include "hardware/adc.h"
+#include <hardware/gpio.h>
+
+#include "hardware/i2c.h"
+#include "hardware/irq.h"
+#include "hardware/pwm.h"
+#include "pico/i2c_slave.h"
+#include "hardware/spi.h"
+#include "hardware/sync.h"
+#include "hardware/uart.h"
+#include "pico/binary_info.h"
 
 // Board Leds and buttons
 #define LED_PIN       PICO_DEFAULT_LED_PIN

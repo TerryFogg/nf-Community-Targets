@@ -80,7 +80,7 @@ extern "C"
 {
 #endif
 
-#ifdef FILE_SYSTEM_SD
+#if defined(FILEX_SYSTEM_SD)
     void Sd_Driver(FX_MEDIA *media_ptr);
     bool GetCardState(int SDBus_index);
     bool ReadSD(
@@ -97,7 +97,7 @@ extern "C"
         int number_of_blocks);
 #endif
 
-#ifdef FILE_SYSTEM_NAND
+#if defined(FILEX_SYSTEM_NAND)
     void Nand_Driver(FX_MEDIA *media_ptr);
     void ReadNAND(
         int NANDStore_index,
@@ -112,7 +112,7 @@ extern "C"
         int number_of_blocks);
 #endif
 
-#ifdef FILE_SYSTEM_NOR
+#if defined(FILEX_SYSTEM_NOR)
     void Nor_Driver(FX_MEDIA *media_ptr);
     void ReadNOR(
         int NORStore_index,
@@ -129,7 +129,7 @@ extern "C"
         int number_of_blocks);
 #endif
 
-#ifdef FILE_SYSTEM_RAM
+#if defined(FILEX_SYSTEM_RAM)
     void Ram_Driver( FX_MEDIA *media_ptr);
     void ReadRAM(
         int RAMStore_index,

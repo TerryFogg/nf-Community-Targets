@@ -62,8 +62,6 @@ void nanoHAL_Initialize()
 
     Events_Initialize();
 
-    CPU_GPIO_Initialize();
-
     // Initialise Network Stack
     Network_Initialize();
 }
@@ -73,7 +71,7 @@ void nanoHAL_Uninitialize(bool isPoweringDown)
     (void)isPoweringDown;
     SOCKETS_CloseConnections();
     BlockStorageList_UnInitializeDevices();
-    CPU_GPIO_Uninitialize();
+
     Events_Uninitialize();
     HAL_CONTINUATION::Uninitialize();
     HAL_COMPLETION::Uninitialize();

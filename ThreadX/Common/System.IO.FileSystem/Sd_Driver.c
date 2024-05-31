@@ -2,9 +2,10 @@
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
-
 #include "File_Drivers.h"
 #include "board.h"
+
+typedef signed int CLR_INT32;
 
 // NOTE: 
 //------
@@ -19,9 +20,9 @@ UINT _fx_partition_offset_calculate(
 
 #define FX_SD_DEFAULT_TIMEOUT (10 * TX_TIMER_TICKS_PER_SECOND)
 
-bool check_sd_status(uint32_t SDBus_index)
+bool check_sd_status(CLR_INT32 SDBus_index)
 {
-    uint32_t start = HAL_Time_CurrentSysTicks();
+    CLR_INT32 start = HAL_Time_CurrentSysTicks();
 
     while (HAL_Time_CurrentSysTicks() - start < FX_SD_DEFAULT_TIMEOUT)
     {
@@ -38,7 +39,7 @@ void Sd_Driver(FX_MEDIA *media_ptr)
     ULONG partition_start;
     ULONG partition_size;
 
-    uint32_t SDBus_index = (uint32_t)media_ptr->fx_media_driver_info;
+    CLR_INT32 SDBus_index = (CLR_INT32)media_ptr->fx_media_driver_info;
 
     if (check_sd_status(SDBus_index) != 0)
     {

@@ -81,8 +81,21 @@ endif()
 
 
 ## Link Options
-target_link_options(nanoCLR.elf PUBLIC "--specs=nano.specs")
+# Add semihosting if selected
 target_link_options(nanoCLR.elf PUBLIC "--specs=nosys.specs")
+if( NOT SEMIHOSTING)
+##target_link_options(nanoCLR.elf PUBLIC "--specs=nano.specs")
+target_link_options(nanoCLR.elf PUBLIC "--specs=nosys.specs")
+else()
+    MESSAGE(STATUS "Enable the 'Remote Dispatch Interface Monitor'")
+    # use newlib library
+    target_compile_options(nanoCLR.elf PUBLIC -specs=rdimon.specs)
+    target_link_libraries(nanoCLR.elf PUBLIC -lc -lrdimon)
+
+    target_compile_definitions(nanoCLR.elf PUBLIC -DSEMIHOSTING)
+endif()
+
+
 target_link_options(nanoCLR.elf PUBLIC "-mthumb")
 target_link_options(nanoCLR.elf PUBLIC "-mcpu=cortex-m7")
 target_link_options(nanoCLR.elf PUBLIC "-mfpu=fpv5-sp-d16")

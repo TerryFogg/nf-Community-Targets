@@ -15,7 +15,7 @@ So we need additional copies of openocd from STMicroelectronics and RaspberryPi.
 
 #### Release binaries for the official windows can be found at https://github.com/openocd-org/openocd/releases
 
- ---
+---
 
 ### Debugging with Visual Studio 17.7.6 requires the following files in the ```C:\nf-interpreter\.vs```  directory.
 
@@ -382,7 +382,7 @@ So we need additional copies of openocd from STMicroelectronics and RaspberryPi.
 You can get a better understanding of problems that may be occuring with the gdb/openocd debug setup.
 In Visual Studio select the Command Window Ctrl+Alt+A, and turn on debug logging with the following command.
 
-`debug.midebuglog /On:c:\Temp\debug.log`
+``debug.midebuglog /On:c:\Temp\debug.log``
 
 Run a debugging session to collect data and turn it off with the following command.
 

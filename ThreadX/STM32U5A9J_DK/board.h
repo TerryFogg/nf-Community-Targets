@@ -20,7 +20,7 @@
 #include "tx_port.h"
 #include "core_cm33.h"
 #include "stm32u5xx_hal_cortex.h"
-#include "tx_adaption.h"
+#include "target_platform.h"
 
 //#include <stdarg.h>
 //#include <stdio.h>
@@ -288,7 +288,6 @@ extern "C"
     void LTDCClock_Config(void);
     int GetCurrentMilliseconds();
     void InitOneMillisecondTick();
-    void DelayMilliseconds(int milliseconds);
 
 #ifdef __cplusplus
 }

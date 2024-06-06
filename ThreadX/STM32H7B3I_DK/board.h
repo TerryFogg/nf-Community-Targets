@@ -7,7 +7,7 @@
 
 #include "tx_api.h"
 #include "tx_port.h"
-#include "tx_adaption.h"
+#include "target_platform.h"
 #include "stm32h7xx.h"
 #include "stm32h7xx_ll.h"
 
@@ -19,7 +19,7 @@
 
 #pragma region Byte pool configuration and definitions
 #define DEFAULT_BYTE_POOL_SIZE     16000
-#define CLR_THREAD_STACK_SIZE      6000
+#define CLR_THREAD_STACK_SIZE      4096
 #define RECEIVER_THREAD_STACK_SIZE 4096
 #pragma endregion
 
@@ -342,7 +342,8 @@ extern "C"
     void Initialize_Board();
     void InitializeDevicePins();
     void Initialize_DWT_Counter();
-    void Initialize_Board_LEDS_And_Buttons();
+    void Initialize_Board_LEDS();
+    void Initialize_Board_Buttons();
     void Initialize_SDRAM(uint32_t base_address, uint32_t sdram_region_size);
     void Initialize_64bit_timer();
     void CPU_CACHE_Enable(void);
@@ -355,9 +356,8 @@ extern "C"
     void PeriphCommonClock_Config(void);
     void LTDCClock_Config(void);
 
-    int GetCurrentMilliseconds();
-    void InitOneMillisecondTick();
-    void DelayMilliseconds(int milliseconds);
+    uint64_t Get100nsTimerValue();
+    void Initialize64bit100nsTimer();
 
 #ifdef __cplusplus
 }

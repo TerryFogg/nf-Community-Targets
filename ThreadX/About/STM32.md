@@ -1,6 +1,8 @@
-# Getting Started with STM32 - Working with ADC and DMA
+# STM32
 
 
+
+## Getting Started with STM32 - Working with ADC and DMA
 
 One of the most common peripherals on many modern microcontrollers is the analog-to-digital converter (ADC). These embedded devices read an analog voltage (usually somewhere between 0 V and the given reference voltage) and report it as a binary value. The exact implementation of the ADC can change among STM32 chips, as some use the [successive-approximation register (SAR)](https://en.wikipedia.org/wiki/Successive_approximation_ADC) technique while others rely on [sigma-delta modulation](https://en.wikipedia.org/wiki/Delta-sigma_modulation) for more resolution (but lower speeds). Make sure you check your datasheet to find out which ADC is in your particular chip!
 

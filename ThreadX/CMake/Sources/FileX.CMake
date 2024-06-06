@@ -14,7 +14,7 @@
 	    FetchContent_Populate(fileX)
  
 #Per Core
-        if(${ARM_PROCESSOR} STREQUAL "Cortex-M0")
+        if(${ARM_PROCESSOR} STREQUAL "cortex-m0plus" OR ${ARM_PROCESSOR} STREQUAL "cortex-m0")
             list(APPEND OPTIONAL_INCLUDES 
                 ${FILEX_SOURCE}/ports/cortex_m0/gnu/inc
             )

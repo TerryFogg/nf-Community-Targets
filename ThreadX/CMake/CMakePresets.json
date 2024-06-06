@@ -19,6 +19,14 @@
             }
         },
         {
+            "name": "SEMIHOSTING",
+            "description": "Variable to allow inclusion of semihosting code for printf etc across debug wire",
+            "hidden": true,
+            "cacheVariables": {
+                "SEMIHOSTING": true
+            }
+        },
+        {
             "name": "DEBUG",
             "description": "This is non-optimized and contains all the debug symbols",
             "hidden": true,
@@ -51,12 +59,21 @@
             }
         },
         {
+            "name": "LIGHT_MATHEMATICS",
+            "description": "Configuration for setting up what hardware/software support for mathematics",
+            "hidden": true,
+            "cacheVariables": {
+                "NF_FEATURE_LIGHT_MATH": true,
+                "DP_FLOATINGPOINT": false
+            }
+        },
+        {
             "name": "FULL_MATHEMATICS",
             "description": "Configuration for setting up what hardware/software support for mathematics",
             "hidden": true,
             "cacheVariables": {
-                "NF_FEATURE_LIGHT_MATH": "false",
-                "DP_FLOATINGPOINT": "true"
+                "NF_FEATURE_LIGHT_MATH": false,
+                "DP_FLOATINGPOINT": true
             }
         },
         {
@@ -69,7 +86,6 @@
                 "RTOS": "ThreadX",
                 "COMMUNITY_TARGET": "ThreadX",
                 "CMAKE_SYSTEM_NAME": "Generic",
-                "CMAKE_SYSTEM_PROCESSOR": "ARM",
                 "CMAKE_TRY_COMPILE_TARGET_TYPE": "STATIC_LIBRARY",
                 "CMAKE_C_COMPILER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc.exe",
                 "CMAKE_CXX_COMPILER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-g++.exe",
@@ -95,13 +111,33 @@
                 "TARGET_BOARD": "STM32H735G_DK",
                 "TARGET_FAMILY": "STM32H7",
                 "TARGET_SERIES": "STM32H735xx",
-                "ARM_PROCESSOR": "Cortex-M7",
+                "ARM_PROCESSOR": "cortex-m7",
+
                 "BUILD_VERSION": "1.0.0.0",
                 "INFOSTRING": "Built with ThreadX 6.1.12",
                 "HAS_A_USER_BUTTON": true,
-                "GRAPHICS_SUPPORT": "true",
-                "TOUCH_DISPLAY_SUPPORT": "true",
-                "RANDOM_NUMBER_GENERATOR": "true"
+                "HAS_CONFIG_BLOCK": false,
+                "RANDOM_NUMBER_GENERATOR": true,
+                "NANOCLR_SYSTEM_COLLECTIONS": true,
+                "NANOCLR_REFLECTION": true,
+                "REALTIME_CLOCK": false,
+                "WATCHDOG": false,
+                "ADVANCED_PROFILING": false,
+
+                "GRAPHICS_SUPPORT": true,
+                "TOUCH_DISPLAY_SUPPORT": true,
+
+                "FILEX_SYSTEM_SD": true,
+                "FILEX_SYSTEM_NAND": false,
+                "FILEX_SYSTEM_NOR": false,
+                "FILEX_SYSTEM_RAM": false,
+
+                "USB_DEVICE": false,
+                "USB_HOST": false,
+                "USB_HOST_CONTROLLER": false,
+                "USB_NETWORK": false,
+                "USB_PICTBRIDGE": false,
+                "NETWORKING": false
             },
             "hidden": false
         },
@@ -117,11 +153,18 @@
                 "TARGET_BOARD": "STM32H7B3I_DK",
                 "TARGET_FAMILY": "STM32H7",
                 "TARGET_SERIES": "STM32H7B3xxQ",
-                "ARM_PROCESSOR": "Cortex-M7",
+                "ARM_PROCESSOR": "cortex-m7",
+
                 "BUILD_VERSION": "1.0.0.0",
                 "INFOSTRING": "Built with ThreadX 6.1.12",
                 "HAS_A_USER_BUTTON": true,
+                "HAS_CONFIG_BLOCK": false,
                 "RANDOM_NUMBER_GENERATOR": true,
+                "NANOCLR_SYSTEM_COLLECTIONS": true,
+                "NANOCLR_REFLECTION": true,
+                "REALTIME_CLOCK": false,
+                "WATCHDOG": false,
+                "ADVANCED_PROFILING": false,
 
                 "GRAPHICS_SUPPORT": true,
                 "TOUCH_DISPLAY_SUPPORT": true,
@@ -131,14 +174,29 @@
                 "FILEX_SYSTEM_NOR": false,
                 "FILEX_SYSTEM_RAM": false,
 
-                "USB_DEVICE": true,
-                "USB_HOST": true,
-                "USB_HOST_CONTROLLER": true,
-                "USB_NETWORK": true,
-                "USB_PICTBRIDGE": true,
-                "NETWORKING": true
+                "USB_DEVICE": false,
+                "USB_HOST": false,
+                "USB_HOST_CONTROLLER": false,
+                "USB_NETWORK": false,
+                "USB_PICTBRIDGE": false,
+                "NETWORKING": false
             },
             "hidden": false
+        },
+        {
+            "name": "STM32H7B3I_DK-DEBUG",
+            "description": "Configuration for the STM32H7B3I_DK (Cortex M-7) discovery board from STMicroelectronics",
+            "inherits": [ "STM32H7B3I_DK", "DEBUG" ]
+        },
+        {
+            "name": "STM32H7B3I_DK-DEBUG-SEMIHOSTING",
+            "description": "Configuration for the STM32H7B3I_DK (Cortex M-7) discovery board from STMicroelectronics",
+            "inherits": [ "STM32H7B3I_DK", "DEBUG","SEMIHOSTING" ]
+        },
+        {
+            "name": "STM32H7B3I_DK-RELEASE",
+            "description": "Configuration for the STM32H7B3I_DK (Cortex M-7) discovery board from STMicroelectronics",
+            "inherits": [ "STM32H7B3I_DK", "RELEASE" ]
         },
         {
             "name": "NUCLEO_H743ZI2",
@@ -152,12 +210,33 @@
                 "TARGET_BOARD": "NUCLEO_H743ZI2",
                 "TARGET_FAMILY": "STM32H7",
                 "TARGET_SERIES": "STM32H743xx",
-                "ARM_PROCESSOR": "Cortex-M7",
+                "ARM_PROCESSOR": "cortex-m7",
+
                 "BUILD_VERSION": "1.0.0.0",
                 "INFOSTRING": "Built with ThreadX 6.1.12",
                 "HAS_A_USER_BUTTON": true,
-                "GRAPHICS_SUPPORT": true,
-                "TOUCH_DISPLAY_SUPPORT": true
+                "HAS_CONFIG_BLOCK": false,
+                "RANDOM_NUMBER_GENERATOR": true,
+                "NANOCLR_SYSTEM_COLLECTIONS": true,
+                "NANOCLR_REFLECTION": true,
+                "REALTIME_CLOCK": false,
+                "WATCHDOG": false,
+                "ADVANCED_PROFILING": false,
+
+                "GRAPHICS_SUPPORT": false,
+                "TOUCH_DISPLAY_SUPPORT": false,
+
+                "FILEX_SYSTEM_SD": false,
+                "FILEX_SYSTEM_NAND": false,
+                "FILEX_SYSTEM_NOR": false,
+                "FILEX_SYSTEM_RAM": false,
+
+                "USB_DEVICE": false,
+                "USB_HOST": false,
+                "USB_HOST_CONTROLLER": false,
+                "USB_NETWORK": false,
+                "USB_PICTBRIDGE": false,
+                "NETWORKING": false
             },
             "hidden": false
         },
@@ -173,12 +252,33 @@
                 "TARGET_BOARD": "STM32U5A9J_DK",
                 "TARGET_FAMILY": "STM32U5",
                 "TARGET_SERIES": "STM32U5A9xx",
-                "ARM_PROCESSOR": "Cortex-M33",
+                "ARM_PROCESSOR": "cortex-m33",
+
                 "BUILD_VERSION": "1.0.0.0",
                 "INFOSTRING": "Built with ThreadX 6.1.12",
-                "GRAPHICS_SUPPORT": "TRUE",
-                "TOUCH_DISPLAY_SUPPORT": "TRUE",
-                "RANDOM_NUMBER_GENERATOR": "TRUE"
+                "HAS_A_USER_BUTTON": true,
+                "HAS_CONFIG_BLOCK": false,
+                "RANDOM_NUMBER_GENERATOR": true,
+                "NANOCLR_SYSTEM_COLLECTIONS": true,
+                "NANOCLR_REFLECTION": true,
+                "REALTIME_CLOCK": false,
+                "WATCHDOG": false,
+                "ADVANCED_PROFILING": false,
+
+                "GRAPHICS_SUPPORT": false,
+                "TOUCH_DISPLAY_SUPPORT": false,
+
+                "FILEX_SYSTEM_SD": false,
+                "FILEX_SYSTEM_NAND": false,
+                "FILEX_SYSTEM_NOR": false,
+                "FILEX_SYSTEM_RAM": false,
+
+                "USB_DEVICE": false,
+                "USB_HOST": false,
+                "USB_HOST_CONTROLLER": false,
+                "USB_NETWORK": false,
+                "USB_PICTBRIDGE": false,
+                "NETWORKING": false
             },
             "hidden": false
         },
@@ -194,11 +294,18 @@
                 "TARGET_BOARD": "RP2040",
                 "TARGET_FAMILY": "RP2040",
                 "TARGET_SERIES": "RP2040",
-                "ARM_PROCESSOR": "Cortex-M0",
+                "ARM_PROCESSOR": "cortex-m0plus",
+
                 "BUILD_VERSION": "1.0.0.0",
                 "INFOSTRING": "Built with ThreadX 6.1.12",
                 "HAS_A_USER_BUTTON": true,
+                "HAS_CONFIG_BLOCK": false,
                 "RANDOM_NUMBER_GENERATOR": true,
+                "NANOCLR_SYSTEM_COLLECTIONS": true,
+                "NANOCLR_REFLECTION": true,
+                "REALTIME_CLOCK": false,
+                "WATCHDOG": false,
+                "ADVANCED_PROFILING": false,
 
                 "GRAPHICS_SUPPORT": true,
                 "TOUCH_DISPLAY_SUPPORT": false,
@@ -218,5 +325,46 @@
             "hidden": false
         }
     ],
-    "include": [ "BuildPresets.json" ]
+    "buildPresets": [
+        {
+            "name": "STM32H735G_DK-Debug",
+            "configurePreset": "STM32H735G_DK"
+        },
+        {
+            "name": "STM32H735G_DK-Release",
+            "configurePreset": "STM32H735G_DK"
+        },
+        {
+            "name": "STM32H7B3I_DK-Debug",
+            "configurePreset": "STM32H7B3I_DK-DEBUG"
+        },
+        {
+            "name": "STM32H7B3I_DK-Release",
+            "configurePreset": "STM32H7B3I_DK-RELEASE"
+        },
+        {
+            "name": "NUCLEO-H743ZI2-Debug",
+            "configurePreset": "NUCLEO_H743ZI2"
+        },
+        {
+            "name": "NUCLEO-H743ZI2-Release",
+            "configurePreset": "NUCLEO_H743ZI2"
+        },
+        {
+            "name": "STM32U5A9J_DK-Debug",
+            "configurePreset": "STM32U5A9J_DK"
+        },
+        {
+            "name": "STM32U5A9J_DK-Release",
+            "configurePreset": "STM32U5A9J_DK"
+        },
+        {
+            "name": "RP2040-Debug",
+            "configurePreset": "RP2040"
+        },
+        {
+            "name": "RP2040-Release",
+            "configurePreset": "RP2040"
+        }
+    ]
 }

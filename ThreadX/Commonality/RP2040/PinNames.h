@@ -1,6 +1,8 @@
-
-// STM32 Pins
-
+#pragma once
+//
+// Copyright (c) .NET Foundation and Contributors
+// See LICENSE file in the project root for full license information.
+//
 
 typedef enum PinNameValues
 {

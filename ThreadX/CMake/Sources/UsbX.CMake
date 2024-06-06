@@ -15,7 +15,7 @@
 	FetchContent_Populate(usbX)
 
 # Per core
-        if(${ARM_PROCESSOR} STREQUAL "Cortex-M0")
+        if(${ARM_PROCESSOR} STREQUAL "cortex-m0plus" OR ${ARM_PROCESSOR} STREQUAL "cortex-m0")
             list(APPEND USBX_INCLUDES 
                 ${USBX_SOURCE}/ports/cortex_m0/gnu/inc
             )

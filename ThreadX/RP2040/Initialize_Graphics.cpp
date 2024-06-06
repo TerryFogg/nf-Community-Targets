@@ -8,7 +8,6 @@
 #include <hardware/spi.h>
 #include <nanoCLR_Headers.h>
 #include <nanoHAL_Graphics.h>
-#include <target_BlockStorage.h>
 #include <string.h>
 
 #define PICO_LCD_114 true

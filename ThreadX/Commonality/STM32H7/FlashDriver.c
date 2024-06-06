@@ -4,6 +4,7 @@
 //
 
 #include "FlashDriver.h"
+#include "Delays.h"
 
 bool FlashDriver_InitializeDevice(void *context)
 {
@@ -157,9 +158,7 @@ bool FlashDriver_EraseBlock(void *context, ByteAddress address)
     {
         case 1:
         {
-            // Clear error flag if any
-            uint32_t errorflag = FLASH->SR1 & FLASH_FLAG_ALL_ERRORS_BANK1;
-            WRITE_REG(FLASH->CCR1, errorflag);
+            WRITE_REG(FLASH->CCR1, FLASH_FLAG_ALL_ERRORS_BANK1);
 #if defined(FLASH_CR_PSIZE)
             FLASH->CR1 &= ~(FLASH_CR_PSIZE | FLASH_CR_SNB);
             FLASH->CR1 |= (FLASH_CR_SER | FLASH_ERASE_SIZE | (sector << FLASH_CR_SNB_Pos) | FLASH_CR_START);
@@ -173,9 +172,8 @@ bool FlashDriver_EraseBlock(void *context, ByteAddress address)
             break;
 #if defined(DUAL_BANK)
         case 2:
-            // Clear error flag if any
-            uint32_t errorflag = (FLASH->SR2 & FLASH_FLAG_ALL_ERRORS_BANK2) | 0x80000000U;
-            WRITE_REG(FLASH->CCR2, errorflag & 0x7FFFFFFFU);
+            WRITE_REG(FLASH->CCR2, FLASH_FLAG_ALL_ERRORS_BANK2);
+
 #if defined(FLASH_CR_PSIZE)
             FLASH->CR2 &= ~(FLASH_CR_PSIZE | FLASH_CR_SNB);
             FLASH->CR2 |= (FLASH_CR_SER | FLASH_ERASE_SIZE | (sector << FLASH_CR_SNB_Pos) | FLASH_CR_START);
@@ -188,6 +186,7 @@ bool FlashDriver_EraseBlock(void *context, ByteAddress address)
             break;
 #endif
     }
+
     return success;
 }
 bool FlashUnlock()
@@ -308,13 +307,18 @@ bool WaitForLastOperation(uint32_t bank)
     // Wait for the FLASH operation to complete by polling on QW flag to be reset.
     // Even if the FLASH operation fails, the QW flag will be reset and an error
     // flag will be set
+    uint64_t flashTimeout = 50000; // 50 Milliseconds
     uint32_t errorflag = -1;
+    uint32_t tickstart = GetCurrentMicroseconds(true);
     switch (bank)
     {
         case 1:
             while (READ_BIT(FLASH->SR1, FLASH_FLAG_QW_BANK1) == FLASH_FLAG_QW_BANK1)
             {
-                // TODO : (timeout code here) is this necessary?
+                if (((GetCurrentMicroseconds(false) - tickstart) > flashTimeout))
+                {
+                    return false;
+                }
             }
             errorflag = FLASH->SR1 & FLASH_FLAG_ALL_ERRORS_BANK1;
             if ((errorflag & 0x7FFFFFFFU) != 0U)
@@ -330,9 +334,13 @@ bool WaitForLastOperation(uint32_t bank)
             break;
 #if defined(DUAL_BANK)
         case 2:
-            while (READ_BIT(FLASH->SR2, FLASH_FLAG_QW_BANK2 & 0x7FFFFFFFU) == FLASH_FLAG_QW_BANK2)
+            tickstart = GetCurrentMicroseconds(true);
+            while (READ_BIT(FLASH->SR2, FLASH_FLAG_QW_BANK2) == FLASH_FLAG_QW_BANK2)
             {
-                // TODO : (timeout code here) is this necessary?
+                if (((GetCurrentMicroseconds(false) - tickstart) > flashTimeout))
+                {
+                    return false;
+                }
             }
             errorflag = (FLASH->SR2 & FLASH_FLAG_ALL_ERRORS_BANK2) | 0x80000000U;
             if ((errorflag & 0x7FFFFFFFU) != 0U)

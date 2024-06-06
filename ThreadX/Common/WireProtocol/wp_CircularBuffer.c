@@ -6,7 +6,7 @@
 //
 
 #include "wp_CircularBuffer.h"
-#include "tx_adaption.h"
+#include "target_platform.h"
 
 CLR_UINT8 wp_InitializeBuffer(CircularBuffer_t *buffer, void *data, CLR_INT32 size)
 {

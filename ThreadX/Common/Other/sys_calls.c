@@ -8,13 +8,13 @@
 
 #include <sys/stat.h>
 
-int _close(int file)
+__attribute__((weak)) int _close(int file)
 {
     (void)file;
     return 0;
 }
 
-void _exit(int status)
+__attribute__((weak)) void _exit(int status)
 {
     (void)status;
     while (1)
@@ -22,32 +22,32 @@ void _exit(int status)
     } /* Hang here forever... */
 }
 
-int _fstat(int file, struct stat *st)
+__attribute__((weak)) int _fstat(int file, struct stat *st)
 {
     (void)file;
     st->st_mode = S_IFCHR;
     return 0;
 }
 
-int _getpid(void)
+__attribute__((weak)) int _getpid(void)
 {
     return 1;
 }
 
-int _isatty(int file)
+__attribute__((weak)) int _isatty(int file)
 {
     (void)file;
     return 1;
 }
 
-int _kill(int pid, int sig)
+__attribute__((weak)) int _kill(int pid, int sig)
 {
     (void)pid;
     (void)sig;
     return -1;
 }
 
-int _lseek(int file, int ptr, int dir)
+__attribute__((weak)) int _lseek(int file, int ptr, int dir)
 {
     (void)file;
     (void)ptr;
@@ -55,7 +55,7 @@ int _lseek(int file, int ptr, int dir)
     return 0;
 }
 
-int _read(int file, char *ptr, int len)
+__attribute__((weak)) int _read(int file, char *ptr, int len)
 {
     (void)file;
     (void)ptr;
@@ -64,7 +64,7 @@ int _read(int file, char *ptr, int len)
     return -1;
 }
 
-int _write(int file, const char *ptr, int len)
+__attribute__((weak)) int _write(int file, const char *ptr, int len)
 {
     int txCount;
 

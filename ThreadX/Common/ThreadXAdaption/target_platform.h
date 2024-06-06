@@ -17,3 +17,6 @@
 
 #define GLOBAL_LOCK_SOCKETS(x)
 #define LPCSTR const char *
+
+
+#define EVENTS_HEART_BEAT

@@ -8,84 +8,80 @@ set(CMAKE_C_EXTENSIONS OFF CACHE INTERNAL "-std=c++17 instead of -std=gnu++17")
 set(CMAKE_CXX_STANDARD 17 CACHE INTERNAL "C++ standard for all targets")
 set(CMAKE_CXX_EXTENSIONS OFF CACHE INTERNAL "-std=c++17 instead of -std=gnu++17")
 
+target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:  -mthumb -mcpu=cortex-m0plus>)
+target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:-ffunction-sections -fdata-sections>)
+target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:CXX>: -mthumb -mcpu=cortex-m0plus>)
+target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-ffunction-sections -fdata-sections>)
+target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:ASM>: -mthumb -mcpu=cortex-m0plus -x assembler-with-cpp>)
 
-    target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:  -mthumb -mcpu=cortex-m0plus>)
-    target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:-ffunction-sections -fdata-sections>)
+target_compile_definitions(nanoCLR.elf PUBLIC 
+                           DEBUG                           
+                           DPLATFORM_ARM
+                           __CM0_CMSIS_VERSION
+                           LIB_PICO_BIT_OPS=1
+                           LIB_PICO_BIT_OPS_PICO=1
+                           LIB_PICO_DIVIDER=1
+                           LIB_PICO_DIVIDER_HARDWARE=1
+                           #
+                           #  Apparently float/double in RAM is faster
+                           #
+                           PICO_FLOAT_IN_RAM=1
+                           PICO_DOUBLE_IN_RAM=1
 
-    target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:CXX>: -mthumb -mcpu=cortex-m0plus>)
-    target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-ffunction-sections -fdata-sections>)
+                           LIB_PICO_DOUBLE=1
+                           LIB_PICO_DOUBLE_PICO=1
+                       
+                           LIB_PICO_FLOAT=1
+                           LIB_PICO_FLOAT_PICO=1
+                       
+                           LIB_PICO_INT64_OPS=1
+                           LIB_PICO_INT64_OPS_PICO=1
 
-    target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:ASM>: -mthumb -mcpu=cortex-m0plus -x assembler-with-cpp>)
+                           LIB_PICO_MALLOC=1
+                           LIB_PICO_MEM_OPS=1
+                           LIB_PICO_MEM_OPS_PICO=1
 
-    target_compile_definitions(nanoCLR.elf PUBLIC 
-                               DEBUG                           
-                               DPLATFORM_ARM
-                               __CM0_CMSIS_VERSION
-                               LIB_PICO_BIT_OPS=1
-                               LIB_PICO_BIT_OPS_PICO=1
-                               LIB_PICO_DIVIDER=1
-                               LIB_PICO_DIVIDER_HARDWARE=1
-                               #
-                               #  Apparently float/double in RAM is faster
-                               #
-                               PICO_FLOAT_IN_RAM=1
-                               PICO_DOUBLE_IN_RAM=1
+                           LIB_PICO_PLATFORM=1
+                           LIB_PICO_PRINTF=1
+                           LIB_PICO_PRINTF_PICO=1
+                           LIB_PICO_RUNTIME=1
+                           LIB_PICO_STANDARD_LINK=1
 
-                               LIB_PICO_DOUBLE=1
-                               LIB_PICO_DOUBLE_PICO=1
-                           
-                               LIB_PICO_FLOAT=1
-                               LIB_PICO_FLOAT_PICO=1
-                           
-                               LIB_PICO_INT64_OPS=1
-                               LIB_PICO_INT64_OPS_PICO=1
+                           LIB_PICO_STDIO=1
+                           LIB_PICO_STDIO_UART=1
 
-                               LIB_PICO_MALLOC=1
-                               LIB_PICO_MEM_OPS=1
-                               LIB_PICO_MEM_OPS_PICO=1
+                           LIB_PICO_STDLIB=1
 
-                               LIB_PICO_PLATFORM=1
-                               LIB_PICO_PRINTF=1
-                               LIB_PICO_PRINTF_PICO=1
-                               LIB_PICO_RUNTIME=1
-                               LIB_PICO_STANDARD_LINK=1
+                           LIB_PICO_SYNC=1
+                           LIB_PICO_SYNC_CORE=1
+                           LIB_PICO_SYNC_CRITICAL_SECTION=1
+                           LIB_PICO_SYNC_MUTEX=1
+                           LIB_PICO_SYNC_SEM=1
 
-                               LIB_PICO_STDIO=1
-                               LIB_PICO_STDIO_UART=1
+                           LIB_PICO_TIME=1
+                           LIB_PICO_UTIL=1
+                           PICO_BOARD=\"pico\"
+                           PICO_BUILD=1
+                           PICO_COPY_TO_RAM=0
+                           PICO_CXX_ENABLE_EXCEPTIONS=0
+                           PICO_NO_FLASH=0
+                           PICO_NO_HARDWARE=0
+                           PICO_ON_DEVICE=1
+                           PICO_USE_BLOCKED_RAM=0
+                           PendSV_Handler=isr_pendsv
+                           SysTick_Handler=isr_systick
+                           CFG_TUSB_MCU=OPT_MCU_RP2040
+ )
 
-                               LIB_PICO_STDLIB=1
+ ## Link Options
+#target_link_options(nanoCLR.elf PUBLIC "--specs=nosys.specs")
 
-                               LIB_PICO_SYNC=1
-                               LIB_PICO_SYNC_CORE=1
-                               LIB_PICO_SYNC_CRITICAL_SECTION=1
-                               LIB_PICO_SYNC_MUTEX=1
-                               LIB_PICO_SYNC_SEM=1
-
-                               LIB_PICO_TIME=1
-                               LIB_PICO_UTIL=1
-                               PICO_BOARD=\"pico\"
-                               PICO_BUILD=1
-                               PICO_COPY_TO_RAM=0
-                               PICO_CXX_ENABLE_EXCEPTIONS=0
-                               PICO_NO_FLASH=0
-                               PICO_NO_HARDWARE=0
-                               PICO_ON_DEVICE=1
-                               PICO_USE_BLOCKED_RAM=0
-                               PendSV_Handler=isr_pendsv
-                               SysTick_Handler=isr_systick
-                               CFG_TUSB_MCU=OPT_MCU_RP2040
-     )
-
-
-     ## Link Options
-    target_link_options(nanoCLR.elf PUBLIC "-mthumb")
-    target_link_options(nanoCLR.elf PUBLIC "-mcpu=cortex-m0")
-    target_link_options(nanoCLR.elf PUBLIC "-mfpu=fpv5-sp-d16")
-    target_link_options(nanoCLR.elf PUBLIC "-mfloat-abi=hard")
-    target_link_options(nanoCLR.elf PUBLIC "-mabi=aapcs")
-    target_link_options(nanoCLR.elf PUBLIC "-Wl,--gc-sections")
-    target_link_options(nanoCLR.elf PUBLIC "-Wl,--no-wchar-size-warning")
-    target_link_options(nanoCLR.elf PUBLIC "-Wl,--print-memory-usage")
+target_link_options(nanoCLR.elf PUBLIC "-mthumb")
+target_link_options(nanoCLR.elf PUBLIC "-mcpu=cortex-m0plus")
+target_link_options(nanoCLR.elf PUBLIC "-mabi=aapcs")
+#target_link_options(nanoCLR.elf PUBLIC "-Wl,--gc-sections")
+#target_link_options(nanoCLR.elf PUBLIC "-Wl,--no-wchar-size-warning")
+target_link_options(nanoCLR.elf PUBLIC "-Wl,--print-memory-usage")
 
 
 # -------------------
@@ -123,6 +119,7 @@ set(CMAKE_CXX_EXTENSIONS OFF CACHE INTERNAL "-std=c++17 instead of -std=gnu++17"
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=__aeabi_dsub")
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=__aeabi_i2d")
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=__aeabi_l2d")
+    target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=__aeabi_l2f")
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=__aeabi_ui2d")
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=__aeabi_ul2f")
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=acos")
@@ -232,6 +229,7 @@ set(CMAKE_CXX_EXTENSIONS OFF CACHE INTERNAL "-std=c++17 instead of -std=gnu++17"
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=roundf")
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=sincosf")
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=sinf")
+    target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=sinh")
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=sinhf")
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=sqrtf")
     target_link_options(nanoCLR.elf PUBLIC "LINKER:--wrap=tanf")
@@ -278,3 +276,4 @@ add_custom_command(TARGET nanoCLR.elf POST_BUILD
       COMMAND ${ELF2UF2_EXECUTABLE}  $<TARGET_FILE:nanoCLR.elf>   ${CMAKE_BINARY_DIR}/nanoCLR.uf2
 )
 
+                   

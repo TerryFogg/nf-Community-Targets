@@ -78,6 +78,7 @@
              ${PICO_SDK_SOURCE}/src/rp2040/hardware_regs/include
              ${PICO_SDK_SOURCE}/src/rp2040/hardware_structs/include
 
+
              ${PICO_SDK_SOURCE}/lib/tinyusb/src
              ${PICO_SDK_SOURCE}/lib/tinyusb/src/class/cdc
              ${PICO_SDK_SOURCE}/lib/tinyusb/src/common
@@ -85,8 +86,6 @@
              ${PICO_SDK_SOURCE}/lib/tinyusb/src/portable/raspberrypi/rp2040
      )
      list(APPEND RP2040_SOURCES
-             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RP2040/bs2_default_padded_checksummed.s
-
              ${PICO_SDK_SOURCE}/src/common/pico_sync/critical_section.c
              ${PICO_SDK_SOURCE}/src/common/pico_sync/lock_core.c
              ${PICO_SDK_SOURCE}/src/common/pico_sync/mutex.c

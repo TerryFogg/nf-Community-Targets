@@ -18,7 +18,7 @@
 	set(TX_USER_FILE ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/RtosAdaption/target_tx_user.h CACHE STRING "Enable TX user configuration")
 
 # Per Core
-        if(${ARM_PROCESSOR} STREQUAL "Cortex-M0")
+        if(${ARM_PROCESSOR} STREQUAL "cortex-m0plus" OR ${ARM_PROCESSOR} STREQUAL "cortex-m0")
             list(APPEND THREADX_INCLUDES 
                         ${THREADX_SOURCE}/ports/cortex_m0/gnu/inc
                         ${THREADX_SOURCE}/filex/ports/cortex_m0/gnu/inc
@@ -34,7 +34,7 @@
                         ${THREADX_SOURCE}/ports/cortex_m0/gnu/src/tx_thread_interrupt_disable.S
                         ${THREADX_SOURCE}/ports/cortex_m0/gnu/src/tx_thread_interrupt_restore.S
             )
-        elseif(${ARM_PROCESSOR} STREQUAL "Cortex-M7")
+        elseif(${ARM_PROCESSOR} STREQUAL "cortex-m7")
             list(APPEND THREADX_INCLUDES 
                         ${THREADX_SOURCE}/ports/cortex_m7/gnu/inc
                         ${THREADX_SOURCE}/filex/ports/cortex_m7/gnu/inc
@@ -51,7 +51,7 @@
                         ${THREADX_SOURCE}/ports/cortex_m7/gnu/src/tx_thread_system_return.S
                         ${THREADX_SOURCE}/ports/cortex_m7/gnu/src/tx_timer_interrupt.S
             )
-        elseif(${ARM_PROCESSOR} STREQUAL "Cortex-M33")
+        elseif(${ARM_PROCESSOR} STREQUAL "cortex-m33")
             list(APPEND THREADX_INCLUDES 
                         ${THREADX_SOURCE}/ports/cortex_m33/gnu/inc
                         ${THREADX_SOURCE}/filex/ports/cortex_33/gnu/inc

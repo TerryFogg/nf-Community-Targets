@@ -12,7 +12,7 @@ The full range of hardware features available on the board helps users enhance t
 
 STLINK-V3E is integrated into the board, as an embedded in-circuit debugger and programmer for the STM32 MCU and the USB Virtual COM port bridge. The STM32H7B3I-DK board comes with the STM32CubeH7 MCU Package, which provides an STM32 comprehensive software HAL library as well as various software examples.
 
-![STM32H7B3I-DK](https://docs.zephyrproject.org/latest/_images/stm32h7b3i_dk.jpg)
+![STM32H7B3I-DK](assets/stm32h7b3i_dk.jpg)
 
 More information about the board can be found at the [STM32H7B3I-DK website](https://www.st.com/en/evaluation-tools/stm32h7b3i-dk.html). More information about STM32H7B3 can be found here:
 

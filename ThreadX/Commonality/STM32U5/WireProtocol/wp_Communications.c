@@ -18,7 +18,7 @@
 */
 
 #include "wp_Communications.h"
-#include "wp_CircularBuffer.h"
+#include "CircularBuffer.h"
 #include <assert.h>
 #include <tx_api.h>
 #include "board.h"

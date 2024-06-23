@@ -6,6 +6,8 @@
 #include <nanoHAL_v2.h>
 #include <wp_Communications.h>
 #include <tx_api.h>
+#include "WireProtocol_HAL_Interface.h"
+
 
 WP_Message inboundMessage;
 

@@ -4,7 +4,7 @@
 #
 
      list(APPEND NF_INTERPRETER_SOURCES 
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/BlockStorage.c
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/Device_BlockStorage.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/board.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/Clock_configuration.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/NUCLEO_H743ZI2/CLR_RT_InteropAssembliesTable.cpp

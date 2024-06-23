@@ -5,7 +5,7 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include "wp_CircularBuffer.h"
+#include "CircularBuffer.h"
 #include "target_platform.h"
 
 CLR_UINT8 wp_InitializeBuffer(CircularBuffer_t *buffer, void *data, CLR_INT32 size)

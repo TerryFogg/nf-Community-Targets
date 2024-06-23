@@ -6,13 +6,21 @@
 #include "Delays.h"
 #include "board.h"
 
+static uint32_t microsecondsPerTick;
+
 void InitializeDelayCounter()
 {
-    CoreDebug->DEMCR &= ~CoreDebug_DEMCR_TRCENA_Msk; // Disable TRC
-    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;  // Enable TRC
-    DWT->CTRL &= ~DWT_CTRL_CYCCNTENA_Msk;            // Disable clock cycle counter
-    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;             // Enable  clock cycle counter
-    DWT->CYCCNT = 0;                                 // Reset the clock cycle counter value
+    LL_RCC_ClocksTypeDef RCC_Clocks;
+    LL_RCC_GetSystemClocksFreq(&RCC_Clocks);
+    microsecondsPerTick = RCC_Clocks.SYSCLK_Frequency / 1000000;
+    // Disable TRC
+    CoreDebug->DEMCR &= ~CoreDebug_DEMCR_TRCENA_Msk;
+    // Enable TRC
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    // Disable clock cycle counter
+    DWT->CTRL &= ~DWT_CTRL_CYCCNTENA_Msk;
+    // Enable  clock cycle counter
+    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 }
 void DelayCounter(int delayValue, int period)
 {
@@ -45,14 +53,11 @@ void DelayMilliseconds(uint32_t milliseconds)
 {
     DelayCounter(milliseconds, 1000);
 }
-uint32_t GetCurrentMicroseconds(bool reset)
+void ResetCurrentMicroseconds()
 {
-    LL_RCC_ClocksTypeDef RCC_Clocks;
-    LL_RCC_GetSystemClocksFreq(&RCC_Clocks);
-    uint32_t microsecondsPerTick = RCC_Clocks.SYSCLK_Frequency / 1000000;
-    if (reset)
-    {
-        DWT->CYCCNT = 0;
-    }
+    DWT->CYCCNT = 0;
+}
+uint32_t GetCurrentMicroseconds()
+{
     return DWT->CYCCNT / microsecondsPerTick;
 }

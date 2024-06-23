@@ -6,7 +6,7 @@
                 ${STM32U5_CUBE_SOURCE}/Drivers/BSP/STM32U5x9J-DK
     )
     list(APPEND NF_INTERPRETER_SOURCES
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/BlockStorage.c
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/Device_BlockStorage.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/board.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/clock_configuration.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/CLR_RT_InteropAssembliesTable.cpp

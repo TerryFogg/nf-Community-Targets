@@ -100,7 +100,7 @@ static DevicePin mcuPins[] = {
     // SDMMC uSD detect
     {PI8, true, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::GPIO, 0}};
 
-AdcPin BoardADCChannels[] = {{ADC1, 1, 1}, {ADC1, 11, 2}};
+AdcPin BoardADCChannels[] = {{ADC1, 1, 1}, {ADC2, 11, 2}};
 DacPin BoardDACChannels[] = {{DAC1, 1, 1}, {DAC2, 2, 2}};
 I2cPin BoardI2CChannels[] = {{I2C1, 1, 4}, {I2C4, 1, 4}};
 PwmPin BoardPWMChannels[] = {{TIM3, 3, 1}, {TIM4, 4, 1}};
@@ -141,7 +141,7 @@ void Initialize_Board()
         PC10, // SDMMC D2
         PC11, // SDMMC D3
         PC12, // SDMMC CLK
-        PC2,  // SDMMC CMD
+        PD2,  // SDMMC CMD
         PI8); // SDMMC uSD detect
 }
 void CPU_CACHE_Enable(void)

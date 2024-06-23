@@ -52,16 +52,17 @@ Download version 13.2.rel1 of GNU_Tools_ARM_Embedded from ```https://developer.a
 
 
 ### Get Repositories
- | Repository             |Version  | Command                                                                                    
- | -----------            |         |:-------------------------------------------------------------------------------------------
- | Eclipse ThreadX        |         |```git clone https://github.com/eclipse-threadx/threadx.git```                                                                                           |
- | Eclipse FileX          |         |```git clone https://github.com/eclipse-threadx/filex.git```                                                                                           |
- | Eclipse NetXDuo        |         |```git clone https://github.com/eclipse-threadx/netxduo.git```                                                                                           |
- | Eclipse UsbX           |         |```git clone https://github.com/eclipse-threadx/usbx.git```                                                                                           |
- | Eclipse LevelX         |         |```git clone https://github.com/eclipse-threadx/levelx.git```                                                                                           |
- | STM32CubeF7            |         |```git clone --recurse-submodules https://github.com/STMicroelectronics/STM32CubeF7.git```  
- | STM32CubeH7            |         |```git clone --recurse-submodules https://github.com/STMicroelectronics/STM32CubeH7.git```  
- | STM32CubeU5            |         |```git clone --recurse-submodules https://github.com/STMicroelectronics/STM32CubeU5.git```  
+| Repository      | Version | Command                                                      |
+| --------------- | ------- | :----------------------------------------------------------- |
+| Eclipse ThreadX |         | ```git clone https://github.com/eclipse-threadx/threadx.git``` |
+| Eclipse FileX   |         | ```git clone https://github.com/eclipse-threadx/filex.git``` |
+| Eclipse NetXDuo |         | ```git clone https://github.com/eclipse-threadx/netxduo.git``` |
+| Eclipse UsbX    |         | ```git clone https://github.com/eclipse-threadx/usbx.git```  |
+| Eclipse LevelX  |         | ```git clone https://github.com/eclipse-threadx/levelx.git``` |
+| STM32CubeM0     |         | ```git clone --recurse-submodules https://github.com/STMicroelectronics/STM32CubeF0.git``` |
+| STM32CubeF7     |         | ```git clone --recurse-submodules https://github.com/STMicroelectronics/STM32CubeF7.git``` |
+| STM32CubeH7     |         | ```git clone --recurse-submodules https://github.com/STMicroelectronics/STM32CubeH7.git``` |
+| STM32CubeU5     |         | ```git clone --recurse-submodules https://github.com/STMicroelectronics/STM32CubeU5.git``` |
 
 
 

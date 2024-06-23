@@ -1235,7 +1235,7 @@ CLR_UINT32 PwmIO::GetChannel(CLR_INT32 timerId, CLR_INT32 pinNumber)
 #pragma endregion
 
 #pragma region Serial IO
-#include "wp_CircularBuffer.h"
+#include "CircularBuffer.h"
 
 #define MAXIMUM_NUMBER_OF_ACTIVE_USARTS 5
 
@@ -1505,6 +1505,21 @@ bool SerialIO::SetMode(CLR_INT32 usartDeviceNumber, CLR_INT32 mode)
     return true;
 }
 
+
+
+HRESULT SerialIO::SetupWriteLine(CLR_RT_StackFrame& stack, char** buffer, uint32_t* length, bool* isNewAllocation)
+{
+    UNUSED(stack);
+    UNUSED(buffer);
+    UNUSED(length);
+    UNUSED(isNewAllocation);
+    return 1;
+}
+
+
+#pragma endregion
+
+#pragma region SPI
 CLR_INT32 SpiIO::MaximumClockFrequency(CLR_INT32 deviceId)
 {
     UNUSED(deviceId);
@@ -1528,14 +1543,14 @@ bool SpiIO::WriteRead(
     CLR_INT32 deviceId,
     SPI_WRITE_READ_SETTINGS rws,
     CLR_UINT8 *writeData,
-    CLR_UINT32 *writeSize,
+    CLR_UINT16 writeSize,
     CLR_UINT8 *readData,
-    CLR_UINT32 readSize)
+    CLR_UINT16 readSize)
 {
     UNUSED(deviceId);
     UNUSED(rws);
     UNUSED(*writeData);
-    UNUSED(*writeSize);
+    UNUSED(writeSize);
     UNUSED(*readData);
     UNUSED(readSize);
     return false;
@@ -1547,4 +1562,16 @@ bool SpiIO::Open(SPI_DEVICE_CONFIGURATION spiConfig, CLR_UINT32 handle)
 
     return false;
 }
+
+CLR_INT32 SpiIO::ByteTime()
+{
+    return 1;
+}
+SPI_OP_STATUS SpiIO::Completed(CLR_INT32 deviceId)
+{
+    UNUSED(deviceId);
+    return SPI_OP_STATUS::SPI_OP_COMPLETE;
+}
+
 #pragma endregion
+

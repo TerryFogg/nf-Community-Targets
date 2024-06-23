@@ -3,6 +3,7 @@
    See LICENSE file in the project root for full license information.
 */
 
+
 /* NOTE */
 /* Division of internal flash is limited by the smallest erase size of 8K */
 
@@ -19,47 +20,28 @@ _sidata = LOADADDR(.data);
 _Min_Heap_Size  = 0x200; 
 _Min_Stack_Size = 0x400; 
 
-/* Define the availability of FLASH                                                                  */
-/* The flash memory is organized as 137-bit flash words memory that can be used for                  */
-/* storing both code and data constants.                                                             */
-/* Each word consists of:                                                                            */
-/*    One flash word (4 words, 16 bytes or 128 bits)                                                 */
-/*    9 ECC bits                                                                                     */
-/* The flash memory is organized as follows:                                                         */
-/*  1.  Two independent 1 Mbyte banks containing 128 user sectors of 8 Kbytes each.                  */
-/*  2.  128 Kbytes of System flash memory from which the device can boot.                            */
-/*  3.  1 Kbyte of OTP (one-time programmable) memory containing option bytes for user configuration */
-
-
-/* Minimum flash erase size is defined as a sector (8K) for STM32H7B series */
-/* ======================================================================== */
+/* Define the availability of FLASH */
+/* Minimum flash erase size is define as a sector for STM32H7 series*/
 flash_block_1 = 0x08000000;
-sector_size = 8K;
+flash_block_1_size = 2048k;
+sector_size = 128k; 
+
 block_size = sector_size;
-number_of_banks = 2;
+number_flash_banks = 2;
+blocks_per_bank = 8;
+total_blocks = number_flash_banks * blocks_per_bank;
 
-/* TOTAL blocks   */
-/* ============== */
-total_blocks = 128*number_of_banks;
-
-/* CLR allocation */
-/* ============== */
 clr_block_start = 0;
-clr_block_end = 79;
-clr_total_blocks = clr_block_end - clr_block_start + 1;
+clr_block_end = 4;
+blocks_reserved_for_clr = (clr_block_end - clr_block_start) + 1;
 
-/* DEPLOYMENT allocation */
-/* ===================== */
-deployment_block_start = 80;
-deployment_block_end = 253;
-deployment_total_blocks = deployment_block_end - deployment_block_start + 1;
+deployment_block_start = 5;
+deployment_block_end = 15;
+blocks_reserved_for_deployment = (deployment_block_end - deployment_block_start) + 1;
 
-/* CONFIGURATION allocation */
-/* ======================== */
-config_block_start = 254;
-config_block_end = 255;
-config_total_blocks = config_block_end - config_block_start + 1;
-
+config_block_start = 0;
+config_block_end = 0;
+blocks_reserved_for_config = 0; 
 
 MEMORY
 {
@@ -67,74 +49,66 @@ MEMORY
   /* PHYSICAL MEMORY*/
   /* ===============*/
 
-    /* ===============*/
-    /* STM32H7B3LIH6QU*/
-    /* ===============*/
+    /* =============== */
+    /* STM32H743ZIT6U  */
+    /* =============== */
 
      ITCM_SRAM  (rxw):ORIGIN = 0x00000000,LENGTH = 64K 
      DTCM_SRAM  (rxw):ORIGIN = 0x20000000,LENGTH = 128K 
 
      FLASH      (rx) :ORIGIN = 0x08000000,LENGTH = 2048k
-     OTP        (rx) :ORIGIN = 0x08FFF000,LENGTH = 1024
-     AXI_RAM1   (rxw):ORIGIN = 0x24000000,LENGTH = 256K
-     AXI_RAM2   (rxw):ORIGIN = 0x24040000,LENGTH = 384K
-     AXI_RAM3   (rxw):ORIGIN = 0x240A0000,LENGTH = 384K
-     AHB_RAM    (rxw):ORIGIN = 0x30000000,LENGTH = 128K   /* (64K + 64K) */
-     SRD_RAM    (rxw):ORIGIN = 0x38000000,LENGTH = 32K
+     AXI_RAM    (rxw):ORIGIN = 0x24000000,LENGTH = 512K
+     SRAM1      (rxw):ORIGIN = 0x30000000,LENGTH = 128K 
+     SRAM2      (rxw):ORIGIN = 0x30020000,LENGTH = 128K 
+     SRAM3      (rxw):ORIGIN = 0x30040000,LENGTH = 32K
+     SRAM4      (rxw):ORIGIN = 0x38000000,LENGTH = 64K
      BACKUP_RAM (rxw):ORIGIN = 0x38800000,LENGTH = 4k
 
-     /* External RAM on development board (STM32H7B3I_DK) */
-     OCTOSPI1_FLASH (xrw) : ORIGIN = 0x09000000, LENGTH = 64M
-     FMC_SDRAM      (xrw) : ORIGIN = 0xD0000000, LENGTH = 16M
 
+ 
+ 
   /* ============================= */
   /* Memory usage by nanoFramework */
   /* ============================= */
 
-     nanoCLR    (rx) : ORIGIN = ORIGIN(FLASH), LENGTH = clr_total_blocks*sector_size
-     deployment (rx) : ORIGIN = ORIGIN(nanoCLR) + LENGTH(deployment), LENGTH = deployment_total_blocks*sector_size
-     config     (rx) : ORIGIN = ORIGIN(nanoCLR) + LENGTH(nanoCLR), LENGTH = config_total_blocks*sector_size
+     nanoCLR    (rx) : ORIGIN = ORIGIN(FLASH),                     LENGTH = (blocks_reserved_for_clr*block_size)
+     deployment (rx) : ORIGIN = ORIGIN(nanoCLR) + LENGTH(nanoCLR), LENGTH = (blocks_reserved_for_deployment*block_size)
+     config     (rx) : ORIGIN = 0, LENGTH = 0
 
      /* Native code ram (ThreadX, nativeCLR) */
-     NATIVE_RAM   (rxw) : ORIGIN = ORIGIN(AXI_RAM1), LENGTH = LENGTH(AXI_RAM1)
-     CLR_RAM  (rxw) : ORIGIN = ORIGIN(AXI_RAM2), LENGTH =  LENGTH(AXI_RAM2) + LENGTH(AXI_RAM3) 
+     NATIVE_RAM (rxw) : ORIGIN = ORIGIN(DTCM_SRAM),LENGTH = LENGTH(DTCM_SRAM)
+     CLR_RAM    (rxw) : ORIGIN = ORIGIN(AXI_RAM),  LENGTH = LENGTH(AXI_RAM)
 
      /* RAM accessible by the DMA controller */
-     RAM_DMA      (rxw) : ORIGIN = ORIGIN(AHB_RAM), LENGTH = LENGTH(AHB_RAM)
+     RAM_DMA    (rxw) : ORIGIN = ORIGIN(SRAM1), LENGTH = LENGTH(SRAM1)
 
-     graphics_vfb (rxw) : ORIGIN = ORIGIN(FMC_SDRAM), LENGTH = 255K
-     graphics_ram (rxw) : ORIGIN = ORIGIN(graphics_vfb) + LENGTH(graphics_vfb), LENGTH = 4M
+
+
 
 }
 
 /* The CLR managed heap for CLR */
-/* ---------------------------- */
 HeapBegin             = ORIGIN(CLR_RAM); 
 HeapEnd               = ORIGIN(CLR_RAM) + LENGTH(CLR_RAM); 
 
 /* The CLR native Image */
-/* ==================== */
 __nanoImage_start__   = ORIGIN(nanoCLR); 
 __nanoImage_end__     = ORIGIN(nanoCLR) + LENGTH(nanoCLR); 
  
-/*  C# Portable Executable (PE) file is stored here*/
-/* =============================================== */
+/*  C# Portable Executable (PE) file is stored */
 __deployment_start__  = ORIGIN(deployment); 
 __deployment_end__    = ORIGIN(deployment) + LENGTH(deployment); 
  
-/* Small area of persistent configuration storage */
-/* ============================================== */
+/* Small area of persistent storage */
 __nanoConfig_start__  = ORIGIN(config);
 __nanoConfig_end__    = ORIGIN(config) + LENGTH(config);
  
 /* Bit pixel copy of the screen */
-/* ============================ */
-Graphics_frame_buffer = ORIGIN(graphics_vfb); 
+Graphics_frame_buffer = 0; 
   
 /*  Bitmap objects */
-/* =============== */
-Graphics_managed_heap = ORIGIN(graphics_ram); 
-Graphics_managed_end  = ORIGIN(graphics_ram) + LENGTH(graphics_ram);   
+Graphics_managed_heap = 0; 
+Graphics_managed_end  = 0;   
 
 /* Define output sections */
 SECTIONS

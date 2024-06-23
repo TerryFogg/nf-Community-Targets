@@ -12,6 +12,9 @@
 #include <string.h>
 #include <targetPAL.h>
 
+typedef Library_sys_dev_spi_native_System_Device_Spi_SpiConnectionSettings SpiConnectionSettings;
+typedef Library_corlib_native_System_SpanByte SpanByte;
+
 void System_Device_nano_spi_callback(int busIndex)
 {
     (void)busIndex;
@@ -19,7 +22,6 @@ void System_Device_nano_spi_callback(int busIndex)
     Events_Set(SYSTEM_EVENT_FLAG_SPI_MASTER);
 }
 
-#pragma region Library_sys_dev_spi_native_System_Device_Spi_SpiBusInfo
 HRESULT Library_sys_dev_spi_native_System_Device_Spi_SpiBusInfo::NativeMaxClockFrequency___I4(CLR_RT_StackFrame &stack)
 {
     NANOCLR_HEADER();
@@ -49,12 +51,6 @@ HRESULT Library_sys_dev_spi_native_System_Device_Spi_SpiBusInfo::NativeMinClockF
     }
     NANOCLR_NOCLEANUP();
 }
-#pragma endregion
-
-#pragma region Library_sys_dev_spi_native_System_Device_Spi_SpiConnectionSettings
-typedef Library_sys_dev_spi_native_System_Device_Spi_SpiConnectionSettings SpiConnectionSettings;
-typedef Library_corlib_native_System_SpanByte SpanByte;
-
 HRESULT Library_sys_dev_spi_native_System_Device_Spi_SpiDevice::NativeInit___VOID(CLR_RT_StackFrame &stack)
 {
     NANOCLR_HEADER();
@@ -109,7 +105,6 @@ bool System_Device_IsLongRunningOperation(
         return false;
     }
 }
-
 HRESULT Library_sys_dev_spi_native_System_Device_Spi_SpiDevice::
     NativeTransfer___VOID__SystemSpanByte__SystemSpanByte__BOOLEAN(CLR_RT_StackFrame &stack)
 {
@@ -257,13 +252,15 @@ HRESULT Library_sys_dev_spi_native_System_Device_Spi_SpiDevice::NativeTransfer(
                     .u1;
             rws = {fullDuplex, 0, data16Bits, 0, chipSelect, chipSelectActiveState};
 
+
+            int32_t byteTime = SpiIO::ByteTime();
             // Check to see if we should run async so as not to hold up other tasks
             isLongRunningOperation = System_Device_IsLongRunningOperation(
                 writeSize,
                 readSize,
                 fullDuplex,
                 data16Bits,
-                nanoSPI_GetByteTime(deviceId),
+                byteTime,
                 (uint32_t &)estimatedDurationMiliseconds);
 
             if (isLongRunningOperation)
@@ -297,13 +294,7 @@ HRESULT Library_sys_dev_spi_native_System_Device_Spi_SpiDevice::NativeTransfer(
             // Start SPI transfer
             // We can ask for async transfer by setting callback but it depends if underlying supports it
             // return of CLR_E_BUSY means async started
-            hr = nanoSPI_Write_Read(
-                deviceId,
-                rws,
-                (uint8_t *)writeData,
-                (int32_t)writeSize,
-                (uint8_t *)readData,
-                (int32_t)readSize);
+            hr = SpiIO::WriteRead(deviceId, rws, writeData, writeSize, readData, readSize);
 
             // Async transfer started, go to custom 2 state ( wait completion )
             if (hr == CLR_E_BUSY)
@@ -321,7 +312,7 @@ HRESULT Library_sys_dev_spi_native_System_Device_Spi_SpiDevice::NativeTransfer(
             while (eventResult)
             {
                 // Has it completed ?
-                if (nanoSPI_Op_Status(deviceId) == SPI_OP_COMPLETE)
+                if (SpiIO::Completed(deviceId) == SPI_OP_COMPLETE)
                 {
                     // SPI driver is ready meaning that the SPI transaction(s) is(are) completed
                     break;
@@ -341,7 +332,6 @@ HRESULT Library_sys_dev_spi_native_System_Device_Spi_SpiDevice::NativeTransfer(
             stack.PopValue();
         }
     }
-
     NANOCLR_NOCLEANUP();
 }
 HRESULT Library_sys_dev_spi_native_System_Device_Spi_SpiDevice::NativeOpenDevice___I4(CLR_RT_StackFrame &stack)
@@ -386,5 +376,3 @@ HRESULT Library_sys_dev_spi_native_System_Device_Spi_SpiDevice::NativeOpenDevice
     }
     NANOCLR_NOCLEANUP();
 }
-
-#pragma endregion

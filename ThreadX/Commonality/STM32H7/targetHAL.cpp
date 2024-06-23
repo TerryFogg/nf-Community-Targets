@@ -14,7 +14,6 @@
 #include <nanoHAL_v2.h>
 #include "board.h"
 
-extern bool g_waitForDebuggerRequested;
 bool g_fDoNotUninitializeDebuggerPort = false;
 
 extern "C"

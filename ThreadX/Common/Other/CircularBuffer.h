@@ -18,8 +18,18 @@ typedef struct CircularBuffer
     CLR_INT32 w;
 } CircularBuffer_t;
 
-CLR_UINT8 wp_InitializeBuffer(CircularBuffer_t *buff, void *buffdata, CLR_INT32 size);
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+    bool wp_InitializeBuffer(CircularBuffer_t *buff, void *buffdata, CLR_INT32 size);
 CLR_INT32 wp_BufferBytesWaiting(CircularBuffer_t *buff);
 CLR_INT32 wp_WriteBuffer(CircularBuffer_t *buff, const void *data, CLR_INT32 btw);
 CLR_INT32 wp_ReadBuffer(CircularBuffer_t *buff, void *data, CLR_INT32 btr);
 bool wp_ReadLine(CircularBuffer_t *buffer, const char * newLineCharacter, int newLineLength, uint8_t *line);
+
+#ifdef __cplusplus
+}
+#endif

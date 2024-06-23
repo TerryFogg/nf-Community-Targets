@@ -163,18 +163,15 @@ class SerialIO
         CLR_INT32 RequestedParity);
     static bool SetHandshake(CLR_INT32 usartDeviceNumber, Handshake handshake);
     static bool SetMode(CLR_INT32 UsartDeviceNumber, CLR_INT32 mode);
+    static HRESULT SetupWriteLine(CLR_RT_StackFrame &stack, char **buffer, uint32_t *length, bool *isNewAllocation);
 };
 
 class SpiIO
 {
   private:
   public:
-#pragma region Library_sys_dev_spi_native_System_Device_Spi_SpiBusInfo
     static CLR_INT32 MaximumClockFrequency(CLR_INT32 requestClockFrequence);
     static CLR_INT32 MinimumClockFrequency(CLR_INT32 controllerID);
-#pragma endregion
-
-#pragma region Library_sys_dev_spi_native_System_Device_Spi_SpiConnectionSettings
 
     static bool Initialize();
     static bool Dispose(CLR_INT32 deviceId);
@@ -182,9 +179,10 @@ class SpiIO
         CLR_INT32 deviceId,
         SPI_WRITE_READ_SETTINGS rws,
         CLR_UINT8 *writeData,
-        CLR_UINT32 *writeSize,
+        CLR_UINT16 writeSize,
         CLR_UINT8 *readData,
-        CLR_UINT32 readSize);
+        CLR_UINT16 readSize);
     static bool Open(SPI_DEVICE_CONFIGURATION spiConfig, CLR_UINT32 handle);
-#pragma endregion
+    static CLR_INT32 ByteTime();
+    static SPI_OP_STATUS Completed(CLR_INT32 deviceId);
 };

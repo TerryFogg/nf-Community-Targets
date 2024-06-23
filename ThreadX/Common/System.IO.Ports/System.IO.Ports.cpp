@@ -539,7 +539,7 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::NativeWriteString_
             if (stack.m_customState == 1)
             {
                 // get buffer to output
-                NANOCLR_CHECK_HRESULT(SetupWriteLine(stack, &buffer, &bufferLength, &isNewAllocation));
+                NANOCLR_CHECK_HRESULT(SerialIO::SetupWriteLine(stack, &buffer, &bufferLength, &isNewAllocation));
                 stack.PushValueI4(bufferLength);
                 stack.PushValueI4(isNewAllocation ? 1 : 0);
                 SerialIO::WriteBytes(UsartDeviceNumber, (uint8_t *)&buffer, bufferLength);

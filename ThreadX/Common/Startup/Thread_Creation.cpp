@@ -29,17 +29,19 @@ void tx_application_define(void *first_unused_memory)
 {
     (void)first_unused_memory;
     uint16_t status;
-    //CHAR *pointer = TX_NULL;
+    CHAR *bytePoolZero = (CHAR *)"byte pool 0";
+    CHAR *ReceiverThreadName = (CHAR *)"Receiver Thread";
 
-    tx_byte_pool_create(&byte_pool_0, "byte pool 0", memory_area, DEFAULT_BYTE_POOL_SIZE);
+    tx_byte_pool_create(&byte_pool_0, bytePoolZero, memory_area, DEFAULT_BYTE_POOL_SIZE);
 
     //tx_byte_allocate(&byte_pool_0, (VOID **)&pointer, RECEIVER_THREAD_STACK_SIZE, TX_NO_WAIT);
     //tx_byte_allocate(&byte_pool_0, (VOID **)&pointer, CLR_THREAD_STACK_SIZE, TX_NO_WAIT);
 
+#if defined(DEBUG)
     // Create receiver thread
     status = tx_thread_create(
         &receiverThread,
-        "Receiver Thread",
+        ReceiverThreadName,
         ReceiverThread_entry,
         0,
         receiverThreadStack,
@@ -54,11 +56,14 @@ void tx_application_define(void *first_unused_memory)
         {
         }
     }
+#endif
+
+      CHAR *clrThreadName = (CHAR *)"CLR_Thread";
 
     // Create CLR thread
     status = tx_thread_create(
         &CLRThread,
-        "CLR_Thread",
+          clrThreadName,
         CLRStartupThread,
         g_waitForDebuggerRequested,
         CLRThreadStack,

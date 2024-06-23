@@ -4,30 +4,14 @@
 //
 #include "board.h"
 
-#ifdef SEMIHOSTING
-#include "stdio.h"
-extern void initialise_monitor_handles(void);
+#if defined(DEBUG)
+    bool debuggerRequested = true;
+#else
+    bool debuggerRequested = false;
 #endif
 
-void test(void);
-
-bool debuggerRequested = false;
 int main(void)
 {
-
-#ifdef SEMIHOSTING
-    initialise_monitor_handles();
-    char buffer[255];
-    printf("Please enter your name: \n");
-    printf("\nAh, I know you, %s!\n", buffer);
-
-#endif
-
     Initialize_Board();
-
-#if defined(USER_BUTTON)
-    debuggerRequested = BoardUserButton_Pressed();
-#endif
-
     Startup_Rtos(debuggerRequested);
 }

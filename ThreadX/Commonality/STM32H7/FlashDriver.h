@@ -26,7 +26,6 @@ extern "C"
     bool FlashDriver_EraseBlock(void *, ByteAddress address);
     bool FlashUnlock();
     bool FlashLock();
-    void WriteFlashWord(uint32_t bank, uint32_t *aligned_dest_addr, uint32_t *buffer_256bits);
     bool WaitForLastOperation(uint32_t bank);
     uint32_t GetSector(uint32_t Address);
     uint32_t GetBank(uint32_t Address);

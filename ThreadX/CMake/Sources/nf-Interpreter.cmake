@@ -19,7 +19,6 @@
  #    ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.Security.Cryptography/nf_sys_sec_cryptography_System_Security_Cryptography_HMACSHA256.cpp
 
 
- #    ${CMAKE_SOURCE_DIR}/src/System.IO.Ports/sys_io_ser_native.cpp
  #    ${CMAKE_SOURCE_DIR}/src/System.IO.Ports/sys_io_ser_native_System_IO_Ports_SerialPort__.cpp
 
 # Common
@@ -178,11 +177,8 @@
                     ${CMAKE_SOURCE_DIR}/src/CLR/System.Math/nf_native_system_math.cpp
                     ${CMAKE_SOURCE_DIR}/src/CLR/System.Math/nf_native_system_math_System_Math.cpp
                     ${CMAKE_SOURCE_DIR}/src/CLR/WireProtocol/WireProtocol_App_Interface.c
-                    ${CMAKE_SOURCE_DIR}/src/CLR/WireProtocol/WireProtocol_HAL_Interface.c
-
-# Replaced with commonality version
-#                   ${CMAKE_SOURCE_DIR}/src/CLR/WireProtocol/WireProtocol_Message.c
-
+#                    ${CMAKE_SOURCE_DIR}/src/CLR/WireProtocol/WireProtocol_HAL_Interface.c
+                    ${CMAKE_SOURCE_DIR}/src/CLR/WireProtocol/WireProtocol_Message.c
                     ${CMAKE_SOURCE_DIR}/src/CLR/WireProtocol/WireProtocol_MonitorCommands.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Boot.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Capabilites.c
@@ -239,6 +235,7 @@
                     #${CMAKE_SOURCE_DIR}/src/System.Device.Spi/sys_dev_spi_native_System_Device_Spi_SpiBusInfo.cpp
                     #${CMAKE_SOURCE_DIR}/src/System.Device.Spi/sys_dev_spi_native_System_Device_Spi_SpiDevice.cpp
 
+                     ${CMAKE_SOURCE_DIR}/src/System.IO.Ports/sys_io_ser_native.cpp
                     ${CMAKE_SOURCE_DIR}/src/System.Runtime.Serialization/nf_system_runtime_serialization.cpp
                     ${CMAKE_SOURCE_DIR}/src/System.Runtime.Serialization/nf_system_runtime_serialization_System_Runtime_Serialization_Formatters_Binary_BinaryFormatter.cpp
 
@@ -294,16 +291,17 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetPAL_Events.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetPAL_Time.cpp
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/WireProtocol_Message.c
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/WireProtocol_HAL_Interface.c
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/wp_CircularBuffer.c
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/WireProtocol_MonitorCommands.c
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/CircularBuffer.cpp
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/DeviceIO/DeviceIO.cpp																																																																																																																																																																																							
-                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/Delays.cpp
-                   ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/hard_fault_handler.c
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/Delays.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/hard_fault_handler.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/targetHAL.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/FlashDriver.c
-
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/FlashDriver.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/nanoSupport_CRC32.c
+                    
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/WireProtocol/WireProtocol_HAL_Interface.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/WireProtocol/wp_Communications.c)  
 
 # Overide compile flags on selected files

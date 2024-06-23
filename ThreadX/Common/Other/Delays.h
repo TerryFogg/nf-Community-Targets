@@ -15,7 +15,8 @@ extern "C"
     void DelayCounter(int delayValue, int period);
     void DelayMicroseconds(uint32_t microseconds);
     void DelayMilliseconds(uint32_t milliseconds);
-    uint32_t GetCurrentMicroseconds(bool reset);
+    void ResetCurrentMicroseconds();
+    uint32_t GetCurrentMicroseconds();
 
 #ifdef __cplusplus
 }

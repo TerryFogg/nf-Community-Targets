@@ -178,9 +178,9 @@
                     ${CMAKE_SOURCE_DIR}/src/CLR/System.Math/nf_native_system_math_System_Math.cpp
                     ${CMAKE_SOURCE_DIR}/src/CLR/WireProtocol/WireProtocol_App_Interface.c
 #                    ${CMAKE_SOURCE_DIR}/src/CLR/WireProtocol/WireProtocol_HAL_Interface.c
-                    ${CMAKE_SOURCE_DIR}/src/CLR/WireProtocol/WireProtocol_Message.c
+#                    ${CMAKE_SOURCE_DIR}/src/CLR/WireProtocol/WireProtocol_Message.c
                     ${CMAKE_SOURCE_DIR}/src/CLR/WireProtocol/WireProtocol_MonitorCommands.c
-                    ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Boot.c
+#                    ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Boot.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Capabilites.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_ConfigurationManager.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_SystemEvents.c
@@ -264,8 +264,10 @@
         list(APPEND NF_INTERPRETER_SOURCES 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/main.c
 
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/CircularBuffer.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/Memory.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/nanoCRT.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/nanoHAL_Boot.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/sys_calls.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/targetHAL_ConfigurationManager.cpp
 
@@ -281,18 +283,15 @@
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.Ports/System.IO.Ports.cpp
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Startup/Thread_CLRStartup.c
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Startup/Thread_Creation.c
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Startup/Thread_WireProtocolReceiver.c
-
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/platform_heap.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetHAL_Rtos.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetHAL_Time.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetPAL_Events.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetPAL_Time.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Thread_Creation.c
 
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/WireProtocol_Message.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/WireProtocol_MonitorCommands.c
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/CircularBuffer.cpp
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/DeviceIO/DeviceIO.cpp																																																																																																																																																																																							
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/Delays.cpp
@@ -306,4 +305,4 @@
 
 # Overide compile flags on selected files
     # Set flags on code that is required but produces warning/errors with current build parameters
-    set_source_files_properties(${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Boot.c COMPILE_FLAGS -Wno-unused-parameter)
+#    set_source_files_properties(${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Boot.c COMPILE_FLAGS -Wno-unused-parameter)

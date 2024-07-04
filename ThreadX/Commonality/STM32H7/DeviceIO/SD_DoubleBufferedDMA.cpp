@@ -8,7 +8,7 @@
 
 #include "SD_DoubleBufferedDMA.h"
 
-extern SDPin *SDChannels;
+extern DeviceRegistration::SDPin *SDChannels;
 void SD_IRQHandler(int SDBUS_index);
 
 const int blockSize = 512;
@@ -44,13 +44,13 @@ void InitializeSD_Bus(
     SDMMC_TypeDef *SDMMC;
     SDMMC_InitTypeDef SDMMCInit;
 
-    SetPinFunction(SDMMC_D0, DevicePinFunction::SD);
-    SetPinFunction(SDMMC_D1, DevicePinFunction::SD);
-    SetPinFunction(SDMMC_D2, DevicePinFunction::SD);
-    SetPinFunction(SDMMC_D3, DevicePinFunction::SD);
-    SetPinFunction(SDMMC_CLK, DevicePinFunction::SD);
-    SetPinFunction(SDMMC_CMD, DevicePinFunction::SD);
-    SetPinFunction(SDMMC_DETECT, DevicePinFunction::GPIO);
+    DeviceRegistration::SetPinFunction(SDMMC_D0, DeviceRegistration::DevicePinFunction::SD);
+    DeviceRegistration::SetPinFunction(SDMMC_D1, DeviceRegistration::DevicePinFunction::SD);
+    DeviceRegistration::SetPinFunction(SDMMC_D2, DeviceRegistration::DevicePinFunction::SD);
+    DeviceRegistration::SetPinFunction(SDMMC_D3, DeviceRegistration::DevicePinFunction::SD);
+    DeviceRegistration::SetPinFunction(SDMMC_CLK, DeviceRegistration::DevicePinFunction::SD);
+    DeviceRegistration::SetPinFunction(SDMMC_CMD, DeviceRegistration::DevicePinFunction::SD);
+    DeviceRegistration::SetPinFunction(SDMMC_DETECT, DeviceRegistration::DevicePinFunction::GPIO);
 
     switch (SDBus_index)
     {

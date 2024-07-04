@@ -22,7 +22,7 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::NativeInit___VOID(
         CLR_INT32 baudRate = ((int)stack.This()[Library_sys_io_ser_native_System_IO_Ports_SerialPort::FIELD___baudRate]
                                   .NumericByRef()
                                   .s4);
-        if (IsValidSerialBus(UsartDeviceNumber))
+        if (DeviceRegistration::IsValidSerialBus(UsartDeviceNumber))
         {
             SerialIO::Initialize(UsartDeviceNumber, baudRate);
         }
@@ -463,7 +463,7 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::NativeConfig___VOI
         Handshake RequestedHandshake = (Handshake)stack.This()[FIELD___handshake].NumericByRef().s4;
         SerialMode RequestedMode = (SerialMode)stack.This()[FIELD___mode].NumericByRef().s4;
 
-        if (IsValidSerialBus(usartDeviceNumber))
+        if (DeviceRegistration::IsValidSerialBus(usartDeviceNumber))
         {
             if (RequestedMode != SerialMode::SerialMode_Normal)
             {

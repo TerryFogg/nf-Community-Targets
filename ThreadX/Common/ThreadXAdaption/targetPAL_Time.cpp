@@ -7,6 +7,7 @@
 
 #include <nanoPAL.h>
 #include <target_platform.h>
+#include <targetPAL_Time.h>
 
 // timer for next event
 static TX_TIMER nextEventTimer;
@@ -78,7 +79,6 @@ void Time_SetCompare(uint64_t compareValueTicks)
             // compareValueTicks is in CMSIS ticks (which equals to ms)
             compareValueTicks -= HAL_Time_CurrentSysTicks();
 
-            // make sure that chVTSet does not get called with zero delay
             if (compareValueTicks == 0)
             {
                 // compare value is 0 so dequeue and execute immediately
@@ -93,4 +93,15 @@ void Time_SetCompare(uint64_t compareValueTicks)
             tx_timer_activate(&nextEventTimer);
         }
     }
+}
+
+uint64_t CPU_MillisecondsToTicks(uint64_t milliseconds)
+{
+    return milliseconds / NumberOfMillisecondsPerTick;
+}
+
+// Converts sysTicks to .NET ticks (100 nanoseconds)
+uint64_t HAL_Time_SysTicksToTime(uint64_t sysTicks)
+{
+    return sysTicks * NumberOf100nanosecondsPerTick;
 }

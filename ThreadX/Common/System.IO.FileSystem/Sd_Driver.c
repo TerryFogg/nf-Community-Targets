@@ -4,6 +4,7 @@
 //
 #include "File_Drivers.h"
 #include "board.h"
+#include <targetHAL_Time.h>
 
 typedef signed int CLR_INT32;
 

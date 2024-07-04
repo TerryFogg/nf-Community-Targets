@@ -20,7 +20,7 @@ HRESULT Library_sys_dev_pwm_native_System_Device_Pwm_PwmChannel::NativeInit___VO
         CLR_INT32 desiredFrequency = stack.This()[FIELD___frequency].NumericByRef().s4;
         CLR_INT32 dutyCycle = stack.This()[FIELD___dutyCycle].NumericByRef().s4;
 
-        if (IsValidPWMBus(channelId))
+        if (DeviceRegistration::IsValidPWMDevice(channelId))
         {
             PwmIO::Initialize(channelId, timerId, pinNumber, polarity, desiredFrequency, dutyCycle);
         }
@@ -37,7 +37,7 @@ HRESULT Library_sys_dev_pwm_native_System_Device_Pwm_PwmChannel::DisposeNative__
     {
         FAULT_ON_NULL(stack.This());
         CLR_INT32 channelId = stack.This()[FIELD___channelNumber].NumericByRef().s4;
-        if (IsValidPWMBus(channelId))
+        if (DeviceRegistration::IsValidPWMDevice(channelId))
         {
             PwmIO::Dispose(channelId);
         }

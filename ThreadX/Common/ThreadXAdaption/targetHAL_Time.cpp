@@ -9,9 +9,6 @@
 #include <nanoHAL_Time.h>
 #include <target_platform.h>
 
-
-#include <tx_api.h>
-
 __nfweak void InitHardwareRTC(uint32_t secondsTime,int optional)
 {
     (void)secondsTime;
@@ -134,16 +131,4 @@ char *DateTimeToString(const int64_t &time)
 const char *HAL_Time_CurrentDateTimeToString()
 {
     return DateTimeToString(HAL_Time_CurrentDateTime(false));
-}
-
-uint64_t CPU_MillisecondsToTicks(uint64_t ticks)
-{
-    return ((ticks * (uint64_t)TX_TIMER_TICKS_PER_SECOND) / 1000);
-}
-
-
-// Converts sysTicks to .NET ticks (100 nanoseconds)
-uint64_t HAL_Time_SysTicksToTime(uint64_t sysTicks)
-{
-    return sysTicks * TX_TIMER_TICKS_PER_SECOND * 10;
 }

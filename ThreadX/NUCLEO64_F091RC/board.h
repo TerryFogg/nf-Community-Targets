@@ -12,18 +12,16 @@
 #include <nanoCLR_Headers.h>
 
 #include "stm32f0xx.h"
-#include "stm32f0xx.h"
 #include "stm32f0xx_ll.h"
-#include "stm32f0xx_hal_pwr.h"
 #include "tx_api.h"
 #include "tx_port.h"
 
 #define TARGET_BLOCKSTORAGE_COUNT 1
 
 #pragma region Byte pool configuration and definitions
-#define DEFAULT_BYTE_POOL_SIZE     16000
-#define CLR_THREAD_STACK_SIZE      6000
-#define RECEIVER_THREAD_STACK_SIZE 4096
+#define DEFAULT_BYTE_POOL_SIZE     3000
+#define CLR_THREAD_STACK_SIZE      1000
+#define RECEIVER_THREAD_STACK_SIZE 1000
 #pragma endregion
 
 #pragma region Device Input/output
@@ -60,17 +58,12 @@ enum ArduinoPin : int
 #pragma endregion
 
 #pragma region Peripheral clocks definitions
-#define ENABLE_CLOCK_ON_PORT_GPIOA LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOA)
-#define ENABLE_CLOCK_ON_PORT_GPIOB LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOB)
-#define ENABLE_CLOCK_ON_PORT_GPIOC LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOC)
-#define ENABLE_CLOCK_ON_PORT_GPIOD LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOD)
-#define ENABLE_CLOCK_ON_PORT_GPIOE LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOE)
-#define ENABLE_CLOCK_ON_PORT_GPIOF LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOF)
-#define ENABLE_CLOCK_ON_PORT_GPIOG LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOG)
-#define ENABLE_CLOCK_ON_PORT_GPIOH LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOH)
-#define ENABLE_CLOCK_ON_PORT_GPIOI LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOI)
-#define ENABLE_CLOCK_ON_PORT_GPIOJ LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOJ)
-#define ENABLE_CLOCK_ON_PORT_GPIOK LL_AHB4_GRP1_EnableClock(LL_AHB4_GRP1_PERIPH_GPIOK)
+#define ENABLE_CLOCK_ON_PORT_GPIOA LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOA)
+#define ENABLE_CLOCK_ON_PORT_GPIOB LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOB)
+#define ENABLE_CLOCK_ON_PORT_GPIOC LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOC)
+#define ENABLE_CLOCK_ON_PORT_GPIOD LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOD)
+#define ENABLE_CLOCK_ON_PORT_GPIOE LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOE)
+#define ENABLE_CLOCK_ON_PORT_GPIOF LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOF)
 #define ENABLE_CLOCK_ON_USART3     LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART3)
 
 #define ENABLE_CLOCK_ON_DMA1       LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_DMA1)
@@ -105,10 +98,6 @@ enum ArduinoPin : int
 
 #pragma endregion
 
-#pragma region Display interface and controller setup parameters
-#define LCD_WIDTH  480
-#define LCD_HEIGHT 272
-#pragma endregion
 
 
 #pragma region Local board buttons and leds
@@ -153,13 +142,13 @@ static inline void DWT_Delay_us(volatile uint32_t microsecond_delay)
 {
 
     // TODO - At boot time not relevant, but Important  WRAP AROUND counter !!!! to fix
-    LL_RCC_ClocksTypeDef RCC_Clocks;
-    LL_RCC_GetSystemClocksFreq(&RCC_Clocks);
-    uint32_t initial_microseconds = DWT->CYCCNT;
-    uint32_t tick_rate = RCC_Clocks.SYSCLK_Frequency / 1000000;
-    microsecond_delay *= tick_rate;
-    while ((DWT->CYCCNT - initial_microseconds) < microsecond_delay - tick_rate)
-        ;
+    //LL_RCC_ClocksTypeDef RCC_Clocks;
+    //LL_RCC_GetSystemClocksFreq(&RCC_Clocks);
+    //uint32_t initial_microseconds = DWT->CYCCNT;
+    //uint32_t tick_rate = RCC_Clocks.SYSCLK_Frequency / 1000000;
+    //microsecond_delay *= tick_rate;
+    //while ((DWT->CYCCNT - initial_microseconds) < microsecond_delay - tick_rate)
+    //    ;
 }
 
 static inline uint32_t Get_SYSTICK()

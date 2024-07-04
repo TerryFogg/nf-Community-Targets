@@ -11,7 +11,7 @@
 #ifndef TX_USER_H
 #define TX_USER_H
 
-#define TX_TIMER_TICKS_PER_SECOND 1000
+#define TX_TIMER_TICKS_PER_SECOND 100
 
 /* Define various build options for the ThreadX port.  The application should either make changes
    here by commenting or un-commenting the conditional compilation defined OR supply the defines

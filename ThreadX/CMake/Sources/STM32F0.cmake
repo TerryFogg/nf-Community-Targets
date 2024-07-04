@@ -35,32 +35,18 @@
              ${STM32F0_CUBE_SOURCE}/Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates/system_stm32F0xx.c
 
              ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_adc.c
-             ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_bdma.c
              ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_comp.c
-             ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_cordic.c
              ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_crc.c
              ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_crs.c
              ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_dac.c
-             ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_delayblock.c
              ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_dma.c
-             ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_dma2d.c
              ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_exti.c
-             ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_fmac.c
-             ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_fmc.c
              ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_gpio.c
-             ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_hrtim.c
              ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_i2c.c
-             ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_lptim.c
-             ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_lpuart.c
-             ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_mdma.c
-             ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_opamp.c
              ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_pwr.c
              ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_rcc.c
-             ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_rng.c
              ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_rtc.c
-             ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_sdmmc.c
              ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_spi.c
-             ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_swpmi.c
              ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_tim.c
              ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_usart.c
              ${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_HAL_Driver/Src/stm32F0xx_ll_usb.c
@@ -68,8 +54,4 @@
       )
 
 # Overide compile flags on selected files
- set_source_files_properties(${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_Hal_Driver/src/stm32F0xx_ll_hrtim.c COMPILE_FLAGS -Wno-unused-parameter)
- set_source_files_properties(${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_Hal_Driver/src/stm32F0xx_ll_rng.c COMPILE_FLAGS -Wno-unused-variable)
- set_source_files_properties(${STM32F0_CUBE_SOURCE}/Drivers/STM32F0xx_Hal_Driver/src/stm32F0xx_ll_rng.c COMPILE_FLAGS -Wno-unused-parameter)
-
                                            

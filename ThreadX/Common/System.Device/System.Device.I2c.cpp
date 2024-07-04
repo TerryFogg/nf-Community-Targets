@@ -21,7 +21,7 @@ HRESULT Library_sys_dev_i2c_native_System_Device_I2c_I2cDevice::NativeInit___VOI
         CLR_RT_HeapBlock *connectionSettings = stack.This()[FIELD___connectionSettings].Dereference();
         CLR_INT32 deviceId = connectionSettings[I2cConnectionSettings::FIELD___busId].NumericByRef().s4;
 
-        if (IsValidI2CDevice(deviceId))
+        if (DeviceRegistration::IsValidI2CDevice(deviceId))
         {
             I2cBusSpeed I2cSpeed =
                 (I2cBusSpeed)connectionSettings[I2cConnectionSettings::FIELD___busSpeed].NumericByRef().s4;
@@ -83,7 +83,7 @@ HRESULT Library_sys_dev_i2c_native_System_Device_I2c_I2cDevice::
 
         uint8_t deviceId = (uint8_t)connectionSettings[I2cConnectionSettings::FIELD___busId].NumericByRef().s4;
 
-        if (!IsValidI2CDevice(deviceId))
+        if (!DeviceRegistration::IsValidI2CDevice(deviceId))
         {
             NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_OPERATION);
         }

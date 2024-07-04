@@ -1,0 +1,22 @@
+sequenceDiagram
+activate StartupRTOS
+StartupRTOS-->>Thread_Creation : tx_application_define
+
+
+tx_application_define-->tx_thread_create()
+
+
+Thread_Creation-->>Thread_Creation : tx_thread_create()
+Thread_Creation-->>Thread_Creation : CLRStartupThread(CLRStartupThread)
+
+CLRStartupThread-->>nanoHAL_Initialize
+
+nanoHAL_Initialize-->>Events_Initialize
+
+Events_Initialize-->>Events_Initialize_Platform()
+Events_Initialize_Platform-->>tx_timer_create(local_Events_SetBoolTimer_Callback)
+
+tx_thread_create-->Thread_Creation : CLRStartupThread()
+Thread_Creation-->>targetHAL :nanoHAL_Initialize
+
+

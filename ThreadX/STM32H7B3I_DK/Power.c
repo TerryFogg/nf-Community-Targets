@@ -7,8 +7,12 @@
 #include <nanoHAL_v2.h>
 #include "board.h"
 
+extern void Reset_Handler();
+
 uint32_t WakeupReasonStore;
 
+
+/* Call the reset handler */
 inline void CPU_Reset()
 {
     NVIC_SystemReset();

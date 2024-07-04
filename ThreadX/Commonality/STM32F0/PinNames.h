@@ -7,9 +7,7 @@
 typedef enum PinNameValues
 {
     PA0 = 0,
-    PA0_C = 100,
     PA1 = 1,
-    PA1_C = 101,
     PA2 = 2,
     PA3 = 3,
     PA4 = 4,
@@ -43,9 +41,7 @@ typedef enum PinNameValues
     PC0 = 32,
     PC1 = 33,
     PC2 = 34,
-    PC2_C = 102,
     PC3 = 35,
-    PC3_C = 103,
     PC4 = 36,
     PC5 = 37,
     PC6 = 38,

@@ -17,148 +17,159 @@
     if (disposedState != 0)                                                                                            \
     NANOCLR_SET_AND_LEAVE(CLR_E_OBJECT_DISPOSED)
 
-typedef struct I2C_Buses
-{
-    void *bus;
-    int busSpeed;
-    int8_t I2cAddress[128];
-    int8_t numberOfActiveDevices;
-} I2C_Bus;
-typedef enum DevicePinFunction
-{
-    NONE = 1,
-    GPIO = 2,
-    ADC = 4,
-    DAC = 8,
-    SPI = 16,
-    PWM = 32,
-    I2C = 64,
-    USART = 128,
-    CAN = 256,
-    COUNTER = 512,
-    TIMER = 1024,
-    I2S = 2048,
-    WAKEUP = 4096,
-    SD = 8192
-} DevicePinFunction;
-typedef enum I2c_Bus_Type
-{
-    Master,
-    Slave
-} I2c_Bus_Type;
-typedef struct GpioParameter
-{
-    TX_TIMER debounceTimer;
-    GPIO_INTERRUPT_SERVICE_ROUTINE isrPtr;
-    uint32_t debounceMs;
-    uint8_t edgeTrigger;
-    void *param;
-    bool expectedState;
-    bool waitingForDebounceToExpire;
-} GpioParameter;
-typedef struct DevicePin
-{
-    PinNameValue pinNameValue;
-    bool Reserved;
-    struct DevicePins *next;
-    GpioParameter *GpioParameterData;
-    PinMode Mode;
-    DevicePinFunction CurrentFunction;
-    int DeviceFunctionChannelNumber;
-} DevicePin;
-typedef struct AdcPin
-{
-    void *controllerId;
-    int controllerNumber;
-    int channelNumber;
-} AdcPin;
-typedef struct DacPin
-{
-    void *controllerId;
-    int controllerNumber;
-    int channelNumber;
-} DacPin;
-typedef struct I2cPin
-{
-    void *controllerId;
-    int controllerNumber;
-    int channelNumber;
-} I2cPin;
-typedef struct PwmPin
-{
-    void *controllerId;
-    int controllerNumber;
-    int channelNumber;
-} PwmPin;
-typedef struct SpiPin
-{
-    void *controllerId;
-    int controllerNumber;
-    int channelNumber;
-} SpiPin;
-typedef struct SerialPin
-{
-    void *controllerId;
-    int controllerNumber;
-    int channelNumber;
-} SerialPin;
-typedef struct SerialChannel
-{
-    void *controllerId;
-    char newLine;
-} SerialChannel;
-
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-    unsigned int countSetBits(unsigned int num);
-    void CreatePinList(DevicePin *GPIOPins, int numberOfPins);
-    int NumberOfPins();
-    bool AddPinParameters(PinNameValue pinNameValue, void *newParameters);
-    bool ReservePin(PinNameValue pinNameValue);
-    bool IsValidPin(PinNameValue pinNameValue);
-    bool IsPinReserved(PinNameValue pinNameValue);
-    bool ReleasePin(PinNameValue pinNameValue);
-    bool SetPinMode1(PinNameValue pinNameValue, PinMode pinMode);
-    bool GetPinMode(PinNameValue pinNameValue, PinMode *pinMode);
-    bool SetPinFunction(PinNameValue pinNameValue, DevicePinFunction devicePinFunction);
-    bool GetPinFunction(PinNameValue pinNameValue, DevicePinFunction *devicePinFunction);
-    int FindPin(PinNameValue pinNameValue);
-    PinNameValue FindPinWithFunctionAndChannel(DevicePinFunction dph, int deviceChannel);
-    bool IsValidOutputDriveMode(PinMode driveMode);
-    bool IsValidInputDriveMode(PinMode driveMode);
 
-    GpioParameter *GetPinParameters(PinNameValue pinNameValue);
-    // bool AddPinParameters(PinNameValue pinNameValue, void *newParameters);
-    bool RemovePinParameters(PinNameValue pinNameValue);
+    class DeviceRegistration
+    {
+      public:
+        typedef enum DevicePinFunction
+        {
+            NONE = 1,
+            GPIO = 2,
+            ADC = 4,
+            DAC = 8,
+            SPI = 16,
+            PWM = 32,
+            I2C = 64,
+            USART = 128,
+            CAN = 256,
+            COUNTER = 512,
+            TIMER = 1024,
+            I2S = 2048,
+            WAKEUP = 4096,
+            SD = 8192,
+            LCD = 16384
+        } DevicePinFunction;
+        typedef struct GpioParameter
+        {
+            TX_TIMER debounceTimer;
+            GPIO_INTERRUPT_SERVICE_ROUTINE isrPtr;
+            uint32_t debounceMs;
+            uint8_t edgeTrigger;
+            void *param;
+            bool expectedState;
+            bool waitingForDebounceToExpire;
+        } GpioParameter;
 
-    void CreateADCChannelList(AdcPin *AdcChannels, int numberOfAdcChannels);
-    void CreateDACChannelList(DacPin *DACChannels, int numberOfDACChannels);
-    void CreateI2CChannelList(I2cPin *I2CChannels, int numberOfI2CChannels);
-    void CreatePWMChannelList(PwmPin *PWMChannels, int numberOfPWMChannels);
-    void CreateSPIChannelList(SpiPin *SPIChannels, int numberOfSPIChannels);
-    void CreateSerialChannelList(SerialPin *SerialChannels, int numberOfSerialChannels);
-    bool IsValidI2CDevice(int busIndex);
-    bool IsValidPWMBus(int busIndex);
-    bool IsValidSDBus(int busIndex);
-    bool IsValidSerialBus(int busIndex);
-    bool IsValidOutputPin(PinNameValue pinNameValue);
-    bool IsValidInputPin(PinNameValue pinNameValue);
+        typedef struct DevicePin
+        {
+            PinNameValue pinNameValue;
+            bool Reserved;
+            struct DevicePins *next;
+            GpioParameter *GpioParameterData;
+            PinMode Mode;
+            DevicePinFunction CurrentFunction;
+            int DeviceFunctionChannelNumber;
+        } DevicePin;
+
+        typedef struct I2C_Buses
+        {
+            void *bus;
+            int busSpeed;
+            int8_t I2cAddress[128];
+            int8_t numberOfActiveDevices;
+        } I2C_Bus;
+        typedef enum I2c_Bus_Type
+        {
+            Master,
+            Slave
+        } I2c_Bus_Type;
+        typedef struct AdcPin
+        {
+            void *controllerId;
+            int controllerNumber;
+            int channelNumber;
+        } AdcPin;
+        typedef struct DacPin
+        {
+            void *controllerId;
+            int controllerNumber;
+            int channelNumber;
+        } DacPin;
+        typedef struct I2cPin
+        {
+            void *controllerId;
+            int controllerNumber;
+            int channelNumber;
+        } I2cPin;
+        typedef struct PwmPin
+        {
+            void *controllerId;
+            int controllerNumber;
+            int channelNumber;
+        } PwmPin;
+        typedef struct SpiPin
+        {
+            void *controllerId;
+            int controllerNumber;
+            int channelNumber;
+        } SpiPin;
+        typedef struct SerialPin
+        {
+            void *controllerId;
+            int controllerNumber;
+            int channelNumber;
+        } SerialPin;
+        typedef struct SerialChannel
+        {
+            void *controllerId;
+            char newLine;
+        } SerialChannel;
+
+        static unsigned int countSetBits(unsigned int num);
+        static void CreatePinList(DevicePin *GPIOPins, int numberOfPins);
+        static int NumberOfPins();
+        static bool AddPinParameters(PinNameValue pinNameValue, void *newParameters);
+        static bool ReservePin(PinNameValue pinNameValue);
+        static bool IsValidPin(PinNameValue pinNameValue);
+        static bool IsPinReserved(PinNameValue pinNameValue);
+        static bool ReleasePin(PinNameValue pinNameValue);
+        static bool SetPinMode(PinNameValue pinNameValue, PinMode pinMode);
+        static bool GetPinMode(PinNameValue pinNameValue, PinMode *pinMode);
+        static bool SetPinFunction(PinNameValue pinNameValue, DevicePinFunction devicePinFunction);
+        static bool GetPinFunction(PinNameValue pinNameValue, DevicePinFunction *devicePinFunction);
+        static int FindPin(PinNameValue pinNameValue);
+        static PinNameValue FindPinWithFunctionAndChannel(DevicePinFunction dph, int deviceChannel);
+        static bool IsValidOutputDriveMode(PinMode driveMode);
+        static bool IsValidInputDriveMode(PinMode driveMode);
+
+        static GpioParameter *GetPinParameters(PinNameValue pinNameValue);
+        // bool AddPinParameters(PinNameValue pinNameValue, void *newParameters);
+        static bool RemovePinParameters(PinNameValue pinNameValue);
+
+        static void CreateADCChannelList(AdcPin *AdcChannels, int numberOfAdcChannels);
+        static void CreateDACChannelList(DacPin *DACChannels, int numberOfDACChannels);
+        static void CreateI2CChannelList(I2cPin *I2CChannels, int numberOfI2CChannels);
+        static void CreatePWMChannelList(PwmPin *PWMChannels, int numberOfPWMChannels);
+        static void CreateSPIChannelList(SpiPin *SPIChannels, int numberOfSPIChannels);
+        static void CreateSerialChannelList(SerialPin *SerialChannels, int numberOfSerialChannels);
+        static bool IsValidADCDevice(int deviceIndex);
+        static bool IsValidDACDevice(int deviceIndex);
+        static bool IsValidI2CDevice(int deviceIndex);
+        static bool IsValidPWMDevice(int deviceIndex);
+        static bool IsValidSDBus(int deviceIndex);
+        static bool IsValidSerialBus(int deviceIndex);
+        static bool IsValidSPIDevice(int deviceIndex);
+        static bool IsValidOutputPin(PinNameValue pinNameValue);
+        static bool IsValidInputPin(PinNameValue pinNameValue);
 
 #if defined(FILEX_SYSTEM_SD)
-    typedef struct SDPin
-    {
-        void *controllerId;
-        int controllerNumber;
-        int channelNumber;
-        File_Read_Type readType;
-        File_Status status;
-        TX_SEMAPHORE RX_semaphore;
-        TX_SEMAPHORE TX_semaphore;
-    } SDPin;
-    void CreateSDChannelList(SDPin *BoardSDChannels, int BoardnumberOfSDChannels);
+        typedef struct SDPin
+        {
+            void *controllerId;
+            int controllerNumber;
+            int channelNumber;
+            File_Read_Type readType;
+            File_Status status;
+            TX_SEMAPHORE RX_semaphore;
+            TX_SEMAPHORE TX_semaphore;
+        } SDPin;
+        static void CreateSDChannelList(SDPin *BoardSDChannels, int BoardnumberOfSDChannels);
 #endif
+    };
 
 #ifdef __cplusplus
 }

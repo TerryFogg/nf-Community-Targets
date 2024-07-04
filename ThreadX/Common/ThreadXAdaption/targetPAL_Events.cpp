@@ -9,8 +9,8 @@
 #include <nanoCLR_Runtime.h>
 #include <nanoPAL.h>
 #include <target_platform.h>
+#include <nanoHAL_Time.h>
 
-uint64_t CPU_MillisecondsToTicks(uint64_t ticks);
 
 // timer for bool events
 TX_TIMER boolEventsTimer;
@@ -51,7 +51,8 @@ void Events_SetBoolTimer(bool *timerCompleteFlag, uint32_t millisecondsFromNow)
 
         // need to stop the timer first
         tx_timer_deactivate(&boolEventsTimer);
-        tx_timer_change(&boolEventsTimer, TX_TICKS_PER_MILLISEC(millisecondsFromNow), 0);
+        uint64_t ticks = CPU_MillisecondsToTicks(millisecondsFromNow);
+        tx_timer_change(&boolEventsTimer, ticks, 0);
         tx_timer_activate(&boolEventsTimer);
     }
 }

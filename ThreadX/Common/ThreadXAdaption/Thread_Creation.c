@@ -3,13 +3,19 @@
 
 #include <nanoCLR_Application.h>
 #include <tx_api.h>
-#include "startup_threads.h"
 #include "board.h"
 #include "target_platform.h"
+#include <nanoHAL_v2.h>
+#include "targetHAL.h"
+#include "WireProtocol_ReceiverThread.h"
+#include <WireProtocol_Message.h>
 
 #ifdef FILEX
 #include <fx_api.h>
 #endif
+
+void CLRStartupThread(uint32_t parameter);
+void ReceiverThread_entry(uint32_t parameter);
 
 #define RECEIVER_THREAD_PRIORITY 4
 #define CLR_THREAD_PRIORITY      5
@@ -20,21 +26,23 @@ TX_BYTE_POOL byte_pool_0;
 uint8_t memory_area[DEFAULT_BYTE_POOL_SIZE] = {0};
 
 TX_THREAD receiverThread;
-TX_THREAD CLRThread;
-
 uint32_t receiverThreadStack[RECEIVER_THREAD_STACK_SIZE / sizeof(uint32_t)];
+
+TX_THREAD CLRThread;
 uint32_t CLRThreadStack[CLR_THREAD_STACK_SIZE / sizeof(uint32_t)];
+
+void Startup_Rtos(bool debuggerRequested)
+{
+    g_waitForDebuggerRequested = debuggerRequested;
+    tx_kernel_enter();
+}
 
 void tx_application_define(void *first_unused_memory)
 {
     (void)first_unused_memory;
     uint16_t status;
-    //CHAR *pointer = TX_NULL;
 
     tx_byte_pool_create(&byte_pool_0, "byte pool 0", memory_area, DEFAULT_BYTE_POOL_SIZE);
-
-    //tx_byte_allocate(&byte_pool_0, (VOID **)&pointer, RECEIVER_THREAD_STACK_SIZE, TX_NO_WAIT);
-    //tx_byte_allocate(&byte_pool_0, (VOID **)&pointer, CLR_THREAD_STACK_SIZE, TX_NO_WAIT);
 
     // Create receiver thread
     status = tx_thread_create(
@@ -80,8 +88,49 @@ void tx_application_define(void *first_unused_memory)
         }
     }
 }
-void Startup_Rtos(bool debuggerRequested)
+
+
+void CLRStartupThread(uint32_t parameter)
 {
-    g_waitForDebuggerRequested = debuggerRequested;
-    tx_kernel_enter();
+
+    bool userRequestedWaitForDebugger = (bool)parameter;
+
+    // CLR settings to launch CLR thread
+    CLR_SETTINGS clrSettings;
+    (void)memset(&clrSettings, 0, sizeof(CLR_SETTINGS));
+    clrSettings.MaxContextSwitches = 50;
+    clrSettings.EnterDebuggerLoopAfterExit = true;
+    clrSettings.WaitForDebugger = userRequestedWaitForDebugger;
+
+    //   HAL_Time_CurrentSysTicks
+
+    nanoHAL_Initialize_C();
+    ClrStartup(clrSettings);
+}
+
+
+extern WP_Message inboundMessage;
+
+__attribute__((noreturn)) void ReceiverThread_entry(uint32_t parameter)
+{
+    (void)parameter;
+
+    // NOTE: Don't call scheduler type calls in this module
+    InitWireProtocolCommunications();
+    tx_thread_sleep(50);
+
+    WP_Message_Initialize(&inboundMessage);
+    WP_Message_PrepareReception(&inboundMessage);
+
+    // loop until thread receives a request to terminate
+    while (true)
+    {
+        WP_Message_Process(&inboundMessage);
+        tx_thread_relinquish();
+    }
+}
+
+void WP_Message_PrepareReception_Platform()
+{
+    // empty on purpose, nothing to configure
 }

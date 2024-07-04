@@ -37,13 +37,6 @@
     if(CMAKE_BUILD_TYPE STREQUAL "Release")
         target_compile_definitions(nanoCLR.elf PUBLIC -DBUILD_RTM)
     endif()
-    if(CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
-        target_compile_definitions(nanoCLR.elf PUBLIC -DBUILD_RTM)
-    endif()
-    if(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo") 
-        target_compile_definitions(nanoCLR.elf PUBLIC -DBUILD_RTM)
-        target_compile_definitions(nanoCLR.elf PUBLIC -DNANOCLR_ENABLE_SOURCELEVELDEBUGGING)
-    endif()
     
     target_compile_definitions(nanoCLR.elf PUBLIC -DPLATFORM_NO_CLR_TRACE=1)
     target_compile_definitions(nanoCLR.elf PUBLIC -DDEBUG)

@@ -31,7 +31,10 @@ class GpioIO
     static bool Read(PinNameValue pinNumber);
     static bool Write(PinNameValue pinNumber, bool pinState);
     static bool Toggle(PinNameValue pinNumber);
-    static bool SetFunction(PinNameValue pinNumber, DevicePinFunction PinFunction, int optional = 0);
+    static bool SetFunction(
+        PinNameValue pinNumber,
+        DeviceRegistration::DevicePinFunction PinFunction,
+        int optional = 0);
     static bool SetLowPower(PinNameValue pinNumber);
     static bool SetMode(PinNameValue pinNumber, PinMode pinMode);
     static bool InterruptEnable(

@@ -11,7 +11,7 @@
 #include "File_Drivers.h"
 #include "Delays.h"
 
-static DeviceRegistration::DevicePin mcuPins[] = {
+const DeviceRegistration::DevicePin mcuPins[] = {
 
     // -----------------
     // Arduino connector
@@ -338,21 +338,29 @@ void Initialize_Board()
 
     InitializeDelayCounter();
     Initialize64bit100nsTimer();
+    Initialize_SDRAM(SDRAM_BANK_ADDR, SDRAM_RAM_REGION_SIZE);
+    //InitializeBoardPeripherals();
+    //InitializeSD_Bus(
+    //    SD1_BUSIndex,
+    //    PC8,  // SDMMC D0
+    //    PC9,  // SDMMC D1
+    //    PC10, // SDMMC D2
+    //    PC11, // SDMMC D3
+    //    PC12, // SDMMC CLK
+    //    PD2,  // SDMMC CMD
+    //    PI8); // SDMMC uSD detect
+
+}
+
+void InitializeBoardPeripherals()
+{
     Initialize_Board_LEDS();
     Initialize_Board_Buttons();
-    Initialize_SDRAM(SDRAM_BANK_ADDR, SDRAM_RAM_REGION_SIZE);
     InitializeDevicePins();
-
-    InitializeSD_Bus(
-        SD1_BUSIndex,
-        PC8,  // SDMMC D0
-        PC9,  // SDMMC D1
-        PC10, // SDMMC D2
-        PC11, // SDMMC D3
-        PC12, // SDMMC CLK
-        PD2,  // SDMMC CMD
-        PI8); // SDMMC uSD detect
 }
+
+
+
 void CPU_CACHE_Enable(void)
 {
     SCB_EnableICache();

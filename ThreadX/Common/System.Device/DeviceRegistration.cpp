@@ -21,9 +21,14 @@ static int NumberOfSerialChannels;
 static DeviceRegistration::SpiPin *SpiChannels;
 static int NumberOfSpiChannels;
 
-void DeviceRegistration::CreatePinList(DevicePin *mcuGPIOPinList, int numberOfPins)
+void DeviceRegistration::CreatePinList(const DevicePin *mcuGPIOPinList, int numberOfPins)
 {
-    GPIOPins = mcuGPIOPinList;
+
+    GPIOPins = (DeviceRegistration::DevicePin *)platform_malloc(sizeof(DevicePin) * numberOfPins);
+    for (int i = 0; i < numberOfPins; i++)
+    {
+        GPIOPins[i] = mcuGPIOPinList[i];
+    }
     NumberOfGPIOPins = numberOfPins;
 }
 bool DeviceRegistration::AddPinParameters(PinNameValue pinNameValue, void *newParameters)

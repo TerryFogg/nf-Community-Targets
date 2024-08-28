@@ -4,13 +4,31 @@
 //
 #include "DeviceIO.h"
 #include "board.h"
+#include "nf_rt_events_native.h"
 
 #pragma region STM32 definitions
 
-GPIO_INTERRUPT_SERVICE_ROUTINE *SavedInterruptCallBack[16];
-int16_t SavedInterruptPinNumber[16];
+#define INTERRUPT_PIN_NOT_ASSIGNED -1
+#define EXTI0                      0
+#define EXTI1                      1
+#define EXTI2                      2
+#define EXTI3                      3
+#define EXTI4                      4
+#define EXTI5                      5
+#define EXTI6                      6
+#define EXTI7                      7
+#define EXTI8                      8
+#define EXTI9                      9
+#define EXTI10                     10
+#define EXTI11                     11
+#define EXTI12                     12
+#define EXTI13                     13
+#define EXTI14                     14
+#define EXTI15                     15
 
-uint32_t GpioPortClockEnable[] = {
+PinNameValue ActiveInterruptPin[16];
+
+const uint32_t GpioPortClockEnable[] = {
     LL_AHB4_GRP1_PERIPH_GPIOA,
     LL_AHB4_GRP1_PERIPH_GPIOB,
     LL_AHB4_GRP1_PERIPH_GPIOC,
@@ -25,7 +43,7 @@ uint32_t GpioPortClockEnable[] = {
 #endif
     LL_AHB4_GRP1_PERIPH_GPIOJ,
     LL_AHB4_GRP1_PERIPH_GPIOK};
-uint32_t UsartPortClockEnable[] = {
+const uint32_t UsartPortClockEnable[] = {
     LL_APB2_GRP1_PERIPH_USART1,
     LL_APB1_GRP1_PERIPH_USART2,
     LL_APB1_GRP1_PERIPH_USART3,
@@ -36,11 +54,11 @@ uint32_t UsartPortClockEnable[] = {
     0,
     0,
     LL_APB2_GRP1_PERIPH_USART10};
-uint32_t DmaClockEnable[] = {
+const uint32_t DmaClockEnable[] = {
     LL_AHB1_GRP1_PERIPH_DMA1,
     LL_AHB1_GRP1_PERIPH_DMA2,
 };
-uint32_t PinMask[] = {
+const uint32_t PinMask[] = {
     LL_GPIO_PIN_0,
     LL_GPIO_PIN_1,
     LL_GPIO_PIN_2,
@@ -74,7 +92,7 @@ GPIO_TypeDef *Port[] = {
 #endif
     GPIOJ,
     GPIOK};
-uint32_t EXTI_Line[] = {
+const uint32_t EXTI_Line[] = {
     LL_EXTI_LINE_0,
     LL_EXTI_LINE_1,
     LL_EXTI_LINE_2,
@@ -91,7 +109,7 @@ uint32_t EXTI_Line[] = {
     LL_EXTI_LINE_13,
     LL_EXTI_LINE_14,
     LL_EXTI_LINE_15};
-uint32_t SyscfgPorts[] = {
+const uint32_t SyscfgPorts[] = {
     LL_SYSCFG_EXTI_PORTA,
     LL_SYSCFG_EXTI_PORTB,
     LL_SYSCFG_EXTI_PORTC,
@@ -319,9 +337,15 @@ uint32_t I2C_GetTiming(I2cBusSpeed busSpeed)
 #pragma endregion
 
 #pragma region GPIO
-bool GpioIO::Initialize(PinNameValue pinNameValue)
+bool GpioIO::Initialize()
 {
-    int GPIOPortByNumber = pinNameValue / 16;
+    // Track the Pin usage as only 1 interrupt per PIN number 0..16
+    memset(ActiveInterruptPin, PinNameValue::NONE, sizeof(PinNameValue::NONE));
+    return true;
+}
+bool GpioIO::InitializePin(PinNameValue pinNameValue)
+{
+    int GPIOPortByNumber = PORT_INDEX(pinNameValue);
     if (!LL_AHB4_GRP1_IsEnabledClock(GpioPortClockEnable[GPIOPortByNumber]))
     {
         LL_AHB4_GRP1_EnableClock(GpioPortClockEnable[GPIOPortByNumber]);
@@ -336,16 +360,16 @@ bool GpioIO::Dispose(PinNameValue pinNameValue)
 }
 bool GpioIO::Read(PinNameValue pinNameValue)
 {
-    int GPIOPortByNumber = pinNameValue / 16;
-    uint32_t gpioPortPinNumber = pinNameValue % 16;
+    int GPIOPortByNumber = PORT_INDEX(pinNameValue);
+    uint32_t gpioPortPinNumber = PIN_INDEX(pinNameValue);
     return (bool)LL_GPIO_IsInputPinSet(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber]);
 }
 bool GpioIO::Write(PinNameValue pinNameValue, bool pinState)
 {
     // true == 1
     // false == 0
-    int GPIOPortByNumber = pinNameValue / 16;
-    uint32_t gpioPortPinNumber = pinNameValue % 16;
+    int GPIOPortByNumber = PORT_INDEX(pinNameValue);
+    uint32_t gpioPortPinNumber = PIN_INDEX(pinNameValue);
 
     if (pinState == GpioPinValue_Low)
     {
@@ -360,8 +384,8 @@ bool GpioIO::Write(PinNameValue pinNameValue, bool pinState)
 bool GpioIO::Toggle(PinNameValue pinNameValue)
 {
     bool status = false;
-    int GPIOPortByNumber = pinNameValue / 16;
-    uint32_t gpioPortPinNumber = pinNameValue % 16;
+    int GPIOPortByNumber = PORT_INDEX(pinNameValue);
+    uint32_t gpioPortPinNumber = PIN_INDEX(pinNameValue);
     LL_GPIO_TogglePin(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber]);
     status = true;
     return status;
@@ -371,8 +395,9 @@ bool GpioIO::SetFunction(
     DeviceRegistration::DevicePinFunction PinFunction,
     int alternateFunctionNumber)
 {
-    int GPIOPortByNumber = pinNameValue / 16;
-    uint32_t gpioPortPinNumber = pinNameValue % 16;
+    int GPIOPortByNumber = PORT_INDEX(pinNameValue);
+    uint32_t gpioPortPinNumber = PIN_INDEX(pinNameValue);
+
     bool status = false;
     switch (PinFunction)
     {
@@ -448,10 +473,10 @@ bool GpioIO::SetFunction(
     }
     return status;
 }
-bool GpioIO::SetLowPower(PinNameValue pinNumber)
+bool GpioIO::SetLowPower(PinNameValue pinNameValue)
 {
-    int GPIOPortByNumber = pinNumber / 16;
-    uint32_t gpioPortPinNumber = pinNumber % 16;
+    int GPIOPortByNumber = PORT_INDEX(pinNameValue);
+    int gpioPortPinNumber = PIN_INDEX(pinNameValue);
 
     // Set the unused pins as input(floating) to minimize current consumption.
     LL_GPIO_SetPinMode(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_MODE_INPUT);
@@ -461,175 +486,334 @@ bool GpioIO::SetLowPower(PinNameValue pinNumber)
 }
 bool GpioIO::SetMode(PinNameValue pinNameValue, PinMode pinMode)
 {
+    // For GPIO details of the STM32, see section 4.3 of
+    // https://www.st.com/resource/en/application_note/dm00315319-stm32-gpio-configuration-for-hardware-settings-and-lowpower-consumption-stmicroelectronics.pdf
+    //
+
     bool status = false;
-    int GPIOPortByNumber = pinNameValue / 16;
-    uint32_t gpioPortPinNumber = pinNameValue % 16;
+    int GPIOPortByNumber = PORT_INDEX(pinNameValue);
+    uint32_t gpioPortPinNumber = PIN_INDEX(pinNameValue);
+
     switch (pinMode)
     {
+        // Configures the GPIO pin in floating mode, with high impedance.
         case PinMode_Input:
-            LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_MODE_INPUT);
+            LL_GPIO_SetPinMode(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_MODE_INPUT);
+            LL_GPIO_SetPinSpeed(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_SPEED_FREQ_VERY_HIGH);
             LL_GPIO_SetPinPull(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_PULL_NO);
             status = true;
             break;
+
+        // Configures the GPIO pin as high impedance with a pull-down resistor to ground.
         case PinMode_InputPullDown:
-            LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_MODE_INPUT);
+            LL_GPIO_SetPinMode(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_MODE_INPUT);
+            LL_GPIO_SetPinSpeed(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_SPEED_FREQ_VERY_HIGH);
             LL_GPIO_SetPinPull(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_PULL_DOWN);
             status = true;
             break;
+
+        // Configures the GPIO pin as high impedance with a pull-up resistor to the voltage charge connection (VCC).
         case PinMode_InputPullUp:
-            LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_MODE_INPUT);
+            LL_GPIO_SetPinMode(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_MODE_INPUT);
+            LL_GPIO_SetPinSpeed(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_SPEED_FREQ_VERY_HIGH);
             LL_GPIO_SetPinPull(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_PULL_UP);
             status = true;
             break;
+
+        // Configures the GPIO pin in strong drive mode, with low impedance.
         case PinMode_Output:
-            LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_OUTPUT_PUSHPULL);
+            LL_GPIO_SetPinMode(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_MODE_OUTPUT);
+            LL_GPIO_SetPinSpeed(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_SPEED_FREQ_VERY_HIGH);
             status = true;
             break;
+
+            // Configures the GPIO in open drain mode
         case PinMode_OutputOpenDrain:
+            LL_GPIO_SetPinMode(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_MODE_OUTPUT);
+            LL_GPIO_SetPinSpeed(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_SPEED_FREQ_VERY_HIGH);
             LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_OUTPUT_OPENDRAIN);
             status = true;
             break;
+
+        // Configures the GPIO pin in open drain mode with resistive pull-up mode.
         case PinMode_OutputOpenDrainPullUp:
+            LL_GPIO_SetPinMode(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_MODE_OUTPUT);
+            LL_GPIO_SetPinSpeed(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_SPEED_FREQ_VERY_HIGH);
             LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_OUTPUT_OPENDRAIN);
+            LL_GPIO_SetPinPull(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_PULL_UP);
             status = true;
             break;
+
+        // FROM C# description : Configures the GPIO pin in open collector mode.
+        // NOTE: "open collector" is functionally the same as an "open drain"
+        // Re-use the OutputOpenSource for Push Pull
         case PinMode_OutputOpenSource:
-            LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_OUTPUT_OPENDRAIN);
+            LL_GPIO_SetPinMode(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_MODE_OUTPUT);
+            LL_GPIO_SetPinSpeed(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_SPEED_FREQ_VERY_HIGH);
+            LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_OUTPUT_PUSHPULL);
+            LL_GPIO_SetPinPull(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_PULL_NO);
             status = true;
             break;
+
+        // FROM C# description : Configures the GPIO pin in open collector mode.
+        // NOTE: "open collector" is functionally the same as an "open drain"
+        // Re-use the OutputOpenSource for Push Pull
         case PinMode_OutputOpenSourcePullDown:
-            LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_OUTPUT_OPENDRAIN);
+            LL_GPIO_SetPinMode(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_MODE_OUTPUT);
+            LL_GPIO_SetPinSpeed(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_SPEED_FREQ_VERY_HIGH);
+            LL_GPIO_SetPinOutputType(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_OUTPUT_PUSHPULL);
+            LL_GPIO_SetPinPull(Port[GPIOPortByNumber], PinMask[gpioPortPinNumber], LL_GPIO_PULL_DOWN);
             status = true;
             break;
+
         default:
             status = false;
             break;
     }
     return status;
 }
-bool GpioIO::InterruptEnable(PinNameValue pinNameValue, GPIO_INT_EDGE events, GPIO_INTERRUPT_SERVICE_ROUTINE gpioIsrPtr)
+bool GpioIO::InterruptEnable(PinNameValue pinNameValue,  GPIO_INT_EDGE events)
 {
     // NOTE: There is a limitation of 16 external interrupts on the GPIO lines with one 1 interrupt per line number.
     //      One interrupt on (PA0 or PB0 or PC0 or PD0...) and one interrupt on (PA1, or PB1 or PC1 ...) etc.
-    bool expectedState = false;
-    int GPIOPortByNumber = pinNameValue / 16;
-    uint32_t gpioPortPinNumber = pinNameValue % 16;
+    bool result = false;
+    int GPIOPortByNumber = PORT_INDEX(pinNameValue);
+    uint32_t gpioPortPinNumber = PIN_INDEX(pinNameValue);
     uint32_t priority = 0;
-    SavedInterruptCallBack[gpioPortPinNumber] = &gpioIsrPtr;
     LL_SYSCFG_SetEXTISource(SyscfgPorts[GPIOPortByNumber], PinMask[gpioPortPinNumber]);
     switch (events)
     {
         case GPIO_INT_NONE:
             LL_EXTI_DisableFallingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
             LL_EXTI_DisableRisingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
-            expectedState = false;
             break;
         case GPIO_INT_EDGE_LOW:
             LL_EXTI_EnableFallingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
             LL_EXTI_DisableRisingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
-            expectedState = true;
             break;
         case GPIO_INT_LEVEL_LOW:
             LL_EXTI_EnableFallingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
             LL_EXTI_DisableRisingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
-            expectedState = true;
             break;
         case GPIO_INT_EDGE_HIGH:
             LL_EXTI_EnableRisingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
             LL_EXTI_DisableFallingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
-            expectedState = false;
             break;
         case GPIO_INT_LEVEL_HIGH:
             LL_EXTI_EnableRisingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
             LL_EXTI_DisableFallingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
-            expectedState = false;
             break;
             LL_EXTI_EnableFallingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
             LL_EXTI_EnableRisingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
-            expectedState = false;
             break;
         case GPIO_INT_EDGE_BOTH:
             LL_EXTI_EnableFallingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
             LL_EXTI_EnableRisingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
-            // Wait for the opposite of current state
-            expectedState = !GpioIO::Read(pinNameValue);
             break;
     }
+
     switch (gpioPortPinNumber)
     {
-        case 0:
-            NVIC_SetPriority(EXTI0_IRQn, priority);
-            NVIC_EnableIRQ(EXTI0_IRQn);
+        case EXTI0:
+            if (ActiveInterruptPin[EXTI0] == PinNameValue::NONE || ActiveInterruptPin[EXTI0] == pinNameValue)
+            {
+                ActiveInterruptPin[EXTI0] = pinNameValue;
+                NVIC_SetPriority(EXTI0_IRQn, priority);
+                NVIC_EnableIRQ(EXTI0_IRQn);
+            }
+            else
+            {
+                result = false;
+            }
             break;
-        case 1:
-            NVIC_SetPriority(EXTI1_IRQn, priority);
-            NVIC_EnableIRQ(EXTI1_IRQn);
+        case EXTI1:
+            if (ActiveInterruptPin[EXTI1] == PinNameValue::NONE || ActiveInterruptPin[EXTI1] == pinNameValue)
+            {
+                ActiveInterruptPin[EXTI1] = pinNameValue;
+                NVIC_SetPriority(EXTI1_IRQn, priority);
+                NVIC_EnableIRQ(EXTI1_IRQn);
+            }
+            else
+            {
+                result = false;
+            }
             break;
-        case 2:
-            NVIC_SetPriority(EXTI2_IRQn, priority);
-            NVIC_EnableIRQ(EXTI2_IRQn);
+        case EXTI2:
+            if (ActiveInterruptPin[EXTI2] == PinNameValue::NONE || ActiveInterruptPin[EXTI2] == pinNameValue)
+            {
+                ActiveInterruptPin[EXTI2] = pinNameValue;
+                NVIC_SetPriority(EXTI2_IRQn, priority);
+                NVIC_EnableIRQ(EXTI2_IRQn);
+            }
+            else
+            {
+                result = false;
+            }
             break;
-        case 3:
-            NVIC_SetPriority(EXTI3_IRQn, priority);
-            NVIC_EnableIRQ(EXTI3_IRQn);
+        case EXTI3:
+            if (ActiveInterruptPin[EXTI3] == PinNameValue::NONE || ActiveInterruptPin[EXTI3] == pinNameValue)
+            {
+                ActiveInterruptPin[EXTI3] = pinNameValue;
+                NVIC_SetPriority(EXTI3_IRQn, priority);
+                NVIC_EnableIRQ(EXTI3_IRQn);
+            }
+            else
+            {
+                result = false;
+            }
             break;
-        case 4:
-            NVIC_SetPriority(EXTI4_IRQn, priority);
-            NVIC_EnableIRQ(EXTI4_IRQn);
+        case EXTI4:
+            if (ActiveInterruptPin[EXTI4] == PinNameValue::NONE || ActiveInterruptPin[EXTI4] == pinNameValue)
+            {
+                ActiveInterruptPin[EXTI4] = pinNameValue;
+                NVIC_SetPriority(EXTI4_IRQn, priority);
+                NVIC_EnableIRQ(EXTI4_IRQn);
+            }
+            else
+            {
+                result = false;
+            }
             break;
         case 5:
-            NVIC_SetPriority(EXTI9_5_IRQn, priority);
-            NVIC_EnableIRQ(EXTI9_5_IRQn);
+            if (ActiveInterruptPin[EXTI5] == PinNameValue::NONE || ActiveInterruptPin[EXTI5] == pinNameValue)
+            {
+                ActiveInterruptPin[EXTI5] = pinNameValue;
+                NVIC_SetPriority(EXTI9_5_IRQn, priority);
+                NVIC_EnableIRQ(EXTI9_5_IRQn);
+            }
+            else
+            {
+                result = false;
+            }
             break;
         case 6:
-            NVIC_SetPriority(EXTI9_5_IRQn, priority);
-            NVIC_EnableIRQ(EXTI9_5_IRQn);
+            if (ActiveInterruptPin[EXTI6] == PinNameValue::NONE || ActiveInterruptPin[EXTI6] == pinNameValue)
+            {
+                ActiveInterruptPin[EXTI6] = pinNameValue;
+                NVIC_SetPriority(EXTI9_5_IRQn, priority);
+                NVIC_EnableIRQ(EXTI9_5_IRQn);
+            }
+            else
+            {
+                result = false;
+            }
             break;
         case 7:
-            NVIC_SetPriority(EXTI9_5_IRQn, priority);
-            NVIC_EnableIRQ(EXTI9_5_IRQn);
+            if (ActiveInterruptPin[EXTI7] == PinNameValue::NONE || ActiveInterruptPin[EXTI7] == pinNameValue)
+            {
+                ActiveInterruptPin[EXTI7] = pinNameValue;
+                NVIC_SetPriority(EXTI9_5_IRQn, priority);
+                NVIC_EnableIRQ(EXTI9_5_IRQn);
+            }
+            else
+            {
+                result = false;
+            }
             break;
         case 8:
-            NVIC_SetPriority(EXTI9_5_IRQn, priority);
-            NVIC_EnableIRQ(EXTI9_5_IRQn);
+            if (ActiveInterruptPin[EXTI8] == PinNameValue::NONE || ActiveInterruptPin[EXTI8] == pinNameValue)
+            {
+                ActiveInterruptPin[EXTI8] = pinNameValue;
+                NVIC_SetPriority(EXTI9_5_IRQn, priority);
+                NVIC_EnableIRQ(EXTI9_5_IRQn);
+            }
+            else
+            {
+                result = false;
+            }
             break;
         case 9:
-            NVIC_SetPriority(EXTI9_5_IRQn, priority);
-            NVIC_EnableIRQ(EXTI9_5_IRQn);
+            if (ActiveInterruptPin[EXTI9] == PinNameValue::NONE || ActiveInterruptPin[EXTI9] == pinNameValue)
+            {
+                ActiveInterruptPin[EXTI9] = pinNameValue;
+                NVIC_SetPriority(EXTI9_5_IRQn, priority);
+                NVIC_EnableIRQ(EXTI9_5_IRQn);
+            }
+            else
+            {
+                result = false;
+            }
             break;
         case 10:
-            NVIC_SetPriority(EXTI15_10_IRQn, priority);
-            NVIC_EnableIRQ(EXTI15_10_IRQn);
+            if (ActiveInterruptPin[EXTI10] == PinNameValue::NONE || ActiveInterruptPin[EXTI10] == pinNameValue)
+            {
+                ActiveInterruptPin[EXTI10] = pinNameValue;
+                NVIC_SetPriority(EXTI15_10_IRQn, priority);
+                NVIC_EnableIRQ(EXTI15_10_IRQn);
+            }
+            else
+            {
+                result = false;
+            }
             break;
         case 11:
-            NVIC_SetPriority(EXTI15_10_IRQn, priority);
-            NVIC_EnableIRQ(EXTI15_10_IRQn);
+            if (ActiveInterruptPin[EXTI11] == PinNameValue::NONE || ActiveInterruptPin[EXTI11] == pinNameValue)
+            {
+                ActiveInterruptPin[EXTI11] = pinNameValue;
+                NVIC_SetPriority(EXTI15_10_IRQn, priority);
+                NVIC_EnableIRQ(EXTI15_10_IRQn);
+            }
+            else
+            {
+                result = false;
+            }
             break;
         case 12:
-            NVIC_SetPriority(EXTI15_10_IRQn, priority);
-            NVIC_EnableIRQ(EXTI15_10_IRQn);
+            if (ActiveInterruptPin[EXTI12] == PinNameValue::NONE || ActiveInterruptPin[EXTI12] == pinNameValue)
+            {
+                ActiveInterruptPin[EXTI12] = pinNameValue;
+                NVIC_SetPriority(EXTI15_10_IRQn, priority);
+                NVIC_EnableIRQ(EXTI15_10_IRQn);
+            }
+            else
+            {
+                result = false;
+            }
             break;
         case 13:
-            NVIC_SetPriority(EXTI15_10_IRQn, priority);
-            NVIC_EnableIRQ(EXTI15_10_IRQn);
+            if (ActiveInterruptPin[EXTI13] == PinNameValue::NONE || ActiveInterruptPin[EXTI13] == pinNameValue)
+            {
+                ActiveInterruptPin[EXTI13] = pinNameValue;
+                NVIC_SetPriority(EXTI15_10_IRQn, priority);
+                NVIC_EnableIRQ(EXTI15_10_IRQn);
+            }
+            else
+            {
+                result = false;
+            }
             break;
         case 14:
-            NVIC_SetPriority(EXTI15_10_IRQn, priority);
-            NVIC_EnableIRQ(EXTI15_10_IRQn);
+            if (ActiveInterruptPin[EXTI14] == PinNameValue::NONE || ActiveInterruptPin[EXTI14] == pinNameValue)
+            {
+                ActiveInterruptPin[EXTI14] = pinNameValue;
+                NVIC_SetPriority(EXTI15_10_IRQn, priority);
+                NVIC_EnableIRQ(EXTI15_10_IRQn);
+            }
+            else
+            {
+                result = false;
+            }
             break;
         case 15:
-            NVIC_SetPriority(EXTI15_10_IRQn, priority);
-            NVIC_EnableIRQ(EXTI15_10_IRQn);
+            if (ActiveInterruptPin[EXTI15] == PinNameValue::NONE || ActiveInterruptPin[EXTI15] == pinNameValue)
+            {
+                ActiveInterruptPin[EXTI15] = pinNameValue;
+                NVIC_SetPriority(EXTI15_10_IRQn, priority);
+                NVIC_EnableIRQ(EXTI15_10_IRQn);
+            }
+            else
+            {
+                result = false;
+            }
             break;
     }
     LL_EXTI_EnableIT_0_31(EXTI_Line[gpioPortPinNumber]);
-    LL_EXTI_ClearFlag_0_31(EXTI_Line[gpioPortPinNumber]);
 
-    return expectedState;
+    return result;
 }
 bool GpioIO::InterruptDisable(PinNameValue pinNameValue)
 {
-    uint32_t gpioPortPinNumber = pinNameValue % 16;
+    uint32_t gpioPortPinNumber = PIN_INDEX(pinNameValue);
     LL_D3_EXTI_DisablePendMask_0_31(EXTI_Line[gpioPortPinNumber]);
     LL_EXTI_DisableIT_0_31(EXTI_Line[gpioPortPinNumber]);
     LL_EXTI_DisableFallingTrig_0_31(EXTI_Line[gpioPortPinNumber]);
@@ -639,7 +823,7 @@ bool GpioIO::InterruptDisable(PinNameValue pinNameValue)
 }
 bool GpioIO::InterruptRemove(PinNameValue pinNameValue)
 {
-    uint32_t gpioPortPinNumber = pinNameValue % 16;
+    uint32_t gpioPortPinNumber = PIN_INDEX(pinNameValue);
     // Clear the External Interrupt or Event for the current IO
     LL_D3_EXTI_DisablePendMask_0_31(EXTI_Line[gpioPortPinNumber]);
     LL_EXTI_DisableIT_0_31(EXTI_Line[gpioPortPinNumber]);
@@ -651,6 +835,94 @@ bool GpioIO::InterruptRemove(PinNameValue pinNameValue)
 
     return true;
 }
+
+void EXTI0_IRQHandler()
+{
+    bool pinState = GpioIO::Read(ActiveInterruptPin[EXTI0]);
+    Callback_EVENT_GPIO(ActiveInterruptPin[EXTI0], pinState);
+}
+void EXTI1_IRQHandler()
+{
+    bool pinState = GpioIO::Read(ActiveInterruptPin[EXTI1]);
+    Callback_EVENT_GPIO(ActiveInterruptPin[EXTI1], pinState);
+}
+void EXTI2_IRQHandler()
+{
+    bool pinState = GpioIO::Read(ActiveInterruptPin[EXTI2]);
+    Callback_EVENT_GPIO(ActiveInterruptPin[EXTI2], pinState);
+}
+void EXTI3_IRQHandler()
+{
+    bool pinState = GpioIO::Read(ActiveInterruptPin[EXTI3]);
+    Callback_EVENT_GPIO(ActiveInterruptPin[EXTI3], pinState);
+}
+void EXTI4_IRQHandler()
+{
+    bool pinState = GpioIO::Read(ActiveInterruptPin[EXTI4]);
+    Callback_EVENT_GPIO(ActiveInterruptPin[EXTI4], pinState);
+}
+void EXTI9_5_IRQHandler()
+{
+    if (LL_EXTI_IsActiveFlag_0_31(5))
+    {
+        bool pinState = GpioIO::Read(ActiveInterruptPin[EXTI5]);
+        Callback_EVENT_GPIO(ActiveInterruptPin[EXTI5], pinState);
+    }
+    else if (LL_EXTI_IsActiveFlag_0_31(6))
+    {
+        bool pinState = GpioIO::Read(ActiveInterruptPin[EXTI6]);
+        Callback_EVENT_GPIO(ActiveInterruptPin[EXTI6], pinState);
+    }
+    else if (LL_EXTI_IsActiveFlag_0_31(7))
+    {
+        bool pinState = GpioIO::Read(ActiveInterruptPin[EXTI7]);
+        Callback_EVENT_GPIO(ActiveInterruptPin[EXTI7], pinState);
+    }
+    else if (LL_EXTI_IsActiveFlag_0_31(8))
+    {
+        bool pinState = GpioIO::Read(ActiveInterruptPin[EXTI8]);
+        Callback_EVENT_GPIO(ActiveInterruptPin[EXTI8], pinState);
+    }
+    else if (LL_EXTI_IsActiveFlag_0_31(9))
+    {
+        bool pinState = GpioIO::Read(ActiveInterruptPin[EXTI9]);
+        Callback_EVENT_GPIO(ActiveInterruptPin[EXTI9], pinState);
+    }
+}
+void EXTI15_10_IRQHandler()
+{
+    if (LL_EXTI_IsActiveFlag_0_31(10))
+    {
+        bool pinState = GpioIO::Read(ActiveInterruptPin[EXTI10]);
+        Callback_EVENT_GPIO(ActiveInterruptPin[EXTI10], pinState);
+    }
+    else if (LL_EXTI_IsActiveFlag_0_31(11))
+    {
+        bool pinState = GpioIO::Read(ActiveInterruptPin[EXTI11]);
+        Callback_EVENT_GPIO(ActiveInterruptPin[EXTI11], pinState);
+    }
+    else if (LL_EXTI_IsActiveFlag_0_31(12))
+    {
+        bool pinState = GpioIO::Read(ActiveInterruptPin[EXTI12]);
+        Callback_EVENT_GPIO(ActiveInterruptPin[EXTI12], pinState);
+    }
+    else if (LL_EXTI_IsActiveFlag_0_31(13))
+    {
+        bool pinState = GpioIO::Read(ActiveInterruptPin[EXTI13]);
+        Callback_EVENT_GPIO(ActiveInterruptPin[EXTI13], pinState);
+    }
+    else if (LL_EXTI_IsActiveFlag_0_31(14))
+    {
+        bool pinState = GpioIO::Read(ActiveInterruptPin[EXTI14]);
+        Callback_EVENT_GPIO(ActiveInterruptPin[EXTI14], pinState);
+    }
+    else if (LL_EXTI_IsActiveFlag_0_31(15))
+    {
+        bool pinState = GpioIO::Read(ActiveInterruptPin[EXTI15]);
+        Callback_EVENT_GPIO(ActiveInterruptPin[EXTI1], pinState);
+    }
+}
+
 #pragma endregion
 
 #pragma region ADC
@@ -683,7 +955,7 @@ int AdcIO::ChannelCount()
 bool AdcIO::Initialize()
 {
     {
-        // int GPIOPortByNumber = pinNameValue / 16;
+        // int GPIOPortByNumber = PORT_INDEX(pinNameValue);
         // if (!LL_AHB1_GRP1_EnableClock(GpioPortClockEnable[GPIOPortByNumber]))
         //{
         //     LL_AHB1_GRP1_EnableClock(GpioPortClockEnable[GPIOPortByNumber]);

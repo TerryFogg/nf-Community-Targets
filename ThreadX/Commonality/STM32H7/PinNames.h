@@ -6,6 +6,7 @@
 
 typedef enum PinNameValues
 {
+    NONE = 999,
     PA0 = 0,
     PA0_C = 100,
     PA1 = 1,

@@ -2,7 +2,66 @@
 
 
 
-![image-20240531102554297](assets/image-20240531102554297.png)
+
+
+
+
+
+
+## GPIO
+
+
+
+## Testing input with pullup resistor
+
+Sure, I can help you with that. Here’s a simple way to test if a microcontroller unit (MCU) pin is working using an input pull-up resistor. This method uses a button to change the state of the pin.
+
+Here’s a simple circuit diagram:
+
+```
+MCU Pin <-----> Button <-----> Vcc
+   |
+   |
+Pull-up Resistor
+   |
+   |
+  GND
+```
+
+And here’s how you can implement it:
+
+1. **Connect a button to the MCU pin**: One end of the button should be connected to the MCU pin you want to test, and the other end should be connected to the power supply (Vcc).
+2. **Connect a pull-up resistor**: Connect a pull-up resistor (typically 10kΩ) between the MCU pin and the ground (GND). This ensures that the pin reads a `HIGH` signal when the button is not pressed.
+3. **Write a simple program**: Write a simple program that reads the state of the pin and outputs the result. Here’s a simple example in Arduino C:
+
+```c
+const int pin = 2; // Change this to your pin number
+
+void setup() {
+  pinMode(pin, INPUT_PULLUP);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int buttonState = digitalRead(pin);
+  Serial.println(buttonState);
+  delay(1000);
+}
+```
+
+This program will print `1` when the button is not pressed and `0` when the button is pressed. If you see these results, it means your MCU pin is working correctly with the input pull-up resistor.
+
+Remember to replace `2` with the number of the pin you’re testing. Also, ensure your MCU supports internal pull-up resistors. If not, you’ll need to add an external one.
+
+Please note that this is a simple test and might not catch all possible issues with the pin. If you suspect there’s a hardware issue with the pin, you might need to use more advanced debugging tools or techniques.
+
+I hope this helps! Let me know if you have any other questions. 😊
+
+​              
+
+
+
+
 
 
 
@@ -39,6 +98,34 @@
 
 
 All GPIOs are able to drive 5 V and 3.3 V in input mode, but they are only able to generate 3.3V in output push-pull mode
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -79,4 +166,207 @@ The system can be woken up from standby mode using a SYS_WKUP pin, an [RTC](http
 After waking up from Standby mode, program execution restarts in the same way as after a Reset (boot pin sampling, option bytes loading, reset vector is fetched, etc.)
 
 [![PWR Standby.png](assets/700px-PWR_Standby.png)
+
+
+
+
+
+
+
+# APPENDIX 1 - TESTING GPIO
+
+## Testing input with without pull up or pull down resistor
+
+Sure, I can help you with that. Here’s a simple way to test if a microcontroller unit (MCU) pin is working without using a pull-up or pull-down resistor. This method uses a button to change the state of the pin.
+
+Here’s a simple circuit diagram:
+
+```
+MCU Pin <-----> Button <-----> Vcc
+   |
+   |
+  GND
+```
+
+And here’s how you can implement it:
+
+1. **Connect a button to the MCU pin**: One end of the button should be connected to the MCU pin you want to test, and the other end should be connected to the power supply (Vcc).
+2. **Connect the MCU pin to the ground (GND)**: When the button is not pressed, the MCU pin is connected to the ground (GND), so it reads a `LOW` signal.
+3. **Write a simple program**: Write a simple program that reads the state of the pin and outputs the result. Here’s a simple example in Arduino C:
+
+```c
+const int pin = 2; // Change this to your pin number
+
+void setup() {
+  pinMode(pin, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int buttonState = digitalRead(pin);
+  Serial.println(buttonState);
+  delay(1000);
+}
+```
+
+This program will print `0` when the button is not pressed and `1` when the button is pressed. If you see these results, it means your MCU pin is working correctly.
+
+Remember to replace `2` with the number of the pin you’re testing.
+
+## Testing input with pull up resistor
+
+This method uses a button to change the state of the pin.
+
+Circuit diagram:
+
+```
+MCU Pin <-----> Button <-----> Vcc
+   |
+   |
+Pull-up Resistor
+   |
+   |
+  GND
+```
+
+1. **Connect a button to the MCU pin**: One end of the button should be connected to the MCU pin you want to test, and the other end should be connected to the power supply (Vcc).
+2. **Connect a pull-up resistor**: Connect a pull-up resistor (typically 10kΩ) between the MCU pin and the ground (GND). This ensures that the pin reads a `HIGH` signal when the button is not pressed.
+3. **Write a simple program**: Write a simple program that reads the state of the pin and outputs the result. Here’s a simple example in Arduino C:
+
+```c
+const int pin = 2; // Change this to your pin number
+
+void setup() {
+  pinMode(pin, INPUT_PULLUP);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int buttonState = digitalRead(pin);
+  Serial.println(buttonState);
+  delay(1000);
+}
+```
+
+This program will print `1` when the button is not pressed and `0` when the button is pressed. If you see these results, it means your MCU pin is working correctly with the input pull-up resistor.
+
+Remember to replace `2` with the number of the pin you’re testing. Also, ensure your MCU supports internal pull-up resistors. If not, you’ll need to add an external one.
+
+​           
+
+## Testing input with pull down resistor
+
+Sure, I can help you with that. Here’s a simple way to test if a microcontroller unit (MCU) pin is working using an input pull-down resistor. This method uses a button to change the state of the pin.
+
+Here’s a simple circuit diagram:
+
+```
+MCU Pin <-----> Button <-----> GND
+   |
+   |
+Pull-down Resistor
+   |
+   |
+  Vcc
+```
+
+And here’s how you can implement it:
+
+1. **Connect a button to the MCU pin**: One end of the button should be connected to the MCU pin you want to test, and the other end should be connected to the ground (GND).
+2. **Connect a pull-down resistor**: Connect a pull-down resistor (typically 10kΩ) between the MCU pin and the power supply (Vcc). This ensures that the pin reads a `LOW` signal when the button is not pressed.
+3. **Write a simple program**: Write a simple program that reads the state of the pin and outputs the result. Here’s a simple example in Arduino C:
+
+```c
+const int pin = 2; // Change this to your pin number
+
+void setup() {
+  pinMode(pin, INPUT);
+  digitalWrite(pin, LOW); // Enable pull-down resistor
+  Serial.begin(9600);
+}
+
+void loop() {
+  int buttonState = digitalRead(pin);
+  Serial.println(buttonState);
+  delay(1000);
+}
+```
+
+This program will print `0` when the button is not pressed and `1` when the button is pressed. If you see these results, it means your MCU pin is working correctly with the input pull-down resistor.
+
+Remember to replace `2` with the number of the pin you’re testing. Also, ensure your MCU supports internal pull-down resistors. If not, you’ll need to add an external one.
+
+
+
+## Testing  Output with open drain
+
+Sure, I can help you with that. Here’s a simple way to test if a microcontroller unit (MCU) pin is working using an output open-drain configuration. This method uses an LED to indicate the state of the pin.
+
+Here’s a simple circuit diagram:
+
+```
+MCU Pin (Open-Drain) <-----> Resistor <-----> LED <-----> Vcc
+```
+
+And here’s how you can implement it:
+
+1. **Connect an LED to the MCU pin**: One end of the LED should be connected to the MCU pin you want to test through a resistor (typically 330Ω to 1kΩ depending on the LED and Vcc), and the other end should be connected to the power supply (Vcc).
+2. **Configure the MCU pin as open-drain**: In the MCU’s software, configure the pin as an output and set it to open-drain mode. This means the pin can either provide a path to ground (when it’s outputting a `LOW` signal) or be disconnected (when it’s outputting a `HIGH` signal).
+3. **Write a simple program**: Write a simple program that toggles the state of the pin and observe the LED. Here’s a simple example in Arduino C:
+
+```c
+const int pin = 2; // Change this to your pin number
+
+void setup() {
+  pinMode(pin, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(pin, LOW); // LED on
+  delay(1000);
+  digitalWrite(pin, HIGH); // LED off
+  delay(1000);
+}
+```
+
+This program will turn the LED on and off every second. If you see the LED blinking, it means your MCU pin is working correctly in open-drain mode.
+
+Remember to replace `2` with the number of the pin you’re testing.
+
+Please note that this is a simple test and might not catch all possible issues with the pin. If you suspect there’s a hardware issue with the pin, you might need to use more advanced debugging tools or techniques.
+
+I hope this helps! Let me know if you have any other questions. 😊
+
+## Testing  Output with open drain push pull
+
+Sure, I can help you with that. Here’s a simple way to test if a microcontroller unit (MCU) pin is working using an output push-pull configuration. This method uses an LED to indicate the state of the pin.
+
+Here’s a simple circuit diagram:
+
+```
+MCU Pin (Push-Pull) <-----> Resistor <-----> LED <-----> GND
+```
+
+And here’s how you can implement it:
+
+1. **Connect an LED to the MCU pin**: One end of the LED should be connected to the MCU pin you want to test through a resistor (typically 330Ω to 1kΩ depending on the LED and Vcc), and the other end should be connected to the ground (GND).
+2. **Configure the MCU pin as push-pull**: In the MCU’s software, configure the pin as an output and set it to push-pull mode. This means the pin can either provide a path to Vcc (when it’s outputting a `HIGH` signal) or a path to ground (when it’s outputting a `LOW` signal).
+3. **Write a simple program**: Write a simple program that toggles the state of the pin and observe the LED. Here’s a simple example in Arduino C:
+
+```c
+const int pin = 2; // Change this to your pin number
+
+void setup() {
+  pinMode(pin, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(pin, HIGH); // LED on
+  delay(1000);
+  digitalWrite(pin, LOW); // LED off
+  delay(1000);
+}
+```
+
+This program will turn the LED on and off every second. If you see the LED blinking, it means your MCU pin is working correctly in push-pull mode.
 

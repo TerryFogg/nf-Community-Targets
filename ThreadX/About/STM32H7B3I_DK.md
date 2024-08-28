@@ -1,3 +1,5 @@
+
+
 # Welcome to .NET **nanoFramework** community targets port of STM32H7B3I_DK
 
 # STM32H7B3I Discovery Kit
@@ -23,99 +25,36 @@ More information about the board can be found at the [STM32H7B3I-DK website](htt
 
 - [STM32H7B3I_DK user manual](https://www.st.com/resource/en/user_manual/um2569-discovery-kit-with-stm32h7b3li-mcu-stmicroelectronics.pdf)
 
-
-
-### Supported Features
-
-The current configuration supports the following hardware features:
-
-| Interface | Controller | Driver/Component |
-| --------- | ---------- | ---------------- |
-| NVIC      | on-chip    | In Development   |
-| UART      | on-chip    | In Development   |
-| PINMUX    | on-chip    | In Development   |
-| GPIO      | on-chip    | In Development   |
-| I2C       | on-chip    | In Development   |
-| FLASH     | on-chip    | In Development   |
-| FMC       | on-chip    | In Development   |
-| LTDC      | on-chip    | In Development   |
-| CANFD     | on-chip    | In Development   |
-
-Other hardware features have not been enabled yet for this board.
-
-### Standard Peripheral Mapping:
-
-#### Serial Ports
-
-##### UART_1 -  (ST-Link Virtual Port Com)
-
-- TX - PA9
-- RX - PA10
-
-##### UART_4  -  (Arduino Serial)
-
-- TX - PH13
-- RX - PH14
-
-#### **Touch Screen - FT5336**
-
-##### I2C4 
-
-- SCL - PD12
-- SDA - PD13
-- Touch Screen Interrupt - PH2
-
-#### **Arduino SPI**
-
-##### SPI2
-
-- SCK - PA12
-- MISO - PB14
-- MOSI - PB15
-- NSS - PI0
-
-#### LEDS
-
-- LD1 : PG11
-- LD2 : PG2
-
-#### USER Push Button
-
-- PC13
-
-#### SDMMC
-
-- D0 - PC8
-- D1 - PC9
-- D2 - PC10
-- D3 - PC11
-- CK - PC12
-- CMD - PD2
-- CD - PI8
-
-#### CANFD
-
-- RX  - PA11
-- TX - PA12
-- WAKE 1 - PH8
-
-#### FMC SDRAM
-
-#### LTDC
-
-#### System Clock
-
-The STM32H7B3I System Clock can be driven by an internal or external oscillator, as well as by the main PLL clock. By default, the System clock is driven by the PLL clock at 280MHz. PLL clock is fed by a 24MHz high speed external clock.
-
-#### Serial Port
-
-The STM32H7B3I Discovery kit has up to 8 UARTs. The Zephyr console output is assigned to UART1 which connected to the onboard ST-LINK/V3.0. Virtual COM port interface. Default communication settings are 115200 8N1.
-
-### Programming and Debugging
-
-To use CAN, solder bridges SB3, SB4 and SB5 need to be connected. Take note that CANFD pins are shared with STMOD+ connector (P1), so please check [STM32H7B3I_DK board schematics](https://www.st.com/resource/en/schematic_pack/mb1332-h7b3i-c02_schematic.pdf) for possible collisions if using that connector.
+# Arduino UNO V3  compatible connector
 
 
 
+| Arduino Pin Number | STM32 Pin Reference | Analogue   |
+| ------------------ | ------------------- | ---------- |
+| A0                 | PA4                 | ADC1_INP18 |
+| A1                 | PC4                 | ADC12_INP4 |
+| A2                 | PA0_C               | ADC1_INP0  |
+| A3                 | PA1_C               | ADC1_INP1  |
+| A4                 | PC2_C               | ADC2_INP0  |
+| A5                 | PC3_C               | ADC2_INP1  |
 
 
+
+|      | Arduino Pin Number | STM32 Pin Reference | Digital  | Alternate                          |
+| ---- | ------------------ | ------------------- | -------- | ---------------------------------- |
+|      | D0                 | PH14                | GPIO     | USART4_RX                          |
+|      | D1                 | PH13                | GPIO     | USART4_TX                          |
+|      | D2                 | PI9                 | GPIO     |                                    |
+|      | D3                 | PH9                 | GPIO     | TIM12_CH2                          |
+|      | D4                 | PE2                 | GPIO     |                                    |
+|      | D5                 | PH11                | GPIO     | TIM5_CH2                           |
+|      | D6                 | PH10                | GPIO     | TIM5_CH1                           |
+|      | D7                 | PI10                | GPIO     |                                    |
+|      | D8                 | PF10                | GPIO     |                                    |
+|      | D9                 | PI7                 | GPIO     | TIM8_CH3                           |
+|      | D10                | PI0                 | GPIO     | SPI2_NSS                           |
+|      | D11                | PB15                | GPIO     | SPI2 _MOSO                         |
+|      | D12                | PB14                | GPIO     | SPI2 _MISO                         |
+|      | D13                | PA12                | GPIO     | SPI2_SCK                           |
+|      | D14                | PD13                | I2C4_SDA | Wired to touch and audio circuitry |
+|      | D15                | PD12                | I2C4_SCL | Wired to touch and audio circuitry |

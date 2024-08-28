@@ -57,7 +57,6 @@ extern "C"
     void Initialize_Board();
     void Initialize64BitMicrosecondTimer();
     uint64_t ReadMicrosecondCounter();
-    void DelayMilliseconds(int milliseconds);
     void InitializeDevicePins();
     void Initialize_Board_LEDS();
     void SystemClock_Config();

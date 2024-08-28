@@ -1,4 +1,4 @@
-
+//
 // Copyright (c) .NET Foundation and Contributors
 // Portions Copyright (c) 2021 STMicroelectronics.  All rights reserved.
 // See LICENSE file in the project root for full license information.
@@ -13,240 +13,274 @@
 #include "File_Drivers.h"
 #endif
 
-static DevicePin mcuPins[] = {
+const DeviceRegistration::DevicePin mcuPins[] = {
     {GP0,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART,0},
     {GP1,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP2,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP3,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP4,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP5,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP6,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP7,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP8,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP9,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP10,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP11,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP12,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP13,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP14,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP15,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP16,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP17,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP18,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP19,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP20,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP21,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
-    {GP22, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::NONE, DevicePinFunction::GPIO},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
+    {GP22,
+     false,
+     NULL,
+     NULL,
+     PinMode::PinMode_Input,
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO},
     {GP23,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP24,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP25,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART},
     {GP26,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART | DevicePinFunction::ADC},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART | DeviceRegistration::DevicePinFunction::ADC},
     {GP27,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART | DevicePinFunction::ADC},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART | DeviceRegistration::DevicePinFunction::ADC},
     {GP28,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART | DevicePinFunction::ADC},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART | DeviceRegistration::DevicePinFunction::ADC},
     {GP29,
      false,
      NULL,
      NULL,
      PinMode::PinMode_Input,
-     DevicePinFunction::NONE,
-     DevicePinFunction::GPIO | DevicePinFunction::I2C | DevicePinFunction::PWM | DevicePinFunction::SPI |
-         DevicePinFunction::USART | DevicePinFunction::ADC},
+     DeviceRegistration::DevicePinFunction::NONE,
+     DeviceRegistration::DevicePinFunction::GPIO | DeviceRegistration::DevicePinFunction::I2C |
+         DeviceRegistration::DevicePinFunction::PWM | DeviceRegistration::DevicePinFunction::SPI |
+         DeviceRegistration::DevicePinFunction::USART | DeviceRegistration::DevicePinFunction::ADC},
 };
 
 // 1 Analog Digital controller
@@ -309,7 +343,6 @@ void Initialize_Board()
     Initialize_Board_LEDS();
     Initialize64BitMicrosecondTimer();
     InitializeDevicePins();
-
 }
 void Initialize_Board_LEDS()
 {
@@ -337,7 +370,7 @@ void BoardLed_Toggle()
 }
 bool BoardUserButton_Pressed()
 {
-//TODO: Define one of the pins as a input for and add-on user button 
+    // TODO: Define one of the pins as a input for and add-on user button
     return false;
 }
 uint64_t ReadMicrosecondCounter()

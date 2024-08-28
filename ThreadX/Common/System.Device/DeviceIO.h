@@ -18,15 +18,25 @@
 #include "sys_dev_spi_native.h"
 #include "sys_dev_usbstream_native.h"
 
+#define PORT_INDEX(pinNumber) (pinNumber / 16)
+#define PIN_INDEX(pinNumber)  pinNameValue % 16
+
 #ifndef UNUSED
 #define UNUSED(x) ((void)(x))
 #endif
+
+
+inline void Callback_EVENT_GPIO(GPIO_PIN pinNumber, bool pinValue)
+{
+    PostManagedEvent(EVENT_GPIO, 0, (uint16_t)pinNumber, pinValue);
+}
 
 class GpioIO
 {
   private:
   public:
-    static bool Initialize(PinNameValue pinNumber);
+    static bool Initialize();
+    static bool InitializePin(PinNameValue pinNumber);
     static bool Dispose(PinNameValue pinNumber);
     static bool Read(PinNameValue pinNumber);
     static bool Write(PinNameValue pinNumber, bool pinState);
@@ -37,10 +47,7 @@ class GpioIO
         int optional = 0);
     static bool SetLowPower(PinNameValue pinNumber);
     static bool SetMode(PinNameValue pinNumber, PinMode pinMode);
-    static bool InterruptEnable(
-        PinNameValue pinNumber,
-        GPIO_INT_EDGE events,
-        GPIO_INTERRUPT_SERVICE_ROUTINE gpioIsrPtr);
+    static bool InterruptEnable(PinNameValue pinNumber,  GPIO_INT_EDGE events);
     static bool InterruptDisable(PinNameValue pinNumber);
     static bool InterruptRemove(PinNameValue pinNumber);
 };

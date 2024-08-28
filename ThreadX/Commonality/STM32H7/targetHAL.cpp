@@ -13,6 +13,7 @@
 #include <nanoHAL_Graphics.h>
 #include <nanoHAL_v2.h>
 #include "board.h"
+#include "SD_DoubleBufferedDMA.h"
 
 bool g_fDoNotUninitializeDebuggerPort = false;
 
@@ -36,6 +37,16 @@ extern "C"
 
 void nanoHAL_Initialize()
 {
+    InitializeBoardPeripherals();
+    InitializeSD_Bus(
+        SD1_BUSIndex,
+        PC8,  // SDMMC D0
+        PC9,  // SDMMC D1
+        PC10, // SDMMC D2
+        PC11, // SDMMC D3
+        PC12, // SDMMC CLK
+        PD2,  // SDMMC CMD
+        PI8); // SDMMC uSD detect
 
     // initialize global mutex
     // chMtxObjectInit(&interpreterGlobalMutex);

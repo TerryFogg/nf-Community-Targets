@@ -341,6 +341,7 @@ extern "C"
 #define INVALIDATE_DCACHE SCB_CleanInvalidateDCache()
     void Startup_Rtos(bool debuggerRequested);
     void Initialize_Board();
+    void InitializeBoardPeripherals();
     void InitializeDevicePins();
     void Initialize_DWT_Counter();
     void Initialize_Board_LEDS();

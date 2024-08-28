@@ -45,12 +45,12 @@ extern "C"
         } DevicePinFunction;
         typedef struct GpioParameter
         {
-            TX_TIMER debounceTimer;
-            GPIO_INTERRUPT_SERVICE_ROUTINE isrPtr;
-            uint32_t debounceMs;
+            bool callBack;
             uint8_t edgeTrigger;
             void *param;
+            TX_TIMER debounceTimer;
             bool expectedState;
+            uint32_t debounceMs;
             bool waitingForDebounceToExpire;
         } GpioParameter;
 
@@ -120,7 +120,7 @@ extern "C"
         } SerialChannel;
 
         static unsigned int countSetBits(unsigned int num);
-        static void CreatePinList(DevicePin *GPIOPins, int numberOfPins);
+        static void CreatePinList(const DevicePin *GPIOPins, int numberOfPins);
         static int NumberOfPins();
         static bool AddPinParameters(PinNameValue pinNameValue, void *newParameters);
         static bool ReservePin(PinNameValue pinNameValue);

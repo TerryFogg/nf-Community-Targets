@@ -2,21 +2,30 @@
     "version": 4,
     "configurePresets": [
         {
-            "name": "LOCAL_SOURCES",
+            "name": "THREADX_AND_COMPONENT_PATHS",
             "description": "Configuration for setting up locations where external source repositories have been copied to local disk",
             "hidden": true,
             // $env{<variable-name>}
             "cacheVariables": {
-                "THREADX_SOURCE": "C:/nftools/ThreadX",
-                "FILEX_SOURCE": "C:/nftools/FileX",
-                "USBX_SOURCE": "C:/nftools/UsbX",
-                "NETXDUO_SOURCE": "C:/nftools/netxduo",
-                "LEVELX_SOURCE": "C:/nftools/levelx",
-                "STM32F0_CUBE_SOURCE": "C:/nftools/STM32CubeF0",
-                "STM32H7_CUBE_SOURCE": "C:/nftools/STM32CubeH7",
-                "STM32U5_CUBE_SOURCE": "C:/nftools/STM32CubeU5",
-                "PICO_SDK_SOURCE": "C:/nftools/pico-sdk",
-                "ELF2UF2_EXECUTABLE": "C:/nftools/Utilities/elf2uf2.exe"
+                "THREADX_PATH": "C:/nftools/ThreadX",
+                "FILEX_PATH": "C:/nftools/FileX",
+                "USBX_PATH": "C:/nftools/UsbX",
+                "NETXDUO_PATH": "C:/nftools/netxduo",
+                "LEVELX_PATH": "C:/nftools/levelx"
+            }
+        },
+        {
+            "name": "PICO_SDK",
+            "description": "Pico sdk support variables",
+            "hidden": true,
+            // $env{<variable-name>}
+            "cacheVariables": {
+                "picotool_DIR": "C:/nftools/picotool",
+                "PICO_TOOLS_DIR": "C:/nftools/pico-sdk/tools",
+                "PICOTOOL_EXECUTABLE": "C:/nftools/picotool/build/picotool.exe",
+                "PICO_ARM": "1",
+                "PICO_SDK_PATH": "C:/nftools/pico-sdk",
+                "PICO_NO_PICOTOOL": true
             }
         },
         {
@@ -63,24 +72,39 @@
                 "RTOS": "ThreadX",
                 "COMMUNITY_TARGET": "ThreadX",
                 "CMAKE_SYSTEM_NAME": "Generic",
-                "CMAKE_TRY_COMPILE_TARGET_TYPE": "STATIC_LIBRARY",
-                "CMAKE_C_COMPILER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc.exe",
-                "CMAKE_CXX_COMPILER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-g++.exe",
+
+                "CMAKE_AR": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-ar.exe",
                 "CMAKE_ASM_COMPILER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc.exe",
-                "CMAKE_LINKER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc.exe",
-                "CMAKE_SIZE_UTIL": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-size.exe",
+                "CMAKE_ASM_COMPILER_AR": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc-ar.exe",
+                "CMAKE_RANLIB": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-ranlib.exe",
+                "CMAKE_CXX_COMPILER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-g++.exe",
+                "CMAKE_CXX_COMPILER_AR": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc-ar.exe",
+                "CMAKE_CXX_COMPILER_RANLIB": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc-ranlib.exe",
+                "CMAKE_C_COMPILER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc.exe",
+                "CMAKE_C_COMPILER_AR": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-gcc-ar.exe",
+                "CMAKE_C_COMPILER_RANLIB": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc-ranlib.exe",
+                "CMAKE_LINKER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-ld.exe",
+                "CMAKE_NM": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-nm.exe",
+                "CMAKE_READELF": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-readelf.exe",
+                "CMAKE_STRIP": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-strip.exe",
+                "CMAKE_TRY_COMPILE_TARGET_TYPE": "STATIC_LIBRARY",
+
                 "CMAKE_OBJCOPY": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-objcopy.exe",
                 "CMAKE_OBJDUMP": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-objdump.exe",
+                "CMAKE_VERBOSE_MAKEFILE": "1",
+
                 "CMAKE_NM_UTIL": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-nm.exe",
-                "CMAKE_AR": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc-ar",
-                "CMAKE_RANLIB": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-ranlib.exe"
+
+
+
+                "CMAKE_SIZE_UTIL": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-size.exe"
             }
         },
         {
             "name": "STM32H735G_DK",
             "description": "Configuration for the STM32H735G_DK (Cortex M-7) discovery board from STMicroelectronics",
             "inherits": [
-                "LOCAL_SOURCES",
+                "THREADX_AND_COMPONENT_PATHS",
                 "GCC_ARM_COMMON_BUILD",
                 "FULL_MATHEMATICS"
             ],
@@ -89,6 +113,9 @@
                 "TARGET_FAMILY": "STM32H7",
                 "TARGET_SERIES": "STM32H735xx",
                 "ARM_PROCESSOR": "cortex-m7",
+                "TARGET_GIT_REPOSITORY": "https://github.com/STMicroelectronics/STM32CubeH7.git",
+                "TARGET_GIT_TAG": "v1.11.1",
+                "TARGET_GIT_LOCAL_PATH": "C:/nftools/STM32CubeH7",
 
                 "BUILD_VERSION": "1.0.0.0",
                 "INFOSTRING": "Built with ThreadX 6.1.12",
@@ -121,7 +148,7 @@
             "name": "STM32H7B3I_DK",
             "description": "Configuration for the STM32H7B3I_DK (Cortex M-7) discovery board from STMicroelectronics",
             "inherits": [
-                "LOCAL_SOURCES",
+                "THREADX_AND_COMPONENT_PATHS",
                 "GCC_ARM_COMMON_BUILD",
                 "FULL_MATHEMATICS"
             ],
@@ -130,6 +157,9 @@
                 "TARGET_FAMILY": "STM32H7",
                 "TARGET_SERIES": "STM32H7B3xxQ",
                 "ARM_PROCESSOR": "cortex-m7",
+                "TARGET_GIT_REPOSITORY": "https://github.com/STMicroelectronics/STM32CubeH7.git",
+                "TARGET_GIT_TAG": "v1.11.1",
+                "TARGET_GIT_LOCAL_PATH": "C:/nftools/STM32CubeH7",
 
                 "BUILD_VERSION": "1.0.0.0",
                 "INFOSTRING": "Built with ThreadX 6.1.12",
@@ -159,20 +189,10 @@
             "hidden": false
         },
         {
-            "name": "STM32H7B3I_DK-DEBUG",
-            "description": "Configuration for the STM32H7B3I_DK (Cortex M-7) discovery board from STMicroelectronics",
-            "inherits": [ "STM32H7B3I_DK", "DEBUG" ]
-        },
-        {
-            "name": "STM32H7B3I_DK-RELEASE",
-            "description": "Configuration for the STM32H7B3I_DK (Cortex M-7) discovery board from STMicroelectronics",
-            "inherits": [ "STM32H7B3I_DK", "RELEASE" ]
-        },
-        {
             "name": "NUCLEO64_F091RC",
             "description": "Configuration for the NUCLEO64_F091RC (Cortex M0) nucleo board from STMicroelectronics",
             "inherits": [
-                "LOCAL_SOURCES",
+                "THREADX_AND_COMPONENT_PATHS",
                 "GCC_ARM_COMMON_BUILD",
                 "FULL_MATHEMATICS"
             ],
@@ -181,6 +201,9 @@
                 "TARGET_FAMILY": "STM32F0",
                 "TARGET_SERIES": "STM32F091xC",
                 "ARM_PROCESSOR": "cortex-m0",
+                "TARGET_GIT_REPOSITORY": "https://github.com/STMicroelectronics/STM32CubeF7.git",
+                "TARGET_GIT_TAG": "v1.11.5",
+                "TARGET_GIT_LOCAL_PATH": "C:/nftools/STM32CubeF7",
 
                 "BUILD_VERSION": "1.0.0.0",
                 "INFOSTRING": "Built with ThreadX 6.1.12",
@@ -213,7 +236,7 @@
             "name": "NUCLEO_H743ZI2",
             "description": "Configuration for the NUCLEO-H743ZI2 (Cortex M-7) nucleo board from STMicroelectronics",
             "inherits": [
-                "LOCAL_SOURCES",
+                "THREADX_AND_COMPONENT_PATHS",
                 "GCC_ARM_COMMON_BUILD",
                 "FULL_MATHEMATICS"
             ],
@@ -222,6 +245,9 @@
                 "TARGET_FAMILY": "STM32H7",
                 "TARGET_SERIES": "STM32H743xx",
                 "ARM_PROCESSOR": "cortex-m7",
+                "TARGET_GIT_REPOSITORY": "https://github.com/STMicroelectronics/STM32CubeH7.git",
+                "TARGET_GIT_TAG": "v1.11.1",
+                "TARGET_GIT_LOCAL_PATH": "C:/nftools/STM32CubeH7",
 
                 "BUILD_VERSION": "1.0.0.0",
                 "INFOSTRING": "Built with ThreadX 6.1.12",
@@ -254,7 +280,7 @@
             "name": "STM32U5A9J_DK",
             "description": "Configuration for the STM32U5A9J_DK (Cortex-M33) from STMicroelectronics",
             "inherits": [
-                "LOCAL_SOURCES",
+                "THREADX_AND_COMPONENT_PATHS",
                 "GCC_ARM_COMMON_BUILD",
                 "FULL_MATHEMATICS"
             ],
@@ -263,6 +289,10 @@
                 "TARGET_FAMILY": "STM32U5",
                 "TARGET_SERIES": "STM32U5A9xx",
                 "ARM_PROCESSOR": "cortex-m33",
+                "SECURE_CODE" :  false,
+                "TARGET_GIT_REPOSITORY": "https://github.com/STMicroelectronics/STM32CubeU5.git",
+                "TARGET_GIT_TAG": "v1.4.0",
+                "TARGET_GIT_LOCAL_PATH": "C:/nftools/STM32CubeU5",
 
                 "BUILD_VERSION": "1.0.0.0",
                 "INFOSTRING": "Built with ThreadX 6.1.12",
@@ -295,15 +325,20 @@
             "name": "RP2040",
             "description": "Configuration for the Raspberry Pi Pico",
             "inherits": [
-                "LOCAL_SOURCES",
+                "THREADX_AND_COMPONENT_PATHS",
                 "GCC_ARM_COMMON_BUILD",
-                "FULL_MATHEMATICS"
+                "FULL_MATHEMATICS",
+                "PICO_SDK"
             ],
             "cacheVariables": {
                 "TARGET_BOARD": "RP2040",
-                "TARGET_FAMILY": "RP2040",
+                "TARGET_FAMILY": "RP2XXX",
                 "TARGET_SERIES": "RP2040",
+                "TARGET_TYPE": "PICO_RP2040",
                 "ARM_PROCESSOR": "cortex-m0plus",
+                "TARGET_GIT_REPOSITORY": "https://github.com/raspberrypi/pico-sdk.git",
+                "TARGET_GIT_TAG": "2.0.0",
+                "TARGET_GIT_LOCAL_PATH": "C:/nftools/pico-sdk",
 
                 "BUILD_VERSION": "1.0.0.0",
                 "INFOSTRING": "Built with ThreadX 6.1.12",
@@ -328,7 +363,65 @@
                 "USB_HOST_CONTROLLER": false,
                 "USB_NETWORK": false,
                 "USB_PICTBRIDGE": false,
-                "NETWORKING": false
+                "NETWORKING": false,
+
+                "PICO_BOARD": "pico",
+                "PICO_CMSIS_DEVICE": "RP2040",
+                "PICO_RP2040": "1",
+                "PICO_CMAKE_PRELOAD_PLATFORM_FILE": "C:/nftools/pico-sdk/cmake/preload/platforms/rp2040.cmake"
+            },
+            "hidden": false
+        },
+        {
+            "name": "RP2350",
+            "description": "Configuration for the Raspberry Pi Pico",
+            "inherits": [
+                "THREADX_AND_COMPONENT_PATHS",
+                "GCC_ARM_COMMON_BUILD",
+                "FULL_MATHEMATICS",
+                "PICO_SDK"
+            ],
+            "cacheVariables": {
+                "TARGET_BOARD": "RP2350",
+                "TARGET_FAMILY": "RP2XXX",
+                "TARGET_SERIES": "RP2350",
+                "TARGET_TYPE": "PICO_RP2350",
+                "ARM_PROCESSOR": "cortex-m33",
+                "SECURE_CODE": false,
+                "TARGET_GIT_REPOSITORY": "https://github.com/raspberrypi/pico-sdk.git",
+                "TARGET_GIT_TAG": "2.0.0",
+                "TARGET_GIT_LOCAL_PATH": "C:/nftools/pico-sdk",
+
+                "BUILD_VERSION": "1.0.0.0",
+                "INFOSTRING": "Built with ThreadX 6.1.12",
+                "HAS_CONFIG_BLOCK": false,
+                "RANDOM_NUMBER_GENERATOR": true,
+                "NANOCLR_SYSTEM_COLLECTIONS": true,
+                "NANOCLR_REFLECTION": true,
+                "REALTIME_CLOCK": false,
+                "WATCHDOG": false,
+                "ADVANCED_PROFILING": false,
+
+                "GRAPHICS_SUPPORT": true,
+                "TOUCH_DISPLAY_SUPPORT": false,
+
+                "FILEX_SYSTEM_SD": false,
+                "FILEX_SYSTEM_NAND": false,
+                "FILEX_SYSTEM_NOR": false,
+                "FILEX_SYSTEM_RAM": false,
+
+                "USB_DEVICE": false,
+                "USB_HOST": false,
+                "USB_HOST_CONTROLLER": false,
+                "USB_NETWORK": false,
+                "USB_PICTBRIDGE": false,
+                "NETWORKING": false,
+
+                "PICO_BOARD": "pico2",
+                "PICO_CMSIS_DEVICE": "RP2350",
+                "PICO_PLATFORM": "rp2350-arm-s",
+                "PICO_RP2350": "1",
+                "PICO_CMAKE_PRELOAD_PLATFORM_FILE": "C:/nftools/pico-sdk/cmake/preload/platforms/rp2350-arm-s.cmake"
             },
             "hidden": false
         }
@@ -339,23 +432,11 @@
             "configurePreset": "STM32H735G_DK"
         },
         {
-            "name": "STM32H735G_DK-Release",
-            "configurePreset": "STM32H735G_DK"
-        },
-        {
             "name": "STM32H7B3I_DK-Debug",
-            "configurePreset": "STM32H7B3I_DK-DEBUG"
-        },
-        {
-            "name": "STM32H7B3I_DK-Release",
-            "configurePreset": "STM32H7B3I_DK-RELEASE"
+            "configurePreset": "STM32H7B3I_DK"
         },
         {
             "name": "NUCLEO-H743ZI2-Debug",
-            "configurePreset": "NUCLEO_H743ZI2"
-        },
-        {
-            "name": "NUCLEO-H743ZI2-Release",
             "configurePreset": "NUCLEO_H743ZI2"
         },
         {
@@ -363,16 +444,12 @@
             "configurePreset": "STM32U5A9J_DK"
         },
         {
-            "name": "STM32U5A9J_DK-Release",
-            "configurePreset": "STM32U5A9J_DK"
-        },
-        {
             "name": "RP2040-Debug",
             "configurePreset": "RP2040"
         },
         {
-            "name": "RP2040-Release",
-            "configurePreset": "RP2040"
+            "name": "RP2350-Debug",
+            "configurePreset": "RP2350"
         }
     ]
 }

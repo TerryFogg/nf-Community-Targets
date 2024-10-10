@@ -41,69 +41,68 @@ set(CMAKE_CXX_EXTENSIONS OFF CACHE INTERNAL "-std=c++17 instead of -std=gnu++17"
 # -mlong-calls -- do we need this?
 #-fdollars-in-identifiers ??
 
-target_compile_definitions(nanoCLR.elf PUBLIC -DUSE_FULL_LL_DRIVER)
+target_compile_definitions(nanoCLR PUBLIC -DUSE_FULL_LL_DRIVER)
+target_compile_definitions(nanoCLR PUBLIC -DDEBUG)
+target_compile_definitions(nanoCLR PUBLIC -D${TARGET_SERIES})
 
 if(SDRAM)
-    target_compile_definitions(nanoCLR.elf PUBLIC -DHAL_SDRAM_MODULE_ENABLED)
+    target_compile_definitions(nanoCLR PUBLIC -DHAL_SDRAM_MODULE_ENABLED)
 endif()
 
-target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:-mthumb -mcpu=cortex-m7 -mfpu=fpv5-d16 -mfloat-abi=hard -frounding-math -fsignaling-nans>)
-target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:-fno-builtin -fno-common -fno-unroll-loops>)
-target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:-fshort-wchar -falign-functions=16>)
-target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:-ffunction-sections -fdata-sections>)
-target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:-mabi=aapcs -fcheck-new>)
-target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:C>:-Wall -Wextra -Werror>)
+target_compile_options(nanoCLR PUBLIC $<$<COMPILE_LANGUAGE:C>:-mthumb -mcpu=cortex-m7 -mfpu=fpv5-d16 -mfloat-abi=hard -frounding-math -fsignaling-nans>)
+target_compile_options(nanoCLR PUBLIC $<$<COMPILE_LANGUAGE:C>:-fno-builtin -fno-common -fno-unroll-loops>)
+target_compile_options(nanoCLR PUBLIC $<$<COMPILE_LANGUAGE:C>:-fshort-wchar -falign-functions=16>)
+target_compile_options(nanoCLR PUBLIC $<$<COMPILE_LANGUAGE:C>:-ffunction-sections -fdata-sections>)
+target_compile_options(nanoCLR PUBLIC $<$<COMPILE_LANGUAGE:C>:-mabi=aapcs -fcheck-new>)
+target_compile_options(nanoCLR PUBLIC $<$<COMPILE_LANGUAGE:C>:-Wall -Wextra -Werror>)
 
-target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-mthumb -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -frounding-math -fsignaling-nans >)
-target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions -fno-builtin -fno-common -fno-unroll-loops>)
-target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-fshort-wchar -falign-functions=16>)
-target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-ffunction-sections -fdata-sections>)
-target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-mabi=aapcs -fcheck-new>)
-target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-Wall -Wextra -Werror>)
+target_compile_options(nanoCLR PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-mthumb -mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard -frounding-math -fsignaling-nans >)
+target_compile_options(nanoCLR PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions -fno-builtin -fno-common -fno-unroll-loops>)
+target_compile_options(nanoCLR PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-fshort-wchar -falign-functions=16>)
+target_compile_options(nanoCLR PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-ffunction-sections -fdata-sections>)
+target_compile_options(nanoCLR PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-mabi=aapcs -fcheck-new>)
+target_compile_options(nanoCLR PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-Wall -Wextra -Werror>)
 
-target_compile_options(nanoCLR.elf  PUBLIC $<$<COMPILE_LANGUAGE:ASM>:-mcpu=cortex-m7 -x assembler-with-cpp>)
+target_compile_options(nanoCLR PUBLIC $<$<COMPILE_LANGUAGE:ASM>:-mcpu=cortex-m7 -x assembler-with-cpp>)
 
 
 #-fomit-frame-pointer  : Generate code that does not use the frame pointer resulting in smaller and faster code
 #                        It can make debugging more difficult, as the stack frame information is not available
 
 if( CMAKE_BUILD_TYPE STREQUAL "Debug")
-#   target_compile_options(nanoCLR.elf PUBLIC  "-Og -ggdb")
+#   target_compile_options(nanoCLR PUBLIC  "-Og -ggdb")
 elseif( CMAKE_BUILD_TYPE STREQUAL "Release")
-#   target_compile_options(nanoCLR.elf PUBLIC  "-O3 -flto -ffat-lto-objects")
-   target_compile_options(nanoCLR.elf PUBLIC  "-fomit-frame-pointer")
+#   target_compile_options(nanoCLR PUBLIC  "-O3 -flto -ffat-lto-objects")
+   target_compile_options(nanoCLR PUBLIC  "-fomit-frame-pointer")
    
 elseif( CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
- #  target_compile_options(nanoCLR.elf PUBLIC  "-Os -femit-class-debug-always -ggdb")
+ #  target_compile_options(nanoCLR PUBLIC  "-Os -femit-class-debug-always -ggdb")
 elseif( CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
-  # target_compile_options(nanoCLR.elf PUBLIC  "-Os -flto -ffat-lto-objects")
+  # target_compile_options(nanoCLR PUBLIC  "-Os -flto -ffat-lto-objects")
 endif()
 
 
 ## Link Options
-# Add semihosting if selected
-target_link_options(nanoCLR.elf PUBLIC "--specs=nosys.specs")
-   ##         if( NOT SEMIHOSTING)
-   ##         ##target_link_options(nanoCLR.elf PUBLIC "--specs=nano.specs")
-   ##         target_link_options(nanoCLR.elf PUBLIC "--specs=nosys.specs")
-   ##         else()
-   ##             MESSAGE(STATUS "Enable the 'Remote Dispatch Interface Monitor'")
-   ##             # use newlib library
-   ##             target_compile_options(nanoCLR.elf PUBLIC -specs=rdimon.specs)
-   ##             target_link_libraries(nanoCLR.elf PUBLIC -lc -lrdimon)
-   ##
-   ##             target_compile_definitions(nanoCLR.elf PUBLIC -DSEMIHOSTING)
-   ##         endif()
+# Set the linker file and register to detect when linker script changes so a re-link is executed
+target_link_options(nanoCLR PUBLIC "-T${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_BOARD}/Linker_script.ld")
+set_target_properties(nanoCLR PROPERTIES LINK_DEPENDS "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_BOARD}/Linker_script.ld")
+
+target_link_options(nanoCLR PUBLIC "--specs=nosys.specs")
+target_link_options(nanoCLR PUBLIC "-mthumb")
+target_link_options(nanoCLR PUBLIC "-mcpu=cortex-m7")
+target_link_options(nanoCLR PUBLIC "-mfpu=fpv5-sp-d16")
+target_link_options(nanoCLR PUBLIC "-mfloat-abi=hard")
+target_link_options(nanoCLR PUBLIC "-mabi=aapcs")
+target_link_options(nanoCLR PUBLIC "-Wl,--gc-sections")
+target_link_options(nanoCLR PUBLIC "-Wl,--no-wchar-size-warning")
+target_link_options(nanoCLR PUBLIC "-Wl,--print-memory-usage")
 
 
-target_link_options(nanoCLR.elf PUBLIC "-mthumb")
-target_link_options(nanoCLR.elf PUBLIC "-mcpu=cortex-m7")
-target_link_options(nanoCLR.elf PUBLIC "-mfpu=fpv5-sp-d16")
-target_link_options(nanoCLR.elf PUBLIC "-mfloat-abi=hard")
-target_link_options(nanoCLR.elf PUBLIC "-mabi=aapcs")
-target_link_options(nanoCLR.elf PUBLIC "-Wl,--gc-sections")
-target_link_options(nanoCLR.elf PUBLIC "-Wl,--no-wchar-size-warning")
-target_link_options(nanoCLR.elf PUBLIC "-Wl,--print-memory-usage")
-
-
+# Post build commands to create logs and additional files
+    add_custom_command(TARGET nanoCLR POST_BUILD
+      COMMAND ${CMAKE_OBJCOPY}           $<TARGET_FILE:nanoCLR>   ${CMAKE_BINARY_DIR}/nanoCLR.elf
+      COMMAND ${CMAKE_OBJCOPY} -Oihex    $<TARGET_FILE:nanoCLR>   nanoCLR.hex
+      COMMAND ${CMAKE_OBJCOPY} -Obinary  $<TARGET_FILE:nanoCLR>   nanoCLR.bin
+      COMMAND ${CMAKE_OBJDUMP} -d -EL -S $<TARGET_FILE:nanoCLR> > nanoCLR.lst
+    )
 

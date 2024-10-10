@@ -2,8 +2,8 @@
 # Copyright (c) .NET Foundation and Contributors
 # See LICENSE file in the project root for full license information.
 #
-    list(APPEND NF_INTERPRETER_SOURCES
-                ${STM32U5_CUBE_SOURCE}/Drivers/BSP/STM32U5x9J-DK
+    list(APPEND NF_INTERPRETER_INCLUDES
+                ${STM32U5_CUBE_PATH}/Drivers/BSP/STM32U5x9J-DK
     )
     list(APPEND NF_INTERPRETER_SOURCES
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/Device_BlockStorage.c

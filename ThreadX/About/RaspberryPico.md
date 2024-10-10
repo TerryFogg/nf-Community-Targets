@@ -101,3 +101,6 @@ The RP2040 SoC comes with two PIO peripherals. These are two simple co-processor
 
 
  
+
+
+ C:\nftools\pico-sdk\src\rp2040\rp2040_interface_pins.json

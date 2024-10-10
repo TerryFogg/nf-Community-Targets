@@ -14,7 +14,7 @@
 #include "boards/pico.h"
 
 #include "hardware/adc.h"
-#include <hardware/gpio.h>
+#include "hardware/gpio.h"
 #include "hardware/i2c.h"
 #include "hardware/irq.h"
 #include "hardware/pwm.h"

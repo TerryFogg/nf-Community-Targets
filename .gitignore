@@ -55,3 +55,4 @@ CMake/Modules/FindINTEROP*.cmake
 **/packages/*
 # except build/, which is used as an MSBuild target.
 !**/packages/build/
+/ThreadX/Commonality/RP2350/Utilities

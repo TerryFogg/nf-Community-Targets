@@ -9,8 +9,6 @@
 # This build does not support a nanbooter, code starts in the CLR
      target_compile_definitions(nanoCLR PUBLIC -DTARGET_HAS_NANOBOOTER=FALSE)
 
-     target_compile_definitions(nanoCLR PUBLIC -DPLATFORM_ARM)
-
 # Informational strings
     SET(OEM "nanoCLR running ${TARGET_BOARD}")
     string(REPLACE "." " " BUILD_VERSION_SPACED ${BUILD_VERSION})

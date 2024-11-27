@@ -71,11 +71,11 @@ MEMORY
     /* STM32H7B3LIH6QU*/
     /* ===============*/
 
-     ITCM_SRAM  (rxw):ORIGIN = 0x00000000,LENGTH = 64K 
-     DTCM_SRAM  (rxw):ORIGIN = 0x20000000,LENGTH = 128K 
-
      FLASH      (rx) :ORIGIN = 0x08000000,LENGTH = 2048k
      OTP        (rx) :ORIGIN = 0x08FFF000,LENGTH = 1024
+
+     ITCM_SRAM  (rxw):ORIGIN = 0x00000000,LENGTH = 64K 
+     DTCM_SRAM  (rxw):ORIGIN = 0x20000000,LENGTH = 128K 
      AXI_RAM1   (rxw):ORIGIN = 0x24000000,LENGTH = 256K
      AXI_RAM2   (rxw):ORIGIN = 0x24040000,LENGTH = 384K
      AXI_RAM3   (rxw):ORIGIN = 0x240A0000,LENGTH = 384K
@@ -92,8 +92,8 @@ MEMORY
   /* ============================= */
 
      nanoCLR    (rx) : ORIGIN = ORIGIN(FLASH), LENGTH = clr_total_blocks*sector_size
-     deployment (rx) : ORIGIN = ORIGIN(nanoCLR) + LENGTH(deployment), LENGTH = deployment_total_blocks*sector_size
-     config     (rx) : ORIGIN = ORIGIN(nanoCLR) + LENGTH(nanoCLR), LENGTH = config_total_blocks*sector_size
+     deployment (rx) : ORIGIN = ORIGIN(nanoCLR) + LENGTH(nanoCLR), LENGTH = deployment_total_blocks*sector_size
+     config     (rx) : ORIGIN = ORIGIN(deployment) + LENGTH(deployment), LENGTH = config_total_blocks*sector_size
 
      /* Native code ram (ThreadX, nativeCLR) */
      NATIVE_RAM   (rxw) : ORIGIN = ORIGIN(AXI_RAM1), LENGTH = LENGTH(AXI_RAM1)
@@ -107,6 +107,7 @@ MEMORY
 
 }
 
+/* ---------------------------- */
 /* The CLR managed heap for CLR */
 /* ---------------------------- */
 HeapBegin             = ORIGIN(CLR_RAM); 

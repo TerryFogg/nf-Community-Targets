@@ -80,22 +80,27 @@ elseif(${ARM_PROCESSOR} STREQUAL "cortex-m33" AND SECURE_CODE)
     )
 
     list(APPEND THREADX_SOURCES
+     # To run ThreadX and the user application in non-secure mode and support non-secure callable secure functions,
+     # add the following
+
+        ${THREADX_PATH}/ports/cortex_m33/gnu/src/tx_thread_secure_stack.c
         ${THREADX_PATH}/ports/cortex_m33/gnu/src/txe_thread_secure_stack_allocate.c
         ${THREADX_PATH}/ports/cortex_m33/gnu/src/txe_thread_secure_stack_free.c
+        ${THREADX_PATH}/ports/cortex_m33/gnu/src/tx_thread_secure_stack_allocate.S
+        ${THREADX_PATH}/ports/cortex_m33/gnu/src/tx_thread_secure_stack_free.S
 
         # ??? Do we need this ??? MISRA (Motor Industry Software Reliability Association) compliance
         ${THREADX_PATH}/ports/cortex_m33/gnu/src/tx_misra.S
 
+        # Additional ThreadX Sources for ARMv8-M
+        ${THREADX_PATH}/ports/cortex_m33/gnu/src/tx_thread_secure_stack_initialize.S
+    
         ${THREADX_PATH}/ports/cortex_m33/gnu/src/tx_thread_context_restore.S
         ${THREADX_PATH}/ports/cortex_m33/gnu/src/tx_thread_context_save.S
         ${THREADX_PATH}/ports/cortex_m33/gnu/src/tx_thread_interrupt_control.S
         ${THREADX_PATH}/ports/cortex_m33/gnu/src/tx_thread_interrupt_disable.S
         ${THREADX_PATH}/ports/cortex_m33/gnu/src/tx_thread_interrupt_restore.S
         ${THREADX_PATH}/ports/cortex_m33/gnu/src/tx_thread_schedule.S
-        ${THREADX_PATH}/ports/cortex_m33/gnu/src/tx_thread_secure_stack.c
-        ${THREADX_PATH}/ports/cortex_m33/gnu/src/tx_thread_secure_stack_allocate.S
-        ${THREADX_PATH}/ports/cortex_m33/gnu/src/tx_thread_secure_stack_free.S
-        ${THREADX_PATH}/ports/cortex_m33/gnu/src/tx_thread_secure_stack_initialize.S
         ${THREADX_PATH}/ports/cortex_m33/gnu/src/tx_thread_stack_build.S
         ${THREADX_PATH}/ports/cortex_m33/gnu/src/tx_thread_system_return.S
         ${THREADX_PATH}/ports/cortex_m33/gnu/src/tx_timer_interrupt.S

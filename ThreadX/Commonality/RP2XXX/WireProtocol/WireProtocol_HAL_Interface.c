@@ -41,3 +41,8 @@ uint8_t WP_TransmitMessage(WP_Message *message)
     }
     return true;
 }
+
+void WP_Message_PrepareReception_Platform()
+{
+    // empty on purpose, nothing to configure
+}

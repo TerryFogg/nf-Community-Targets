@@ -6,5 +6,5 @@
 #include "tx_api.h"
 
 #define HAL_Time_CurrentSysTicks tx_time_get
-#define PLATFORM_DELAY(milliSeconds) tx_thread_sleep(CPU_MillisecondsToTicks(milliSeconds))
+#define PLATFORM_DELAY(milliSeconds) tx_thread_sleep(milliSeconds/(1000/TX_TIMER_TICKS_PER_SECOND))
 

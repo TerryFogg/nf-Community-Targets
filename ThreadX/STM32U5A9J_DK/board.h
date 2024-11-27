@@ -78,9 +78,6 @@
 #pragma endregion
 
 #pragma region Display interface and controller setup parameters
-#define LCD_WIDTH  320
-#define LCD_HEIGHT 240
-
 #define DSI_RESET_PIN      LL_GPIO_PIN_5
 #define DSI_RESET_PIN_PORT         GPIOD
 

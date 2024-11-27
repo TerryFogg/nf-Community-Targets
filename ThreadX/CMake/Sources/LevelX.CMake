@@ -80,3 +80,6 @@
             ${LEVELX_PATH}/common/src/lx_nor_flash_simulator.c
             ${LEVELX_PATH}/common/src/lx_nor_flash_system_error.c
         )
+
+set_source_files_properties(${LEVELX_PATH}/common/src/lx_nor_flash_next_block_to_erase_find.c COMPILE_FLAGS -Wno-maybe-uninitialized)
+

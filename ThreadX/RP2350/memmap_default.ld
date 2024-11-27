@@ -6,65 +6,62 @@
 /* NOTE */
 /* Division of internal flash is limited by the smallest erase size of 4K       */
 
-/* Entry point */
-ENTRY(_entry_point)
-
 
 /* Minimum flash erase size is define as a page for RP2350 series*/
 /* ======================================================================== */
 flash_block_1 = 0x10000000;
 sector_size = 4096;
 block_size = sector_size;
+number_of_banks = 1;
 
 /* TOTAL blocks   */
 /* ============== */
-total_blocks = 1024;
+total_blocks = 1024*number_of_banks;
 
 /* CLR allocation */
 /* ============== */
 clr_block_start = 0;
 clr_block_end = 79;
-clr_total_blocks = clr_block_end - clr_block_start + 1;
+clr_total_allocation = (clr_block_end - clr_block_start + 1)*sector_size;
 
 /* DEPLOYMENT allocation */
 /* ===================== */
 deployment_block_start = 80;
 deployment_block_end = 1021;
-deployment_total_blocks = deployment_block_end - deployment_block_start + 1;
+deployment_total_allocation = (deployment_block_end - deployment_block_start + 1)*sector_size;
 
 /* CONFIGURATION allocation */
 /* ======================== */
 config_block_start = 1022;
 config_block_end = 1023;
-config_total_blocks = config_block_end - config_block_start + 1;
+config_total_allocation = (config_block_end - config_block_start + 1)*sector_size;
 
 MEMORY
 {
-  /* ===============*/
-  /* PHYSICAL MEMORY*/
-  /* ===============*/
-
-    /* ===============*/
-    /* RP2350 (Pico2) */
-    /* ===============*/
+    /* ================================= */
+    /* PHYSICAL MEMORY - RP2350 (Pico2)  */
+    /* ================================= */
 
      FLASH             (rx) :ORIGIN = 0x10000000,LENGTH = 4096k
      RAM_STRIPED       (rwx):ORIGIN = 0x20000000,LENGTH = 512K  
      SCRATCH_X         (rxw):ORIGIN = 0x20080000,LENGTH = 4K  
      SCRATCH_Y         (rxw):ORIGIN = 0x20081000,LENGTH = 4K 
 
-     /* ============================= */
-     /* Memory usage by nanoFramework */
-     /* ============================= */
+     /* =================================== */
+     /* FLASH Memory usage by nanoFramework */
+     /* =================================== */
      
-     nanoCLR    (rx) : ORIGIN = ORIGIN(FLASH), LENGTH = clr_total_blocks*sector_size
-     deployment (rx) : ORIGIN = ORIGIN(nanoCLR) + LENGTH(deployment), LENGTH = deployment_total_blocks*sector_size
-     config     (rx) : ORIGIN = ORIGIN(nanoCLR) + LENGTH(nanoCLR), LENGTH = config_total_blocks*sector_size
+     nanoCLR    (rx) : ORIGIN = ORIGIN(FLASH), LENGTH = clr_total_allocation
+     deployment (rx) : ORIGIN = ORIGIN(nanoCLR) + LENGTH(nanoCLR), LENGTH = deployment_total_allocation
+     config     (rx) : ORIGIN = ORIGIN(deployment) + LENGTH(deployment), LENGTH = config_total_allocation
 
-     /* Native code ram (ThreadX, nativeCLR) */
+     /* ========================================= */
+     /* RAM Memory usage by ThreadX/nanoFramework */
+     /* ========================================= */
+     
      NATIVE_RAM   (rxw) : ORIGIN = ORIGIN(RAM_STRIPED), LENGTH = 100K
      CLR_RAM      (rxw) : ORIGIN = ORIGIN(NATIVE_RAM) + LENGTH(NATIVE_RAM),LENGTH = 200K
-     graphics_ram (rxw) :ORIGIN = ORIGIN(CLR_RAM) + LENGTH(CLR_RAM), LENGTH = LENGTH(RAM_STRIPED) - LENGTH(NATIVE_RAM) - LENGTH(CLR_RAM)
+     graphics_ram (rxw) : ORIGIN = ORIGIN(CLR_RAM) + LENGTH(CLR_RAM), LENGTH = LENGTH(RAM_STRIPED) - LENGTH(NATIVE_RAM) - LENGTH(CLR_RAM)
      /* NO FRAME BUFFER - use SPI local buffer to transfer graphics */
 }
   
@@ -72,11 +69,10 @@ MEMORY
 /* VARIABLES USED  */
 /* =============== */
 
-/* Stack and heap size */
-_Min_Heap_Size = 0x200; 
-_Min_Stack_Size = 0x400; 
 
+/* ---------------------------- */
 /* The CLR managed heap for CLR */
+/* ---------------------------- */
 HeapBegin             = ORIGIN(CLR_RAM); 
 HeapEnd               = ORIGIN(CLR_RAM) + LENGTH(CLR_RAM); 
 
@@ -99,7 +95,9 @@ Graphics_frame_buffer = 0;
 Graphics_managed_heap = ORIGIN(graphics_ram); 
 Graphics_managed_end  = ORIGIN(graphics_ram) + LENGTH(graphics_ram);   
 
-/* Define output sections */
+/* Entry point */
+ENTRY(_entry_point)
+
 SECTIONS
 {
     .flash_begin : {
@@ -169,28 +167,26 @@ SECTIONS
         . = ALIGN(4);
     } > FLASH
 
-            /*-------------------------------------------------------------------------------*/
-            /*   Note the boot2 section is optional, and should be discarded if there is     */
-            /*   no reference to it *inside* the binary, as it is not called by the          */
-            /*   bootrom. (The bootrom performs a simple best-effort XIP setup and           */
-            /*   leaves it to the binary to do anything more sophisticated.) However         */
-            /*   there is still a size limit of 256 bytes, to ensure the boot2 can be        */
-            /*   stored in boot RAM.                                                         */
-            /*                                                                               */
-            /*   Really this is a "XIP setup function" -- the name boot2 is historic and     */
-            /*   refers to its dual-purpose on RP2040, where it also handled vectoring       */
-            /*   from the bootrom into the user image.                                       */
-            /*                                                                               */
-            /*  .boot2 : {                                                                   */
-            /*    __boot2_start__ = .;                                                       */
-            /*    *(.boot2)                                                                  */
-            /*    __boot2_end__ = .;                                                         */
-            /*   }   > FLASH                                                                 */
-            /*                                                                               */
-            /* ASSERT(__boot2_end__ - __boot2_start__ <= 256,                                */
-            /* "ERROR: Pico second stage bootloader must be no more than 256 bytes in size") */
-            /*-------------------------------------------------------------------------------*/
+    /* Note the boot2 section is optional, and should be discarded if there is
+       no reference to it *inside* the binary, as it is not called by the
+       bootrom. (The bootrom performs a simple best-effort XIP setup and
+       leaves it to the binary to do anything more sophisticated.) However
+       there is still a size limit of 256 bytes, to ensure the boot2 can be
+       stored in boot RAM.
 
+       Really this is a "XIP setup function" -- the name boot2 is historic and
+       refers to its dual-purpose on RP2040, where it also handled vectoring
+       from the bootrom into the user image.
+    */
+
+    .boot2 : {
+        __boot2_start__ = .;
+        *(.boot2)
+        __boot2_end__ = .;
+    } > FLASH
+
+    ASSERT(__boot2_end__ - __boot2_start__ <= 256,
+        "ERROR: Pico second stage bootloader must be no more than 256 bytes in size")
 
     .rodata : {
         *(EXCLUDE_FILE(*libgcc.a: *libc.a:*lib_a-mem*.o *libm.a:) .rodata*)

@@ -38,11 +38,12 @@ int AccessMemory(uint32_t location, uint32_t lengthInBytes, uint8_t *buffer, int
  int Monitor_Reboot(WP_Message *message)
 {
      Monitor_Reboot_Command *cmd = (Monitor_Reboot_Command *)message->m_payload;
+
      WP_ReplyToCommand(message, true, false, NULL, 0);
+
      if (cmd != NULL)
      {
          CPU_Reset();
      }
      return true;
  }
-

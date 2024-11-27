@@ -39,7 +39,7 @@
 // byte pool configuration and definitions
 #define DEFAULT_BYTE_POOL_SIZE     10000
 #define CLR_THREAD_STACK_SIZE      3000
-#define RECEIVER_THREAD_STACK_SIZE 1800
+#define RECEIVER_THREAD_STACK_SIZE 5000
 
 // #define TARGET_BLOCKSTORAGE_COUNT 1
 

@@ -8,17 +8,13 @@ include(CMakePrintHelpers)
 include(BuildParameters/Repositories.cmake)
 
 if( "${TARGET_SERIES}" STREQUAL "RP2040" OR "${TARGET_SERIES}" STREQUAL "RP2350")
-    set(CMAKE_C_STANDARD 11)
-    set(CMAKE_CXX_STANDARD 17)
-    SET(PICO_TOOLCHAIN_PATH "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1")
+    set(PICO_NO_CMSE true)
     Set(PICO_LINKER_SCRIPT_PATH  "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_BOARD}")
- include(${PICO_SDK_PATH}/pico_sdk_init.cmake)
-endif()
-
-project(nanoFramework VERSION ${BUILD_VERSION} LANGUAGES C CXX ASM)
- 
-if( "${TARGET_SERIES}" STREQUAL "RP2040" OR "${TARGET_SERIES}" STREQUAL "RP2350")
+    include(${PICO_SDK_PATH}/pico_sdk_init.cmake)
+    project(nanoFramework VERSION ${BUILD_VERSION} LANGUAGES C CXX ASM)
     pico_sdk_init()
+else()
+    project(nanoFramework VERSION ${BUILD_VERSION} LANGUAGES C CXX ASM)
 endif()
 
 # Sources
@@ -29,6 +25,7 @@ endif()
     include( ${CMAKE_CURRENT_SOURCE_DIR}/Sources/nf-Interpreter.options.cmake)
 
     add_executable(nanoCLR ${NF_INTERPRETER_SOURCES}
+                               ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/main.c
                                ${THREADX_SOURCES}
                                ${OPTIONAL_SOURCES}
                                ${${TARGET_FAMILY}_SOURCES}
@@ -46,3 +43,17 @@ endif()
 # Build parameters
     include( BuildParameters/Common.cmake)
     include( BuildParameters/${TARGET_FAMILY}.cmake)
+
+
+    # Function to print all variables
+function(print_all_variables)
+    message(STATUS "CMake variables at configuration time:")
+    get_cmake_property(_variableNames VARIABLES)
+    foreach (_variableName ${_variableNames})
+        message(STATUS "${_variableName}=${${_variableName}}")
+    endforeach()
+endfunction()
+
+# Call the function to print variables
+print_all_variables()
+

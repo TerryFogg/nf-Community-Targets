@@ -2,13 +2,16 @@
 # Copyright (c) .NET Foundation and Contributors
 # See LICENSE file in the project root for full license information.
 #
-
-# Common compiler definitions
+# Compiler definitions
 # --------------------------------------------------------------
 set(CMAKE_C_STANDARD 17 CACHE INTERNAL "C standard for all targets")
 set(CMAKE_C_EXTENSIONS OFF CACHE INTERNAL "-std=c++17 instead of -std=gnu++17")
 set(CMAKE_CXX_STANDARD 17 CACHE INTERNAL "C++ standard for all targets")
 set(CMAKE_CXX_EXTENSIONS OFF CACHE INTERNAL "-std=c++17 instead of -std=gnu++17")
+
+
+ target_compile_definitions(nanoCLR PUBLIC -DPLATFORM_ARM)
+
 
 target_compile_definitions(nanoCLR PUBLIC -DTX_SINGLE_MODE_NON_SECURE=1 -DARM_MATH_CM33  -DUSE_FULL_LL_DRIVER -DOCTOSPI -DHAL_XSPI_MODULE_ENABLED) 
 target_compile_definitions(nanoCLR PUBLIC -DDEBUG)
@@ -56,7 +59,7 @@ target_link_options(nanoCLR PUBLIC "-Wl,--print-memory-usage")
 # Post build commands to create logs and additional files
     add_custom_command(TARGET nanoCLR POST_BUILD
       COMMAND ${CMAKE_OBJCOPY}           $<TARGET_FILE:nanoCLR>   ${CMAKE_BINARY_DIR}/nanoCLR.elf
-      COMMAND ${CMAKE_OBJCOPY} -Oihex    $<TARGET_FILE:nanoCLR>   nanoCLR.hex
-      COMMAND ${CMAKE_OBJCOPY} -Obinary  $<TARGET_FILE:nanoCLR>   nanoCLR.bin
-      COMMAND ${CMAKE_OBJDUMP} -d -EL -S $<TARGET_FILE:nanoCLR> > nanoCLR.lst
+      COMMAND ${CMAKE_OBJCOPY} -Oihex    $<TARGET_FILE:nanoCLR>   ${CMAKE_BINARY_DIR}/nanoCLR.hex
+      COMMAND ${CMAKE_OBJCOPY} -Obinary  $<TARGET_FILE:nanoCLR>   ${CMAKE_BINARY_DIR}/nanoCLR.bin
+      COMMAND ${CMAKE_OBJDUMP} -d -EL -S $<TARGET_FILE:nanoCLR> > ${CMAKE_BINARY_DIR}/nanoCLR.lst
     )

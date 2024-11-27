@@ -41,7 +41,7 @@ void InitializeSD_Bus(
     PinNameValue SDMMC_CMD,
     PinNameValue SDMMC_DETECT)
 {
-    SDMMC_TypeDef *SDMMC;
+    SDMMC_TypeDef *SDMMC=NULL;
     SDMMC_InitTypeDef SDMMCInit;
 
     DeviceRegistration::SetPinFunction(SDMMC_D0, DeviceRegistration::DevicePinFunction::SD);
@@ -102,7 +102,7 @@ void SDMMC2_IRQHandler(void)
 }
 File_Status STM32ErrorToFileStatus(uint32_t status)
 {
-    File_Status return_value;
+    File_Status return_value = File_Status::FILE_ERROR;
     switch (status)
     {
         case SDMMC_ERROR_NONE:
@@ -146,6 +146,7 @@ File_Status STM32ErrorToFileStatus(uint32_t status)
             return_value = File_Status::FILE_WRITE_PROTECTED;
             break;
         default:
+            return_value = File_Status::FILE_ERROR;
             break;
     }
     return return_value;

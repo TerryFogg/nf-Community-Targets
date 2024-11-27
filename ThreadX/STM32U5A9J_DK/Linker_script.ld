@@ -2,7 +2,6 @@
    Copyright (c) .NET Foundation and Contributors
    See LICENSE file in the project root for full license information.
 */
-
 /*       | The flash page size is 8K bytes    |CLR>>*/  
 /*       | Flash word is (4x32) bits (Normal) |     */
 /*       | The flash controller implements two|     */

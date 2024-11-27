@@ -67,7 +67,6 @@
 #define USBD_MAX_POWER_MA                       (1)
 #endif
 
-#define USBD_ITF_CDC (0) // needs 2 interfaces
 #if !PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE
 #define USBD_ITF_MAX (2)
 #else
@@ -122,13 +121,13 @@ static const uint8_t usbd_desc_cfg[USBD_DESC_LEN] = {
         USBD_MAX_POWER_MA),
 
     TUD_CDC_DESCRIPTOR(
-        USBD_ITF_CDC,
-        USBD_STR_CDC,
-        USBD_CDC_EP_CMD,
-        USBD_CDC_CMD_MAX_SIZE,
-        USBD_CDC_EP_OUT,
-        USBD_CDC_EP_IN,
-        USBD_CDC_IN_OUT_MAX_SIZE),
+        0,
+        4,
+        0x81,
+        8,
+        2, 
+        0x82,
+        64),
 
 #if PICO_STDIO_USB_ENABLE_RESET_VIA_VENDOR_INTERFACE
     TUD_RPI_RESET_DESCRIPTOR(USBD_ITF_RPI_RESET, USBD_STR_RPI_RESET)

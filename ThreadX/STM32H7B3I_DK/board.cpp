@@ -484,3 +484,4 @@ void InitializeDevicePins()
     DeviceRegistration::CreateSerialChannelList(BoardSerialChannels, ARRAY_LEN(BoardSerialChannels));
     DeviceRegistration::CreateSDChannelList(BoardSDChannels, ARRAY_LEN(BoardSDChannels));
 };
+

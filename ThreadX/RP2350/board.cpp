@@ -13,7 +13,7 @@
 #include "File_Drivers.h"
 #endif
 
-const DeviceRegistration::DevicePin mcuPins[] = {
+DeviceRegistration::DevicePin mcuPins[] = {
     {GP0, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
     {GP1, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
     {GP2, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},

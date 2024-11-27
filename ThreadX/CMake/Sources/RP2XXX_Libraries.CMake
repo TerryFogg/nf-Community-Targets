@@ -25,7 +25,7 @@ target_link_libraries(nanoCLR
     pico_aon_timer
     pico_bit_ops
     pico_bootrom
-    pico_bootsel_via_double_reset
+   # pico_bootsel_via_double_reset
     pico_divider
     pico_double
     pico_fix_rp2040_usb_device_enumeration
@@ -39,12 +39,13 @@ target_link_libraries(nanoCLR
     pico_platform
     pico_rand
     pico_stdlib
+#    pico_stdio
     pico_sync
     pico_time
     pico_unique_id
     pico_util
 
-    tinyusb_board
+    #tinyusb_board
 )
 
 if( "${TARGET_SERIES}" STREQUAL "RP2040")
@@ -59,9 +60,6 @@ if( "${TARGET_SERIES}" STREQUAL "RP2350")
                          pico_sha256
    )
 endif()
-
-
-
 
 # create map/bin/hex file etc.
 pico_add_extra_outputs(nanoCLR)

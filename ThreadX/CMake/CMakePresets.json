@@ -5,7 +5,6 @@
             "name": "THREADX_AND_COMPONENT_PATHS",
             "description": "Configuration for setting up locations where external source repositories have been copied to local disk",
             "hidden": true,
-            // $env{<variable-name>}
             "cacheVariables": {
                 "THREADX_PATH": "C:/nftools/ThreadX",
                 "FILEX_PATH": "C:/nftools/FileX",
@@ -18,8 +17,8 @@
             "name": "PICO_SDK",
             "description": "Pico sdk support variables",
             "hidden": true,
-            // $env{<variable-name>}
             "cacheVariables": {
+                "PICO_TOOLCHAIN_PATH": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1",
                 "picotool_DIR": "C:/nftools/picotool",
                 "PICO_TOOLS_DIR": "C:/nftools/pico-sdk/tools",
                 "PICOTOOL_EXECUTABLE": "C:/nftools/picotool/build/picotool.exe",
@@ -289,7 +288,7 @@
                 "TARGET_FAMILY": "STM32U5",
                 "TARGET_SERIES": "STM32U5A9xx",
                 "ARM_PROCESSOR": "cortex-m33",
-                "SECURE_CODE" :  false,
+                "SECURE_CODE": false,
                 "TARGET_GIT_REPOSITORY": "https://github.com/STMicroelectronics/STM32CubeU5.git",
                 "TARGET_GIT_TAG": "v1.4.0",
                 "TARGET_GIT_LOCAL_PATH": "C:/nftools/STM32CubeU5",
@@ -336,6 +335,8 @@
                 "TARGET_SERIES": "RP2040",
                 "TARGET_TYPE": "PICO_RP2040",
                 "ARM_PROCESSOR": "cortex-m0plus",
+                "PICO_BOARD": "pico",
+                "PICO_RP2040": "1",
                 "TARGET_GIT_REPOSITORY": "https://github.com/raspberrypi/pico-sdk.git",
                 "TARGET_GIT_TAG": "2.0.0",
                 "TARGET_GIT_LOCAL_PATH": "C:/nftools/pico-sdk",
@@ -363,12 +364,8 @@
                 "USB_HOST_CONTROLLER": false,
                 "USB_NETWORK": false,
                 "USB_PICTBRIDGE": false,
-                "NETWORKING": false,
+                "NETWORKING": false
 
-                "PICO_BOARD": "pico",
-                "PICO_CMSIS_DEVICE": "RP2040",
-                "PICO_RP2040": "1",
-                "PICO_CMAKE_PRELOAD_PLATFORM_FILE": "C:/nftools/pico-sdk/cmake/preload/platforms/rp2040.cmake"
             },
             "hidden": false
         },
@@ -379,7 +376,8 @@
                 "THREADX_AND_COMPONENT_PATHS",
                 "GCC_ARM_COMMON_BUILD",
                 "FULL_MATHEMATICS",
-                "PICO_SDK"
+                "PICO_SDK",
+                "DEBUG"
             ],
             "cacheVariables": {
                 "TARGET_BOARD": "RP2350",
@@ -388,6 +386,8 @@
                 "TARGET_TYPE": "PICO_RP2350",
                 "ARM_PROCESSOR": "cortex-m33",
                 "SECURE_CODE": false,
+                "PICO_BOARD": "pico2",
+                "PICO_RP2350": "1",
                 "TARGET_GIT_REPOSITORY": "https://github.com/raspberrypi/pico-sdk.git",
                 "TARGET_GIT_TAG": "2.0.0",
                 "TARGET_GIT_LOCAL_PATH": "C:/nftools/pico-sdk",
@@ -417,11 +417,9 @@
                 "USB_PICTBRIDGE": false,
                 "NETWORKING": false,
 
-                "PICO_BOARD": "pico2",
-                "PICO_CMSIS_DEVICE": "RP2350",
-                "PICO_PLATFORM": "rp2350-arm-s",
-                "PICO_RP2350": "1",
-                "PICO_CMAKE_PRELOAD_PLATFORM_FILE": "C:/nftools/pico-sdk/cmake/preload/platforms/rp2350-arm-s.cmake"
+                "HARD_FAULT_DEBUG_HANDLER": true,
+                "CFG_USB_USE_DTR": false
+
             },
             "hidden": false
         }

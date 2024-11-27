@@ -120,7 +120,7 @@ extern "C"
         } SerialChannel;
 
         static unsigned int countSetBits(unsigned int num);
-        static void CreatePinList(const DevicePin *GPIOPins, int numberOfPins);
+        static void CreatePinList(DevicePin *GPIOPins, int numberOfPins);
         static int NumberOfPins();
         static bool AddPinParameters(PinNameValue pinNameValue, void *newParameters);
         static bool ReservePin(PinNameValue pinNameValue);

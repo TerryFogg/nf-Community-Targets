@@ -16,3 +16,6 @@
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/RP2XXX/pico-LCD-1.14V2-ST7789VW.cpp
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/RP2XXX/Spi_To_Display_Pico.cpp
   )
+
+
+  set_source_files_properties(${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RP2040/tx_initialize_low_level.s COMPILE_FLAGS -std=gnu17)

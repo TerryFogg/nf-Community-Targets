@@ -5,7 +5,7 @@
 
 #include "DeviceRegistration.h"
 
-DeviceRegistration::DevicePin *GPIOPins;
+static DeviceRegistration::DevicePin *GPIOPins;
 static int NumberOfGPIOPins;
 
 static DeviceRegistration::AdcPin *ADCChannels;
@@ -21,14 +21,9 @@ static int NumberOfSerialChannels;
 static DeviceRegistration::SpiPin *SpiChannels;
 static int NumberOfSpiChannels;
 
-void DeviceRegistration::CreatePinList(const DevicePin *mcuGPIOPinList, int numberOfPins)
+void DeviceRegistration::CreatePinList(DevicePin *mcuGPIOPinList, int numberOfPins)
 {
-
-    GPIOPins = (DeviceRegistration::DevicePin *)platform_malloc(sizeof(DevicePin) * numberOfPins);
-    for (int i = 0; i < numberOfPins; i++)
-    {
-        GPIOPins[i] = mcuGPIOPinList[i];
-    }
+    GPIOPins = mcuGPIOPinList;
     NumberOfGPIOPins = numberOfPins;
 }
 bool DeviceRegistration::AddPinParameters(PinNameValue pinNameValue, void *newParameters)
@@ -42,7 +37,6 @@ bool DeviceRegistration::AddPinParameters(PinNameValue pinNameValue, void *newPa
     }
     return status;
 }
-
 void DeviceRegistration::CreateADCChannelList(AdcPin *BoardAdcChannels, int BoardnumberOfAdcChannels)
 {
     ADCChannels = BoardAdcChannels;

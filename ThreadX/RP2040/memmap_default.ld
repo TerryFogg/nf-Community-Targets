@@ -5,7 +5,7 @@
 
 /* Division of internal flash is limited by the smallest erase size of 4K       */
 /* The first sector contains a prepended bs2_default_padded_checksummed.S boot  */
-/* Define the availability of FLASH */
+
 /* Minimum flash erase size is define as a page for RP2040 series*/
 flash_block_1 = 0x10000000;
 flash_block_1_size = 2048K;

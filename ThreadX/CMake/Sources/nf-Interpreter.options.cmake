@@ -69,10 +69,7 @@ if( "${TARGET_FAMILY}" STREQUAL "STM32H7")
 endif()
 if( "${TARGET_FAMILY}" STREQUAL "STM32U5")
     list(APPEND FILEX_INCLUDES
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/STM32H7/DeviceIO
-    )
-    list(APPEND FILEX_SOURCES
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/STM32H7/DeviceIO/SD_DoubleBufferedDMA.cpp
+         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/STM32U5/DeviceIO
     )
 endif()
 if( "${TARGET_FAMILY}" STREQUAL "RP2XXX")

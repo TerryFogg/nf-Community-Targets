@@ -18,7 +18,7 @@ bool FlashDriver_UninitializeDevice(void *context)
 }
 DeviceBlockInfo *FlashDriver_GetDeviceInfo(void *context)
 {
-    MEMORY_MAPPED_NOR_BLOCK_CONFIG *config = context;
+    MEMORY_MAPPED_NOR_BLOCK_CONFIG *config = (MEMORY_MAPPED_NOR_BLOCK_CONFIG *)context;
     return config->BlockConfig.BlockDeviceInformation;
 }
 bool FlashDriver_Read(void *context, ByteAddress startAddress, unsigned int numBytes, unsigned char *buffer)
@@ -44,14 +44,13 @@ bool FlashDriver_Write(
     UNUSED(readModifyWrite);
 
     uint32_t primask_bit;
-    uint32_t bank = GetBank(startAddress);
     __IO uint32_t *dest_addr = (__IO uint32_t *)(startAddress);
     __IO uint32_t *src_addr = (__IO uint32_t *)(buffer);
 
     int number_of_flash_words = numBytes / (FLASH_TYPEPROGRAM_QUADWORD * 4U);
     int remaining_bytes = numBytes % (FLASH_TYPEPROGRAM_QUADWORD * 4U);
 
-    FlashUnlock(bank);
+    FlashUnlock();
     {
         if (number_of_flash_words != 0) // Program the full flash word
         {
@@ -80,7 +79,7 @@ bool FlashDriver_Write(
         {
             __IO uint8_t *dest_addr_8_bit = (__IO uint8_t *)(dest_addr);
             __IO uint8_t *src_addr_8_bit = (__IO uint8_t *)(src_addr);
-            WaitForLastOperation(bank);
+            WaitForLastOperation();
 
             // Disable interrupts
             primask_bit = __get_PRIMASK();
@@ -98,7 +97,7 @@ bool FlashDriver_Write(
             __set_PRIMASK(primask_bit);
         }
     }
-    FlashLock(bank);
+    FlashLock();
 
     return true;
 }
@@ -129,7 +128,7 @@ bool FlashDriver_EraseBlock(void *context, ByteAddress address)
     uint32_t bank = GetBank(address);
     __IO uint32_t *reg_cr = IS_FLASH_SECURE_OPERATION() ? &(FLASH->SECCR) : &(FLASH->NSCR);
 
-    FlashUnlock(bank);
+    FlashUnlock();
     {
 
         if (WaitForLastOperation()) // Flash unlocked?
@@ -152,7 +151,7 @@ bool FlashDriver_EraseBlock(void *context, ByteAddress address)
             CLEAR_BIT((*reg_cr), FLASH_TYPEERASE_PAGES & (~(FLASH_NON_SECURE_MASK)));
         }
     }
-    FlashLock(bank);
+    FlashLock();
     return success;
 }
 bool FlashUnlock()
@@ -186,10 +185,11 @@ bool FlashLock()
 }
 void WriteFlashWord(uint32_t bank, uint32_t *aligned_dest_addr, uint32_t *buffer_128bits)
 {
+    (void)bank;
     __IO uint32_t *reg_cr = IS_FLASH_SECURE_OPERATION() ? &(FLASH->SECCR) : &(FLASH_NS->NSCR);
     uint32_t primask_bit;
 
-    FlashUnlock(bank);
+    FlashUnlock();
     {
         if (WaitForLastOperation())
         {
@@ -213,7 +213,7 @@ void WriteFlashWord(uint32_t bank, uint32_t *aligned_dest_addr, uint32_t *buffer
             __set_PRIMASK(primask_bit);
         }
     }
-    FlashLock(bank);
+    FlashLock();
 }
 uint32_t GetPage(uint32_t Addr)
 {

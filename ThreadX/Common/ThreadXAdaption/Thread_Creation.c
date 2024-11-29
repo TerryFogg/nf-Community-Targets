@@ -104,6 +104,50 @@ void CreateCLRThread()
         }
     }
 }
+
+
+#pragma region Thread startup programs
+
+void CLRStartupThread(uint32_t parameter)
+{
+
+    bool userRequestedWaitForDebugger = (bool)parameter;
+
+    // CLR settings to launch CLR thread
+    CLR_SETTINGS clrSettings;
+    (void)memset(&clrSettings, 0, sizeof(CLR_SETTINGS));
+    clrSettings.MaxContextSwitches = 50;
+    clrSettings.EnterDebuggerLoopAfterExit = true;
+    clrSettings.WaitForDebugger = userRequestedWaitForDebugger;
+
+    //   HAL_Time_CurrentSysTicks
+
+    nanoHAL_Initialize_C();
+    ClrStartup(clrSettings);
+}
+void ReceiverThread_entry(uint32_t parameter)
+{
+    (void)parameter;
+    extern WP_Message inboundMessage;
+
+    // NOTE: Don't call scheduler type calls in this module
+    InitWireProtocolCommunications();
+    tx_thread_sleep(50);
+
+    WP_Message_Initialize(&inboundMessage);
+    WP_Message_PrepareReception(&inboundMessage);
+
+    // loop until thread receives a request to terminate
+    while (true)
+    {
+        WP_Message_Process(&inboundMessage);
+        tx_thread_relinquish();
+    }
+}
+#pragma endregion
+
+
+#ifdef USING_USBX
 void CreateUsbXThreads()
 {
 #define USBX_READ_STACK_SIZE  500
@@ -148,47 +192,6 @@ void CreateUsbXThreads()
         }
     }
 }
-#pragma endregion
-
-#pragma region Thread startup programs
-
-void CLRStartupThread(uint32_t parameter)
-{
-
-    bool userRequestedWaitForDebugger = (bool)parameter;
-
-    // CLR settings to launch CLR thread
-    CLR_SETTINGS clrSettings;
-    (void)memset(&clrSettings, 0, sizeof(CLR_SETTINGS));
-    clrSettings.MaxContextSwitches = 50;
-    clrSettings.EnterDebuggerLoopAfterExit = true;
-    clrSettings.WaitForDebugger = userRequestedWaitForDebugger;
-
-    //   HAL_Time_CurrentSysTicks
-
-    nanoHAL_Initialize_C();
-    ClrStartup(clrSettings);
-}
-void ReceiverThread_entry(uint32_t parameter)
-{
-    (void)parameter;
-    extern WP_Message inboundMessage;
-
-    // NOTE: Don't call scheduler type calls in this module
-    InitWireProtocolCommunications();
-    tx_thread_sleep(50);
-
-    WP_Message_Initialize(&inboundMessage);
-    WP_Message_PrepareReception(&inboundMessage);
-
-    // loop until thread receives a request to terminate
-    while (true)
-    {
-        WP_Message_Process(&inboundMessage);
-        tx_thread_relinquish();
-    }
-}
-#pragma endregion
 
 VOID usbx_cdc_acm_read_thread_entry(ULONG thread_input)
 {
@@ -200,9 +203,6 @@ VOID usbx_cdc_acm_read_thread_entry(ULONG thread_input)
 
 /* Rx/TX flag */
 #define TX_NEW_TRANSMITTED_DATA 0x02
-
-    ULONG actual_length;
-    ULONG actual_flags;
 
     // Blocking read?
     // maybe need async read with event flag
@@ -218,3 +218,4 @@ VOID usbx_cdc_acm_write_thread_entry(ULONG thread_input)
 
     // ux_device_class_cdc_acm_write(cdc_acm, (UCHAR *)(&UserTxBufferFS[buffptr]), buffsize, &actual_length);
 }
+#endif

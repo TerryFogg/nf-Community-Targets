@@ -11,7 +11,7 @@
 #include "File_Drivers.h"
 #include "Delays.h"
 
-const DeviceRegistration::DevicePin mcuPins[] = {
+DeviceRegistration::DevicePin mcuPins[] = {
 
     // -----------------
     // Arduino connector

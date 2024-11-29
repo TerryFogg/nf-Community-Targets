@@ -94,14 +94,3 @@ void Time_SetCompare(uint64_t compareValueTicks)
         }
     }
 }
-
-uint64_t CPU_MillisecondsToTicks(uint64_t milliseconds)
-{
-    return milliseconds / NumberOfMillisecondsPerTick;
-}
-
-// Converts sysTicks to .NET ticks (100 nanoseconds)
-uint64_t HAL_Time_SysTicksToTime(uint64_t sysTicks)
-{
-    return sysTicks * NumberOf100nanosecondsPerTick;
-}

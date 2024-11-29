@@ -1,1 +1,0 @@
-c:/nftools/openocd-raspberrypi/bin/openocd-rp2350.exe -s c:/nfTools/openocd-raspberrypi/share/openocd/scripts/ -f c:/nfTools/openocd-raspberrypi/share/openocd/scripts/interface/cmsis-dap.cfg -c "adapter speed 3000" -f target/rp2350.cfg -c init

@@ -11,7 +11,7 @@
 #include "tx_api.h"
 #include "target_platform.h"
 
-#include "boards/pico.h"
+#include "boards/pico2.h"
 
 #include "hardware/adc.h"
 #include <hardware/gpio.h>

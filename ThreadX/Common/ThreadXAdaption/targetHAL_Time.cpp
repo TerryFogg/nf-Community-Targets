@@ -132,3 +132,8 @@ const char *HAL_Time_CurrentDateTimeToString()
 {
     return DateTimeToString(HAL_Time_CurrentDateTime(false));
 }
+
+uint64_t CPU_MillisecondsToTicks(uint64_t ticks)
+{
+    return ((ticks * (uint64_t)TX_TIMER_TICKS_PER_SECOND) / 1000);
+}

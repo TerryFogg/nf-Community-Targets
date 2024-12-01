@@ -21,16 +21,15 @@ Board: RaspberryPiPico
 #include <lib/tinyusb/src/device/usbd.h>
 #include <tx_api.h>
 #include "targetHAL_Time.h"
-static bool UsbConnected = false;
 
 TX_EVENT_FLAGS_GROUP wpReceivedEvent;
 void shared_interrupt(void);
 
 // Configuration at compile time to chose if DTR is available from the host
 #ifdef CFG_USB_USE_DTR
-#define UsbConnected  tud_cdc_connected() 
+#define UsbConnected tud_cdc_connected()
 #else
-#define UsbConnected  tud_ready()
+#define UsbConnected tud_ready()
 #endif
 
 void InitWireProtocolCommunications()
@@ -56,6 +55,7 @@ int wp_ReadBytes(uint8_t **ptr, uint32_t *size, uint32_t wait_time)
     while (!tud_cdc_n_available(0))
     {
         tud_task();
+        tx_thread_relinquish();
     }
     ULONG read = tud_cdc_n_read(0, *ptr, requestedSize);
     return read;

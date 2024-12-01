@@ -22,7 +22,7 @@ void CreateUsbXThreads();
 void usbx_cdc_acm_read_thread_entry(ULONG thread_input);
 void usbx_cdc_acm_write_thread_entry(ULONG thread_input);
 
-#define RECEIVER_THREAD_PRIORITY 4
+#define RECEIVER_THREAD_PRIORITY 5
 #define CLR_THREAD_PRIORITY      5
 
 bool g_waitForDebuggerRequested;

@@ -364,6 +364,5 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
-// static inline uint32_t Get_SYSTICK();
 
 #pragma endregion

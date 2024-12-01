@@ -7,6 +7,13 @@
 #include <platform_target_capabilities.h>
 #include <stdbool.h>
 
+
+#define RAM1_MEMORY_StartAddress   ((uint32_t)0x20000000)
+#define RAM1_MEMORY_Size           ((uint32_t)0x00082000)
+#define FLASH1_MEMORY_StartAddress ((uint32_t)0x10000000)
+#define FLASH1_MEMORY_Size         ((uint32_t)0x00400000)
+
+
 HAL_SYSTEM_CONFIG HalSystemConfig = {
 	{true}, // HAL_DRIVER_CONFIG_HEADER Header;
 	1,		// ConvertCOM_DebugHandle(1),

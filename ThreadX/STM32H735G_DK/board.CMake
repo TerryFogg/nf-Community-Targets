@@ -5,7 +5,7 @@
 
     list(APPEND NF_INTERPRETER_SOURCES 
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H735G_DK/Device_BlockStorage.c
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H735G_DK/board.c
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H735G_DK/board.cpp
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H735G_DK/Clock_configuration.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H735G_DK/CLR_RT_InteropAssembliesTable.cpp
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H735G_DK/MicroSD.c

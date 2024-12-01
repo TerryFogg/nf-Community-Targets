@@ -13,12 +13,12 @@ BlockStorageDevice Device_BlockStorage;
 // Block Size 4096 Bytes (Smallest erase size)
 const BlockRange BlockRange1[] = {
     {BlockRange_BLOCKTYPE_CODE, (uint32_t)(uint32_t *)&clr_block_start, (uint32_t)(uint32_t *)&clr_block_end},
-    {BlockRange_BLOCKTYPE_CONFIG, (uint32_t)(uint32_t *)&config_block_start, (uint32_t)(uint32_t *)&config_block_end},
-    {BlockRange_BLOCKTYPE_DEPLOYMENT, (uint32_t)(uint32_t *)&deployment_block_start, (uint32_t)(uint32_t *)&deployment_block_end}};
+    {BlockRange_BLOCKTYPE_DEPLOYMENT, (uint32_t)(uint32_t *)&deployment_block_start, (uint32_t)(uint32_t *)&deployment_block_end},
+    {BlockRange_BLOCKTYPE_CONFIG, (uint32_t)(uint32_t *)&config_block_start, (uint32_t)(uint32_t *)&config_block_end}};
 
-const BlockRegionInfo BlockRegions[] = {
+    const BlockRegionInfo BlockRegions[] = {
     {
-        (BlockRegionAttribute_ProgramWidthIs128bits),
+        (BlockRegionAttribute_ProgramWidthIs2048bits),
         (uint32_t)(uint32_t *)&flash_block_1, // start address for block region
         (uint32_t)(uint32_t *)&total_blocks,  // total number of blocks in this region
         (uint32_t)(uint32_t *)&block_size,    // total number of bytes per block

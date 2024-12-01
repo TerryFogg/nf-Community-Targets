@@ -121,7 +121,7 @@ const uint32_t SyscfgPorts[] = {
 #ifdef GPIOI
     LL_SYSCFG_EXTI_PORTI,
 #else
-    -1,
+    (uint32_t) - 1,
 #endif
     LL_SYSCFG_EXTI_PORTJ,
     LL_SYSCFG_EXTI_PORTK};

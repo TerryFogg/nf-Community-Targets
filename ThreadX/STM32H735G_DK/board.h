@@ -252,6 +252,12 @@ enum ArduinoPin : int
 // #define FLASH_FLAG_EOP_BANK1 FLASH_SR_EOP
 #pragma endregion
 
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #pragma region Inline functions
 // DWT is connected to the system clock
 static inline void DWT_Delay_us(volatile uint32_t microsecond_delay)
@@ -290,6 +296,10 @@ static inline bool OSPI2_WaitUntilState(uint32_t Flag, FlagStatus State)
 
 void Startup_Rtos(bool debuggerRequested);
 void Initialize_Board();
+void InitializeBoardPeripherals();
+void Initialize_Board_LEDS();
+void Initialize_Board_Buttons();
+void InitializeDevicePins();
 void Initialize_OCTOSPI2_Hyperam();
 void Initialize_OPSPI_Flash();
 void Initialize_RTC();
@@ -306,10 +316,6 @@ void BoardLed_Toggle(GPIO_TypeDef *gpio_port, uint32_t led);
 bool BoardUserButton_Pressed();
 static inline uint32_t Get_SYSTICK();
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
     void LTDCClock_Config(void);
 #ifdef __cplusplus
 }

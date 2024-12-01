@@ -339,7 +339,6 @@ void Initialize_Board()
     InitializeDelayCounter();
     Initialize64bit100nsTimer();
     Initialize_SDRAM(SDRAM_BANK_ADDR, SDRAM_RAM_REGION_SIZE);
-    //InitializeBoardPeripherals();
     //InitializeSD_Bus(
     //    SD1_BUSIndex,
     //    PC8,  // SDMMC D0
@@ -351,16 +350,12 @@ void Initialize_Board()
     //    PI8); // SDMMC uSD detect
 
 }
-
 void InitializeBoardPeripherals()
 {
     Initialize_Board_LEDS();
     Initialize_Board_Buttons();
     InitializeDevicePins();
 }
-
-
-
 void CPU_CACHE_Enable(void)
 {
     SCB_EnableICache();

@@ -5,7 +5,6 @@
 //
 #include "board.h"
 
-
 void Initialize_Board()
 {
     CPU_CACHE_Enable();
@@ -16,8 +15,14 @@ void Initialize_Board()
     FMC_Bank1_R->BTCR[0] &= ~FMC_BCRx_MBKEN;
 
     Initialize_DWT_Counter();
-    Initialize_Board_LEDS_And_Buttons();
+    InitializeBoardPeripherals();
     Initialize_OCTOSPI2_Hyperam();
+}
+void InitializeBoardPeripherals()
+{
+    Initialize_Board_LEDS();
+    Initialize_Board_Buttons();
+    InitializeDevicePins();
 }
 void CPU_CACHE_Enable(void)
 {
@@ -27,11 +32,11 @@ void CPU_CACHE_Enable(void)
     // Enable D-Cache
     SCB_EnableDCache();
 }
-void Initialize_Board_LEDS_And_Buttons()
+void Initialize_Board_LEDS()
 {
     // LED's
     ENABLE_CLOCK_ON_PORT_GPIOC;
-    LL_GPIO_InitTypeDef gpio_InitStruct = {0};
+    LL_GPIO_InitTypeDef gpio_InitStruct;
     gpio_InitStruct.Pin = LED_GREEN | LED_RED;
     gpio_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
     gpio_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
@@ -43,8 +48,13 @@ void Initialize_Board_LEDS_And_Buttons()
     LL_GPIO_SetOutputPin(LED_GPIO_PORT, LED_GREEN);
     LL_GPIO_SetOutputPin(LED_GPIO_PORT, LED_RED);
 
+}
+void Initialize_Board_Buttons()
+{
     // USER button
     ENABLE_CLOCK_ON_PORT_GPIOC;
+    LL_GPIO_InitTypeDef gpio_InitStruct;
+
     gpio_InitStruct.Pin = BUTTON_USER_PIN;
     gpio_InitStruct.Mode = LL_GPIO_MODE_INPUT;
     gpio_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
@@ -137,3 +147,6 @@ bool BoardUserButton_Pressed()
         return false;
     }
 }
+void InitializeDevicePins()
+{
+};

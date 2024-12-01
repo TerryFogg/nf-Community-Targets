@@ -30,36 +30,24 @@ _Min_Stack_Size = 0x400;
 /*  2.  128 Kbytes of System flash memory from which the device can boot.                            */
 /*  3.  1 Kbyte of OTP (one-time programmable) memory containing option bytes for user configuration */
 
-
 /* Minimum flash erase size is defined as a sector (8K) for STM32H7B series */
-/* ======================================================================== */
+
 flash_block_1 = 0x08000000;
 sector_size = 8K;
 block_size = sector_size;
 number_of_banks = 2;
-
-/* TOTAL blocks   */
-/* ============== */
 total_blocks = 128*number_of_banks;
-
-/* CLR allocation */
-/* ============== */
 clr_block_start = 0;
 clr_block_end = 79;
 clr_total_blocks = clr_block_end - clr_block_start + 1;
 
-/* DEPLOYMENT allocation */
-/* ===================== */
 deployment_block_start = 80;
 deployment_block_end = 253;
 deployment_total_blocks = deployment_block_end - deployment_block_start + 1;
 
-/* CONFIGURATION allocation */
-/* ======================== */
 config_block_start = 254;
 config_block_end = 255;
 config_total_blocks = config_block_end - config_block_start + 1;
-
 
 MEMORY
 {
@@ -107,33 +95,26 @@ MEMORY
 
 }
 
-/* ---------------------------- */
 /* The CLR managed heap for CLR */
-/* ---------------------------- */
 HeapBegin             = ORIGIN(CLR_RAM); 
 HeapEnd               = ORIGIN(CLR_RAM) + LENGTH(CLR_RAM); 
 
 /* The CLR native Image */
-/* ==================== */
 __nanoImage_start__   = ORIGIN(nanoCLR); 
 __nanoImage_end__     = ORIGIN(nanoCLR) + LENGTH(nanoCLR); 
  
-/*  C# Portable Executable (PE) file is stored here*/
-/* =============================================== */
+/*  C# Portable Executable (PE) file is stored */
 __deployment_start__  = ORIGIN(deployment); 
 __deployment_end__    = ORIGIN(deployment) + LENGTH(deployment); 
  
-/* Small area of persistent configuration storage */
-/* ============================================== */
+/* Small area of persistent storage */
 __nanoConfig_start__  = ORIGIN(config);
 __nanoConfig_end__    = ORIGIN(config) + LENGTH(config);
  
 /* Bit pixel copy of the screen */
-/* ============================ */
 Graphics_frame_buffer = ORIGIN(graphics_vfb); 
   
 /*  Bitmap objects */
-/* =============== */
 Graphics_managed_heap = ORIGIN(graphics_ram); 
 Graphics_managed_end  = ORIGIN(graphics_ram) + LENGTH(graphics_ram);   
 

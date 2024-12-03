@@ -28,8 +28,6 @@
 ////#include "stm32u5xx_hal_conf.h"
 //#include "stm32u5xx_hal.h"
 
-
-
 #define TARGET_BLOCKSTORAGE_COUNT 1
 
 #pragma region Peripheral clocks

@@ -30,7 +30,6 @@
 
 #define ARRAY_LEN(x) (sizeof(x) / sizeof((x)[0]))
 
-
 // Board Leds and buttons
 #define LED_PIN       PICO_DEFAULT_LED_PIN
 #define LED_STATE_OFF 0
@@ -40,8 +39,6 @@
 #define DEFAULT_BYTE_POOL_SIZE     10000
 #define CLR_THREAD_STACK_SIZE      3000
 #define RECEIVER_THREAD_STACK_SIZE 5000
-
-// #define TARGET_BLOCKSTORAGE_COUNT 1
 
 #pragma region Display interface and controller setup parameters
 #define LCD_WIDTH  240
@@ -56,23 +53,15 @@ extern "C"
     void Startup_Rtos(bool debuggerRequested);
     void Initialize_Board();
     void Initialize64BitMicrosecondTimer();
-    uint64_t ReadMicrosecondCounter();
     void InitializeDevicePins();
     void Initialize_Board_LEDS();
+    uint64_t ReadMicrosecondCounter();
     void SystemClock_Config();
     void BoardLed_ON();
     void BoardLed_OFF();
     void BoardLed_Toggle();
     bool BoardUserButton_Pressed();
-    static inline uint32_t Get_SYSTICK();
 
-
-    static inline uint32_t Get_SYSTICK()
-    {
-        return tx_time_get();
-    }
-
-    void LTDCClock_Config(void);
 #ifdef __cplusplus
 }
 #endif

@@ -70,9 +70,7 @@ MEMORY
 /* =============== */
 
 
-/* ---------------------------- */
 /* The CLR managed heap for CLR */
-/* ---------------------------- */
 HeapBegin             = ORIGIN(CLR_RAM); 
 HeapEnd               = ORIGIN(CLR_RAM) + LENGTH(CLR_RAM); 
 
@@ -94,6 +92,8 @@ Graphics_frame_buffer = 0;
 /*  Bitmap objects */
 Graphics_managed_heap = ORIGIN(graphics_ram); 
 Graphics_managed_end  = ORIGIN(graphics_ram) + LENGTH(graphics_ram);   
+
+
 
 /* Entry point */
 ENTRY(_entry_point)

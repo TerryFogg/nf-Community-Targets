@@ -5,9 +5,3 @@
 //
 
 #include <sys_dev_spi_native.h>
-
-// struct representing the SPI bus
-struct NF_PAL_SPI
-{
-};
-

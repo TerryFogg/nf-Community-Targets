@@ -18,8 +18,6 @@
 #include "tx_api.h"
 #include "tx_port.h"
 
-//#define TARGET_BLOCKSTORAGE_COUNT 1
-
 #pragma region Byte pool configuration and definitions
 #define DEFAULT_BYTE_POOL_SIZE     16000
 #define CLR_THREAD_STACK_SIZE      6000

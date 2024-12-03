@@ -60,6 +60,7 @@ DeviceRegistration::AdcPin BoardADCChannels[] = {
     {&AdcControllerReference, 1, 2},
     {&AdcControllerReference, 1, 3},
     {&AdcControllerReference, 1, 4}};
+
 DeviceRegistration::I2cPin BoardI2CChannels[] = {{i2c0, 1, 1}, {i2c1, 2, 1}};
 
 // PWM controllers are slice id's
@@ -140,7 +141,6 @@ uint64_t ReadMicrosecondCounter()
 {
     return time_us_64();
 }
-
 void InitializeDevicePins()
 {
     DeviceRegistration::CreatePinList(&mcuPins[0], ARRAY_LEN(mcuPins));

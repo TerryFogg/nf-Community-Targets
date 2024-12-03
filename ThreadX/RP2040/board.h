@@ -41,8 +41,6 @@
 #define CLR_THREAD_STACK_SIZE      3000
 #define RECEIVER_THREAD_STACK_SIZE 1800
 
-// #define TARGET_BLOCKSTORAGE_COUNT 1
-
 #pragma region Display interface and controller setup parameters
 #define LCD_WIDTH  240
 #define LCD_HEIGHT 135

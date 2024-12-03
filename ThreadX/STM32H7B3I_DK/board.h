@@ -14,7 +14,6 @@
 #include "stm32h7b3xxq.h"
 #include "PinNames.h"
 
-// #define TARGET_BLOCKSTORAGE_COUNT 1
 #define ARRAY_LEN(x) (sizeof(x) / sizeof((x)[0]))
 
 #pragma region Byte pool configuration and definitions

@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
  * Copyright (c) 2024 Microsoft Corporation 
  * 
  * This program and the accompanying materials are made available under the
@@ -97,7 +97,7 @@ _tx_initialize_low_level:
     STR     r1, [r0]                                // Setup first unused memory pointer
 #endif
 
-#ifdef DISABLE_THIS_CODE
+#ifdef DISABLE_THIS_CODE__VECTOR_TABLE_LOADED_IN_CRT0_S
     /* Setup Vector Table Offset Register.  */
     MOV     r0, #0xE000E000                         // Build address of NVIC registers
     LDR     r1, =__vectors                           // Pickup address of vector table
@@ -112,7 +112,7 @@ _tx_initialize_low_level:
 
     /* Set system stack pointer from vector value.  */
     LDR     r0, =_tx_thread_system_stack_ptr        // Build address of system stack pointer
-    LDR     r1, =__vectors                           // Pickup address of vector table
+    LDR     r1, =__vectors                          // Pickup address of vector table
     LDR     r1, [r1]                                // Pickup reset stack pointer
     STR     r1, [r0]                                // Save system stack pointer
 

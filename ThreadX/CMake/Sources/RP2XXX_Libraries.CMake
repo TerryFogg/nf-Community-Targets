@@ -1,4 +1,9 @@
-# pull in common dependencies
+﻿#
+# Copyright (c) .NET Foundation and Contributors
+# See LICENSE file in the project root for full license information.
+#
+
+# Pico SDK builds INTERFACE libraries
 target_link_libraries(nanoCLR
     hardware_adc
     hardware_clocks

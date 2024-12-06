@@ -1,4 +1,4 @@
-#
+﻿#
 # Copyright (c) .NET Foundation and Contributors
 # See LICENSE file in the project root for full license information.
 #
@@ -183,6 +183,7 @@
 #                    ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Boot.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Capabilites.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_ConfigurationManager.c
+                    ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_ConfigurationManager_stubs.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_SystemEvents.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_SystemInformation.cpp
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Time.cpp
@@ -265,11 +266,9 @@
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/other/CortexM_HardFaultHandler.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/CircularBuffer.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/Memory.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/nanoCRT.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/nanoHAL_Boot.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/sys_calls.c
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/targetHAL_ConfigurationManager.cpp
 
                     # These device I/O are typical and have not been made optional
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/DeviceRegistration.cpp
@@ -283,7 +282,7 @@
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.Ports/System.IO.Ports.cpp
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/platform_heap.c
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Memory.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetHAL_Rtos.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetHAL_Time.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetPAL_Events.cpp

@@ -1,4 +1,4 @@
-// Copyright (c) .NET Foundation and Contributors
+﻿// Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
 
@@ -79,7 +79,7 @@ bool FlashDriver_IsBlockErased(void *context, ByteAddress blockAddress,
 {
     return false;
 }
-// On the RP2040, flash blocks are 4096 bytes, and all operations are aligned to and in multiples of 4096 bytes
+// On the RP2XXX, flash blocks are 4096 bytes, and all operations are aligned to and in multiples of 4096 bytes
 bool FlashDriver_EraseBlock(void *context, ByteAddress address)
 {
  

@@ -1,7 +1,11 @@
+﻿#
+# Copyright (c) .NET Foundation and Contributors
+# See LICENSE file in the project root for full license information.
+#
 
 
-# Access to include files for local code
-
+# The Pico-SDK uses interface libraries and most likely does not need these includes.
+# Add these includes for local code for #includes etc
      list(APPEND RP2XXX_INCLUDES 
           ${TARGET_GIT_LOCAL_PATH}
           ${TARGET_GIT_LOCAL_PATH}/src/boards/include
@@ -77,7 +81,6 @@
           ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src/portable/raspberrypi/rp2040
      
           ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/RP2XXX/DeviceIO/UsbDevice
-
      )
 
      if( "${TARGET_SERIES}" STREQUAL "RP2040")
@@ -96,6 +99,7 @@
           )
      endif()
 
+     # Add the TinyUsb sources
      list(APPEND RP2XXX_SOURCES
           ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src/tusb.c
           ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src/class/cdc/cdc_device.c
@@ -107,6 +111,7 @@
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c
      )
 
+     # Set properties on certain files to compile successfully
      set_source_files_properties(${TARGET_GIT_LOCAL_PATH}/src/common/pico_sync/sem.c COMPILE_FLAGS -std=gnu17)
      set_source_files_properties(${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_runtime_init/runtime_init.c COMPILE_FLAGS -std=gnu17)
      set_source_files_properties(${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_multicore/multicore.c COMPILE_FLAGS -std=gnu17)

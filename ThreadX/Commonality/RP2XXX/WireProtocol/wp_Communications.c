@@ -1,4 +1,4 @@
-#include <hardware/irq.h>
+﻿#include <hardware/irq.h>
 //
 // Copyright (c) .NET Foundation and Contributors
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
@@ -34,6 +34,7 @@ void shared_interrupt(void);
 
 void InitWireProtocolCommunications()
 {
+
     // Initialize Tinyusb
     tusb_init();
     irq_add_shared_handler(USBCTRL_IRQ, shared_interrupt, PICO_SHARED_IRQ_HANDLER_HIGHEST_ORDER_PRIORITY - 3);

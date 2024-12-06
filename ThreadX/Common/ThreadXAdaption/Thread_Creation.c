@@ -1,4 +1,4 @@
-// Copyright (c) .NET Foundation and Contributors
+﻿// Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 
 #include <nanoCLR_Application.h>
@@ -105,12 +105,10 @@ void CreateCLRThread()
     }
 }
 
-
 #pragma region Thread startup programs
 
 void CLRStartupThread(uint32_t parameter)
 {
-
     bool userRequestedWaitForDebugger = (bool)parameter;
 
     // CLR settings to launch CLR thread
@@ -119,8 +117,6 @@ void CLRStartupThread(uint32_t parameter)
     clrSettings.MaxContextSwitches = 50;
     clrSettings.EnterDebuggerLoopAfterExit = true;
     clrSettings.WaitForDebugger = userRequestedWaitForDebugger;
-
-    //   HAL_Time_CurrentSysTicks
 
     nanoHAL_Initialize_C();
     ClrStartup(clrSettings);
@@ -145,7 +141,6 @@ void ReceiverThread_entry(uint32_t parameter)
     }
 }
 #pragma endregion
-
 
 #ifdef USING_USBX
 void CreateUsbXThreads()

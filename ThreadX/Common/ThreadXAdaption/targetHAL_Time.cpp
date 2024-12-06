@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
@@ -133,7 +133,8 @@ const char *HAL_Time_CurrentDateTimeToString()
     return DateTimeToString(HAL_Time_CurrentDateTime(false));
 }
 
-uint64_t CPU_MillisecondsToTicks(uint64_t ticks)
+uint64_t CPU_MillisecondsToTicks(uint64_t milliseconds)
 {
-    return ((ticks * (uint64_t)TX_TIMER_TICKS_PER_SECOND) / 1000);
+    uint64_t ticks = (milliseconds * TX_TIMER_TICKS_PER_SECOND) / 1000;
+    return ticks;
 }

@@ -1,4 +1,4 @@
-#
+﻿#
 # Copyright (c) .NET Foundation and Contributors
 # See LICENSE file in the project root for full license information.
 #
@@ -30,10 +30,11 @@ if(FILEX_SYSTEM_SD OR FILEX_SYSTEM_NAND OR FILEX_SYSTEM_NOR OR FILEX_SYSTEM_RAM)
          ${CMAKE_SOURCE_DIR}/src/System.IO.FileSystem/nf_sys_io_filesystem.cpp
          
          # Can't use the master copies as they have references to "ff.h"
+         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/nf_sys_io_filesystem_nanoFramework_System_IO_FileSystem_SDCard.cpp
+
          ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/nf_sys_io_filesystem_System_IO_Directory.cpp
          ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/nf_sys_io_filesystem_System_IO_File.cpp
          ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/nf_sys_io_filesystem_System_IO_FileStream.cpp
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/nf_sys_io_filesystem_nanoFramework_System_IO_FileSystem_SDCard.cpp
          ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/FileSystem.cpp
     )
 endif()

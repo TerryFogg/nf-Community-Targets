@@ -6,6 +6,22 @@
 
 
 
+# RP2350
+
+![{6FF98C0B-8FD1-4564-88C3-6FB6AB16E009}](assets/{6FF98C0B-8FD1-4564-88C3-6FB6AB16E009}.png)
+
+
+
+# 
+
+
+
+
+
+
+
+
+
 | Pin    | AF1      | AF2       | AF3      | AF4    | AF5  | AF6  | AF7  | AF8         | AF9           |
 | ------ | -------- | --------- | -------- | ------ | ---- | ---- | ---- | ----------- | ------------- |
 | GPIO1  | SPI0_CS  | UART0_RX  | I2C0_SCL | PWM0_B | SIO  | PIO0 | PIO1 |             | USB_VBUS_DET  |

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // Copyright (c) .NET Foundation and Contributors
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
@@ -40,18 +40,13 @@
 #define CLR_THREAD_STACK_SIZE      3000
 #define RECEIVER_THREAD_STACK_SIZE 5000
 
-#pragma region Display interface and controller setup parameters
-#define LCD_WIDTH  240
-#define LCD_HEIGHT 135
-#pragma endregion
-
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
     void Startup_Rtos(bool debuggerRequested);
     void Initialize_Board();
+    void ResetPinList();
     void Initialize64BitMicrosecondTimer();
     void InitializeDevicePins();
     void Initialize_Board_LEDS();
@@ -61,7 +56,7 @@ extern "C"
     void BoardLed_OFF();
     void BoardLed_Toggle();
     bool BoardUserButton_Pressed();
-
+    bool PinSupportsADC(int pinNumber);
 #ifdef __cplusplus
 }
 #endif

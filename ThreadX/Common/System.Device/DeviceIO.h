@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 //
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
@@ -47,9 +47,26 @@ class GpioIO
         int optional = 0);
     static bool SetLowPower(PinNameValue pinNumber);
     static bool SetMode(PinNameValue pinNumber, PinMode pinMode);
-    static bool InterruptEnable(PinNameValue pinNumber,  GPIO_INT_EDGE events);
+    static bool InterruptEnable(PinNameValue pinNumber, GPIO_INT_EDGE events);
     static bool InterruptDisable(PinNameValue pinNumber);
     static bool InterruptRemove(PinNameValue pinNumber);
+
+    enum PinFunction
+    {
+        NONE = 1,
+        ADC = 2,
+        CAN = 3,
+        COUNTER = 4,
+        DAC = 5,
+        GPIO = 6,
+        I2C = 7,
+        I2S = 8,
+        PWM = 9,
+        SD = 10,
+        SPI = 11,
+        TIMER = 12,
+        USART = 13
+    };
 };
 
 class AdcIO

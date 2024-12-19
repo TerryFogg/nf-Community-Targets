@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // Portions Copyright (c) 2021 STMicroelectronics.  All rights reserved.
 // See LICENSE file in the project root for full license information.
@@ -106,6 +106,18 @@ void Initialize_Board()
     Initialize_Board_LEDS();
     Initialize64BitMicrosecondTimer();
     InitializeDevicePins();
+}
+void ResetPinList()
+{
+    for (int i = 0; i < sizeof(mcuPins) / sizeof(DeviceRegistration::DevicePin); i++)
+    {
+        mcuPins[i].Reserved = false;
+        mcuPins[i].next = NULL;
+        mcuPins[i].GpioParameterData = NULL;
+        mcuPins[i].Mode = PinMode::PinMode_Input;
+        mcuPins[i].CurrentFunction = DeviceRegistration::DevicePinFunction::NONE;
+        mcuPins[i].DeviceFunctionChannelNumber = 0;
+    }
 }
 void Initialize_Board_LEDS()
 {

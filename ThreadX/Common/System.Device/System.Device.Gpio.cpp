@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
@@ -230,10 +230,10 @@ HRESULT Library_sys_dev_gpio_native_System_Device_Gpio_GpioPin::Read___SystemDev
         CLR_RT_TypeDef_Index pinValueTypeDef;
         CLR_RT_HeapBlock *hbObj;
         CLR_UINT8 pinValue;
-        PinNameValue pinNumber = (PinNameValue)stack.This()[FIELD___pinNumber].NumericByRefConst().s4;
-        if (DeviceRegistration::IsValidPin(pinNumber))
+        PinNameValue pinNameValue = (PinNameValue)stack.This()[FIELD___pinNumber].NumericByRefConst().s4;
+        if (DeviceRegistration::IsValidPin(pinNameValue))
         {
-            pinValue = GpioIO::Read(pinNumber) ? 1 : 0;
+            pinValue = GpioIO::Read(pinNameValue) ? 1 : 0;
             g_CLR_RT_TypeSystem.FindTypeDef("PinValue", "System.Device.Gpio", pinValueTypeDef);
             NANOCLR_CHECK_HRESULT(g_CLR_RT_ExecutionEngine.NewObjectFromIndex(top, pinValueTypeDef));
             hbObj = top.Dereference();
@@ -253,17 +253,17 @@ HRESULT Library_sys_dev_gpio_native_System_Device_Gpio_GpioPin::WriteNative___VO
     {
         FAULT_ON_NULL(stack.This());
         FAULT_ON_OBJECT_DISPOSED(stack.This()[FIELD___disposedValue].NumericByRef().u1);
-        PinNameValue pinNumber = (PinNameValue)stack.This()[FIELD___pinNumber].NumericByRefConst().s4;
+        PinNameValue pinNameValue = (PinNameValue)stack.This()[FIELD___pinNumber].NumericByRefConst().s4;
         CLR_RT_HeapBlock *pinValue = stack.Arg1().Dereference();
         bool callbackRequested = stack.This()[FIELD___callbacks].Dereference() != NULL;
         bool pinState = (GpioPinValue)pinValue[PinValue::FIELD___value].NumericByRef().u1;
 
-        if (DeviceRegistration::IsValidPin(pinNumber) && DeviceRegistration::IsValidOutputPin(pinNumber))
+        if (DeviceRegistration::IsValidPin(pinNameValue) && DeviceRegistration::IsValidOutputPin(pinNameValue))
         {
-            GpioIO::Write(pinNumber, pinState);
+            GpioIO::Write(pinNameValue, pinState);
             if (callbackRequested)
             {
-                PostManagedEvent(EVENT_GPIO, 0, (uint16_t)pinNumber, pinState);
+                PostManagedEvent(EVENT_GPIO, 0, (uint16_t)pinNameValue, pinState);
             }
         }
         else

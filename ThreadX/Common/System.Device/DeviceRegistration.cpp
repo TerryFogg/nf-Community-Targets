@@ -1,9 +1,11 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
 
 #include "DeviceRegistration.h"
+
+#define NOT_FOUND -1
 
 static DeviceRegistration::DevicePin *GPIOPins;
 static int NumberOfGPIOPins;
@@ -69,7 +71,7 @@ void DeviceRegistration::CreateSerialChannelList(SerialPin *BoardSerialChannels,
 }
 bool DeviceRegistration::IsValidPin(PinNameValue pinNameValue)
 {
-    return (FindPin(pinNameValue) >= 0);
+    return (FindPin(pinNameValue) != NOT_FOUND);
 }
 int DeviceRegistration::NumberOfPins()
 {
@@ -84,7 +86,7 @@ int DeviceRegistration::FindPin(PinNameValue pinNameValue)
             return pinIndex;
         }
     }
-    return -1;
+    return NOT_FOUND;
 }
 PinNameValue DeviceRegistration::FindPinWithFunctionAndChannel(DevicePinFunction dph, int deviceChannel)
 {
@@ -101,7 +103,7 @@ bool DeviceRegistration::IsPinReserved(PinNameValue pinNameValue)
 {
     bool status = false;
     int pinIndex = FindPin(pinNameValue);
-    if (pinIndex != 0)
+    if (pinIndex != NOT_FOUND)
     {
         status = GPIOPins[pinIndex].Reserved;
     }
@@ -111,7 +113,7 @@ bool DeviceRegistration::ReservePin(PinNameValue pinNameValue)
 {
     bool status = false;
     int pinIndex = FindPin(pinNameValue);
-    if (pinIndex != 0)
+    if (pinIndex != NOT_FOUND)
     {
         if (!IsPinReserved(pinNameValue))
         {
@@ -247,7 +249,7 @@ bool DeviceRegistration::GetPinMode(PinNameValue pinNameValue, PinMode *pinMode)
 {
     bool status = false;
     int pinIndex = FindPin(pinNameValue);
-    if (pinIndex != -1)
+    if (pinIndex != NOT_FOUND)
     {
         *pinMode = GPIOPins[pinIndex].Mode;
         status = true;
@@ -264,7 +266,7 @@ bool DeviceRegistration::GetPinFunction(PinNameValue pinNameValue, DevicePinFunc
 {
     bool status = false;
     int pinIndex = FindPin(pinNameValue);
-    if (pinIndex != -1)
+    if (pinIndex != NOT_FOUND)
     {
         *devicePinFunction = GPIOPins[pinIndex].CurrentFunction;
         status = true;

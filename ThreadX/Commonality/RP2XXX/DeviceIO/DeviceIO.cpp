@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
@@ -11,23 +11,28 @@ bool GpioIO::Initialize()
 }
 bool GpioIO::InitializePin(PinNameValue pinNameValue)
 {
-    gpio_init(pinNameValue);
+    // Sets pin as input, sets output to low and function as SIO
+    int pinNumber = pinNameValue;
+    gpio_init(pinNumber);
     return true;
 }
 bool GpioIO::Dispose(PinNameValue pinNameValue)
 {
+    int pinNumber = pinNameValue;
     GpioIO::InterruptRemove(pinNameValue);
-    gpio_deinit(pinNameValue);
+    gpio_deinit(pinNumber);
     GpioIO::SetLowPower(pinNameValue);
     return true;
 }
 bool GpioIO::Read(PinNameValue pinNameValue)
 {
-    return gpio_get(pinNameValue);
+    int pinNumber = pinNameValue;
+    return gpio_get(pinNumber);
 }
 bool GpioIO::Write(PinNameValue pinNameValue, bool pinState)
 {
-    gpio_put(pinNameValue, pinState);
+    int pinNumber = pinNameValue;
+    gpio_put(pinNumber, pinState);
     return true;
 }
 bool GpioIO::Toggle(PinNameValue pinNameValue)
@@ -45,20 +50,23 @@ static void gpio_callback(uint gpio, uint32_t events)
 bool GpioIO::SetFunction(PinNameValue pinNameValue, DeviceRegistration::DevicePinFunction PinFunction, int optional)
 {
     bool status = false;
+    int pinNumber = pinNameValue;
+
     switch (PinFunction)
     {
         case DeviceRegistration::DevicePinFunction::NONE:
             // basic input/output mode with output disabled
-            gpio_set_function(pinNameValue, GPIO_FUNC_NULL);
+            gpio_set_function(pinNumber, GPIO_FUNC_NULL);
             status = true;
             break;
         case DeviceRegistration::DevicePinFunction::ADC:
-            if (pinNameValue >= 26 and pinNameValue <= 29)
+
+            if (PinSupportsADC(pinNameValue))
             {
                 // Set pin to input (as far as SIO is concerned)
-                gpio_set_function(pinNameValue, GPIO_FUNC_SIO);
-                gpio_disable_pulls(pinNameValue);
-                gpio_set_input_enabled(pinNameValue, false);
+                gpio_set_function(pinNumber, GPIO_FUNC_SIO);
+                gpio_disable_pulls(pinNumber);
+                gpio_set_input_enabled(pinNumber, false);
                 status = true;
             }
             else
@@ -76,11 +84,11 @@ bool GpioIO::SetFunction(PinNameValue pinNameValue, DeviceRegistration::DevicePi
             break;
         case DeviceRegistration::DevicePinFunction::GPIO:
             // basic input/output mode with output disabled
-            gpio_set_function(pinNameValue, GPIO_FUNC_NULL);
+            gpio_set_function(pinNumber, GPIO_FUNC_NULL);
             status = true;
             break;
         case DeviceRegistration::DevicePinFunction::SPI:
-            gpio_set_function(pinNameValue, GPIO_FUNC_SPI);
+            gpio_set_function(pinNumber, GPIO_FUNC_SPI);
             status = true;
             break;
         case DeviceRegistration::DevicePinFunction::COUNTER:
@@ -88,18 +96,18 @@ bool GpioIO::SetFunction(PinNameValue pinNameValue, DeviceRegistration::DevicePi
             status = false;
             break;
         case DeviceRegistration::DevicePinFunction::PWM:
-            gpio_set_function(pinNameValue, GPIO_FUNC_PWM);
+            gpio_set_function(pinNumber, GPIO_FUNC_PWM);
             status = true;
             break;
         case DeviceRegistration::DevicePinFunction::SD:
             status = true;
             break;
         case DeviceRegistration::DevicePinFunction::TIMER:
-            gpio_set_function(pinNameValue, GPIO_FUNC_GPCK);
+            gpio_set_function(pinNumber, GPIO_FUNC_GPCK);
             status = true;
             break;
         case DeviceRegistration::DevicePinFunction::I2C:
-            gpio_set_function(pinNameValue, GPIO_FUNC_I2C);
+            gpio_set_function(pinNumber, GPIO_FUNC_I2C);
             status = true;
             break;
         case DeviceRegistration::DevicePinFunction::I2S:
@@ -107,16 +115,16 @@ bool GpioIO::SetFunction(PinNameValue pinNameValue, DeviceRegistration::DevicePi
             status = false;
             break;
         case DeviceRegistration::DevicePinFunction::USART:
-            gpio_set_function(pinNameValue, GPIO_FUNC_UART);
+            gpio_set_function(pinNumber, GPIO_FUNC_UART);
             status = true;
             break;
         case DeviceRegistration::DevicePinFunction::WAKEUP:
             // No formal pin wakeup function but we can set an interrupt to return from low power mode
-            gpio_init(pinNameValue);
-            gpio_set_dir(pinNameValue, GPIO_IN);
-            gpio_pull_up(pinNameValue);
+            gpio_init(pinNumber);
+            gpio_set_dir(pinNumber, GPIO_IN);
+            gpio_pull_up(pinNumber);
             gpio_set_irq_enabled_with_callback(
-                pinNameValue,
+                pinNumber,
                 GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE,
                 true,
                 &gpio_callback);
@@ -130,47 +138,53 @@ bool GpioIO::SetFunction(PinNameValue pinNameValue, DeviceRegistration::DevicePi
 }
 bool GpioIO::SetLowPower(PinNameValue pinNameValue)
 {
-    gpio_deinit(pinNameValue);
-    gpio_disable_pulls(pinNameValue);
-    gpio_set_input_enabled(pinNameValue, false);
+    int pinNumber = pinNameValue;
+    gpio_deinit(pinNumber);
+    gpio_disable_pulls(pinNumber);
+    gpio_set_input_enabled(pinNumber, false);
     return true;
 }
 bool GpioIO::SetMode(PinNameValue pinNameValue, PinMode pinMode)
 {
     bool status = false;
-    gpio_init(pinNameValue);
+    int pinNumber = pinNameValue;
+
+    gpio_init(pinNumber);
     switch (pinMode)
     {
         case PinMode_Input:
-            gpio_set_dir(pinNameValue, GPIO_IN);
+            gpio_set_dir(pinNumber, GPIO_IN);
             status = true;
             break;
         case PinMode_InputPullDown:
-            gpio_set_dir(pinNameValue, GPIO_IN);
+            gpio_pull_down(pinNumber);
+            gpio_set_dir(pinNumber, GPIO_IN);
             status = true;
             break;
         case PinMode_InputPullUp:
-            gpio_set_dir(pinNameValue, GPIO_IN);
+            gpio_pull_up(pinNumber);
+            gpio_set_dir(pinNumber, GPIO_IN);
             status = true;
             break;
         case PinMode_Output:
-            gpio_set_dir(pinNameValue, GPIO_OUT);
+            gpio_set_dir(pinNumber, GPIO_OUT);
             status = true;
             break;
         case PinMode_OutputOpenDrain:
-            gpio_set_dir(pinNameValue, GPIO_OUT);
+            gpio_set_dir(pinNumber, GPIO_OUT);
             status = true;
             break;
         case PinMode_OutputOpenDrainPullUp:
-            gpio_set_dir(pinNameValue, GPIO_OUT);
+            gpio_set_dir(pinNumber, GPIO_OUT);
             status = true;
             break;
         case PinMode_OutputOpenSource:
-            gpio_set_dir(pinNameValue, GPIO_OUT);
+            gpio_set_dir(pinNumber, GPIO_OUT);
             status = true;
             break;
         case PinMode_OutputOpenSourcePullDown:
-            gpio_set_dir(pinNameValue, GPIO_OUT);
+            gpio_pull_down(pinNumber);
+            gpio_set_dir(pinNumber, GPIO_OUT);
             status = true;
             break;
         default:
@@ -183,33 +197,35 @@ bool GpioIO::InterruptEnable(PinNameValue pinNameValue, GPIO_INT_EDGE events)
 {
     bool enable = true;
     bool expectedState = false;
+    int pinNumber = pinNameValue;
+
     // gpio_set_irq_callback((gpio_irq_callback_t)gpioIsrPtr);
 
     switch (events)
     {
         case GPIO_INT_NONE:
-            gpio_set_irq_enabled(pinNameValue, GPIO_IRQ_EDGE_FALL, !enable);
-            gpio_set_irq_enabled(pinNameValue, GPIO_IRQ_LEVEL_LOW, !enable);
-            gpio_set_irq_enabled(pinNameValue, GPIO_IRQ_EDGE_RISE, !enable);
-            gpio_set_irq_enabled(pinNameValue, GPIO_IRQ_LEVEL_HIGH, !enable);
+            gpio_set_irq_enabled(pinNumber, GPIO_IRQ_EDGE_FALL, !enable);
+            gpio_set_irq_enabled(pinNumber, GPIO_IRQ_LEVEL_LOW, !enable);
+            gpio_set_irq_enabled(pinNumber, GPIO_IRQ_EDGE_RISE, !enable);
+            gpio_set_irq_enabled(pinNumber, GPIO_IRQ_LEVEL_HIGH, !enable);
             break;
         case GPIO_INT_EDGE_LOW:
-            gpio_set_irq_enabled(pinNameValue, GPIO_IRQ_EDGE_FALL, enable);
+            gpio_set_irq_enabled(pinNumber, GPIO_IRQ_EDGE_FALL, enable);
             expectedState = false;
         case GPIO_INT_LEVEL_LOW:
-            gpio_set_irq_enabled(pinNameValue, GPIO_IRQ_LEVEL_LOW, enable);
+            gpio_set_irq_enabled(pinNumber, GPIO_IRQ_LEVEL_LOW, enable);
             expectedState = false;
             break;
         case GPIO_INT_EDGE_HIGH:
-            gpio_set_irq_enabled(pinNameValue, GPIO_IRQ_EDGE_RISE, enable);
+            gpio_set_irq_enabled(pinNumber, GPIO_IRQ_EDGE_RISE, enable);
             expectedState = false;
             break;
         case GPIO_INT_LEVEL_HIGH:
-            gpio_set_irq_enabled(pinNameValue, GPIO_IRQ_LEVEL_HIGH, enable);
+            gpio_set_irq_enabled(pinNumber, GPIO_IRQ_LEVEL_HIGH, enable);
             expectedState = false;
             break;
         case GPIO_INT_EDGE_BOTH:
-            gpio_set_irq_enabled(pinNameValue, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, enable);
+            gpio_set_irq_enabled(pinNumber, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, enable);
             expectedState = false;
             break;
     }
@@ -219,13 +235,17 @@ bool GpioIO::InterruptDisable(PinNameValue pinNameValue)
 {
     uint32_t events = 0;
     bool disable = false;
-    gpio_set_irq_enabled(pinNameValue, events, disable);
+    int pinNumber = pinNameValue;
+
+    gpio_set_irq_enabled(pinNumber, events, disable);
     return false;
 }
 bool GpioIO::InterruptRemove(PinNameValue pinNameValue)
 {
+    int pinNumber = pinNameValue;
+
     GpioIO::InterruptDisable(pinNameValue);
-    gpio_set_irq_enabled_with_callback(pinNameValue, GPIO_IRQ_EDGE_RISE, false, NULL);
+    gpio_set_irq_enabled_with_callback(pinNumber, GPIO_IRQ_EDGE_RISE, false, NULL);
     return true;
 }
 #pragma endregion
@@ -256,8 +276,8 @@ bool AdcIO::Initialize()
 }
 bool AdcIO::Dispose(CLR_INT32 adc_channel_number)
 {
-    PinNameValue pinNameValue_number = AdcIO::ChannelToPin(adc_channel_number);
-    GpioIO::SetLowPower(pinNameValue_number);
+    PinNameValue pinNameValue = AdcIO::ChannelToPin(adc_channel_number);
+    GpioIO::SetLowPower(pinNameValue);
     return true;
 }
 bool AdcIO::Open(CLR_INT32 adc_channel_number)
@@ -363,8 +383,8 @@ PinNameValue DacIO::ChannelToPin(CLR_INT32 dac_channel_number)
 }
 bool DacIO::Dispose(CLR_INT32 dac_channel_number)
 {
-    PinNameValue pinNameValue_number = DacIO::ChannelToPin(dac_channel_number);
-    GpioIO::SetLowPower(pinNameValue_number);
+    PinNameValue pinNameValue = DacIO::ChannelToPin(dac_channel_number);
+    GpioIO::SetLowPower(pinNameValue);
     return true;
 }
 #pragma endregion

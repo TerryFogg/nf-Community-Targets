@@ -1,4 +1,4 @@
-{
+﻿{
     "version": 4,
     "configurePresets": [
         {
@@ -90,7 +90,8 @@
 
                 "CMAKE_OBJCOPY": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-objcopy.exe",
                 "CMAKE_OBJDUMP": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-objdump.exe",
-                "CMAKE_VERBOSE_MAKEFILE": "1",
+                // Can set verbose in build preset below
+                //      "CMAKE_VERBOSE_MAKEFILE": "1",
 
                 "CMAKE_NM_UTIL": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-nm.exe",
 
@@ -406,9 +407,6 @@
                 "WATCHDOG": false,
                 "ADVANCED_PROFILING": false,
 
-                "GRAPHICS_SUPPORT": true,
-                "TOUCH_DISPLAY_SUPPORT": false,
-
                 "FILEX_SYSTEM_SD": false,
                 "FILEX_SYSTEM_NAND": false,
                 "FILEX_SYSTEM_NOR": false,
@@ -424,6 +422,50 @@
                 "HARD_FAULT_DEBUG_HANDLER": true,
                 "CFG_USB_USE_DTR": false
 
+            },
+            "hidden": false
+        },
+        {
+            "name": "RP2350-Pico-LCD01.14",
+            "description": "Configuration for the Raspberry Pi Pico",
+            "inherits": [
+                "RP2350"
+            ],
+            "cacheVariables": {
+                "GRAPHICS_SUPPORT": true,
+                "TOUCH_DISPLAY_SUPPORT": false,
+                "GRAPHICS_LCD": "pico-LCD-1.14V2-ST7789VW.cpp",
+                "LCD_WIDTH": "240",
+                "LCD_HEIGHT": "135",
+                "LCD_BACKLIGHT": "13",
+                "LCD_RESET": "12",
+                "SPI_CLK": "10",
+                "SPI_MOSI": "11",
+                "SPI_BUS": "1",
+                "SPI_CS": "9",
+                "SPI_DC": "8"
+            },
+            "hidden": false
+        },
+        {
+            "name": "RP2350-ER-TFTM028",
+            "description": "Configuration for the Raspberry Pi Pico",
+            "inherits": [
+                "RP2350"
+            ],
+            "cacheVariables": {
+                "GRAPHICS_SUPPORT": true,
+                "TOUCH_DISPLAY_SUPPORT": true,
+                "GRAPHICS_LCD": "pico-LCD-ER-TFTM028-4.cpp",
+                "LCD_WIDTH": "320",
+                "LCD_HEIGHT": "240",
+                "LCD_BACKLIGHT": "26",
+                "LCD_RESET": "27",
+                "SPI_CLK": "18",
+                "SPI_MOSI": "19",
+                "SPI_BUS": "0",
+                "SPI_CS": "17",
+                "SPI_DC": "16"
             },
             "hidden": false
         }
@@ -450,8 +492,16 @@
             "configurePreset": "RP2040"
         },
         {
-            "name": "RP2350-Debug",
-            "configurePreset": "RP2350"
+            "name": "RP2350-Pico-LCD01.14",
+            "configurePreset": "RP2350-Pico-LCD01.14",
+            "configuration": "Debug",
+            "verbose": true
+        },
+        {
+            "name": "RP2350-ER-TFTM028",
+            "configurePreset": "RP2350-ER-TFTM028",
+            "configuration": "Debug",
+            "verbose": false
         }
-    ]
+   ]
 }

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // Copyright (c) .NET Foundation and Contributors
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
@@ -30,7 +30,6 @@
 
 #define ARRAY_LEN(x) (sizeof(x) / sizeof((x)[0]))
 
-
 // Board Leds and buttons
 #define LED_PIN       PICO_DEFAULT_LED_PIN
 #define LED_STATE_OFF 0
@@ -50,9 +49,9 @@
 extern "C"
 {
 #endif
-
     void Startup_Rtos(bool debuggerRequested);
     void Initialize_Board();
+    void ResetPinList();
     void Initialize64BitMicrosecondTimer();
     uint64_t ReadMicrosecondCounter();
     void InitializeDevicePins();
@@ -62,14 +61,12 @@ extern "C"
     void BoardLed_OFF();
     void BoardLed_Toggle();
     bool BoardUserButton_Pressed();
-    static inline uint32_t Get_SYSTICK();
-
+    bool PinSupportsADC(int pinNumber);
 
     static inline uint32_t Get_SYSTICK()
     {
         return tx_time_get();
     }
-
     void LTDCClock_Config(void);
 #ifdef __cplusplus
 }

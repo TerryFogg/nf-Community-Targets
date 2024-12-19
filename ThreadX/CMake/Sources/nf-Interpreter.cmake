@@ -256,6 +256,7 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/RequiredNotUsed
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Startup																																																																																																																																																																																							
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}
@@ -279,6 +280,9 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.I2c.slave.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Pwm.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Spi.cpp
+
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware/nanoframework_Hardware.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware/nanoframework_Hardware_nanoframework_Hardware_NativeFunctions.cpp
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.Ports/System.IO.Ports.cpp
 

@@ -1,4 +1,4 @@
-#
+﻿#
 # Copyright (c) .NET Foundation and Contributors
 # See LICENSE file in the project root for full license information.
 #
@@ -104,7 +104,16 @@
 
 # Common Graphics definitions
     if(GRAPHICS_SUPPORT)
-          target_compile_definitions(nanoCLR PUBLIC -DNANOCLR_GRAPHICS=${GRAPHICS_SUPPORT})
+          target_compile_definitions(nanoCLR PUBLIC -DNANOCLR_GRAPHICS=TRUE)
+          target_compile_definitions(nanoCLR PUBLIC -DLCD_WIDTH=${LCD_WIDTH})
+          target_compile_definitions(nanoCLR PUBLIC -DLCD_HEIGHT=${LCD_HEIGHT})
+          target_compile_definitions(nanoCLR PUBLIC -DLCD_BACKLIGHT=${LCD_BACKLIGHT})
+          target_compile_definitions(nanoCLR PUBLIC -DLCD_RESET=${LCD_RESET})
+          target_compile_definitions(nanoCLR PUBLIC -DSPI_CLK=${SPI_CLK})
+          target_compile_definitions(nanoCLR PUBLIC -DSPI_MOSI=${SPI_MOSI})
+          target_compile_definitions(nanoCLR PUBLIC -DSPI_BUS=${SPI_BUS})
+          target_compile_definitions(nanoCLR PUBLIC -DSPI_CS=${SPI_CS})
+          target_compile_definitions(nanoCLR PUBLIC -DSPI_DC=${SPI_DC})
     else()
           target_compile_definitions(nanoCLR PUBLIC -DNANOCLR_GRAPHICS=FALSE)
     endif()

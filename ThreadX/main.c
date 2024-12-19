@@ -12,7 +12,7 @@ bool debuggerRequested = false;
 
 int main(void)
 {
-
+    debuggerRequested = false;
     Initialize_Board();
     Startup_Rtos(debuggerRequested);
 }

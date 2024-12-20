@@ -26,16 +26,6 @@
 struct DisplayInterface g_DisplayInterface;
 DisplayInterfaceConfig g_DisplayInterfaceConfig;
 
-int clock = 10;
-int MOSI = 11;
-
-int lcdchipSelect;
-int lcdDC;
-int lcdReset;
-int lcdBacklight;
-int width = 240;
-int height = 135;
-
 CLR_INT16 outputBufferSize;
 CLR_UINT8 spiBuffer[SPI_MAX_TRANSFER_SIZE];
 CLR_UINT8 spiCommandMode = 0; // 0 Command first byte, 1 = Command all bytes
@@ -50,14 +40,9 @@ spi_inst_t *spi_port;
 // Display Interface
 void DisplayInterface::Initialize(DisplayInterfaceConfig &config)
 {
-    lcdchipSelect = config.Spi.chipSelect;
-    lcdDC = config.Spi.dataCommand;
-    lcdReset = config.Spi.reset;
-    lcdBacklight = config.Spi.backLight;
-    width = config.Screen.width;
-    height = config.Screen.height;
+    (void)config;
 
-    switch (config.Spi.spiBus)
+    switch (SPI_BUS)
     {
         case 0:
             spi_port = spi0;
@@ -68,45 +53,39 @@ void DisplayInterface::Initialize(DisplayInterfaceConfig &config)
     }
 
     spi_init(spi_port, MAX_SPI_BAUD_RATE);
-    gpio_set_function(clock, GPIO_FUNC_SPI);
-    gpio_set_function(MOSI, GPIO_FUNC_SPI);
-    gpio_set_function(lcdchipSelect, GPIO_FUNC_SPI);
+    gpio_set_function(SPI_CLK, GPIO_FUNC_SPI);
+    gpio_set_function(SPI_TX, GPIO_FUNC_SPI);
+    gpio_set_function(SPI_CS, GPIO_FUNC_SPI);
 
     // Configure GPIO's
     // ==============
 
     // Reset
-    gpio_init(lcdReset);
-    gpio_set_dir(lcdReset, GPIO_OUT);
-    gpio_put(lcdReset, 1);
+    gpio_init(LCD_RESET);
+    gpio_set_dir(LCD_RESET, GPIO_OUT);
+    gpio_put(LCD_RESET, 1);
 
     // Data/Command
-    gpio_init(lcdDC);
-    gpio_set_dir(lcdDC, GPIO_OUT);
-    gpio_put(lcdDC, 1);
+    gpio_init(LCD_DC);
+    gpio_set_dir(LCD_DC, GPIO_OUT);
+    gpio_put(LCD_DC, 1);
 
-    //    lcdchipSelect = config.Spi.chipSelect;
-    //    gpio_init(lcdchipSelect);
-    //    gpio_set_dir(lcdchipSelect, GPIO_OUT);
-    //    gpio_put(lcdchipSelect, 1);
+    gpio_init(LCD_BACKLIGHT);
+    gpio_set_dir(LCD_BACKLIGHT, GPIO_OUT);
+    gpio_put(LCD_BACKLIGHT, 1);
 
-    gpio_init(lcdBacklight);
-    gpio_set_dir(lcdBacklight, GPIO_OUT);
-    gpio_put(lcdBacklight, 1);
-
-    gpio_put(lcdReset, 1);
+    gpio_put(LCD_RESET, 1);
     PLATFORM_DELAY(100);
-    gpio_put(lcdReset, 0);
+    gpio_put(LCD_RESET, 0);
     PLATFORM_DELAY(100);
-    gpio_put(lcdReset, 1);
+    gpio_put(LCD_RESET, 1);
     PLATFORM_DELAY(100);
 
     // Setup DMA
     // We set the outbound DMA to transfer from a memory buffer to the SPI
     // transmit FIFO paced by the SPI TX FIFO DREQ
     // The default is for the read address to increment every element (in this
-    // case 1 byte = DMA_SIZE_8) and for the write address to remain
-    // unchanged.
+    // case 1 byte = DMA_SIZE_8) and for the write address to remain unchanged.
 
     dma_tx = dma_claim_unused_channel(true);
     dma_tx_config = dma_channel_get_default_config(dma_tx);
@@ -124,12 +103,10 @@ void DisplayInterface::GetTransferBuffer(CLR_UINT8 *&TransferBuffer, CLR_UINT32 
     TransferBuffer = spiBuffer;
     TransferBufferSize = sizeof(spiBuffer);
 }
-
 void DisplayInterface::ClearFrameBuffer()
 {
     // Set screen to black
 }
-
 void DisplayInterface::WriteToFrameBuffer(
     CLR_UINT8 command,
     CLR_UINT8 data[],
@@ -162,11 +139,11 @@ void DisplayInterface::DisplayBacklight(bool on) // true = on
 {
     if (on)
     {
-        gpio_put(lcdBacklight, 1);
+        gpio_put(LCD_BACKLIGHT, 1);
     }
     else
     {
-        gpio_put(lcdBacklight, 0);
+        gpio_put(LCD_BACKLIGHT, 0);
     }
     return;
 }
@@ -178,7 +155,7 @@ void SendCommandBytes(CLR_UINT8 *data, CLR_UINT32 length)
     while (spi_is_busy(spi_port))
         tight_loop_contents();
 
-    gpio_put(lcdDC, GpioPinValue_Low);
+    gpio_put(LCD_DC, GpioPinValue_Low);
     dma_channel_transfer_from_buffer_now(dma_tx, data, length);
 }
 void SendDataBytes(CLR_UINT8 *data, CLR_UINT32 length)
@@ -189,6 +166,6 @@ void SendDataBytes(CLR_UINT8 *data, CLR_UINT32 length)
     while (spi_is_busy(spi_port))
         tight_loop_contents();
 
-    gpio_put(lcdDC, GpioPinValue_High);
+    gpio_put(LCD_DC, GpioPinValue_High);
     dma_channel_transfer_from_buffer_now(dma_tx, data, length);
 }

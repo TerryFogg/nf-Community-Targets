@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
@@ -19,11 +19,6 @@ bool g_fDoNotUninitializeDebuggerPort = false;
 
 extern "C"
 {
-    extern void Initialize_Graphics(void);
-}
-
-extern "C"
-{
     void nanoHAL_Initialize_C()
     {
         nanoHAL_Initialize();
@@ -41,7 +36,11 @@ void nanoHAL_Initialize()
     // chMtxObjectInit(&interpreterGlobalMutex);
 
 #if (NANOCLR_GRAPHICS == TRUE)
-    Initialize_Graphics();
+    DisplayInterfaceConfig displayConfig = {0};
+    g_GraphicsMemoryHeap.Initialize(0);
+    g_DisplayInterface.Initialize(displayConfig);
+    g_DisplayDriver.Initialize();
+
 #endif
 
     PalEvent_Initialize();

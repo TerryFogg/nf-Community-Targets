@@ -19,7 +19,7 @@
 
 if(GRAPHICS_SUPPORT)
     list(APPEND NF_INTERPRETER_SOURCES 
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RP2350/Initialize_Graphics.cpp
+               # ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RP2350/Initialize_Graphics.cpp
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/RP2XXX/${GRAPHICS_LCD}
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/RP2XXX/Spi_To_Display_Pico.cpp
     )

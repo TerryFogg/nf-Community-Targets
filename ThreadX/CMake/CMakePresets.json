@@ -439,11 +439,11 @@
                 "LCD_HEIGHT": "135",
                 "LCD_BACKLIGHT": "13",
                 "LCD_RESET": "12",
-                "SPI_CLK": "10",
-                "SPI_MOSI": "11",
+                "LDC_DC": "8",
                 "SPI_BUS": "1",
-                "SPI_CS": "9",
-                "SPI_DC": "8"
+                "SPI_TX": "11",
+                "SPI_CLK": "10",
+                "SPI_CS": "9"
             },
             "hidden": false
         },

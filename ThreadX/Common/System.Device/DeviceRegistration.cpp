@@ -92,7 +92,8 @@ PinNameValue DeviceRegistration::FindPinWithFunctionAndChannel(DevicePinFunction
 {
     for (int pinIndex = 0; pinIndex < NumberOfPins(); pinIndex++)
     {
-        if (GPIOPins[pinIndex].CurrentFunction == dph && GPIOPins[pinIndex].DeviceFunctionChannelNumber == deviceChannel)
+        if (GPIOPins[pinIndex].CurrentFunction == dph &&
+            GPIOPins[pinIndex].DeviceFunctionChannelNumber == deviceChannel)
         {
             return GPIOPins[pinIndex].pinNameValue;
         }
@@ -101,46 +102,41 @@ PinNameValue DeviceRegistration::FindPinWithFunctionAndChannel(DevicePinFunction
 }
 bool DeviceRegistration::IsPinReserved(PinNameValue pinNameValue)
 {
-    bool status = false;
     int pinIndex = FindPin(pinNameValue);
-    if (pinIndex != NOT_FOUND)
-    {
-        status = GPIOPins[pinIndex].Reserved;
-    }
-    return status;
+    return GPIOPins[pinIndex].Reserved;
 }
-bool DeviceRegistration::ReservePin(PinNameValue pinNameValue)
+bool DeviceRegistration::ReservePin(
+    PinNameValue pinNameValue,
+    DevicePinFunction devicePinFunction,
+    int deviceFunctionChannelNumber)
 {
     bool status = false;
     int pinIndex = FindPin(pinNameValue);
-    if (pinIndex != NOT_FOUND)
+    if (!IsPinReserved(pinNameValue))
     {
-        if (!IsPinReserved(pinNameValue))
-        {
-            GPIOPins[pinIndex].Reserved = true;
-            GPIOPins[pinIndex].Mode = (PinMode)NOT_SET;
-            GPIOPins[pinIndex].CurrentFunction = DevicePinFunction::NONE;
-            GPIOPins[pinIndex].DeviceFunctionChannelNumber = 0;
-            status = true;
-        }
+        GPIOPins[pinIndex].Reserved = true;
+        GPIOPins[pinIndex].Mode = (PinMode)NOT_SET;
+        GPIOPins[pinIndex].CurrentFunction = devicePinFunction;
+        GPIOPins[pinIndex].DeviceFunctionChannelNumber = deviceFunctionChannelNumber;
+        status = true;
     }
     return status;
 }
-bool DeviceRegistration::ReleasePin(PinNameValue pinNameValue)
+DeviceRegistration::DevicePin DeviceRegistration::GetPin(PinNameValue pinNameValue)
 {
-    bool status = false;
     int pinIndex = FindPin(pinNameValue);
-    if (pinIndex != 0)
+    return GPIOPins[pinIndex];
+}
+
+void DeviceRegistration::ReleasePin(PinNameValue pinNameValue)
+{
+    int pinIndex = FindPin(pinNameValue);
+    if (IsPinReserved(pinNameValue))
     {
-        if (IsPinReserved(pinNameValue))
-        {
-            GPIOPins[pinIndex].Reserved = false;
-            GPIOPins[pinIndex].CurrentFunction = DevicePinFunction::NONE;
-            GPIOPins[pinIndex].DeviceFunctionChannelNumber = 0;
-            status = true;
-        }
+        GPIOPins[pinIndex].Reserved = false;
+        GPIOPins[pinIndex].CurrentFunction = DevicePinFunction::NONE;
+        GPIOPins[pinIndex].DeviceFunctionChannelNumber = 0;
     }
-    return status;
 }
 bool DeviceRegistration::IsValidOutputPin(PinNameValue pinNameValue)
 {
@@ -245,55 +241,17 @@ bool DeviceRegistration::SetPinMode(PinNameValue pinNameValue, PinMode pinMode)
     GPIOPins[pinIndex].Mode = pinMode;
     return true;
 }
-bool DeviceRegistration::GetPinMode(PinNameValue pinNameValue, PinMode *pinMode)
-{
-    bool status = false;
-    int pinIndex = FindPin(pinNameValue);
-    if (pinIndex != NOT_FOUND)
-    {
-        *pinMode = GPIOPins[pinIndex].Mode;
-        status = true;
-    }
-    return status;
-}
-bool DeviceRegistration::SetPinFunction(PinNameValue pinNameValue, DevicePinFunction devicePinFunction)
-{
-    int pinIndex = FindPin(pinNameValue);
-    GPIOPins[pinIndex].CurrentFunction = devicePinFunction;
-    return true;
-}
-bool DeviceRegistration::GetPinFunction(PinNameValue pinNameValue, DevicePinFunction *devicePinFunction)
-{
-    bool status = false;
-    int pinIndex = FindPin(pinNameValue);
-    if (pinIndex != NOT_FOUND)
-    {
-        *devicePinFunction = GPIOPins[pinIndex].CurrentFunction;
-        status = true;
-    }
-    return status;
-}
-DeviceRegistration::GpioParameter *DeviceRegistration::GetPinParameters(PinNameValue pinNameValue)
-{
-    GpioParameter *returnValue = NULL; //{0};
-    int pinIndex = FindPin(pinNameValue);
-    if (pinIndex != 0)
-    {
-        returnValue = GPIOPins[pinIndex].GpioParameterData;
-    }
-    return returnValue;
-}
-//bool AddPinParameters(PinNameValue pinNameValue, GpioParameter *newParameters)
+// bool AddPinParameters(PinNameValue pinNameValue, GpioParameter *newParameters)
 //{
-//    bool status = false;
-//    int pinIndex = FindPin(pinNameValue);
-//    if (FindPin(pinNameValue) != 0)
-//    {
-//        GPIOPins[pinIndex].GpioParameterData = newParameters;
-//        status = true;
-//    }
-//    return status;
-//}
+//     bool status = false;
+//     int pinIndex = FindPin(pinNameValue);
+//     if (FindPin(pinNameValue) != 0)
+//     {
+//         GPIOPins[pinIndex].GpioParameterData = newParameters;
+//         status = true;
+//     }
+//     return status;
+// }
 bool DeviceRegistration::RemovePinParameters(PinNameValue pinNameValue)
 {
     bool status = false;

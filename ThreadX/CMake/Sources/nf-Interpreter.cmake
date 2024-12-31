@@ -58,6 +58,7 @@
                     ${CMAKE_SOURCE_DIR}/src/System.IO.FileSystem
                     ${CMAKE_SOURCE_DIR}/src/System.Net
                     ${CMAKE_SOURCE_DIR}/src/Windows.Storage)
+
         list(APPEND NF_INTERPRETER_SOURCES
                     ${CMAKE_SOURCE_DIR}/src/CLR/Core/Cache.cpp
                     ${CMAKE_SOURCE_DIR}/src/CLR/Core/Checks.cpp
@@ -180,7 +181,7 @@
                     ${CMAKE_SOURCE_DIR}/src/CLR/WireProtocol/WireProtocol_HAL_Interface.c
                     ${CMAKE_SOURCE_DIR}/src/CLR/WireProtocol/WireProtocol_Message.c
                     ${CMAKE_SOURCE_DIR}/src/CLR/WireProtocol/WireProtocol_MonitorCommands.c
-#                    ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Boot.c
+#                   ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Boot.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Capabilites.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_ConfigurationManager.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_ConfigurationManager_stubs.c
@@ -249,7 +250,6 @@
 
 # Targets
         list(APPEND NF_INTERPRETER_INCLUDES 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_BOARD}
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics																																																																																																																																																																																							
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other																																																																																																																																																																																							
@@ -259,9 +259,11 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/DeviceIO																																																																																																																																																																																							
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/WireProtocol)
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/${TARGET_BOARD}
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/DeviceIO																																																																																																																																																																																							
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/WireProtocol)
+
 
         list(APPEND NF_INTERPRETER_SOURCES 
 
@@ -295,14 +297,14 @@
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/WireProtocol_MonitorCommands.c
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/DeviceIO/DeviceIO.cpp																																																																																																																																																																																							
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/Delays.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/targetHAL.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/FlashDriver.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/nanoSupport_CRC32.c
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/DeviceIO/DeviceIO.cpp																																																																																																																																																																																							
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Delays.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/targetHAL.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/FlashDriver.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/nanoSupport_CRC32.c
                     
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/WireProtocol/WireProtocol_HAL_Interface.c
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/${TARGET_FAMILY}/WireProtocol/wp_Communications.c)  
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/WireProtocol/WireProtocol_HAL_Interface.c
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/WireProtocol/wp_Communications.c)  
 
 # Overide compile flags on selected files
     # Set flags on code that is required but produces warning/errors with current build parameters

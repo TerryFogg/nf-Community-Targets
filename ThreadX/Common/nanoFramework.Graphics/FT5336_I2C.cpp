@@ -1,4 +1,4 @@
-// Copyright (c) .NET Foundation and Contributors
+﻿// Copyright (c) .NET Foundation and Contributors
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
 
 // For a  FT63x6 by Focal Tech.
@@ -9,6 +9,12 @@
 
 #include "TouchDevice.h"
 #include "TouchInterface.h"
+
+enum TranslateCoordinates
+{
+    NONE = 0,
+    SWAP_X_Y = 1
+};
 
 struct TouchDevice g_TouchDevice;
 extern TouchInterface g_TouchInterface;

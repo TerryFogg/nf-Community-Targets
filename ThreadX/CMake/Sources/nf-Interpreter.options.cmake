@@ -20,8 +20,8 @@ endif()
 
 # File System
 if(FILEX_SYSTEM_SD OR FILEX_SYSTEM_NAND OR FILEX_SYSTEM_NOR OR FILEX_SYSTEM_RAM)
-    include( ${CMAKE_CURRENT_SOURCE_DIR}/Sources/FileX.cmake)
-    include( ${CMAKE_CURRENT_SOURCE_DIR}/Sources/LevelX.cmake)
+    include( ${CMAKE_CURRENT_SOURCE_DIR}/Sources/ThreadX/FileX.cmake)
+    include( ${CMAKE_CURRENT_SOURCE_DIR}/Sources/ThreadX/LevelX.cmake)
     list(APPEND FILEX_INCLUDES
          ${CMAKE_SOURCE_DIR}/src/System.IO.FileSystem
          ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem
@@ -62,15 +62,15 @@ endif()
 # Per Board fileX sources    
 if( "${TARGET_FAMILY}" STREQUAL "STM32H7")
     list(APPEND FILEX_INCLUDES
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/STM32H7/DeviceIO
+         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/STM32H7/DeviceIO
     )
     list(APPEND FILEX_SOURCES
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/STM32H7/DeviceIO/SD_DoubleBufferedDMA.cpp
+         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/STM32H7/DeviceIO/SD_DoubleBufferedDMA.cpp
     )
 endif()
 if( "${TARGET_FAMILY}" STREQUAL "STM32U5")
     list(APPEND FILEX_INCLUDES
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/STM32U5/DeviceIO
+         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/STM32U5/DeviceIO
     )
 endif()
 if( "${TARGET_FAMILY}" STREQUAL "RP2XXX")

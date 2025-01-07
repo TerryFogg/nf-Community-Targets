@@ -12,6 +12,7 @@
 #ifdef FileX
 #include "File_Drivers.h"
 #endif
+#include <hardware/structs/xip.h>
 
 DeviceRegistration::DevicePin mcuPins[] = {
     {GP0, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
@@ -108,10 +109,18 @@ void Initialize_Board()
     Initialize64BitMicrosecondTimer();
     InitializeDevicePins();
 
-    //gpio_set_function(18, GPIO_FUNC_SPI);
-   // gpio_set_function(19, GPIO_FUNC_SPI);
+#ifdef PSRAM
+    InitializePSRAM();
+#endif
 
 }
+void InitializeBoardPeripherals()
+{
+    ResetPinList();
+    Initialize_Board_LEDS();
+    InitializeDevicePins();
+}
+
 void ResetPinList()
 {
     for (int i = 0; i < sizeof(mcuPins) / sizeof(DeviceRegistration::DevicePin); i++)
@@ -170,3 +179,12 @@ void InitializeDevicePins()
     DeviceRegistration::CreateSPIChannelList(BoardSPIChannels, ARRAY_LEN(BoardSPIChannels));
     DeviceRegistration::CreateSerialChannelList(BoardSerialChannels, ARRAY_LEN(BoardSerialChannels));
 };
+
+void InitializePSRAM()
+{
+    gpio_set_function(47, GPIO_FUNC_XIP_CS1); // Set GPIO47 as CS for PSRAM
+    xip_ctrl_hw->ctrl |= XIP_CTRL_WRITABLE_M1_BITS;
+
+    // Enable writable memory[_{{{CITATION{{{_1{RP2350: How to enable XIP PSRAM? - // Raspberry Pi Forums](https://forums.raspberrypi.com/viewtopic.php?t=375109)
+
+}

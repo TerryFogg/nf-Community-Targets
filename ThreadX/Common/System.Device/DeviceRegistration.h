@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 //
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
@@ -123,20 +123,20 @@ extern "C"
         static void CreatePinList(DevicePin *GPIOPins, int numberOfPins);
         static int NumberOfPins();
         static bool AddPinParameters(PinNameValue pinNameValue, void *newParameters);
-        static bool ReservePin(PinNameValue pinNameValue);
+        static bool ReservePin(
+            PinNameValue pinNameValue,
+            DevicePinFunction devicePinFunction,
+            int deviceFunctionChannelNumber = 0);
         static bool IsValidPin(PinNameValue pinNameValue);
         static bool IsPinReserved(PinNameValue pinNameValue);
-        static bool ReleasePin(PinNameValue pinNameValue);
+        static void ReleasePin(PinNameValue pinNameValue);
         static bool SetPinMode(PinNameValue pinNameValue, PinMode pinMode);
-        static bool GetPinMode(PinNameValue pinNameValue, PinMode *pinMode);
-        static bool SetPinFunction(PinNameValue pinNameValue, DevicePinFunction devicePinFunction);
-        static bool GetPinFunction(PinNameValue pinNameValue, DevicePinFunction *devicePinFunction);
         static int FindPin(PinNameValue pinNameValue);
         static PinNameValue FindPinWithFunctionAndChannel(DevicePinFunction dph, int deviceChannel);
         static bool IsValidOutputDriveMode(PinMode driveMode);
         static bool IsValidInputDriveMode(PinMode driveMode);
 
-        static GpioParameter *GetPinParameters(PinNameValue pinNameValue);
+        static DevicePin GetPin(PinNameValue pinNameValue);
         // bool AddPinParameters(PinNameValue pinNameValue, void *newParameters);
         static bool RemovePinParameters(PinNameValue pinNameValue);
 

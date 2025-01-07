@@ -8,7 +8,7 @@
 
 ![{E294B91F-46BD-4D52-9607-51F1298E4BCF}](assets/{E294B91F-46BD-4D52-9607-51F1298E4BCF}.png)
 
-
+<img src="assets/image-20250106215950384.png" alt="image-20250106215950384" style="zoom:200%;" />
 
 # RP2350
 
@@ -16,3 +16,30 @@
 
 PICO2 W
 
+![image-20250104091300351](assets/image-20250104091300351.png)
+
+
+
+
+
+
+
+Pimoroni Pico Plus 2W
+
+
+
+
+
+
+
+
+
+
+
+![image-20250105132453975](assets/image-20250105132453975.png)
+
+
+
+
+
+![image-20250105132513653](assets/image-20250105132513653.png)

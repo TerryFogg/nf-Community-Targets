@@ -249,7 +249,7 @@
 
 # Targets
         list(APPEND NF_INTERPRETER_INCLUDES 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_BOARD}
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/${TARGET_BOARD}
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics																																																																																																																																																																																							
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other																																																																																																																																																																																							

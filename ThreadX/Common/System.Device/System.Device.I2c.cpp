@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
@@ -59,10 +59,8 @@ HRESULT Library_sys_dev_i2c_native_System_Device_I2c_I2cDevice::
         CLR_RT_HeapBlock *result = top.Dereference();
         FAULT_ON_NULL(result);
 
-        bool status = false;
         uint8_t *writeBuffer;
         uint8_t *readBuffer;
-        CLR_INT32 transferResult;
 
         CLR_RT_HeapBlock *readSpanByte = stack.Arg2().Dereference();
         CLR_RT_HeapBlock *writeSpanByte = stack.Arg1().Dereference();
@@ -95,17 +93,10 @@ HRESULT Library_sys_dev_i2c_native_System_Device_I2c_I2cDevice::
             if ((writeBuffer = (uint8_t *)platform_malloc(writeSize)) != NULL)
             {
                 memcpy(writeBuffer, (uint8_t *)writeData->GetElement(writeOffset), writeSize);
-                status = I2cIO::Write(deviceId, slaveAddress, writeBuffer, writeSize, &transferResult);
+                I2cTransferStatus transferResult = I2cIO::Write(deviceId, slaveAddress, writeBuffer, writeSize);
                 platform_free(writeBuffer);
-                if (status)
-                {
-                    result[I2cTransferResult::FIELD___status].SetInteger(transferResult);
-                    result[I2cTransferResult::FIELD___bytesTransferred].SetInteger(0);
-                }
-                else
-                {
-                    NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_OPERATION);
-                }
+                result[I2cTransferResult::FIELD___status].SetInteger(transferResult);
+                result[I2cTransferResult::FIELD___bytesTransferred].SetInteger(0);
             }
             else
             {
@@ -119,20 +110,13 @@ HRESULT Library_sys_dev_i2c_native_System_Device_I2c_I2cDevice::
             if ((readBuffer = (uint8_t *)platform_malloc(readSize)) != NULL)
             {
                 memset(readBuffer, 0, readSize);
-                status = I2cIO::Read(deviceId, slaveAddress, readBuffer, readSize, &transferResult);
+                I2cTransferStatus transferResult = I2cIO::Read(deviceId, slaveAddress, readBuffer, readSize);
                 memcpy(readData->GetElement(readOffset), readBuffer, readSize);
                 result[I2cTransferResult::FIELD___status].SetInteger((CLR_UINT32)I2cTransferStatus_FullTransfer);
                 result[I2cTransferResult::FIELD___bytesTransferred].SetInteger((CLR_UINT32)(writeSize + readSize));
                 platform_free(readBuffer);
-                if (status)
-                {
-                    result[I2cTransferResult::FIELD___status].SetInteger(transferResult);
-                    result[I2cTransferResult::FIELD___bytesTransferred].SetInteger(0);
-                }
-                else
-                {
-                    NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_OPERATION);
-                }
+                result[I2cTransferResult::FIELD___status].SetInteger(transferResult);
+                result[I2cTransferResult::FIELD___bytesTransferred].SetInteger(0);
             }
             else
             {

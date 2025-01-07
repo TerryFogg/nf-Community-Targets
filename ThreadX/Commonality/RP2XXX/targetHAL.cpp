@@ -17,33 +17,47 @@
 extern bool g_waitForDebuggerRequested;
 bool g_fDoNotUninitializeDebuggerPort = false;
 
+#if (TOUCH_DISPLAY_SUPPORT == TRUE)
+#include "TouchPanel.h"
+#include "TouchInterface.h"
+
+extern TouchPanelDriver gTouchPanel;
+extern TouchInterface gTouchInterface;
+
+extern TouchDevice gTouch_Device;
+#endif
+
 extern "C"
 {
     void nanoHAL_Initialize_C()
     {
         nanoHAL_Initialize();
     }
-
     void nanoHAL_Uninitialize_C(bool isPoweringDown)
     {
         nanoHAL_Uninitialize(isPoweringDown);
     }
 }
-
 void nanoHAL_Initialize()
 {
-    // initialize global mutex
-    // chMtxObjectInit(&interpreterGlobalMutex);
+    unsigned char *heapStart = NULL;
+    unsigned int heapSize = 0;
+
+    InitializeBoardPeripherals();
 
 #if (NANOCLR_GRAPHICS == TRUE)
     DisplayInterfaceConfig displayConfig = {0};
     g_GraphicsMemoryHeap.Initialize(0);
     g_DisplayInterface.Initialize(displayConfig);
     g_DisplayDriver.Initialize();
-
 #endif
 
-    PalEvent_Initialize();
+#if (TOUCH_DISPLAY_SUPPORT == TRUE)
+    gTouchInterface.Initialize();
+    gTouchPanel.Initialize();
+#endif
+
+   // PalEvent_Initialize();
 
     HAL_CONTINUATION::InitializeList();
     HAL_COMPLETION::InitializeList();
@@ -51,17 +65,11 @@ void nanoHAL_Initialize()
     BlockStorageList_Initialize();
     BlockStorage_AddDevices();
     BlockStorageList_InitializeDevices();
-    unsigned char *heapStart = NULL;
-    unsigned int heapSize = 0;
 
     ::HeapLocation(heapStart, heapSize);
     memset(heapStart, 0, heapSize);
 
-    //    ConfigurationManager_Initialize();
-
     Events_Initialize();
-
-    // Initialise Network Stack
     Network_Initialize();
 }
 

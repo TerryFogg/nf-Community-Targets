@@ -4,17 +4,17 @@
 #
 
     list(APPEND NF_INTERPRETER_SOURCES 
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RP2350/tx_initialize_low_level.s
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RP2350/board.cpp
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RP2350/Device_BlockStorage.c
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RP2350/CLR_RT_InteropAssembliesTable.cpp
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RP2350/Power.c
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RP2350/target_common.c
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RaspberryPi/RP2XXX/RP2350/tx_initialize_low_level.s
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RaspberryPi/RP2XXX/RP2350/board.cpp
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RaspberryPi/RP2XXX/RP2350/Device_BlockStorage.c
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RaspberryPi/RP2XXX/RP2350/CLR_RT_InteropAssembliesTable.cpp
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RaspberryPi/RP2XXX/RP2350/Power.c
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RaspberryPi/RP2XXX/RP2350/target_common.c
 
                 # Wire Protocol support
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/RP2XXX/usb_cdc_descriptor.c
 
-
+                 
     )
 
 if(GRAPHICS_SUPPORT)

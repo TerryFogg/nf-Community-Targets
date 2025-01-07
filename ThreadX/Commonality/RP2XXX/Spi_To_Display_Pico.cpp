@@ -18,9 +18,9 @@
 #define SPI_MAX_TRANSFER_SIZE 960
 
 #if PICO_RP2040
-    #define MAX_SPI_BAUD_RATE     62500000
+#define MAX_SPI_BAUD_RATE 62500000
 #else
-    #define MAX_SPI_BAUD_RATE     75000000
+#define MAX_SPI_BAUD_RATE 75000000
 #endif
 
 struct DisplayInterface g_DisplayInterface;
@@ -60,11 +60,6 @@ void DisplayInterface::Initialize(DisplayInterfaceConfig &config)
     // Configure GPIO's
     // ==============
 
-    // Reset
-    gpio_init(LCD_RESET);
-    gpio_set_dir(LCD_RESET, GPIO_OUT);
-    gpio_put(LCD_RESET, 1);
-
     // Data/Command
     gpio_init(LCD_DC);
     gpio_set_dir(LCD_DC, GPIO_OUT);
@@ -72,14 +67,17 @@ void DisplayInterface::Initialize(DisplayInterfaceConfig &config)
 
     gpio_init(LCD_BACKLIGHT);
     gpio_set_dir(LCD_BACKLIGHT, GPIO_OUT);
-    gpio_put(LCD_BACKLIGHT, 1);
+    // gpio_put(LCD_BACKLIGHT, 1);
 
+    // Reset
+    gpio_init(LCD_RESET);
+    gpio_set_dir(LCD_RESET, GPIO_OUT);
     gpio_put(LCD_RESET, 1);
-    PLATFORM_DELAY(100);
+    PLATFORM_DELAY(10);
     gpio_put(LCD_RESET, 0);
-    PLATFORM_DELAY(100);
+    PLATFORM_DELAY(10);
     gpio_put(LCD_RESET, 1);
-    PLATFORM_DELAY(100);
+    PLATFORM_DELAY(10);
 
     // Setup DMA
     // We set the outbound DMA to transfer from a memory buffer to the SPI

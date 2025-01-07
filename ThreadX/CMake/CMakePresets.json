@@ -103,12 +103,14 @@
         {
             "name": "STM32H735G_DK",
             "description": "Configuration for the STM32H735G_DK (Cortex M-7) discovery board from STMicroelectronics",
+            "hidden": false,
             "inherits": [
                 "THREADX_AND_COMPONENT_PATHS",
                 "GCC_ARM_COMMON_BUILD",
                 "FULL_MATHEMATICS"
             ],
             "cacheVariables": {
+                "TARGET_VENDOR": "ST",
                 "TARGET_BOARD": "STM32H735G_DK",
                 "TARGET_FAMILY": "STM32H7",
                 "TARGET_SERIES": "STM32H735xx",
@@ -130,7 +132,9 @@
                 "GRAPHICS_SUPPORT": true,
                 "TOUCH_DISPLAY_SUPPORT": true,
 
-                "FILEX_SYSTEM_SD": true,
+                "NETWORKING": false,
+
+                "FILEX_SYSTEM_SD": false,
                 "FILEX_SYSTEM_NAND": false,
                 "FILEX_SYSTEM_NOR": false,
                 "FILEX_SYSTEM_RAM": false,
@@ -139,20 +143,21 @@
                 "USB_HOST": false,
                 "USB_HOST_CONTROLLER": false,
                 "USB_NETWORK": false,
-                "USB_PICTBRIDGE": false,
-                "NETWORKING": false
-            },
-            "hidden": false
+                "USB_PICTBRIDGE": false
+
+            }
         },
         {
             "name": "STM32H7B3I_DK",
             "description": "Configuration for the STM32H7B3I_DK (Cortex M-7) discovery board from STMicroelectronics",
+            "hidden": false,
             "inherits": [
                 "THREADX_AND_COMPONENT_PATHS",
                 "GCC_ARM_COMMON_BUILD",
                 "FULL_MATHEMATICS"
             ],
             "cacheVariables": {
+                "TARGET_VENDOR": "ST",
                 "TARGET_BOARD": "STM32H7B3I_DK",
                 "TARGET_FAMILY": "STM32H7",
                 "TARGET_SERIES": "STM32H7B3xxQ",
@@ -174,49 +179,7 @@
                 "GRAPHICS_SUPPORT": true,
                 "TOUCH_DISPLAY_SUPPORT": true,
 
-                "FILEX_SYSTEM_SD": true,
-                "FILEX_SYSTEM_NAND": false,
-                "FILEX_SYSTEM_NOR": false,
-                "FILEX_SYSTEM_RAM": false,
-
-                "USB_DEVICE": false,
-                "USB_HOST": false,
-                "USB_HOST_CONTROLLER": false,
-                "USB_NETWORK": false,
-                "USB_PICTBRIDGE": false,
-                "NETWORKING": false
-            },
-            "hidden": false
-        },
-        {
-            "name": "NUCLEO64_F091RC",
-            "description": "Configuration for the NUCLEO64_F091RC (Cortex M0) nucleo board from STMicroelectronics",
-            "inherits": [
-                "THREADX_AND_COMPONENT_PATHS",
-                "GCC_ARM_COMMON_BUILD",
-                "FULL_MATHEMATICS"
-            ],
-            "cacheVariables": {
-                "TARGET_BOARD": "NUCLEO64_F091RC",
-                "TARGET_FAMILY": "STM32F0",
-                "TARGET_SERIES": "STM32F091xC",
-                "ARM_PROCESSOR": "cortex-m0",
-                "TARGET_GIT_REPOSITORY": "https://github.com/STMicroelectronics/STM32CubeF7.git",
-                "TARGET_GIT_TAG": "v1.11.5",
-                "TARGET_GIT_LOCAL_PATH": "C:/nftools/STM32CubeF7",
-
-                "BUILD_VERSION": "1.0.0.0",
-                "INFOSTRING": "Built with ThreadX 6.1.12",
-                "HAS_CONFIG_BLOCK": false,
-                "RANDOM_NUMBER_GENERATOR": false,
-                "NANOCLR_SYSTEM_COLLECTIONS": false,
-                "NANOCLR_REFLECTION": false,
-                "REALTIME_CLOCK": false,
-                "WATCHDOG": false,
-                "ADVANCED_PROFILING": false,
-
-                "GRAPHICS_SUPPORT": false,
-                "TOUCH_DISPLAY_SUPPORT": false,
+                "NETWORKING": false,
 
                 "FILEX_SYSTEM_SD": false,
                 "FILEX_SYSTEM_NAND": false,
@@ -227,20 +190,21 @@
                 "USB_HOST": false,
                 "USB_HOST_CONTROLLER": false,
                 "USB_NETWORK": false,
-                "USB_PICTBRIDGE": false,
-                "NETWORKING": false
-            },
-            "hidden": false
+                "USB_PICTBRIDGE": false
+
+            }
         },
         {
             "name": "NUCLEO_H743ZI2",
             "description": "Configuration for the NUCLEO-H743ZI2 (Cortex M-7) nucleo board from STMicroelectronics",
+            "hidden": false,
             "inherits": [
                 "THREADX_AND_COMPONENT_PATHS",
                 "GCC_ARM_COMMON_BUILD",
                 "FULL_MATHEMATICS"
             ],
             "cacheVariables": {
+                "TARGET_VENDOR": "ST",
                 "TARGET_BOARD": "NUCLEO_H743ZI2",
                 "TARGET_FAMILY": "STM32H7",
                 "TARGET_SERIES": "STM32H743xx",
@@ -262,6 +226,8 @@
                 "GRAPHICS_SUPPORT": false,
                 "TOUCH_DISPLAY_SUPPORT": false,
 
+                "NETWORKING": false,
+
                 "FILEX_SYSTEM_SD": false,
                 "FILEX_SYSTEM_NAND": false,
                 "FILEX_SYSTEM_NOR": false,
@@ -271,20 +237,21 @@
                 "USB_HOST": false,
                 "USB_HOST_CONTROLLER": false,
                 "USB_NETWORK": false,
-                "USB_PICTBRIDGE": false,
-                "NETWORKING": false
-            },
-            "hidden": false
+                "USB_PICTBRIDGE": false
+
+            }
         },
         {
             "name": "STM32U5A9J_DK",
             "description": "Configuration for the STM32U5A9J_DK (Cortex-M33) from STMicroelectronics",
+            "hidden": false,
             "inherits": [
                 "THREADX_AND_COMPONENT_PATHS",
                 "GCC_ARM_COMMON_BUILD",
                 "FULL_MATHEMATICS"
             ],
             "cacheVariables": {
+                "TARGET_VENDOR": "ST",
                 "TARGET_BOARD": "STM32U5A9J_DK",
                 "TARGET_FAMILY": "STM32U5",
                 "TARGET_SERIES": "STM32U5A9xx",
@@ -307,6 +274,8 @@
                 "GRAPHICS_SUPPORT": false,
                 "TOUCH_DISPLAY_SUPPORT": false,
 
+                "NETWORKING": false,
+
                 "FILEX_SYSTEM_SD": false,
                 "FILEX_SYSTEM_NAND": false,
                 "FILEX_SYSTEM_NOR": false,
@@ -316,22 +285,21 @@
                 "USB_HOST": false,
                 "USB_HOST_CONTROLLER": false,
                 "USB_NETWORK": false,
-                "USB_PICTBRIDGE": false,
-                "NETWORKING": false
-            },
-            "hidden": false
+                "USB_PICTBRIDGE": false
+            }
         },
         {
             "name": "RP2040",
             "description": "Configuration for the Raspberry Pi Pico",
+            "hidden": true,
             "inherits": [
                 "THREADX_AND_COMPONENT_PATHS",
                 "GCC_ARM_COMMON_BUILD",
                 "FULL_MATHEMATICS",
-                "PICO_SDK",
-                "DEBUG"
+                "PICO_SDK"
             ],
             "cacheVariables": {
+                "TARGET_VENDOR": "RaspberryPi",
                 "TARGET_BOARD": "RP2040",
                 "TARGET_FAMILY": "RP2XXX",
                 "TARGET_SERIES": "RP2040",
@@ -370,20 +338,20 @@
 
                 "HARD_FAULT_DEBUG_HANDLER": true,
                 "CFG_USB_USE_DTR": false
-            },
-            "hidden": false
+            }
         },
         {
             "name": "RP2350",
             "description": "Configuration for the Raspberry Pi Pico",
+            "hidden": true,
             "inherits": [
                 "THREADX_AND_COMPONENT_PATHS",
                 "GCC_ARM_COMMON_BUILD",
                 "FULL_MATHEMATICS",
-                "PICO_SDK",
-                "DEBUG"
+                "PICO_SDK"
             ],
             "cacheVariables": {
+                "TARGET_VENDOR": "RaspberryPi",
                 "TARGET_BOARD": "RP2350",
                 "TARGET_FAMILY": "RP2XXX",
                 "TARGET_SERIES": "RP2350",
@@ -407,30 +375,17 @@
                 "WATCHDOG": false,
                 "ADVANCED_PROFILING": false,
 
-                "FILEX_SYSTEM_SD": false,
-                "FILEX_SYSTEM_NAND": false,
-                "FILEX_SYSTEM_NOR": false,
-                "FILEX_SYSTEM_RAM": false,
-
-                "USB_DEVICE": false,
-                "USB_HOST": false,
-                "USB_HOST_CONTROLLER": false,
-                "USB_NETWORK": false,
-                "USB_PICTBRIDGE": false,
                 "NETWORKING": false,
 
                 "HARD_FAULT_DEBUG_HANDLER": true,
                 "CFG_USB_USE_DTR": false
 
-            },
-            "hidden": false
+            }
         },
         {
-            "name": "RP2350-Pico-LCD01.14",
-            "description": "Configuration for the Raspberry Pi Pico",
-            "inherits": [
-                "RP2350"
-            ],
+            "name": "Waveshare-LCD-1.14",
+            "description": "https://www.waveshare.com/pico-lcd-1.14.htm",
+            "hidden": true,
             "cacheVariables": {
                 "GRAPHICS_SUPPORT": true,
                 "TOUCH_DISPLAY_SUPPORT": false,
@@ -444,64 +399,112 @@
                 "SPI_TX": "11",
                 "SPI_CLK": "10",
                 "SPI_CS": "9"
-            },
-            "hidden": false
+            }
         },
         {
-            "name": "RP2350-ER-TFTM028",
-            "description": "Configuration for the Raspberry Pi Pico",
-            "inherits": [
-                "RP2350"
-            ],
+            "name": "BUYDISPLAY-ER-TFTM028",
+            "description": "https://www.buydisplay.com/2-8-inch-tft-touch-shield-for-arduino-w-capacitive-touch-screen-module",
+            "hidden": true,
             "cacheVariables": {
                 "GRAPHICS_SUPPORT": true,
                 "TOUCH_DISPLAY_SUPPORT": true,
+
                 "GRAPHICS_LCD": "pico-LCD-ER-TFTM028-4.cpp",
-                "LCD_WIDTH": "320",
-                "LCD_HEIGHT": "240",
+
+                "TOUCH_INTERFACE_CONTROLLER": "FT6X06.cpp",
+                "TOUCH_INTERFACE_DRIVER": "I2C_To_TouchPanel.cpp",
+                "TOUCH_INTERFACE_BUS": "0",
+                "TOUCH_INTERFACE_SLAVE_ADDRESS": "56", // 0x38
+                "TOUCH_INTERFACE_I2C_SDA": "20",
+                "TOUCH_INTERFACE_I2C_SCL": "21",
+                "TOUCH_INTERFACE_INTERRUPT": "22",
+                "TOUCH_INTERFACE_WIDTH": "240",
+                "TOUCH_INTERFACE_HEIGHT": "320",
+                "TOUCH_INTERFACE_TRANSLATE": "SWAP_NONE",
+
+                "LCD_WIDTH": "240",
+                "LCD_HEIGHT": "320",
                 "LCD_BACKLIGHT": "26",
                 "LCD_RESET": "27",
-                "SPI_CLK": "18",
-                "SPI_MOSI": "19",
+                "LDC_DC": "16",
+
                 "SPI_BUS": "0",
-                "SPI_CS": "17",
-                "SPI_DC": "16"
-            },
-            "hidden": false
+                "SPI_TX": "19",
+                "SPI_CLK": "18",
+                "SPI_CS": "17"
+            }
+        },
+        {
+            "name": "W25Q16JV",
+            "description": "2MB Flash chip as used by Pico",
+            "hidden": true,
+            "cacheVariables": {
+                "FLASH_SIZE": "4",
+                "FLASH_CHIP": "W25Q32RV"
+            }
+        },
+        {
+            "name": "W25Q32RV",
+            "description": "4MB Flash chip as used by Pico2",
+            "hidden": true,
+            "cacheVariables": {
+                "FLASH_SIZE": "4",
+                "FLASH_CHIP": "W25Q32RV"
+            }
+        },
+        {
+            "name": "W25Q128JV",
+            "description": "16MB Flash chip as used by Pimoroni Pico Plus 2W",
+            "hidden": true,
+            "cacheVariables": {
+                "FLASH_SIZE": "16",
+                "FLASH_CHIP": "W25Q128JV"
+            }
+        },
+        {
+            "name": "APS6404L",
+            "description": "8MB PSRAM chip as used by Pimoroni Pico Plus 2W",
+            "hidden": true,
+            "cacheVariables": {
+                "PSRAM" :  true,
+                "PSRAM_SIZE": "8",
+                "PSRAM_CHIP": "APS6404L"
+            }
+        },
+        // ===================================================
+        // Configurations to build
+        // ===================================================
+        {
+            "name": "RP2040 + Waveshare LCD-1.14",
+            "description": "Pico2 board with 1.14 inch LCD",
+            "hidden": false,
+            "inherits": [ "RP2040", "Waveshare-LCD-1.14", "DEBUG" ]
+        },
+        {
+            "name": "RP2350 + Waveshare LCD-1.14",
+            "description": "Pico2 board with 1.14 inch LCD",
+            "hidden": false,
+            "inherits": [ "RP2350", "W25Q32RV", "Waveshare-LCD-1.14", "DEBUG" ]
+        },
+        {
+            "name": "RP2350(16MB,8MB) + Waveshare LCD-1.14",
+            "description": "Pico2 board with 1.14 inch LCD",
+            "hidden": false,
+            "inherits": [ "RP2350", "W25Q128JV", "APS6404L", "Waveshare-LCD-1.14", "DEBUG" ]
+        },
+        {
+            "name": "RP2350 + BuyDisplay-ER-TFTM028",
+            "description": "Pico2 board with 2.8 inch LCD and capacitive touch",
+            "hidden": false,
+            "inherits": [ "RP2350", "BUYDISPLAY-ER-TFTM028", "DEBUG" ]
+        },
+        {
+            "name": "RP2350(16MB,8MB) + BuyDisplay-ER-TFTM028",
+            "description": "Pico2 board with 2.8 inch LCD and capacitive touch",
+            "hidden": false,
+            "inherits": [ "RP2350", "W25Q128JV", "APS6404L", "BUYDISPLAY-ER-TFTM028", "DEBUG" ]
         }
     ],
     "buildPresets": [
-        {
-            "name": "STM32H735G_DK-Debug",
-            "configurePreset": "STM32H735G_DK"
-        },
-        {
-            "name": "STM32H7B3I_DK-Debug",
-            "configurePreset": "STM32H7B3I_DK"
-        },
-        {
-            "name": "NUCLEO-H743ZI2-Debug",
-            "configurePreset": "NUCLEO_H743ZI2"
-        },
-        {
-            "name": "STM32U5A9J_DK-Debug",
-            "configurePreset": "STM32U5A9J_DK"
-        },
-        {
-            "name": "RP2040-Debug",
-            "configurePreset": "RP2040"
-        },
-        {
-            "name": "RP2350-Pico-LCD01.14",
-            "configurePreset": "RP2350-Pico-LCD01.14",
-            "configuration": "Debug",
-            "verbose": true
-        },
-        {
-            "name": "RP2350-ER-TFTM028",
-            "configurePreset": "RP2350-ER-TFTM028",
-            "configuration": "Debug",
-            "verbose": false
-        }
    ]
 }

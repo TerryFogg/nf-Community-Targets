@@ -57,6 +57,9 @@ extern "C"
     void BoardLed_Toggle();
     bool BoardUserButton_Pressed();
     bool PinSupportsADC(int pinNumber);
+    void InitializePSRAM();
+    void InitializeBoardPeripherals();
+
 #ifdef __cplusplus
 }
 #endif

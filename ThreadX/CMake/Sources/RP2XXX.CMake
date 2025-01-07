@@ -3,6 +3,22 @@
 # See LICENSE file in the project root for full license information.
 #
 
+set(PICO_NO_CMSE true)
+option(LINKER_SCRIPT_FILE  "Determine the linker script file to use base on the memory configuration")
+if( "${FLASH_SIZE}" STREQUAL "2")
+    Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/LinkerScripts/memmap_default.ld")
+elseif( "${FLASH_SIZE}" STREQUAL "4")
+    Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/LinkerScripts/LinkerScript4MBFlash")
+elseif( "${FLASH_SIZE}" STREQUAL "16" AND PSRAM)
+    Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/LinkerScripts/LinkerScript16MBFlash8MBPSRAM.ld")
+endif()
+
+configure_file(  ${LINKER_SCRIPT_FILE} "${CMAKE_BINARY_DIR}/memmap_default.ld" COPYONLY)
+Set(PICO_LINKER_SCRIPT_PATH  "${CMAKE_BINARY_DIR}")
+
+include(${PICO_SDK_PATH}/pico_sdk_init.cmake)
+project(nanoFramework VERSION ${BUILD_VERSION} LANGUAGES C CXX ASM)
+pico_sdk_init()
 
 # The Pico-SDK uses interface libraries and most likely does not need these includes.
 # Add these includes for local code for #includes etc
@@ -115,3 +131,66 @@
      set_source_files_properties(${TARGET_GIT_LOCAL_PATH}/src/common/pico_sync/sem.c COMPILE_FLAGS -std=gnu17)
      set_source_files_properties(${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_runtime_init/runtime_init.c COMPILE_FLAGS -std=gnu17)
      set_source_files_properties(${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_multicore/multicore.c COMPILE_FLAGS -std=gnu17)
+
+     # Pico SDK builds INTERFACE libraries
+target_link_libraries(nanoCLR
+    hardware_adc
+    hardware_clocks
+    hardware_divider
+    hardware_dma
+    hardware_exception
+    hardware_flash
+    hardware_gpio
+    hardware_i2c
+    hardware_interp
+    hardware_irq
+    hardware_pio
+    hardware_pll
+    hardware_pwm
+    hardware_resets
+    hardware_spi
+    hardware_sync
+    hardware_ticks
+    hardware_timer
+    hardware_uart
+    hardware_vreg
+    hardware_watchdog
+    hardware_xosc
+    pico_aon_timer
+    pico_bit_ops
+    pico_bootrom
+   # pico_bootsel_via_double_reset
+    pico_divider
+    pico_double
+    pico_fix_rp2040_usb_device_enumeration
+    pico_flash
+    pico_float
+    pico_i2c_slave
+    pico_int64_ops
+    pico_malloc
+    pico_mem_ops
+    pico_multicore
+    pico_platform
+    pico_rand
+    pico_stdlib
+#    pico_stdio
+    pico_sync
+    pico_time
+    pico_unique_id
+    pico_util
+
+    #tinyusb_board
+)
+
+if( "${TARGET_SERIES}" STREQUAL "RP2040")
+   target_link_libraries(nanoCLR
+                         hardware_rtc
+   )
+endif()
+
+if( "${TARGET_SERIES}" STREQUAL "RP2350")
+   target_link_libraries(nanoCLR
+                         hardware_powman
+                         pico_sha256
+   )
+endif()

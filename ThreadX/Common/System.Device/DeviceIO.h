@@ -19,12 +19,11 @@
 #include "sys_dev_usbstream_native.h"
 
 #define PORT_INDEX(pinNumber) (pinNumber / 16)
-#define PIN_INDEX(pinNumber)  pinNameValue % 16
+#define PIN_INDEX(pinNumber)  pinNumber % 16
 
 #ifndef UNUSED
 #define UNUSED(x) ((void)(x))
 #endif
-
 
 inline void Callback_EVENT_GPIO(GPIO_PIN pinNumber, bool pinValue)
 {
@@ -41,13 +40,10 @@ class GpioIO
     static bool Read(PinNameValue pinNumber);
     static bool Write(PinNameValue pinNumber, bool pinState);
     static bool Toggle(PinNameValue pinNumber);
-    static bool SetFunction(
-        PinNameValue pinNumber,
-        DeviceRegistration::DevicePinFunction PinFunction,
-        int optional = 0);
+    static bool SetFunction(DeviceRegistration::DevicePin);
     static bool SetLowPower(PinNameValue pinNumber);
     static bool SetMode(PinNameValue pinNumber, PinMode pinMode);
-    static bool InterruptEnable(PinNameValue pinNumber, GPIO_INT_EDGE events);
+    static bool InterruptEnable(PinNameValue pinNumber, GPIO_INT_EDGE events, void *interruptRoutine = NULL);
     static bool InterruptDisable(PinNameValue pinNumber);
     static bool InterruptRemove(PinNameValue pinNumber);
 
@@ -107,19 +103,17 @@ class I2cIO
   public:
     static bool Initialize(CLR_INT32 I2C_deviceId, I2cBusSpeed I2C_speed);
     static bool Dispose(CLR_INT32 I2C_deviceId);
-    static CLR_INT32 Write(
+    static I2cTransferStatus Write(
         CLR_INT32 I2C_deviceId,
         CLR_INT32 slaveAddress,
         CLR_UINT8 *writeBuffer,
-        CLR_INT32 writeSize,
-        CLR_INT32 *transferResult);
+        CLR_INT32 writeSize);
 
-    static bool Read(
+    static I2cTransferStatus Read(
         CLR_INT32 I2C_deviceId,
         CLR_INT32 slaveAddress,
         CLR_UINT8 *readBuffer,
-        CLR_INT32 readSize,
-        CLR_INT32 *transferResult);
+        CLR_INT32 readSize);
 };
 
 class I2cIO_Slave
@@ -130,20 +124,18 @@ class I2cIO_Slave
     static CLR_INT32 Timeout();
     static bool Initialize(CLR_INT32 I2C_deviceId, CLR_INT32 deviceAddress);
     static bool Dispose(CLR_INT32 I2C_deviceId);
-    static bool Write(
+    static I2cTransferStatus Write(
         CLR_INT32 I2C_deviceId,
         CLR_UINT8 *writeBuffer,
         CLR_INT32 writeSize,
         CLR_INT32 timeoutMilliseconds,
-        CLR_INT32 *readCount,
-        CLR_INT32 *transferResult);
-    static bool Read(
+        CLR_INT32 *readCount);
+    static I2cTransferStatus Read(
         CLR_INT32 I2C_deviceId,
         CLR_UINT8 *readBuffer,
         CLR_INT32 readSize,
         CLR_INT32 timeoutMilliseconds,
-        CLR_INT32 *readCount,
-        CLR_INT32 *transferResult);
+        CLR_INT32 *readCount);
 };
 
 class PwmIO

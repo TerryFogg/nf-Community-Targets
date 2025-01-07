@@ -1,4 +1,4 @@
-//#include <src/common/pico_time/include/pico/time.h>
+﻿// #include <src/common/pico_time/include/pico/time.h>
 
 // Copyright (c) .NET Foundation and Contributors
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
@@ -7,7 +7,6 @@
 #include "Display.h"
 #include "DisplayInterface.h"
 #include "Graphics.h"
-//#include "InternalFont.h"
 
 //
 // ST7789 is a 262,144-color single-chip SOC driver for a-TFT liquid crystal
@@ -23,7 +22,7 @@
 // pixel offset that must be programmed for.
 //
 
-// 
+//
 // Using the default endian order for transferring bytes
 // Normal (MSB first, default)
 //
@@ -74,62 +73,90 @@ enum ST7789_Orientation : CLR_UINT8
 };
 struct DisplayDriver g_DisplayDriver;
 extern DisplayInterface g_DisplayInterface;
-int lcd_width;
-int lcd_height;
-int xx;
-int y;
 int stride;
 int screenX;
 int screenY;
 CLR_UINT32 *ddata;
 
+bool DisplayDriver::Initialize()
+{
 
-bool DisplayDriver::Initialize() {
+    SetupDisplayAttributes();
 
-  lcd_width = 240;
-  lcd_height = 135;
+    g_DisplayInterface.SendCommand(1, SOFTWARE_RESET);
+    OS_DELAY(10);
 
-  SetupDisplayAttributes();
+    g_DisplayInterface.SendCommand(2, Pixel_Format_Set, 0x55);
+    g_DisplayInterface.SendCommand(6, Porch_Setting, 0x0c, 0x0c, 0x00, 0x33, 0x33);
 
-  g_DisplayInterface.SendCommand(1, SOFTWARE_RESET);
-  OS_DELAY(10);
+    // Internal LCD Voltage generator settings
+    g_DisplayInterface.SendCommand(2, Gate_Control, 0x35);
+    g_DisplayInterface.SendCommand(2, VCOMS_Setting, 0x19);
+    g_DisplayInterface.SendCommand(2, LCM_Control, 0x2C);
+    g_DisplayInterface.SendCommand(2, VDV_VRH_Command_Enable, 0x01);
+    g_DisplayInterface.SendCommand(2, VRH_Set, 0x12);
+    g_DisplayInterface.SendCommand(2, VDV_Set, 0x20);
 
-  g_DisplayInterface.SendCommand(2, Pixel_Format_Set, 0x55);
-  g_DisplayInterface.SendCommand(6, Porch_Setting, 0x0c, 0x0c, 0x00, 0x33, 0x33);
+    g_DisplayInterface.SendCommand(2, Frame_Rate_Control, 0x0F);
+    g_DisplayInterface.SendCommand(3, Power_Control_1, 0xA4, 0xA1);
+    g_DisplayInterface.SendCommand(
+        15,
+        Positive_Voltage_Gamma,
+        0xD0,
+        0x04,
+        0x0D,
+        0x11,
+        0x13,
+        0x2B,
+        0x3F,
+        0x54,
+        0x4C,
+        0x18,
+        0x0D,
+        0x0B,
+        0x1F,
+        0x23);
+    g_DisplayInterface.SendCommand(
+        15,
+        Negative_Voltage_Gamma,
+        0xD0,
+        0x04,
+        0x0C,
+        0x11,
+        0x13,
+        0x2C,
+        0x3F,
+        0x44,
+        0x51,
+        0x2F,
+        0x1F,
+        0x1F,
+        0x20,
+        0x23);
 
-  // Internal LCD Voltage generator settings
-  g_DisplayInterface.SendCommand(2, Gate_Control, 0x35);
-  g_DisplayInterface.SendCommand(2, VCOMS_Setting, 0x19);
-  g_DisplayInterface.SendCommand(2, LCM_Control, 0x2C);
-  g_DisplayInterface.SendCommand(2, VDV_VRH_Command_Enable, 0x01);
-  g_DisplayInterface.SendCommand(2, VRH_Set, 0x12);
-  g_DisplayInterface.SendCommand(2, VDV_Set, 0x20);
+    SetDefaultOrientation();
+    Clear();
 
-  g_DisplayInterface.SendCommand(2, Frame_Rate_Control, 0x0F);
-  g_DisplayInterface.SendCommand(3, Power_Control_1, 0xA4, 0xA1);
-  g_DisplayInterface.SendCommand(15, Positive_Voltage_Gamma, 0xD0, 0x04, 0x0D,0x11, 0x13, 0x2B, 0x3F, 0x54, 0x4C, 0x18, 0x0D,0x0B, 0x1F, 0x23);
-  g_DisplayInterface.SendCommand(15, Negative_Voltage_Gamma, 0xD0, 0x04, 0x0C,0x11, 0x13, 0x2C, 0x3F, 0x44, 0x51, 0x2F, 0x1F,0x1F, 0x20, 0x23);
+    g_DisplayInterface.SendCommand(1, Display_Inversion_On);
+    g_DisplayInterface.SendCommand(1, Sleep_OUT);
 
-  SetDefaultOrientation();
-  Clear();
+    g_DisplayInterface.SendCommand(1, Display_ON);
+    //    OS_DELAY(50);
+    //    g_DisplayInterface.SendCommand(1, NOP); // End of sequence
+    //    OS_DELAY(20);
 
-  g_DisplayInterface.SendCommand(1, Display_Inversion_On);
-  g_DisplayInterface.SendCommand(1, Sleep_OUT);
+    g_DisplayInterface.DisplayBacklight(true);
 
-  g_DisplayInterface.SendCommand(1, Display_ON);
-  //    OS_DELAY(50);
-  //    g_DisplayInterface.SendCommand(1, NOP); // End of sequence
-  //    OS_DELAY(20);
-
-  g_DisplayInterface.DisplayBacklight(true);
-
-  return true;
+    return true;
 }
 void DisplayDriver::SetupDisplayAttributes()
 {
     // Define the LCD/TFT resolution
-    Attributes.LongerSide = lcd_width;
-    Attributes.ShorterSide = lcd_height;
+    Attributes.Width = LCD_WIDTH;
+    Attributes.Height = LCD_HEIGHT;
+    Attributes.LongerSide = LCD_WIDTH;
+    Attributes.ShorterSide = LCD_HEIGHT;
+    Attributes.Orientation = DisplayOrientation_Landscape;
     Attributes.PowerSave = PowerSaveState::NORMAL;
     Attributes.BitsPerPixel = 16;
     g_DisplayInterface.GetTransferBuffer(Attributes.TransferBuffer, Attributes.TransferBufferSize);
@@ -139,32 +166,32 @@ bool DisplayDriver::ChangeOrientation(DisplayOrientation orientation)
 {
     switch (orientation)
     {
-    case DisplayOrientation_Portrait:
-      Attributes.Height = Attributes.ShorterSide;
-      Attributes.Width = Attributes.LongerSide;
-      g_DisplayInterface.SendCommand(2, Memory_Access_Control, MADCTL_BGR);
-      break;
-    case DisplayOrientation_Portrait180:
-      Attributes.Height = Attributes.ShorterSide;
-      Attributes.Width = Attributes.LongerSide;
-      g_DisplayInterface.SendCommand(2, Memory_Access_Control,(MADCTL_MY | MADCTL_MX | MADCTL_BGR));
-      break;
-    case DisplayOrientation_Landscape:
-        Attributes.Height = Attributes.ShorterSide;
-        Attributes.Width = Attributes.LongerSide;
-        g_DisplayInterface.SendCommand(2, Memory_Access_Control,(MADCTL_MX | MADCTL_MV | MADCTL_ML));
-        break;
-    case DisplayOrientation_Landscape180:
-      Attributes.Height = Attributes.ShorterSide;
-      Attributes.Width = Attributes.LongerSide;
-      g_DisplayInterface.SendCommand(2, Memory_Access_Control, (MADCTL_MY | MADCTL_BGR));
-      break;
+        case DisplayOrientation_Portrait:
+            Attributes.Height = Attributes.ShorterSide;
+            Attributes.Width = Attributes.LongerSide;
+            g_DisplayInterface.SendCommand(2, Memory_Access_Control, MADCTL_BGR);
+            break;
+        case DisplayOrientation_Portrait180:
+            Attributes.Height = Attributes.ShorterSide;
+            Attributes.Width = Attributes.LongerSide;
+            g_DisplayInterface.SendCommand(2, Memory_Access_Control, (MADCTL_MY | MADCTL_MX | MADCTL_BGR));
+            break;
+        case DisplayOrientation_Landscape:
+            Attributes.Height = Attributes.ShorterSide;
+            Attributes.Width = Attributes.LongerSide;
+            g_DisplayInterface.SendCommand(2, Memory_Access_Control, (MADCTL_MX | MADCTL_MV | MADCTL_ML));
+            break;
+        case DisplayOrientation_Landscape180:
+            Attributes.Height = Attributes.ShorterSide;
+            Attributes.Width = Attributes.LongerSide;
+            g_DisplayInterface.SendCommand(2, Memory_Access_Control, (MADCTL_MY | MADCTL_BGR));
+            break;
     }
     return true;
 }
 void DisplayDriver::SetDefaultOrientation()
 {
-  ChangeOrientation(DisplayOrientation_Landscape);
+    ChangeOrientation(DisplayOrientation_Landscape);
 }
 bool DisplayDriver::Uninitialize()
 {
@@ -175,14 +202,14 @@ void DisplayDriver::PowerSave(PowerSaveState powerState)
 {
     switch (powerState)
     {
-    default:
-        // illegal fall through to Power on
-    case PowerSaveState::NORMAL:
-        g_DisplayInterface.SendCommand(3, Sleep_IN, 0x00, 0x00); // leave sleep mode
-        break;
-    case PowerSaveState::SLEEP:
-        g_DisplayInterface.SendCommand(3, Sleep_IN, 0x00, 0x01); // enter sleep mode
-        break;
+        default:
+            // illegal fall through to Power on
+        case PowerSaveState::NORMAL:
+            g_DisplayInterface.SendCommand(3, Sleep_OUT, 0x00, 0x00); // leave sleep mode
+            break;
+        case PowerSaveState::SLEEP:
+            g_DisplayInterface.SendCommand(3, Sleep_IN, 0x00, 0x01); // enter sleep mode
+            break;
     }
     return;
 }
@@ -207,8 +234,8 @@ void DisplayDriver::Clear()
 
     if (remainderTransferBuffer > 0)
     {
-      PLATFORM_DELAY(10);
-      g_DisplayInterface.WriteToFrameBuffer(command, Attributes.TransferBuffer, remainderTransferBuffer);
+        PLATFORM_DELAY(10);
+        g_DisplayInterface.WriteToFrameBuffer(command, Attributes.TransferBuffer, remainderTransferBuffer);
     }
 }
 void DisplayDriver::DisplayBrightness(CLR_INT16 brightness)
@@ -266,10 +293,9 @@ bool DisplayDriver::SetWindow(CLR_INT16 x1, CLR_INT16 y1, CLR_INT16 x2, CLR_INT1
     return true;
 }
 
-
-void DisplayDriver::BitBlt(int x, int y, int width, int height, int stride,
-                           int screenX, int screenY, CLR_UINT32 data[]) {
-  // 16 bit colour  RRRRRGGGGGGBBBBB mode 565
+void DisplayDriver::BitBlt(int x, int y, int width, int height, int stride, int screenX, int screenY, CLR_UINT32 data[])
+{
+    // 16 bit colour  RRRRRGGGGGGBBBBB mode 565
 
     ASSERT((x >= 0) && ((x + width) <= g_DisplayDriver.Attributes.Width));
     ASSERT((y >= 0) && ((y + height) <= g_DisplayDriver.Attributes.Height));
@@ -306,9 +332,10 @@ void DisplayDriver::BitBlt(int x, int y, int width, int height, int stride,
             if (transferBufferCount < 1)
             {
                 // Transfer buffer full, send it
-                g_DisplayInterface.WriteToFrameBuffer(command, 
-                                                      g_DisplayDriver.Attributes.TransferBuffer,
-                                                     (g_DisplayDriver.Attributes.TransferBufferSize - transferBufferCount));
+                g_DisplayInterface.WriteToFrameBuffer(
+                    command,
+                    g_DisplayDriver.Attributes.TransferBuffer,
+                    (g_DisplayDriver.Attributes.TransferBufferSize - transferBufferCount));
 
                 // Reset transfer ptrs/count
                 transferBufferIndex = g_DisplayDriver.Attributes.TransferBuffer;
@@ -325,12 +352,12 @@ void DisplayDriver::BitBlt(int x, int y, int width, int height, int stride,
     if (transferBufferCount < g_DisplayDriver.Attributes.TransferBufferSize)
     {
         PLATFORM_DELAY(10);
-        g_DisplayInterface.WriteToFrameBuffer( command, 
-                                               g_DisplayDriver.Attributes.TransferBuffer,
-                                             ( g_DisplayDriver.Attributes.TransferBufferSize - transferBufferCount));
+        g_DisplayInterface.WriteToFrameBuffer(
+            command,
+            g_DisplayDriver.Attributes.TransferBuffer,
+            (g_DisplayDriver.Attributes.TransferBufferSize - transferBufferCount));
     }
 
-   
     return;
 }
 CLR_UINT32 DisplayDriver::PixelsPerWord()
@@ -349,4 +376,3 @@ CLR_UINT32 DisplayDriver::SizeInBytes()
 {
     return (SizeInWords() * sizeof(CLR_UINT32));
 }
-

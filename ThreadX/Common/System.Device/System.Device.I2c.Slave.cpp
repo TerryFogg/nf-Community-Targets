@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
@@ -50,7 +50,6 @@ HRESULT Library_sys_dev_i2c_slave_native_System_Device_I2c_I2cSlaveDevice::
         bool IsRead = false;
         bool IsWrite = false;
         CLR_INT32 transferResult;
-        bool status = false;
 
         CLR_RT_HeapBlock_Array *readWorkingData;
         CLR_RT_HeapBlock_Array *writeWorkingData;
@@ -76,8 +75,7 @@ HRESULT Library_sys_dev_i2c_slave_native_System_Device_I2c_I2cSlaveDevice::
             NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_OPERATION);
         }
 
-        timeoutMilliseconds =
-            (timeoutMilliseconds == -1) ? I2cIO_Slave::TimeoutMaximum() : I2cIO_Slave::Timeout();
+        timeoutMilliseconds = (timeoutMilliseconds == -1) ? I2cIO_Slave::TimeoutMaximum() : I2cIO_Slave::Timeout();
 
         if (IsWrite)
         {
@@ -87,16 +85,9 @@ HRESULT Library_sys_dev_i2c_slave_native_System_Device_I2c_I2cSlaveDevice::
             {
                 memset(writeBuffer, 0, bufferSize);
 
-                status =
-                    I2cIO_Slave::Write(
-                    deviceId,
-                    writeBuffer,
-                    writeSize,
-                    timeoutMilliseconds,
-                    &readCount,
-                    &transferResult);
+                transferResult = I2cIO_Slave::Write(deviceId, writeBuffer, writeSize, timeoutMilliseconds, &readCount);
                 platform_free(writeBuffer);
-                if (status)
+                if (transferResult == I2cTransferStatus::I2cTransferStatus_FullTransfer)
                 {
                     memcpy(writeWorkingData->GetElement(bufferOffset), writeBuffer, bufferSize);
                     stack.SetInteger(readCount);
@@ -120,16 +111,9 @@ HRESULT Library_sys_dev_i2c_slave_native_System_Device_I2c_I2cSlaveDevice::
                 memset(readBuffer, 0, readSize);
 
                 // read data from I2C master
-                status =
-                    I2cIO_Slave::Read(
-                    deviceId,
-                    readBuffer,
-                    bufferSize,
-                    timeoutMilliseconds,
-                    &readCount,
-                    &transferResult);
+                transferResult = I2cIO_Slave::Read(deviceId, readBuffer, bufferSize, timeoutMilliseconds, &readCount);
                 platform_free(readBuffer);
-                if (status)
+                if (transferResult == I2cTransferStatus::I2cTransferStatus_FullTransfer)
                 {
                     memcpy(readWorkingData->GetElement(bufferOffset), readBuffer, bufferSize);
                     stack.SetInteger(readCount);

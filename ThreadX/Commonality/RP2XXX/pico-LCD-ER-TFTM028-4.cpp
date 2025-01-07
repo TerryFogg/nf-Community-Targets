@@ -90,6 +90,8 @@ CLR_UINT32 *ddata;
 
 bool DisplayDriver::Initialize()
 {
+    SetupDisplayAttributes();
+
     g_DisplayInterface.SendCommand(1, SOFTWARE_RESET);
     OS_DELAY(10);
     g_DisplayInterface.SendCommand(1, Sleep_OUT);
@@ -107,7 +109,7 @@ bool DisplayDriver::Initialize()
     g_DisplayInterface.SendCommand(3, VCOM_Control_1, 0x34, 0x3D);
     g_DisplayInterface.SendCommand(2, VCOM_Control_2, 0xC0);
     g_DisplayInterface.SendCommand(2, Memory_Access_Control, 0x08);
-    g_DisplayInterface.SendCommand(2, Pixel_Format_Set, 0x55); // 16 bit 
+    g_DisplayInterface.SendCommand(2, Pixel_Format_Set, 0x55); // 16 bit
     g_DisplayInterface.SendCommand(3, Frame_Rate_Control_Normal, 0x00, 0x1D);
     g_DisplayInterface.SendCommand(5, Display_Function_Control, 0x0A, 0xA2, 0x27, 0x00);
     g_DisplayInterface.SendCommand(2, Entry_Mode_Set, 0x07); // Entry mode set
@@ -159,8 +161,11 @@ bool DisplayDriver::Initialize()
 void DisplayDriver::SetupDisplayAttributes()
 {
     // Define the LCD/TFT resolution
-    Attributes.LongerSide = lcd_width;
-    Attributes.ShorterSide = lcd_height;
+    Attributes.Width = LCD_WIDTH;
+    Attributes.Height = LCD_HEIGHT;
+    Attributes.LongerSide = LCD_WIDTH;
+    Attributes.ShorterSide = LCD_HEIGHT;
+    Attributes.Orientation = DisplayOrientation_Landscape;
     Attributes.PowerSave = PowerSaveState::NORMAL;
     Attributes.BitsPerPixel = 16;
     g_DisplayInterface.GetTransferBuffer(Attributes.TransferBuffer, Attributes.TransferBufferSize);
@@ -206,13 +211,15 @@ void DisplayDriver::PowerSave(PowerSaveState powerState)
 {
     switch (powerState)
     {
-        default:
-            // illegal fall through to Power on
         case PowerSaveState::NORMAL:
-            g_DisplayInterface.SendCommand(3, Sleep_IN, 0x00, 0x00); // leave sleep mode
+            g_DisplayInterface.SendCommand(1, Sleep_OUT);
+            g_DisplayInterface.SendCommand(1, Display_ON);
             break;
         case PowerSaveState::SLEEP:
-            g_DisplayInterface.SendCommand(3, Sleep_IN, 0x00, 0x01); // enter sleep mode
+            g_DisplayInterface.SendCommand(1, Display_OFF);
+            g_DisplayInterface.SendCommand(1, Sleep_IN);
+            break;
+        default:
             break;
     }
     return;

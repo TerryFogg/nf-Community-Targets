@@ -1,4 +1,4 @@
-#
+﻿#
 # Copyright (c) .NET Foundation and Contributors
 # See LICENSE file in the project root for full license information.
 #
@@ -82,8 +82,7 @@ elseif( CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
   # target_compile_options(nanoCLR PUBLIC  "-Os -flto -ffat-lto-objects")
 endif()
 
-
-## Link Options
+# Link Options
 # Set the linker file and register to detect when linker script changes so a re-link is executed
 target_link_options(nanoCLR PUBLIC "-T${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_BOARD}/Linker_script.ld")
 set_target_properties(nanoCLR PROPERTIES LINK_DEPENDS "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_BOARD}/Linker_script.ld")

@@ -40,19 +40,17 @@ bool GpioIO::Toggle(PinNameValue pinNameValue)
     Write(pinNameValue, !Read(pinNameValue));
     return true;
 }
-
-static void gpio_callback(uint gpio, uint32_t events)
+static void gpio_wakup_callback(uint gpio, uint32_t events)
 { // Code to handle the interrupt
   // Interrupt callback has woken the MCU
   //  ....  continue
 }
-
-bool GpioIO::SetFunction(PinNameValue pinNameValue, DeviceRegistration::DevicePinFunction PinFunction, int optional)
+bool GpioIO::SetFunction(DeviceRegistration::DevicePin devicePin)
 {
     bool status = false;
-    int pinNumber = pinNameValue;
+    int pinNumber = devicePin.pinNameValue;
 
-    switch (PinFunction)
+    switch (devicePin.CurrentFunction)
     {
         case DeviceRegistration::DevicePinFunction::NONE:
             // basic input/output mode with output disabled
@@ -61,7 +59,7 @@ bool GpioIO::SetFunction(PinNameValue pinNameValue, DeviceRegistration::DevicePi
             break;
         case DeviceRegistration::DevicePinFunction::ADC:
 
-            if (PinSupportsADC(pinNameValue))
+            if (PinSupportsADC(pinNumber))
             {
                 // Set pin to input (as far as SIO is concerned)
                 gpio_set_function(pinNumber, GPIO_FUNC_SIO);
@@ -108,6 +106,7 @@ bool GpioIO::SetFunction(PinNameValue pinNameValue, DeviceRegistration::DevicePi
             break;
         case DeviceRegistration::DevicePinFunction::I2C:
             gpio_set_function(pinNumber, GPIO_FUNC_I2C);
+            gpio_pull_up(pinNumber);
             status = true;
             break;
         case DeviceRegistration::DevicePinFunction::I2S:
@@ -127,7 +126,7 @@ bool GpioIO::SetFunction(PinNameValue pinNameValue, DeviceRegistration::DevicePi
                 pinNumber,
                 GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE,
                 true,
-                &gpio_callback);
+                &gpio_wakup_callback);
             status = true;
             break;
         default:
@@ -193,49 +192,50 @@ bool GpioIO::SetMode(PinNameValue pinNameValue, PinMode pinMode)
     }
     return status;
 }
-bool GpioIO::InterruptEnable(PinNameValue pinNameValue, GPIO_INT_EDGE events)
+bool GpioIO::InterruptEnable(PinNameValue pinNameValue, GPIO_INT_EDGE events, void *interruptRoutine)
 {
     bool enable = true;
     bool expectedState = false;
     int pinNumber = pinNameValue;
 
-    // gpio_set_irq_callback((gpio_irq_callback_t)gpioIsrPtr);
-
+    int edge_events;
+    // Translate events from nanoFramework to Pico
     switch (events)
     {
         case GPIO_INT_NONE:
-            gpio_set_irq_enabled(pinNumber, GPIO_IRQ_EDGE_FALL, !enable);
-            gpio_set_irq_enabled(pinNumber, GPIO_IRQ_LEVEL_LOW, !enable);
-            gpio_set_irq_enabled(pinNumber, GPIO_IRQ_EDGE_RISE, !enable);
-            gpio_set_irq_enabled(pinNumber, GPIO_IRQ_LEVEL_HIGH, !enable);
+            edge_events = GPIO_IRQ_EDGE_FALL | GPIO_IRQ_LEVEL_LOW | GPIO_IRQ_EDGE_RISE | GPIO_IRQ_LEVEL_HIGH;
             break;
         case GPIO_INT_EDGE_LOW:
-            gpio_set_irq_enabled(pinNumber, GPIO_IRQ_EDGE_FALL, enable);
-            expectedState = false;
+            edge_events = GPIO_IRQ_EDGE_FALL;
         case GPIO_INT_LEVEL_LOW:
-            gpio_set_irq_enabled(pinNumber, GPIO_IRQ_LEVEL_LOW, enable);
-            expectedState = false;
+            edge_events = GPIO_IRQ_LEVEL_LOW;
             break;
         case GPIO_INT_EDGE_HIGH:
-            gpio_set_irq_enabled(pinNumber, GPIO_IRQ_EDGE_RISE, enable);
-            expectedState = false;
+            edge_events = GPIO_IRQ_EDGE_RISE;
             break;
         case GPIO_INT_LEVEL_HIGH:
-            gpio_set_irq_enabled(pinNumber, GPIO_IRQ_LEVEL_HIGH, enable);
-            expectedState = false;
+            edge_events = GPIO_IRQ_LEVEL_HIGH;
             break;
         case GPIO_INT_EDGE_BOTH:
-            gpio_set_irq_enabled(pinNumber, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, enable);
-            expectedState = false;
+            edge_events = GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL;
             break;
     }
-    return expectedState;
+
+    if (interruptRoutine != NULL)
+    {
+        gpio_set_irq_enabled_with_callback((int)pinNameValue, edge_events, true, (gpio_irq_callback_t)interruptRoutine);
+    }
+    else
+    {
+        gpio_set_irq_enabled((int)pinNameValue, edge_events, true);
+    }
+    return true;
 }
 bool GpioIO::InterruptDisable(PinNameValue pinNameValue)
 {
+    int pinNumber = pinNameValue;
     uint32_t events = 0;
     bool disable = false;
-    int pinNumber = pinNameValue;
 
     gpio_set_irq_enabled(pinNumber, events, disable);
     return false;
@@ -393,20 +393,13 @@ bool DacIO::Dispose(CLR_INT32 dac_channel_number)
 
 i2c_inst *Get_I2C_Instance(uint32_t busIndex)
 {
+    i2c_inst *i2c_instance = i2c_get_instance(busIndex);
     switch (busIndex)
     {
         case 0:
-            // I2C0_SDA valid pins : 0,4,8,12,16,20,24,28
-            // I2C0_SCL valid pins : 1,5,9,13,17,21,25,29
             return i2c0;
             break;
         case 1:
-// I2C1_SDA valid pins : 2,6,10,14,18,22,26
-// I2C1_SCL valid pins : 3,7,11,15,19,23,27
-#define GPIO6 6
-#define GPIO7 7
-            gpio_set_function(GPIO6, GPIO_FUNC_I2C);
-            gpio_set_function(GPIO7, GPIO_FUNC_I2C);
             return i2c1;
             break;
         default:
@@ -448,55 +441,48 @@ bool I2cIO::Initialize(CLR_INT32 I2C_deviceId, I2cBusSpeed I2C_speed)
 }
 bool I2cIO::Dispose(CLR_INT32 I2C_deviceId)
 {
-    i2c_inst_t *I2C_Instance = Get_I2C_Instance(I2C_deviceId);
+    i2c_inst *I2C_Instance = Get_I2C_Instance(I2C_deviceId);
     i2c_deinit(I2C_Instance);
     return true;
 }
-CLR_INT32 I2cIO::Write(
+I2cTransferStatus I2cIO::Write(
     CLR_INT32 I2C_deviceId,
     CLR_INT32 slaveAddress,
     CLR_UINT8 *writeBuffer,
-    CLR_INT32 writeSize,
-    CLR_INT32 *transferResult)
+    CLR_INT32 writeSize)
 {
-    bool return_status = false;
-    i2c_inst_t *I2C_Instance = Get_I2C_Instance(I2C_deviceId);
-    *transferResult = i2c_write_blocking(
+    I2cTransferStatus return_status = I2cTransferStatus_UnknownError;
+    i2c_inst *I2C_Instance = Get_I2C_Instance(I2C_deviceId);
+    int returnValue = i2c_write_blocking(
         I2C_Instance,
         slaveAddress,
         writeBuffer,
         writeSize,
         true); // true to keep master control of bus
 
-    if (*transferResult == PICO_ERROR_TIMEOUT || *transferResult == PICO_ERROR_GENERIC)
-    {
-        return_status = false;
-    }
-    else
-    {
-        return_status = true;
-    }
+    if (returnValue == PICO_ERROR_TIMEOUT)
+        return_status = I2cTransferStatus_ClockStretchTimeout;
+    if (returnValue == PICO_ERROR_GENERIC)
+        return_status = I2cTransferStatus_UnknownError;
+    if (returnValue != writeSize)
+        return_status = I2cTransferStatus_PartialTransfer;
+    if (returnValue = writeSize)
+        return_status = I2cTransferStatus_FullTransfer;
     return return_status;
 }
-bool I2cIO::Read(
-    CLR_INT32 I2C_deviceId,
-    CLR_INT32 slaveAddress,
-    CLR_UINT8 *readBuffer,
-    CLR_INT32 readSize,
-    CLR_INT32 *transferResult)
+I2cTransferStatus I2cIO::Read(CLR_INT32 I2C_deviceId, CLR_INT32 slaveAddress, CLR_UINT8 *readBuffer, CLR_INT32 readSize)
 {
-    bool return_status = false;
+    I2cTransferStatus return_status = I2cTransferStatus_UnknownError;
     i2c_inst_t *I2C_Instance = Get_I2C_Instance(I2C_deviceId);
-    *transferResult = i2c_read_blocking(I2C_Instance, slaveAddress, readBuffer, readSize, true);
-
-    if (*transferResult == PICO_ERROR_TIMEOUT || *transferResult == PICO_ERROR_GENERIC)
-    {
-        return_status = false;
-    }
-    else
-    {
-        return_status = true;
-    }
+    int returnValue = i2c_read_blocking(I2C_Instance, slaveAddress, readBuffer, readSize, true);
+    if (returnValue == PICO_ERROR_TIMEOUT)
+        return_status = I2cTransferStatus_ClockStretchTimeout;
+    if (returnValue == PICO_ERROR_GENERIC)
+        return_status = I2cTransferStatus_UnknownError;
+    if (returnValue != readSize)
+        return_status = I2cTransferStatus_PartialTransfer;
+    if (returnValue = readSize)
+        return_status = I2cTransferStatus_FullTransfer;
     return return_status;
 }
 #pragma endregion
@@ -550,37 +536,35 @@ bool I2cIO_Slave::Dispose(CLR_INT32 I2C_deviceId)
 
     return true;
 }
-bool I2cIO_Slave::Write(
+I2cTransferStatus I2cIO_Slave::Write(
     CLR_INT32 I2C_deviceId,
     CLR_UINT8 *writeBuffer,
     CLR_INT32 writeSize,
     CLR_INT32 timeoutMilliseconds,
-    CLR_INT32 *readCount,
-    CLR_INT32 *transferResult)
+    CLR_INT32 *readCount)
 {
     uint8_t deviceAddress;
-    bool return_status = false;
+    I2cTransferStatus return_status = I2cTransferStatus::I2cTransferStatus_UnknownError;
     i2c_inst_t *I2C_Instance = Get_I2C_Instance(I2C_deviceId);
     int i2cWriteResult = i2c_write_blocking(I2C_Instance, deviceAddress, writeBuffer, writeSize, true);
     if (i2cWriteResult == PICO_ERROR_TIMEOUT || i2cWriteResult == PICO_ERROR_GENERIC)
     {
-        return_status = false;
+        return_status = I2cTransferStatus::I2cTransferStatus_UnknownError;
     }
     else
     {
-        return_status = true;
+        return_status = I2cTransferStatus::I2cTransferStatus_FullTransfer;
     }
     return return_status;
 }
-bool I2cIO_Slave::Read(
+I2cTransferStatus I2cIO_Slave::Read(
     CLR_INT32 I2C_deviceId,
     CLR_UINT8 *readBuffer,
     CLR_INT32 readSize,
     CLR_INT32 timeoutMilliseconds,
-    CLR_INT32 *readCount,
-    CLR_INT32 *transferResult)
+    CLR_INT32 *readCount)
 {
-    bool return_status = false;
+    I2cTransferStatus return_status = I2cTransferStatus::I2cTransferStatus_UnknownError;
     uint8_t deviceAddress;
     i2c_inst_t *I2C_Instance = Get_I2C_Instance(I2C_deviceId);
     int i2cReadResult = i2c_read_blocking(
@@ -592,11 +576,11 @@ bool I2cIO_Slave::Read(
 
     if (i2cReadResult == PICO_ERROR_TIMEOUT || i2cReadResult == PICO_ERROR_GENERIC)
     {
-        return_status = false;
+        return_status = I2cTransferStatus::I2cTransferStatus_UnknownError;
     }
     else
     {
-        return_status = true;
+        return_status = I2cTransferStatus::I2cTransferStatus_FullTransfer;
     }
     return return_status;
 }
@@ -790,6 +774,15 @@ bool SerialIO::SetHandshake(CLR_INT32 usartDeviceNumber, Handshake handshake)
     uart_set_hw_flow(uart_get_instance(usartDeviceNumber), cts, rts);
     return status;
 }
+HRESULT SerialIO::SetupWriteLine(CLR_RT_StackFrame &stack, char **buffer, uint32_t *length, bool *isNewAllocation)
+{
+    UNUSED(stack);
+    UNUSED(buffer);
+    UNUSED(length);
+    UNUSED(isNewAllocation);
+    return 1;
+}
+
 bool SerialIO::SetMode(CLR_INT32 UsartDeviceNumber, CLR_INT32 mode)
 {
     return true;
@@ -827,4 +820,14 @@ bool SpiIO::Open(SPI_DEVICE_CONFIGURATION spiConfig, CLR_UINT32 handle)
 {
     return false;
 }
+CLR_INT32 SpiIO::ByteTime()
+{
+    return 1;
+}
+SPI_OP_STATUS SpiIO::Completed(CLR_INT32 deviceId)
+{
+    UNUSED(deviceId);
+    return SPI_OP_STATUS::SPI_OP_COMPLETE;
+}
+
 #pragma endregion

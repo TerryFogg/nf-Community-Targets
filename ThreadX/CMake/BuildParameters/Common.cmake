@@ -118,6 +118,20 @@
           target_compile_definitions(nanoCLR PUBLIC -DNANOCLR_GRAPHICS=FALSE)
     endif()
 
+    if(TOUCH_DISPLAY_SUPPORT)
+          target_compile_definitions(nanoCLR PUBLIC -DTOUCH_DISPLAY=TRUE)
+          target_compile_definitions(nanoCLR PUBLIC -DTOUCH_INTERFACE_BUS=${TOUCH_INTERFACE_BUS})
+          target_compile_definitions(nanoCLR PUBLIC -DTOUCH_INTERFACE_SLAVE_ADDRESS=${TOUCH_INTERFACE_SLAVE_ADDRESS})
+          target_compile_definitions(nanoCLR PUBLIC -DTOUCH_INTERFACE_I2C_SDA=${TOUCH_INTERFACE_I2C_SDA})
+          target_compile_definitions(nanoCLR PUBLIC -DTOUCH_INTERFACE_I2C_SCL=${TOUCH_INTERFACE_I2C_SCL})
+          target_compile_definitions(nanoCLR PUBLIC -DTOUCH_INTERFACE_INTERRUPT=${TOUCH_INTERFACE_INTERRUPT})
+          target_compile_definitions(nanoCLR PUBLIC -DTOUCH_INTERFACE_WIDTH=${TOUCH_INTERFACE_WIDTH})
+          target_compile_definitions(nanoCLR PUBLIC -DTOUCH_INTERFACE_HEIGHT=${TOUCH_INTERFACE_HEIGHT})
+          target_compile_definitions(nanoCLR PUBLIC -DTOUCH_INTERFACE_TRANSLATE=${TOUCH_INTERFACE_TRANSLATE})
+    else()
+          target_compile_definitions(nanoCLR PUBLIC -DTOUCH_DISPLAY=FALSE)
+    endif()
+
 # Defines used in the c/c++ code in rare situations to debug and profile
     if(ADVANCED_PROFILING)
            target_compile_definitions(nanoCLR PUBLIC -DNANOCLR_APPDOMAINS=1)

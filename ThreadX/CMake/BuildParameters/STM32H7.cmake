@@ -12,8 +12,6 @@ set(CMAKE_CXX_EXTENSIONS OFF CACHE INTERNAL "-std=c++17 instead of -std=gnu++17"
 # Setup the compiler flags for the build
 ########################################
 
-
-
 # NOTES:
 # -mthumb              : 16-bit instructions instead of 32-bit instructionsfor smaller code size and better performance on systems with limited memory
 # -mcpu=cortex-m7      : Optimized for cortex-m7
@@ -40,7 +38,7 @@ set(CMAKE_CXX_EXTENSIONS OFF CACHE INTERNAL "-std=c++17 instead of -std=gnu++17"
 # -mlong-calls -- do we need this?
 #-fdollars-in-identifiers ??
 
- target_compile_definitions(nanoCLR PUBLIC -DPLATFORM_ARM)
+target_compile_definitions(nanoCLR PUBLIC -DPLATFORM_ARM)
 
 target_compile_definitions(nanoCLR PUBLIC -DUSE_FULL_LL_DRIVER)
 target_compile_definitions(nanoCLR PUBLIC -DDEBUG)
@@ -65,7 +63,6 @@ target_compile_options(nanoCLR PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-mabi=aapcs -fch
 target_compile_options(nanoCLR PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-Wall -Wextra -Werror>)
 
 target_compile_options(nanoCLR PUBLIC $<$<COMPILE_LANGUAGE:ASM>:-mcpu=cortex-m7 -x assembler-with-cpp>)
-
 
 #-fomit-frame-pointer  : Generate code that does not use the frame pointer resulting in smaller and faster code
 #                        It can make debugging more difficult, as the stack frame information is not available

@@ -1,4 +1,4 @@
-//
+﻿//
 //
 // Copyright (c) .NET Foundation and Contributors
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
@@ -238,7 +238,7 @@ void TouchPanelDriver::PollTouchPoint()
                 time,
                 ignoreDuplicates);
             /// Stylus down.
-            PalEventDriver::PostEvent(PAL_EVENT_TOUCH, TouchPanelStylusDown);
+           // PalEventDriver::PostEvent(PAL_EVENT_TOUCH, TouchPanelStylusDown);
 
             if (NULL != (point = AddTouchPoint(0, x, y, time, ignoreDuplicates)))
             {
@@ -353,7 +353,7 @@ void TouchPanelDriver::PollTouchPoint()
         /// Stylus up.
         //        PalEvent_Post((unsigned int)PAL_EVENT_TOUCH, (unsigned int)TouchPanelStylusUp);
 
-        g_palEventDriver.PostEvent(PAL_EVENT_TOUCH, TouchPanelStylusUp);
+      //  g_palEventDriver.PostEvent(PAL_EVENT_TOUCH, TouchPanelStylusUp);
 
         // Make a copy of the point for the nanoFramework.UI.Touch handler.
         if (point == NULL)
@@ -729,84 +729,16 @@ void TouchPanelDriver::GetPoint(TOUCH_PANEL_SAMPLE_FLAGS *pTipState, int *pSourc
     *pSource = 0;
 
     static bool stylusDown = false;
-
-    /// Apparently there's a lot of noise from the touch hardware. We will take several
-    /// independent measures to compensate for them:
-    /// 1. Settle down time (instead of reading right away, wait few moments) --> ReadsToIgnore
-    /// 2. Read multiple samples (read a number of them, and then take average) --> ReadsPerSample.
-    ///
-
-    CLR_UINT16 i = 0;
-    CLR_UINT16 totalReads = g_TouchDevice.ReadsToIgnore + g_TouchDevice.ReadsPerSample;
-
-    CLR_UINT32 x = -1;
-    CLR_UINT32 y = -1;
-
-    CLR_INT32 validReadCount = 0;
-
-    CLR_UINT32 d1 = 0xFFFF;
-    CLR_UINT32 d2 = 0;
-
-    for (i = 0; i < totalReads; i++)
-    {
-        d2 = d1;
-        TouchPointDevice point = g_TouchDevice.GetPoint();
-        d1 = point.x;
-        d1 <<= 8;
-        d1 |= point.y;
-        d1 >>= 3;
-
-        if (d1 == d2)
-            break;
-    }
-
-    y = d1;
-
-    d1 = 0xFFFF;
-    d2 = 0;
-    for (i = 0; i < g_TouchDevice.ReadsPerSample; i++)
-    {
-        d2 = d1;
-        TouchPointDevice point = g_TouchDevice.GetPoint();
-        d1 = point.x;
-        d1 <<= 8;
-        d1 |= point.y;
-        d1 >>= 3;
-
-        if (d1 == d2)
-            break;
-    }
-
-    x = d1;
-
-    if (x >= 3700)
-    {
-        validReadCount = 0;
-    }
-    else
-    {
-        validReadCount = 1;
-    }
-
+    TouchPointDevice point = g_TouchDevice.GetPoint();
     if (stylusDown)
     {
         *pTipState |= TouchSamplePreviousDownFlag;
     }
-
-    if (validReadCount > 0)
-    {
-        *pTipState |= TouchSampleValidFlag;
-        *pUnCalX = x;
-        *pUnCalY = y;
-        *pTipState |= TouchSampleDownFlag;
-        stylusDown = true;
-    }
-    else
-    {
-        *pUnCalX = -1;
-        *pUnCalY = -1;
-        stylusDown = false;
-    }
+    *pTipState |= TouchSampleValidFlag;
+    *pUnCalX = point.x;
+    *pUnCalY = point.y;
+    *pTipState |= TouchSampleDownFlag;
+    stylusDown = true;
 }
 
 bool TouchPanelDriver::CalibrationPointGet(TOUCH_PANEL_CALIBRATION_POINT *pTCP)

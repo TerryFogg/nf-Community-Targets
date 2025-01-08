@@ -144,15 +144,15 @@ TouchPointDevice TouchDevice::GetPoint()
     // The FT6x06 touch controller does its own processing, averaging etc
     // Check device type correct
     CLR_UINT8 *touchValues;
-    CLR_UINT8 registerCommand = FT6X06_CMD::GEST_ID;
-    touchValues = g_TouchInterface.Write_Read(&registerCommand, 1, 6);
+    CLR_UINT8 registerCommand = FT6X06_CMD::DEV_MODE;
+    touchValues = g_TouchInterface.Write_Read(&registerCommand, 1, 7);
 
     // The detected number of touch points 0,1,2 are valid for this controller
 
-    CLR_INT32 numberOfTouchPoints = touchValues[1] & 0x0F;
+    CLR_INT32 numberOfTouchPoints = touchValues[2] & 0x0F;
 
-    CLR_INT16 touchx1 = ((touchValues[2] & 0x0F) << 8) | touchValues[3];
-    CLR_INT16 touchy1 = ((touchValues[4] & 0x0F) << 8) | (touchValues[5]);
+    CLR_INT16 touchx1 = ((touchValues[3] & 0x0F) << 8) | touchValues[4];
+    CLR_INT16 touchy1 = ((touchValues[5] & 0x0F) << 8) | (touchValues[6]);
 
     TouchPointDevice tp;
 

@@ -1,4 +1,4 @@
-#
+﻿#
 # Copyright (c) .NET Foundation and Contributors
 # See LICENSE file in the project root for full license information.
 #
@@ -16,7 +16,7 @@ set(CMAKE_CXX_EXTENSIONS OFF CACHE INTERNAL "-std=c++17 instead of -std=gnu++17"
 
 # NOTES:
 # -mthumb              : 16-bit instructions instead of 32-bit instructionsfor smaller code size and better performance on systems with limited memory
-# -mcpu=cortex-m7      : Optimized for cortex-m7
+# -mcpu=cortex-m0      : Optimized for cortex-m0
 # -mfpu=fpv5-d16       : Specifies the Floating Point Unit optimized for the ARMv7-M architecture with the FPv5-D16 which is a 
 #                        double-precision FPU that supports 16 double-precision registers.
 # -mfloat-abi=hard     : Generate code that is optimized for the ARM architecture with hardware floating-point support. 

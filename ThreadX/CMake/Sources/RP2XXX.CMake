@@ -2,15 +2,32 @@
 # Copyright (c) .NET Foundation and Contributors
 # See LICENSE file in the project root for full license information.
 #
+# Check and find source repository
+include(FetchContent)
+ if(IS_DIRECTORY ${TARGET_GIT_LOCAL_PATH})
+     message(STATUS "Source code support is local folder ${TARGET_GIT_LOCAL_PATH}")
+     FetchContent_Declare(
+         Repository
+         SOURCE_DIR ${TARGET_GIT_LOCAL_PATH}
+     )
+ else()
+       message(STATUS "Source code from GitHub repo version ${TARGET_GIT_REPOSITORY}")
+     FetchContent_Declare(
+         Repository
+         GIT_REPOSITORY  ${TARGET_GIT_REPOSITORY}
+         GIT_TAG ${TARGET_GIT_TAG}
+     )
+ endif()
+ FetchContent_Populate(Repository)
 
 set(PICO_NO_CMSE true)
 option(LINKER_SCRIPT_FILE  "Determine the linker script file to use base on the memory configuration")
 if( "${FLASH_SIZE}" STREQUAL "2")
-    Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/LinkerScripts/memmap_default.ld")
+    Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/LinkerScripts/memmap_default.ld")
 elseif( "${FLASH_SIZE}" STREQUAL "4")
-    Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/LinkerScripts/LinkerScript4MBFlash")
+    Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/LinkerScripts/LinkerScript4MBFlash")
 elseif( "${FLASH_SIZE}" STREQUAL "16" AND PSRAM)
-    Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/LinkerScripts/LinkerScript16MBFlash8MBPSRAM.ld")
+    Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/LinkerScripts/LinkerScript16MBFlash8MBPSRAM.ld")
 endif()
 
 configure_file(  ${LINKER_SCRIPT_FILE} "${CMAKE_BINARY_DIR}/memmap_default.ld" COPYONLY)

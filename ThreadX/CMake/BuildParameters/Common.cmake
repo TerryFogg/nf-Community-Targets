@@ -7,7 +7,7 @@
     set(CMAKE_BUILD_TYPE "Debug")
 
 # This build does not support a nanbooter, code starts in the CLR
-     target_compile_definitions(nanoCLR PUBLIC -DTARGET_HAS_NANOBOOTER=FALSE)
+    target_compile_definitions(nanoCLR PUBLIC -DTARGET_HAS_NANOBOOTER=FALSE)
 
 # Informational strings
     SET(OEM "nanoCLR running ${TARGET_BOARD}")
@@ -42,6 +42,11 @@
     else()
         target_compile_definitions(nanoCLR PUBLIC -DNANOCLR_REFLECTION=0)
     endif()
+    if(NANOCLR_SYSTEM_COLLECTIONS)
+        target_compile_definitions(nanoCLR PUBLIC -DNANOCLR_SYSTEM_COLLECTIONS=1)
+    else()
+        target_compile_definitions(nanoCLR PUBLIC -DNANOCLR_SYSTEM_COLLECTIONS=0)
+    endif()
     if(NF_FEATURE_LIGHT_MATH)
         target_compile_definitions(nanoCLR PUBLIC -DNANOCLR_LIGHT_MATH=1)
     else()
@@ -56,11 +61,6 @@
         target_compile_definitions(nanoCLR PUBLIC -DHAS_CONFIG_BLOCK=1)
     else()
         target_compile_definitions(nanoCLR PUBLIC -DHAS_CONFIG_BLOCK=0)
-    endif()
-    if(NANOCLR_SYSTEM_COLLECTIONS)
-        target_compile_definitions(nanoCLR PUBLIC -DNANOCLR_SYSTEM_COLLECTIONS=1)
-    else()
-        target_compile_definitions(nanoCLR PUBLIC -DNANOCLR_SYSTEM_COLLECTIONS=0)
     endif()
     if(REALTIME_CLOCK)
         target_compile_definitions(nanoCLR PUBLIC -DHAL_USE_RTC=1)
@@ -119,7 +119,7 @@
     endif()
 
     if(TOUCH_DISPLAY_SUPPORT)
-          target_compile_definitions(nanoCLR PUBLIC -DTOUCH_DISPLAY=TRUE)
+          target_compile_definitions(nanoCLR PUBLIC -DTOUCH_DISPLAY_SUPPORT=TRUE)
           target_compile_definitions(nanoCLR PUBLIC -DTOUCH_INTERFACE_BUS=${TOUCH_INTERFACE_BUS})
           target_compile_definitions(nanoCLR PUBLIC -DTOUCH_INTERFACE_SLAVE_ADDRESS=${TOUCH_INTERFACE_SLAVE_ADDRESS})
           target_compile_definitions(nanoCLR PUBLIC -DTOUCH_INTERFACE_I2C_SDA=${TOUCH_INTERFACE_I2C_SDA})

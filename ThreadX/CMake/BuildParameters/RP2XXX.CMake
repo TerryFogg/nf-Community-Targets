@@ -15,7 +15,7 @@
         target_compile_definitions(nanoCLR PUBLIC -DFLASH_SIZE=${FLASH_SIZE}) 
         target_compile_definitions(nanoCLR PUBLIC -DFLASH_CHIP=${FLASH_CHIP}) 
 
-        # The RP2350 can have up 16MB external PSRAM
+        # The RP2350 can have up tp 16MB external PSRAM (It could be additional FLASH, but not supported here)
         if(${PSRAM})
             target_compile_definitions(nanoCLR PUBLIC -DPSRAM) 
             target_compile_definitions(nanoCLR PUBLIC -DPSRAM_SIZE=${PSRAM_SIZE}) 
@@ -33,16 +33,17 @@ target_compile_definitions(nanoCLR PUBLIC -DHardFault_Handler=isr_hardfault)
 target_compile_definitions(nanoCLR PUBLIC -D__tx_NMIHandler=isr_nmi) 
 target_compile_definitions(nanoCLR PUBLIC -D__tx_BadHandler=isr_invalid) 
 
-# Use RP2040 version of this tinyusb file for RP2350 as well for now.
+# Use RP2040 version of the tinyusb file for RP2350 as well for now.
 # The code works on both the same RP2040 and RP2350, but the code modules have the original RP2040 names
 target_compile_definitions(nanoCLR PUBLIC -DCFG_TUSB_MCU=OPT_MCU_RP2040 -DDEBUG) 
 if(CFG_USB_USE_DTR)
  target_compile_definitions(nanoCLR PUBLIC -DCFG_USB_USE_DTR) 
 endif() 
 
-
+#  Some options
 target_link_options(nanoCLR PUBLIC "-Wl,--print-memory-usage")
 
+# Add hex,bin,map and uf2 file outputs
 pico_add_extra_outputs(nanoCLR)
 
 # Add a listing file to the standard Pico SDK build

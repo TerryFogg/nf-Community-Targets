@@ -1,4 +1,4 @@
-#
+﻿#
 # Copyright (c) .NET Foundation and Contributors
 # See LICENSE file in the project root for full license information.
 #
@@ -9,9 +9,7 @@ set(CMAKE_C_EXTENSIONS OFF CACHE INTERNAL "-std=c++17 instead of -std=gnu++17")
 set(CMAKE_CXX_STANDARD 17 CACHE INTERNAL "C++ standard for all targets")
 set(CMAKE_CXX_EXTENSIONS OFF CACHE INTERNAL "-std=c++17 instead of -std=gnu++17")
 
-
  target_compile_definitions(nanoCLR PUBLIC -DPLATFORM_ARM)
-
 
 target_compile_definitions(nanoCLR PUBLIC -DTX_SINGLE_MODE_NON_SECURE=1 -DARM_MATH_CM33  -DUSE_FULL_LL_DRIVER -DOCTOSPI -DHAL_XSPI_MODULE_ENABLED) 
 target_compile_definitions(nanoCLR PUBLIC -DDEBUG)

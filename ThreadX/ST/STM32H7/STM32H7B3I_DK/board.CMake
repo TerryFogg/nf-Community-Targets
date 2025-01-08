@@ -1,4 +1,4 @@
-#
+﻿#
 # Copyright (c) .NET Foundation and Contributors
 # See LICENSE file in the project root for full license information.
 #
@@ -20,7 +20,7 @@
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H7B3I_DK/target_common.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32H7B3I_DK/tx_initialize_low_level.s
     
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/STM32H7/LTDC_PARALLEL_DMA2D_To_Video.cpp
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/STM32H7/VideoMode.cpp
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H7/Common/LTDC_PARALLEL_DMA2D_To_Video.cpp
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H7/Common/VideoMode.cpp
 
 )    

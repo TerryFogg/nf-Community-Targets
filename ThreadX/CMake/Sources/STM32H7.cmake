@@ -30,7 +30,7 @@ include(FetchContent)
              ${TARGET_GIT_LOCAL_PATH}/Drivers/STM32H7xx_HAL_Driver/Inc/Legacy
              ${TARGET_GIT_LOCAL_PATH}/Drivers/BSP/Components/Common
              ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_BOARD}
-             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/STM32
+             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H7/Common
      )
       list(APPEND STM32H7_SOURCES
              ${TARGET_GIT_LOCAL_PATH}/Drivers/CMSIS/Device/ST/STM32H7xx/Source/Templates/system_stm32h7xx.c

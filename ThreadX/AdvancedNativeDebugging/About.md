@@ -1,4 +1,4 @@
-# Community contribution
+﻿# Community contribution
 
 Create with Mark Down ( https://www.markdownguide.org/cheat-sheet/)
 
@@ -37,21 +37,31 @@ endif()
 
 ### Directory layout for targets-community/ThreadX
 
-
     ├── About                        # Documentation relating to maintaining and building
     ├── CMake                        # All common CMake related files other than the specific board CMake file.
     │   ├── BuildParameters          # Common build parameters for GCC compiler
     │   ├── Sources                  # Sources required by function of MCU family
-    │   │   BuildPresets.json        # All of the different optional build configurations
-    │   │   CMakeLists.txt           # Main CMakeLists.txt
-    │   │   CmakePresets.json        # Build options and parameter setup
+    │   ├── ThreadX                  # ST Cortex M7 family
+    │   CMakeLists.txt               # Main CMakeLists.txt
+    │   CmakePresets.json            # Build options and parameter setup
     ├── Common                       # Any code common to ThreadX that runs on all MCU's
-    ├── Commonality                  # Any code common to ThreadX that runs on an MCU family
-    ├── NUCLEO_H743ZI2               # NUCLEO board from STMicroelectronics
-    └── RP2040                       # Rapsberry Pi Pico
-    └── STM32H7B3I_DK                # Development board from STMicroelectronics based on the STM32H7b3 MCU
-    └── STM32H735G_DK                # Development board from STMicroelectronics based on the STM32H735 MCU
-    └── STM32U5A9J_DK                # Development board from STMicroelectronics based on the STM32U5A9 MCU
+    ├── RaspberryPi                  # Raspberry Pi foundation
+    │   ├── RP2XXX                   # ST Cortex M7 family
+    │   │   ├── Common               # Code Common to the series of MCU's
+    │   │   │   ├── DeviceIO         # ST Cortex M7 family
+    │   │   │   ├── Utilities        # ST Cortex M7 family
+    │   │   │   ├── WireProtocol     # ST Cortex M7 family
+    │   │   ├── RP2040               # ST Cortex M7 family
+    │   │   ├── RP2350               # ST Cortex M7 family
+    ├── ST                           # ST Microelectronics
+    │   ├── STM32F0                  # ST Cortex M0 family
+    │   ├── STM32H7                  # ST Cortex M7 family
+    │   │   ├── Common               # ST Cortex M7 family
+    │   │   │   ├── DeviceIO         # ST Cortex M7 family
+    │   │   │   ├── WireProtocol     # ST Cortex M7 family
+    │   │   ├── NUCLEO_H743ZI2       # ST Cortex M7 family
+    │   │   ├── STM32H7B3I_DK        # ST Cortex M7 family
+    │   │   ├── STM32H735G_DK        # ST Cortex M7 family
     └── main.c                       # main entry point
 
 </p>

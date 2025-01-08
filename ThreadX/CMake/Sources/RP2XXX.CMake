@@ -96,7 +96,7 @@ pico_sdk_init()
 
           ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src/portable/raspberrypi/rp2040
      
-          ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/RP2XXX/DeviceIO/UsbDevice
+          ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/DeviceIO/UsbDevice
      )
 
      if( "${TARGET_SERIES}" STREQUAL "RP2040")

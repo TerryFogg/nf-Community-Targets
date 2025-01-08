@@ -8,11 +8,14 @@
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RaspberryPi/RP2XXX/RP2350/board.cpp
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RaspberryPi/RP2XXX/RP2350/Device_BlockStorage.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RaspberryPi/RP2XXX/RP2350/CLR_RT_InteropAssembliesTable.cpp
+
+            #    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/CLR_RT_InteropAssembliesTable.cpp
+
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RaspberryPi/RP2XXX/RP2350/Power.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RaspberryPi/RP2XXX/RP2350/target_common.c
 
                 # Wire Protocol support
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/RP2XXX/usb_cdc_descriptor.c
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RaspberryPi/RP2XXX/Common/usb_cdc_descriptor.c
 
                  
     )
@@ -20,7 +23,7 @@
 if(GRAPHICS_SUPPORT)
     list(APPEND NF_INTERPRETER_SOURCES 
                # ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RP2350/Initialize_Graphics.cpp
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/RP2XXX/${GRAPHICS_LCD}
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/RP2XXX/Spi_To_Display_Pico.cpp
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RaspberryPi/RP2XXX/Common/${GRAPHICS_LCD}
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RaspberryPi/RP2XXX/Common/Spi_To_Display_Pico.cpp
     )
 endif()

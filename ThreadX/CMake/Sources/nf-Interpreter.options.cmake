@@ -59,24 +59,17 @@ if(FILEX_SYSTEM_RAM)
     )
 endif()
 
+
+
 # Per Board fileX sources    
 if( "${TARGET_FAMILY}" STREQUAL "STM32H7")
-    list(APPEND FILEX_INCLUDES
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/STM32H7/DeviceIO
-    )
     list(APPEND FILEX_SOURCES
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/STM32H7/DeviceIO/SD_DoubleBufferedDMA.cpp
+         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/DeviceIO/SD_DoubleBufferedDMA.cpp
     )
 endif()
 if( "${TARGET_FAMILY}" STREQUAL "STM32U5")
     list(APPEND FILEX_INCLUDES
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/STM32U5/DeviceIO
-    )
-endif()
-if( "${TARGET_FAMILY}" STREQUAL "RP2XXX")
-    list(APPEND FILEX_INCLUDES
-    )
-    list(APPEND FILEX_SOURCES
+         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/STM32U5/DeviceIO
     )
 endif()
 

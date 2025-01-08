@@ -27,7 +27,7 @@ include(FetchContent)
              ${TARGET_GIT_LOCAL_PATH}/Drivers/CMSIS/Include
              ${TARGET_GIT_LOCAL_PATH}/Drivers/STM32U5xx_HAL_Driver/Inc
              ${TARGET_GIT_LOCAL_PATH}/Drivers/STM32U5xx_HAL_Driver/Inc/Legacy
-             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Commonality/STM32
+             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ThreadX/ST/STM32U5/Common
       )
       list(APPEND STM32U5_SOURCES
             ${TARGET_GIT_LOCAL_PATH}/Drivers/CMSIS/Device/ST/STM32U5xx/Source/Templates/system_stm32u5xx.c

@@ -90,6 +90,7 @@ CLR_UINT32 *ddata;
 
 bool DisplayDriver::Initialize()
 {
+
     SetupDisplayAttributes();
 
     g_DisplayInterface.SendCommand(1, SOFTWARE_RESET);
@@ -151,6 +152,10 @@ bool DisplayDriver::Initialize()
         0x38,
         0x3A,
         0x1F);
+
+    SetDefaultOrientation();
+    Clear();
+
     g_DisplayInterface.SendCommand(1, Sleep_OUT);
     g_DisplayInterface.SendCommand(1, Display_ON);
 
@@ -200,7 +205,7 @@ bool DisplayDriver::ChangeOrientation(DisplayOrientation orientation)
 }
 void DisplayDriver::SetDefaultOrientation()
 {
-    ChangeOrientation(DisplayOrientation_Landscape);
+    ChangeOrientation(DisplayOrientation_Portrait);
 }
 bool DisplayDriver::Uninitialize()
 {

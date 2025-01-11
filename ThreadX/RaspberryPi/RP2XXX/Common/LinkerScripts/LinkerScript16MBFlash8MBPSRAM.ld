@@ -6,6 +6,16 @@
 /* Division of internal flash is limited by the smallest erase size of 4K       */
 
 
+/*  For the Winbond
+W25Q16JV - 2MB Flash
+
+Pages can be erased in groups of
+   16 (4KB sector erase)
+   128 (32KB block erase)
+   256 (64KB block erase)
+   or the entire chip (chip erase).
+*/
+
 /* Minimum flash erase size is define as a page for RP2350 series*/
 /* ======================================================================== */
 flash_block_1 = 0x10000000;
@@ -35,6 +45,9 @@ config_block_start = 1022;
 config_block_end = 1023;
 config_total_allocation = (config_block_end - config_block_start + 1)*sector_size;
 
+
+INCLUDE @FLASH_CHIP@.ld
+
 MEMORY
 {
     /* ================================= */
@@ -63,10 +76,10 @@ MEMORY
      CLR_RAM      (rxw) : ORIGIN = ORIGIN(NATIVE_RAM) + LENGTH(NATIVE_RAM),LENGTH = 200K
 
 
-     /* graphics_ram (rxw) : ORIGIN = ORIGIN(CLR_RAM) + LENGTH(CLR_RAM), LENGTH = LENGTH(RAM_STRIPED) - LENGTH(NATIVE_RAM) - LENGTH(CLR_RAM) */
+      /* graphics_ram (rxw) : ORIGIN = ORIGIN(CLR_RAM) + LENGTH(CLR_RAM), LENGTH = LENGTH(RAM_STRIPED) - LENGTH(NATIVE_RAM) - LENGTH(CLR_RAM)  */
 
 
-      graphics_ram (rxw) : ORIGIN = ORIGIN(PSRAM), LENGTH = (8 * 1024 * 1024) 
+      graphics_ram (rxw) : ORIGIN = ORIGIN(PSRAM), LENGTH = (8 * 1024 * 1024)  
 
 
      /* NO FRAME BUFFER - use SPI local buffer to transfer graphics */

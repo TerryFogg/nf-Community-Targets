@@ -14,12 +14,11 @@
 #include <target_platform.h>
 
 #define NUMBER_OF_LINES 2
-// #define SPI_MAX_TRANSFER_SIZE (320 * 2 * NUMBER_OF_LINES) // 240 pixels 2 words wide (16 bit colour)
 #define SPI_MAX_TRANSFER_SIZE 960
 
 #if PICO_RP2040
 #define MAX_SPI_BAUD_RATE 62500000
-#else
+#elif PICO_RP2350
 #define MAX_SPI_BAUD_RATE 75000000
 #endif
 
@@ -92,10 +91,6 @@ void DisplayInterface::Initialize(DisplayInterfaceConfig &config)
     dma_channel_configure(dma_tx, &dma_tx_config, &spi_get_hw(spi_port)->dr, NULL, 0, false);
     return;
 }
-void DisplayInterface::SetCommandMode(int mode)
-{
-    spiCommandMode = mode;
-}
 void DisplayInterface::GetTransferBuffer(CLR_UINT8 *&TransferBuffer, CLR_UINT32 &TransferBufferSize)
 {
     TransferBuffer = spiBuffer;
@@ -149,6 +144,7 @@ void SendCommandBytes(CLR_UINT8 *data, CLR_UINT32 length)
 {
     // Wait for all DMA writes to SPI
     dma_channel_wait_for_finish_blocking(dma_tx);
+
     // And all SPI data written out of the Mcu
     while (spi_is_busy(spi_port))
         tight_loop_contents();

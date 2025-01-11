@@ -30,7 +30,7 @@ elseif( "${FLASH_SIZE}" STREQUAL "16" AND PSRAM)
     Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/LinkerScripts/LinkerScript16MBFlash8MBPSRAM.ld")
 endif()
 
-configure_file(  ${LINKER_SCRIPT_FILE} "${CMAKE_BINARY_DIR}/memmap_default.ld" COPYONLY)
+configure_file(  ${LINKER_SCRIPT_FILE} "${CMAKE_BINARY_DIR}/memmap_default.ld" @ONLY)
 Set(PICO_LINKER_SCRIPT_PATH  "${CMAKE_BINARY_DIR}")
 
 include(${PICO_SDK_PATH}/pico_sdk_init.cmake)

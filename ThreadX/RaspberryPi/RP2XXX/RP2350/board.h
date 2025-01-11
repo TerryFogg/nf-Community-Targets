@@ -49,13 +49,8 @@ extern "C"
     void ResetPinList();
     void Initialize64BitMicrosecondTimer();
     void InitializeDevicePins();
-    void Initialize_Board_LEDS();
     uint64_t ReadMicrosecondCounter();
     void SystemClock_Config();
-    void BoardLed_ON();
-    void BoardLed_OFF();
-    void BoardLed_Toggle();
-    bool BoardUserButton_Pressed();
     bool PinSupportsADC(int pinNumber);
     void InitializePSRAM();
     void InitializeBoardPeripherals();

@@ -105,10 +105,8 @@ DeviceRegistration::SerialPin BoardSerialChannels[] = {{uart0, 1, 1}, {uart1, 1,
 
 void Initialize_Board()
 {
-    Initialize_Board_LEDS();
     Initialize64BitMicrosecondTimer();
     InitializeDevicePins();
-
 #ifdef PSRAM
     InitializePSRAM();
 #endif
@@ -117,7 +115,6 @@ void Initialize_Board()
 void InitializeBoardPeripherals()
 {
     ResetPinList();
-    Initialize_Board_LEDS();
     InitializeDevicePins();
 }
 
@@ -137,34 +134,12 @@ bool PinSupportsADC(int pinNumber)
 {
     return pinNumber == 26 || pinNumber == 27 || pinNumber == 28;
 }
-void Initialize_Board_LEDS()
-{
-    gpio_init(LED_PIN);
-    gpio_set_dir(LED_PIN, GPIO_OUT);
-}
 void Initialize64BitMicrosecondTimer()
 {
     // hardware_timer_init(timer_hw, 1, 1);
     // hardware_timer_set_hw_clock_ticks_per_us(timer_hw, 1);
     // hardware_timer_enable(timer_hw);
     return;
-}
-void BoardLed_ON()
-{
-    gpio_put(LED_PIN, LED_STATE_ON);
-}
-void BoardLed_OFF()
-{
-    gpio_put(LED_PIN, LED_STATE_OFF);
-}
-void BoardLed_Toggle()
-{
-    gpio_put(LED_PIN, !gpio_get(25));
-}
-bool BoardUserButton_Pressed()
-{
-    // TODO: Define one of the pins as a input for and add-on user button
-    return false;
 }
 uint64_t ReadMicrosecondCounter()
 {

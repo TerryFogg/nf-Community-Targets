@@ -439,7 +439,7 @@
             "description": "2MB Flash chip as used by Pico",
             "hidden": true,
             "cacheVariables": {
-                "FLASH_SIZE": "4",
+                "FLASH_SIZE": "2",
                 "FLASH_CHIP": "W25Q32RV"
             }
         },

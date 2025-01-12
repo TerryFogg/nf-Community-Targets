@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
@@ -13,7 +13,7 @@ BlockStorageDevice Device_BlockStorage;
 // Block Size 4096 Bytes (Smallest erase size)
 const BlockRange BlockRange1[] = {
     {BlockRange_BLOCKTYPE_CODE, (uint32_t)(uint32_t *)&clr_block_start, (uint32_t)(uint32_t *)&clr_block_end},
-    {BlockRange_BLOCKTYPE_DEPLOYMENT, (uint32_t)(uint32_t *)&deployment_block_start, (uint32_t)(uint32_t *)&deployment_block_end},
+    {BlockRange_BLOCKTYPE_DEPLOYMENT, &deployment_block_start, (uint32_t)(uint32_t *)&deployment_block_end},
     {BlockRange_BLOCKTYPE_CONFIG, (uint32_t)(uint32_t *)&config_block_start, (uint32_t)(uint32_t *)&config_block_end}};
 
     const BlockRegionInfo BlockRegions[] = {

@@ -22,15 +22,14 @@ include(FetchContent)
 
 set(PICO_NO_CMSE true)
 option(LINKER_SCRIPT_FILE  "Determine the linker script file to use base on the memory configuration")
-if( "${FLASH_SIZE}" STREQUAL "2")
-    Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/LinkerScripts/memmap_default.ld")
+if(PSRAM)
+    Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/ldscripts/RP2XXXwithPSRAM.ld")
 elseif( "${FLASH_SIZE}" STREQUAL "4")
-    Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/LinkerScripts/LinkerScript4MBFlash")
-elseif( "${FLASH_SIZE}" STREQUAL "16" AND PSRAM)
-    Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/LinkerScripts/LinkerScript16MBFlash8MBPSRAM.ld")
+    Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/ldscripts/RP2XXX")
 endif()
 
 configure_file(  ${LINKER_SCRIPT_FILE} "${CMAKE_BINARY_DIR}/memmap_default.ld" @ONLY)
+
 Set(PICO_LINKER_SCRIPT_PATH  "${CMAKE_BINARY_DIR}")
 
 include(${PICO_SDK_PATH}/pico_sdk_init.cmake)

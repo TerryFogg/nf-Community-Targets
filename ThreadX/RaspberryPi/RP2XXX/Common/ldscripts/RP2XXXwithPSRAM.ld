@@ -1,11 +1,21 @@
-﻿/*                                                                              */
-/* Copyright (c) .NET Foundation and Contributors                               */
+﻿/* Copyright (c) .NET Foundation and Contributors                               */
 /* See LICENSE file in the project root for full license information.           */
 
 
-/* NOTE */
-/* Division of internal flash is limited by the smallest erase size of 4K       */
+MEMORY
+{
+     FLASH             (rx) :ORIGIN = 0x10000000,LENGTH = (@FLASH_SIZE@ * 1024 * 1024)
+     RAM               (rwx):ORIGIN = 0x20000000,LENGTH = 512K  
+     SCRATCH_X         (rxw):ORIGIN = 0x20080000,LENGTH = 4K  
+     SCRATCH_Y         (rxw):ORIGIN = 0x20081000,LENGTH = 4K 
+     PSRAM             (rxw):ORIGIN = 0x11000000,LENGTH = (@PSRAM_SIZE@ * 1024 * 1024) 
 
+     ThreadX_RAM       (rxw):ORIGIN = ORIGIN(RAM),LENGTH = 200K
+}
+
+/* =============== */
+/* VARIABLES USED  */
+/* =============== */
 
 /* Minimum flash erase size is define as a page for RP2350 series*/
 /* ======================================================================== */
@@ -36,63 +46,24 @@ config_block_start = 1022;
 config_block_end = 1023;
 config_total_allocation = (config_block_end - config_block_start + 1)*sector_size;
 
-MEMORY
-{
-    /* ================================= */
-    /* PHYSICAL MEMORY - RP2350 (Pico2)  */
-    /* ================================= */
+HeapBegin             = ORIGIN(ThreadX_RAM) + LENGTH(ThreadX_RAM); 
+HeapEnd               = HeapBegin + 200K; 
 
-     FLASH             (rx) :ORIGIN = 0x10000000,LENGTH = (@FLASH_SIZE@ *1024 *1024)
-     RAM_STRIPED       (rwx):ORIGIN = 0x20000000,LENGTH = 512K  
-     SCRATCH_X         (rxw):ORIGIN = 0x20080000,LENGTH = 4K  
-     SCRATCH_Y         (rxw):ORIGIN = 0x20081000,LENGTH = 4K 
+__nanoImage_start__   = ORIGIN(FLASH); 
+__nanoImage_end__     = __nanoImage_start__ + clr_total_allocation; 
 
-     /* =================================== */
-     /* FLASH Memory usage by nanoFramework */
-     /* =================================== */
-     
-     nanoCLR    (rx) : ORIGIN = ORIGIN(FLASH), LENGTH = clr_total_allocation
-     deployment (rx) : ORIGIN = ORIGIN(nanoCLR) + LENGTH(nanoCLR), LENGTH = deployment_total_allocation
-     config     (rx) : ORIGIN = ORIGIN(deployment) + LENGTH(deployment), LENGTH = config_total_allocation
+__deployment_start__  = __nanoImage_end__ + 1; 
+__deployment_end__    = __deployment_start__ + deployment_total_allocation; 
 
-     /* ========================================= */
-     /* RAM Memory usage by ThreadX/nanoFramework */
-     /* ========================================= */
-     
-     NATIVE_RAM   (rxw) : ORIGIN = ORIGIN(RAM_STRIPED), LENGTH = 100K
-     CLR_RAM      (rxw) : ORIGIN = ORIGIN(NATIVE_RAM) + LENGTH(NATIVE_RAM),LENGTH = 200K
-     graphics_ram (rxw) : ORIGIN = ORIGIN(CLR_RAM) + LENGTH(CLR_RAM), LENGTH = LENGTH(RAM_STRIPED) - LENGTH(NATIVE_RAM) - LENGTH(CLR_RAM)
-     /* NO FRAME BUFFER - use SPI local buffer to transfer graphics */
-}
-  
-/* =============== */
-/* VARIABLES USED  */
-/* =============== */
+__nanoConfig_start__  = __deployment_end__ + 1;
+__nanoConfig_end__    = __nanoConfig_start__ + config_total_allocation;
 
-
-/* The CLR managed heap for CLR */
-HeapBegin             = ORIGIN(CLR_RAM); 
-HeapEnd               = ORIGIN(CLR_RAM) + LENGTH(CLR_RAM); 
-
-/* The CLR native Image */
-__nanoImage_start__   = ORIGIN(nanoCLR); 
-__nanoImage_end__     = ORIGIN(nanoCLR) + LENGTH(nanoCLR); 
-
-/*  C# Portable Executable (PE) file is stored */
-__deployment_start__  = ORIGIN(deployment); 
-__deployment_end__    = ORIGIN(deployment) + LENGTH(deployment); 
-
-/* Small area of persistent storage */
-__nanoConfig_start__  = ORIGIN(config);
-__nanoConfig_end__    = ORIGIN(config) + LENGTH(config);
+/*  Bitmap objects */
+Graphics_managed_heap = ORIGIN(PSRAM); 
+Graphics_managed_end  = Graphics_managed_heap + (8 * 1024 * 1024);   
 
 /* Bit pixel copy of the screen */
 Graphics_frame_buffer = 0;
-
-/*  Bitmap objects */
-Graphics_managed_heap = ORIGIN(graphics_ram); 
-Graphics_managed_end  = ORIGIN(graphics_ram) + LENGTH(graphics_ram);   
-
 
 
 /* Entry point */
@@ -221,12 +192,12 @@ SECTIONS
 
     .ram_vector_table (NOLOAD): {
         *(.ram_vector_table)
-    } > NATIVE_RAM
+    } > ThreadX_RAM
 
     .uninitialized_data (NOLOAD): {
         . = ALIGN(4);
         *(.uninitialized_data*)
-    } > NATIVE_RAM
+    } > ThreadX_RAM
 
     .data : {
         __data_start__ = .;
@@ -254,14 +225,14 @@ SECTIONS
 
         *(.jcr)
         . = ALIGN(4);
-    } > NATIVE_RAM AT> FLASH
+    } > ThreadX_RAM AT> FLASH
 
     .tdata : {
         . = ALIGN(4);
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
         /* All data end */
         __tdata_end = .;
-    } > NATIVE_RAM AT> FLASH
+    } > ThreadX_RAM AT> FLASH
     PROVIDE(__data_end__ = .);
 
     /* __etext is (for backwards compatibility) the name of the .data init source pointer (...) */
@@ -275,7 +246,7 @@ SECTIONS
         *(.tcommon)
 
         __tls_end = .;
-    } > NATIVE_RAM
+    } > ThreadX_RAM
 
     .bss (NOLOAD) : {
         . = ALIGN(4);
@@ -287,7 +258,7 @@ SECTIONS
         *(.sbss*)
         . = ALIGN(4);
         __bss_end__ = .;
-    } > NATIVE_RAM
+    } > ThreadX_RAM
 
     .heap (NOLOAD):
     {
@@ -296,9 +267,9 @@ SECTIONS
         KEEP(*(.heap*))
         /* historically on GCC sbrk was growing past __HeapLimit to __StackLimit, however
            to be more compatible, we now set __HeapLimit explicitly to where the end of the heap is */
-        . = ORIGIN(NATIVE_RAM) + LENGTH(NATIVE_RAM);
+        . = ORIGIN(ThreadX_RAM) + LENGTH(ThreadX_RAM);
         __HeapLimit = .;
-    } > NATIVE_RAM
+    } > ThreadX_RAM
 
     /* Start and end symbols must be word-aligned */
     .scratch_x : {
@@ -341,7 +312,7 @@ SECTIONS
     } > FLASH =0xaa
 
     /* stack limit is poorly named, but historically is maximum heap ptr */
-    __StackLimit = ORIGIN(NATIVE_RAM) + LENGTH(NATIVE_RAM);
+    __StackLimit = ORIGIN(ThreadX_RAM) + LENGTH(ThreadX_RAM);
     __StackOneTop = ORIGIN(SCRATCH_X) + LENGTH(SCRATCH_X);
     __StackTop = ORIGIN(SCRATCH_Y) + LENGTH(SCRATCH_Y);
     __StackOneBottom = __StackOneTop - SIZEOF(.stack1_dummy);
@@ -359,8 +330,8 @@ SECTIONS
     PROVIDE (_end = __end__);
     PROVIDE (__llvm_libc_heap_limit = __HeapLimit);
 
-    /* Check if data + heap + stack exceeds NATIVE_RAM limit */
-    ASSERT(__StackLimit >= __HeapLimit, "region NATIVE_RAM overflowed")
+    /* Check if data + heap + stack exceeds ThreadX_RAM limit */
+    ASSERT(__StackLimit >= __HeapLimit, "region ThreadX_RAM overflowed")
 
     ASSERT( __binary_info_header_end - __logical_binary_start <= 1024, "Binary info must be in first 1024 bytes of the binary")
     ASSERT( __embedded_block_end - __logical_binary_start <= 4096, "Embedded block must be in first 4096 bytes of the binary")

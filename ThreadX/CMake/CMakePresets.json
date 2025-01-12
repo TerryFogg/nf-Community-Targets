@@ -434,11 +434,19 @@
                 "SPI_CS": "17"
             }
         },
+        // W25Qxxxx Series
+        // Program 1 to 256 bytes per programmable page,
+        // Pages can be erased in
+        // Groups of 16  (4KB sector erase)
+        // Groups of 128 (32KB block erase)
+        // Groups of 256 (64KB block erase)
+        // Or the entire chip (chip erase)
         {
             "name": "W25Q16JV",
             "description": "2MB Flash chip as used by Pico",
             "hidden": true,
             "cacheVariables": {
+                "BLOCK_SIZE_FOR_ERASE": "64", // Groups of 256 (64KB block erase)
                 "FLASH_SIZE": "2",
                 "FLASH_CHIP": "W25Q32RV"
             }
@@ -448,6 +456,7 @@
             "description": "4MB Flash chip as used by Pico2",
             "hidden": true,
             "cacheVariables": {
+                "BLOCK_SIZE_FOR_ERASE": "64", // Groups of 256 (64KB block erase)
                 "FLASH_SIZE": "4",
                 "FLASH_CHIP": "W25Q32RV"
             }
@@ -457,16 +466,19 @@
             "description": "16MB Flash chip as used by Pimoroni Pico Plus 2W",
             "hidden": true,
             "cacheVariables": {
+                "BLOCK_SIZE_FOR_ERASE": "64", // Groups of 256 (64KB block erase)
                 "FLASH_SIZE": "16",
                 "FLASH_CHIP": "W25Q128JV"
             }
         },
+        // APSxx04L - Frequencies up to 133MHz
+        // Seamless self-managed refresh mechanism,does not require the support of DRAM refresh
         {
             "name": "APS6404L",
-            "description": "8MB PSRAM chip as used by Pimoroni Pico Plus 2W",
+            "description": "8MB PSRAM chip",
             "hidden": true,
             "cacheVariables": {
-                "PSRAM" :  true,
+                "PSRAM": true,
                 "PSRAM_SIZE": "8",
                 "PSRAM_CHIP": "APS6404L"
             }

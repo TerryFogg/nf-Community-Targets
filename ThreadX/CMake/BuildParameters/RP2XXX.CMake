@@ -40,6 +40,7 @@ if(CFG_USB_USE_DTR)
  target_compile_definitions(nanoCLR PUBLIC -DCFG_USB_USE_DTR) 
 endif() 
 
+
 #  Some options
 target_link_options(nanoCLR PUBLIC "-Wl,--print-memory-usage")
 

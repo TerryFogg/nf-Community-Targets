@@ -7,7 +7,7 @@
 #include "DeviceRegistration.h"
 #include "DeviceIO.h"
 
-TouchInterface gTouchInterface;
+TouchInterface g_TouchInterface;
 
 static CLR_UINT8 I2C_READ_BUFFER[32];
 
@@ -32,8 +32,11 @@ static CLR_UINT8 readbuffer[12];
 CLR_UINT8 *TouchInterface::Write_Read(CLR_UINT8 *writeBuffer, CLR_UINT16 writeSize, CLR_UINT16 readSize)
 {
     I2cTransferStatus writeStatus = I2cIO::Write(TOUCH_INTERFACE_BUS, TOUCH_INTERFACE_SLAVE_ADDRESS, writeBuffer, writeSize);
-    I2cTransferStatus readStatus =
-        I2cIO::Read(TOUCH_INTERFACE_BUS, TOUCH_INTERFACE_SLAVE_ADDRESS, I2C_READ_BUFFER, readSize);
 
+    if (readSize > 0)
+    {
+        I2cTransferStatus readStatus =
+            I2cIO::Read(TOUCH_INTERFACE_BUS, TOUCH_INTERFACE_SLAVE_ADDRESS, I2C_READ_BUFFER, readSize);
+    }
     return I2C_READ_BUFFER;
 }

@@ -16,7 +16,7 @@ extern "C"
     inline __attribute__((always_inline)) uint64_t HAL_Time_SysTicksToTime(uint64_t sysTicks)
     {
         // need to convert RTOS ticks to 100 nanoseconds
-        return sysTicks * TX_TIMER_TICKS_PER_SECOND * 1000;
+        return sysTicks * TX_TIMER_TICKS_PER_SECOND * 100;
     }
 #ifdef __cplusplus
 }

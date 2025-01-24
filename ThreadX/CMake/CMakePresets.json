@@ -340,6 +340,9 @@
                 "CFG_USB_USE_DTR": false
             }
         },
+        //
+        // RP2XXX
+        //
         {
             "name": "RP2350",
             "description": "Configuration for the Raspberry Pi Pico",
@@ -382,6 +385,9 @@
 
             }
         },
+        //
+        // Displays
+        //
         {
             "name": "Waveshare-LCD-1.14",
             "description": "https://www.waveshare.com/pico-lcd-1.14.htm",
@@ -420,7 +426,7 @@
                 "TOUCH_INTERFACE_INTERRUPT": "22",
                 "TOUCH_INTERFACE_WIDTH": "240",
                 "TOUCH_INTERFACE_HEIGHT": "320",
-                "TOUCH_INTERFACE_TRANSLATE": "SWAP_NONE",
+                "TOUCH_INTERFACE_SWAP_X_Y":true,
 
                 "LCD_WIDTH": "240",
                 "LCD_HEIGHT": "320",
@@ -434,6 +440,9 @@
                 "SPI_CS": "17"
             }
         },
+        //
+        // Flash configurations
+        //
         // W25Qxxxx Series
         // Program 1 to 256 bytes per programmable page,
         // Pages can be erased in
@@ -446,7 +455,7 @@
             "description": "2MB Flash chip as used by Pico",
             "hidden": true,
             "cacheVariables": {
-                "BLOCK_SIZE_FOR_ERASE": "64", // Groups of 256 (64KB block erase)
+                "BLOCK_ERASE_SIZE": "64", // Groups of 256 (64KB block erase)
                 "FLASH_SIZE": "2",
                 "FLASH_CHIP": "W25Q32RV"
             }
@@ -456,7 +465,7 @@
             "description": "4MB Flash chip as used by Pico2",
             "hidden": true,
             "cacheVariables": {
-                "BLOCK_SIZE_FOR_ERASE": "64", // Groups of 256 (64KB block erase)
+                "BLOCK_ERASE_SIZE": "64", // Groups of 256 (64KB block erase)
                 "FLASH_SIZE": "4",
                 "FLASH_CHIP": "W25Q32RV"
             }
@@ -466,11 +475,14 @@
             "description": "16MB Flash chip as used by Pimoroni Pico Plus 2W",
             "hidden": true,
             "cacheVariables": {
-                "BLOCK_SIZE_FOR_ERASE": "64", // Groups of 256 (64KB block erase)
+                "BLOCK_ERASE_SIZE": "64", // Groups of 256 (64KB block erase)
                 "FLASH_SIZE": "16",
                 "FLASH_CHIP": "W25Q128JV"
             }
         },
+        //
+        // PSRAM Configurations
+        //
         // APSxx04L - Frequencies up to 133MHz
         // Seamless self-managed refresh mechanism,does not require the support of DRAM refresh
         {
@@ -483,9 +495,9 @@
                 "PSRAM_CHIP": "APS6404L"
             }
         },
-        // ===================================================
+        //
         // Configurations to build
-        // ===================================================
+        //
         {
             "name": "RP2040 + Waveshare LCD-1.14",
             "description": "Pico2 board with 1.14 inch LCD",
@@ -518,5 +530,5 @@
         }
     ],
     "buildPresets": [
-   ]
+    ]
 }

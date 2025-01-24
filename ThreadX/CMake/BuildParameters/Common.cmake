@@ -127,7 +127,7 @@
           target_compile_definitions(nanoCLR PUBLIC -DTOUCH_INTERFACE_INTERRUPT=${TOUCH_INTERFACE_INTERRUPT})
           target_compile_definitions(nanoCLR PUBLIC -DTOUCH_INTERFACE_WIDTH=${TOUCH_INTERFACE_WIDTH})
           target_compile_definitions(nanoCLR PUBLIC -DTOUCH_INTERFACE_HEIGHT=${TOUCH_INTERFACE_HEIGHT})
-          target_compile_definitions(nanoCLR PUBLIC -DTOUCH_INTERFACE_TRANSLATE=${TOUCH_INTERFACE_TRANSLATE})
+          target_compile_definitions(nanoCLR PUBLIC -DTOUCH_INTERFACE_SWAP_X_Y=${TOUCH_INTERFACE_SWAP_X_Y})
     else()
           target_compile_definitions(nanoCLR PUBLIC -DTOUCH_DISPLAY=FALSE)
     endif()

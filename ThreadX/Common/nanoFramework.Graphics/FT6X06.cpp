@@ -85,9 +85,10 @@ static GPIO_INTERRUPT_SERVICE_ROUTINE touchInterrupt = NULL;
 
 void gpio_callback(uint gpio, uint32_t events)
 {
+    bool pinState = (events == 4) ? true : false;
     if (touchInterrupt != NULL)
     {
-        touchInterrupt(gpio, events & GPIO_IRQ_EDGE_RISE, NULL);
+        touchInterrupt(gpio, pinState, NULL);
     }
 }
 
@@ -102,8 +103,12 @@ bool TouchDevice::Initialize()
     bool result = (*id == ID_VALUE);
     if (result)
     {
-        // Configured to interrupt on touch down and up but not each controller sampling period
-        g_TouchInterface.Write_Read(&registerCommand, FT6X06_VALUES::G_MODE_INTERRUPT_POLLING, 0);
+        uint8_t set_interrupt_mode[2]{FT6X06_CMD::G_MODE, FT6X06_VALUES::G_MODE_INTERRUPT_POLLING};
+        if (result)
+        {
+            // Configured to interrupt on touch down and up but not each controller sampling period
+            g_TouchInterface.Write_Read(set_interrupt_mode, 2, 0);
+        }
     }
     return result;
 }
@@ -127,7 +132,10 @@ bool TouchDevice::Enable(GPIO_INTERRUPT_SERVICE_ROUTINE touchIsrProc)
     DeviceRegistration::AddPinParameters((PinNameValue)TOUCH_INTERFACE_INTERRUPT, newGpioParameter);
     newGpioParameter->callBack = true;
     newGpioParameter->edgeTrigger = GPIO_INT_EDGE_HIGH;
-    GpioIO::InterruptEnable((PinNameValue)TOUCH_INTERFACE_INTERRUPT, GPIO_INT_EDGE_BOTH, (void *)gpio_callback);
+    GpioIO::InterruptEnable(
+        (PinNameValue)TOUCH_INTERFACE_INTERRUPT,
+        GPIO_INT_EDGE_BOTH,
+        (void * )gpio_callback);
 
     return TRUE;
 }
@@ -156,12 +164,12 @@ TouchPointDevice TouchDevice::GetPoint()
 
     TouchPointDevice tp;
 
-#if (TOUCH_INTERFACE_TRANSLATE == SWAP_NONE)
-    tp.x = touchx1;
-    tp.y = touchy1;
-#elif (TOUCH_INTERFACE_TRANSLATE == SWAP_X_Y)
+#if (TOUCH_INTERFACE_SWAP_X_Y)
     tp.x = touchy1;
     tp.y = touchx1;
+#else
+    tp.x = touchx1;
+    tp.y = touchy1;
 #endif
 
     // Upper 2 bits of high X1 coord is (touch Up/Down)

@@ -36,9 +36,8 @@ CLR_UINT32 g_PAL_RunningAvg_Buffer_Size = TOUCH_POINT_RUNNINGAVG_BUFFER_SIZE;
 TOUCH_PANEL_CalibrationData g_TouchPanel_DefaultCalibration_Config = {1, 1, 0, 0, 1, 1};
 
 TouchPanelDriver g_TouchPanelDriver;
-
+extern TouchInterface g_TouchInterface;
 extern TouchDevice g_TouchDevice;
-TouchInterface g_TouchInterface;
 
 /// Divide a by b, and return rounded integer.
 CLR_INT32 RoundDiv(CLR_INT32 a, CLR_INT32 b)
@@ -212,7 +211,10 @@ void TouchPanelDriver::PollTouchPoint()
     bool fProcessUp = false;
 
     bool ignoreDuplicates = true;
-    CLR_INT64 time = ::HAL_Time_CurrentTime();
+    // The number of 100 nanoSeconds at 01/01/1601 from 01/01/01
+    static CLR_INT64 ticksAtOrigin = 504911232000000000;
+
+    CLR_INT64 time = ::HAL_Time_CurrentTime() + ticksAtOrigin;
 
     /// To be revisited::    GLOBAL_LOCK(isr);
 

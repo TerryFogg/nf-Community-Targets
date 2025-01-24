@@ -458,7 +458,7 @@ I2cTransferStatus I2cIO::Write(
         slaveAddress,
         writeBuffer,
         writeSize,
-        true); // true to keep master control of bus
+        false); // true to keep master control of bus
 
     if (returnValue == PICO_ERROR_TIMEOUT)
         return_status = I2cTransferStatus_ClockStretchTimeout;
@@ -474,7 +474,7 @@ I2cTransferStatus I2cIO::Read(CLR_INT32 I2C_deviceId, CLR_INT32 slaveAddress, CL
 {
     I2cTransferStatus return_status = I2cTransferStatus_UnknownError;
     i2c_inst_t *I2C_Instance = Get_I2C_Instance(I2C_deviceId);
-    int returnValue = i2c_read_blocking(I2C_Instance, slaveAddress, readBuffer, readSize, true);
+    int returnValue = i2c_read_blocking(I2C_Instance, slaveAddress, readBuffer, readSize, false);
     if (returnValue == PICO_ERROR_TIMEOUT)
         return_status = I2cTransferStatus_ClockStretchTimeout;
     if (returnValue == PICO_ERROR_GENERIC)

@@ -1,7 +1,6 @@
 ﻿/* Copyright (c) .NET Foundation and Contributors                               */
 /* See LICENSE file in the project root for full license information.           */
 
-
 MEMORY
 {
      FLASH             (rx) :ORIGIN = 0x10000000,LENGTH = (@FLASH_SIZE@ * 1024 * 1024)
@@ -17,8 +16,8 @@ MEMORY
 /* VARIABLES USED  */
 /* =============== */
 
-/* Minimum flash erase size is define as a page for RP2350 series*/
-/* ======================================================================== */
+block_erase_size = @BLOCK_ERASE_SIZE@;
+
 flash_block_1 = 0x10000000;
 sector_size = 4096;
 block_size = sector_size;

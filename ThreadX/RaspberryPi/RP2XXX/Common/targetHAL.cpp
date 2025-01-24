@@ -21,10 +21,9 @@ bool g_fDoNotUninitializeDebuggerPort = false;
 #include "TouchPanel.h"
 #include "TouchInterface.h"
 
-extern TouchPanelDriver gTouchPanel;
-extern TouchInterface gTouchInterface;
-
-extern TouchDevice gTouch_Device;
+extern TouchPanelDriver g_TouchPanel;
+extern TouchInterface g_TouchInterface;
+extern TouchDevice g_TouchDevice;
 #endif
 
 extern "C"
@@ -53,8 +52,9 @@ void nanoHAL_Initialize()
 #endif
 
 #if (TOUCH_DISPLAY_SUPPORT == TRUE)
-    gTouchInterface.Initialize();
-    gTouchPanel.Initialize();
+    g_TouchInterface.Initialize();
+    g_TouchDevice.Initialize();
+    g_TouchPanel.Initialize();
 #endif
 
    // PalEvent_Initialize();

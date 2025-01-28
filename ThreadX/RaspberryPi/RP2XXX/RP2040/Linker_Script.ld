@@ -1,7 +1,6 @@
-/*                                                                              */
+﻿/*                                                                              */
 /* Copyright (c) .NET Foundation and Contributors                               */
 /* See LICENSE file in the project root for full license information.           */
-
 
 /* Division of internal flash is limited by the smallest erase size of 4K       */
 /* The first sector contains a prepended bs2_default_padded_checksummed.S boot  */

@@ -22,7 +22,7 @@ extern "C"
 {
 #endif
 
-    class DeviceRegistration
+    class Device
     {
       public:
         typedef enum DevicePinFunction

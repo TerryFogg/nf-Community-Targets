@@ -5,7 +5,7 @@
 //
 #include "PinNames.h"
 #include "DeviceIO.h"
-#include "DeviceRegistration.h"
+#include "Device.h"
 #include "board.h"
 #include "Delays.h"
 
@@ -13,37 +13,37 @@
 #include "File_Drivers.h"
 #endif
 
-DeviceRegistration::DevicePin mcuPins[] = {
-    {GP0, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP1, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP2, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP3, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP4, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP5, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP6, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP7, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP8, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP9, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP10, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP11, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP12, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP13, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP14, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP15, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP16, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP17, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP18, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP19, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP20, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP21, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP22, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP23, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP24, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP25, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP26, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP27, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP28, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
-    {GP29, false, NULL, NULL, PinMode::PinMode_Input, DeviceRegistration::DevicePinFunction::NONE, 0},
+Device::DevicePin mcuPins[] = {
+    {GP0, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP1, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP2, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP3, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP4, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP5, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP6, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP7, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP8, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP9, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP10, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP11, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP12, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP13, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP14, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP15, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP16, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP17, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP18, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP19, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP20, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP21, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP22, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP23, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP24, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP25, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP26, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP27, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP28, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+    {GP29, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
 };
 
 // 1 Analog Digital controller
@@ -55,12 +55,12 @@ DeviceRegistration::DevicePin mcuPins[] = {
 // Channel 4 --> Temperature Sensor
 
 static int AdcControllerReference = 1;
-DeviceRegistration::AdcPin BoardADCChannels[] = {
+Device::AdcPin BoardADCChannels[] = {
     {&AdcControllerReference, 1, 1},
     {&AdcControllerReference, 1, 2},
     {&AdcControllerReference, 1, 3},
     {&AdcControllerReference, 1, 4}};
-DeviceRegistration::I2cPin BoardI2CChannels[] = {{i2c0, 1, 1}, {i2c1, 2, 1}};
+Device::I2cPin BoardI2CChannels[] = {{i2c0, 1, 1}, {i2c1, 2, 1}};
 
 // PWM controllers are slice id's
 static int PWMSlice1 = 1;
@@ -80,7 +80,7 @@ void *pSlice6 = (void *)PWMSlice6;
 void *pSlice7 = (void *)PWMSlice7;
 void *pSlice8 = (void *)PWMSlice8;
 
-DeviceRegistration::PwmPin BoardPWMChannels[] = {
+Device::PwmPin BoardPWMChannels[] = {
     {pSlice1, 1, 1},
     {pSlice1, 1, 2},
     {pSlice2, 1, 1},
@@ -98,8 +98,8 @@ DeviceRegistration::PwmPin BoardPWMChannels[] = {
     {pSlice8, 1, 1},
     {pSlice8, 1, 2},
 };
-DeviceRegistration::SpiPin BoardSPIChannels[] = {{spi0, 1, 1}, {spi1, 1, 1}};
-DeviceRegistration::SerialPin BoardSerialChannels[] = {{uart0, 1, 1}, {uart1, 1, 1}};
+Device::SpiPin BoardSPIChannels[] = {{spi0, 1, 1}, {spi1, 1, 1}};
+Device::SerialPin BoardSerialChannels[] = {{uart0, 1, 1}, {uart1, 1, 1}};
 
 void Initialize_Board()
 {
@@ -109,13 +109,13 @@ void Initialize_Board()
 }
 void ResetPinList()
 {
-    for (int i = 0; i < sizeof(mcuPins) / sizeof(DeviceRegistration::DevicePin); i++)
+    for (int i = 0; i < sizeof(mcuPins) / sizeof(Device::DevicePin); i++)
     {
         mcuPins[i].Reserved = false;
         mcuPins[i].next = NULL;
         mcuPins[i].GpioParameterData = NULL;
         mcuPins[i].Mode = PinMode::PinMode_Input;
-        mcuPins[i].CurrentFunction = DeviceRegistration::DevicePinFunction::NONE;
+        mcuPins[i].CurrentFunction = Device::DevicePinFunction::NONE;
         mcuPins[i].DeviceFunctionChannelNumber = 0;
     }
 }
@@ -155,10 +155,10 @@ uint64_t ReadMicrosecondCounter()
 
 void InitializeDevicePins()
 {
-    DeviceRegistration::CreatePinList(&mcuPins[0], ARRAY_LEN(mcuPins));
-    DeviceRegistration::CreateADCChannelList(BoardADCChannels, ARRAY_LEN(BoardADCChannels));
-    DeviceRegistration::CreateI2CChannelList(BoardI2CChannels, ARRAY_LEN(BoardI2CChannels));
-    DeviceRegistration::CreatePWMChannelList(BoardPWMChannels, ARRAY_LEN(BoardPWMChannels));
-    DeviceRegistration::CreateSPIChannelList(BoardSPIChannels, ARRAY_LEN(BoardSPIChannels));
-    DeviceRegistration::CreateSerialChannelList(BoardSerialChannels, ARRAY_LEN(BoardSerialChannels));
+    Device::CreatePinList(&mcuPins[0], ARRAY_LEN(mcuPins));
+    Device::CreateADCChannelList(BoardADCChannels, ARRAY_LEN(BoardADCChannels));
+    Device::CreateI2CChannelList(BoardI2CChannels, ARRAY_LEN(BoardI2CChannels));
+    Device::CreatePWMChannelList(BoardPWMChannels, ARRAY_LEN(BoardPWMChannels));
+    Device::CreateSPIChannelList(BoardSPIChannels, ARRAY_LEN(BoardSPIChannels));
+    Device::CreateSerialChannelList(BoardSerialChannels, ARRAY_LEN(BoardSerialChannels));
 };

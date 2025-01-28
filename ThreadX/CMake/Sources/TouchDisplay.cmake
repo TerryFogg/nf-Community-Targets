@@ -14,8 +14,8 @@ list(APPEND TOUCH_SOURCES
             ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_Ink.cpp
             ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/TouchPanel/Core/TouchPanel.cpp
 
-            ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/Ink.cpp
-            ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/Gestures.cpp
+            ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/TouchPanel/Core/Ink.cpp
+            ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/TouchPanel/Core/Gestures.cpp
 
             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/${TOUCH_INTERFACE_CONTROLLER}
             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/${TOUCH_INTERFACE_DRIVER}

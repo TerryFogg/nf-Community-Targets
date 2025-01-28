@@ -133,7 +133,7 @@ const char *HAL_Time_CurrentDateTimeToString()
     return DateTimeToString(HAL_Time_CurrentDateTime(false));
 }
 
-uint64_t CPU_MillisecondsToTicks(uint64_t milliseconds)
+uint64_t CPU_MillisecondsToTicks(volatile uint64_t milliseconds)
 {
     uint64_t ticks = (milliseconds * TX_TIMER_TICKS_PER_SECOND) / 1000;
     return ticks;

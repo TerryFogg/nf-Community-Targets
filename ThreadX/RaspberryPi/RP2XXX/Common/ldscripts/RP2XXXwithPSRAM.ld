@@ -18,7 +18,7 @@ MEMORY
 
 block_erase_size = @BLOCK_ERASE_SIZE@;
 
-flash_block_1 = 0x10000000;
+flash_block_1 = ORIGIN(FLASH);
 sector_size = 4096;
 block_size = sector_size;
 number_of_banks = 1;

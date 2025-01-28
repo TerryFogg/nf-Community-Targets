@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
@@ -16,7 +16,7 @@ static powman_power_state on_state;
 inline void CPU_Reset()
 {
     volatile uint32_t *aircr = (volatile uint32_t *)0xE000ED0C;
-    *aircr = (0x05FA << 16) | 0x1 << 2;
+     *aircr = (0x05FA << 16) | 0x1 << 2;
     
     // wait until reset
     for (;;)

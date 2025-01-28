@@ -3,32 +3,32 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include "DeviceRegistration.h"
+#include "Device.h"
 
 #define NOT_FOUND -1
 
-static DeviceRegistration::DevicePin *GPIOPins;
+static Device::DevicePin *GPIOPins;
 static int NumberOfGPIOPins;
 
-static DeviceRegistration::AdcPin *ADCChannels;
+static Device::AdcPin *ADCChannels;
 static int NumberOfADCChannels;
-static DeviceRegistration::DacPin *DACChannels;
+static Device::DacPin *DACChannels;
 static int NumberOfDACChannels;
-static DeviceRegistration::I2cPin *I2CChannels;
+static Device::I2cPin *I2CChannels;
 static int NumberOfI2CChannels;
-static DeviceRegistration::PwmPin *PWMChannels;
+static Device::PwmPin *PWMChannels;
 static int NumberOfPWMChannels;
-static DeviceRegistration::SerialPin *SerialChannels;
+static Device::SerialPin *SerialChannels;
 static int NumberOfSerialChannels;
-static DeviceRegistration::SpiPin *SpiChannels;
+static Device::SpiPin *SpiChannels;
 static int NumberOfSpiChannels;
 
-void DeviceRegistration::CreatePinList(DevicePin *mcuGPIOPinList, int numberOfPins)
+void Device::CreatePinList(DevicePin *mcuGPIOPinList, int numberOfPins)
 {
     GPIOPins = mcuGPIOPinList;
     NumberOfGPIOPins = numberOfPins;
 }
-bool DeviceRegistration::AddPinParameters(PinNameValue pinNameValue, void *newParameters)
+bool Device::AddPinParameters(PinNameValue pinNameValue, void *newParameters)
 {
     bool status = false;
     int pin = FindPin(pinNameValue);
@@ -39,45 +39,45 @@ bool DeviceRegistration::AddPinParameters(PinNameValue pinNameValue, void *newPa
     }
     return status;
 }
-void DeviceRegistration::CreateADCChannelList(AdcPin *BoardAdcChannels, int BoardnumberOfAdcChannels)
+void Device::CreateADCChannelList(AdcPin *BoardAdcChannels, int BoardnumberOfAdcChannels)
 {
     ADCChannels = BoardAdcChannels;
     NumberOfADCChannels = BoardnumberOfAdcChannels;
 }
-void DeviceRegistration::CreateDACChannelList(DacPin *BoardDACChannels, int BoardnumberOfDACChannels)
+void Device::CreateDACChannelList(DacPin *BoardDACChannels, int BoardnumberOfDACChannels)
 {
     DACChannels = BoardDACChannels;
     NumberOfDACChannels = BoardnumberOfDACChannels;
 }
-void DeviceRegistration::CreateI2CChannelList(I2cPin *BoardI2CChannels, int BoardnumberOfI2CChannels)
+void Device::CreateI2CChannelList(I2cPin *BoardI2CChannels, int BoardnumberOfI2CChannels)
 {
     I2CChannels = BoardI2CChannels;
     NumberOfI2CChannels = BoardnumberOfI2CChannels;
 }
-void DeviceRegistration::CreatePWMChannelList(PwmPin *BoardPWMChannels, int BoardnumberOfPWMChannels)
+void Device::CreatePWMChannelList(PwmPin *BoardPWMChannels, int BoardnumberOfPWMChannels)
 {
     PWMChannels = BoardPWMChannels;
     NumberOfPWMChannels = BoardnumberOfPWMChannels;
 }
-void DeviceRegistration::CreateSPIChannelList(SpiPin *BoardSpiChannels, int BoardnumberOfSpiChannels)
+void Device::CreateSPIChannelList(SpiPin *BoardSpiChannels, int BoardnumberOfSpiChannels)
 {
     SpiChannels = BoardSpiChannels;
     NumberOfSpiChannels = BoardnumberOfSpiChannels;
 }
-void DeviceRegistration::CreateSerialChannelList(SerialPin *BoardSerialChannels, int BoardnumberOfSerialChannels)
+void Device::CreateSerialChannelList(SerialPin *BoardSerialChannels, int BoardnumberOfSerialChannels)
 {
     SerialChannels = BoardSerialChannels;
     NumberOfSerialChannels = BoardnumberOfSerialChannels;
 }
-bool DeviceRegistration::IsValidPin(PinNameValue pinNameValue)
+bool Device::IsValidPin(PinNameValue pinNameValue)
 {
     return (FindPin(pinNameValue) != NOT_FOUND);
 }
-int DeviceRegistration::NumberOfPins()
+int Device::NumberOfPins()
 {
     return NumberOfGPIOPins;
 }
-int DeviceRegistration::FindPin(PinNameValue pinNameValue)
+int Device::FindPin(PinNameValue pinNameValue)
 {
     for (int pinIndex = 0; pinIndex < NumberOfGPIOPins; pinIndex++)
     {
@@ -88,7 +88,7 @@ int DeviceRegistration::FindPin(PinNameValue pinNameValue)
     }
     return NOT_FOUND;
 }
-PinNameValue DeviceRegistration::FindPinWithFunctionAndChannel(DevicePinFunction dph, int deviceChannel)
+PinNameValue Device::FindPinWithFunctionAndChannel(DevicePinFunction dph, int deviceChannel)
 {
     for (int pinIndex = 0; pinIndex < NumberOfPins(); pinIndex++)
     {
@@ -100,12 +100,12 @@ PinNameValue DeviceRegistration::FindPinWithFunctionAndChannel(DevicePinFunction
     }
     return (PinNameValue)0;
 }
-bool DeviceRegistration::IsPinReserved(PinNameValue pinNameValue)
+bool Device::IsPinReserved(PinNameValue pinNameValue)
 {
     int pinIndex = FindPin(pinNameValue);
     return GPIOPins[pinIndex].Reserved;
 }
-bool DeviceRegistration::ReservePin(
+bool Device::ReservePin(
     PinNameValue pinNameValue,
     DevicePinFunction devicePinFunction,
     int deviceFunctionChannelNumber)
@@ -122,13 +122,13 @@ bool DeviceRegistration::ReservePin(
     }
     return status;
 }
-DeviceRegistration::DevicePin DeviceRegistration::GetPin(PinNameValue pinNameValue)
+Device::DevicePin Device::GetPin(PinNameValue pinNameValue)
 {
     int pinIndex = FindPin(pinNameValue);
     return GPIOPins[pinIndex];
 }
 
-void DeviceRegistration::ReleasePin(PinNameValue pinNameValue)
+void Device::ReleasePin(PinNameValue pinNameValue)
 {
     int pinIndex = FindPin(pinNameValue);
     if (IsPinReserved(pinNameValue))
@@ -138,26 +138,26 @@ void DeviceRegistration::ReleasePin(PinNameValue pinNameValue)
         GPIOPins[pinIndex].DeviceFunctionChannelNumber = 0;
     }
 }
-bool DeviceRegistration::IsValidOutputPin(PinNameValue pinNameValue)
+bool Device::IsValidOutputPin(PinNameValue pinNameValue)
 {
     return IsValidOutputDriveMode(GPIOPins[FindPin(pinNameValue)].Mode);
 }
-bool DeviceRegistration::IsValidInputPin(PinNameValue pinNameValue)
+bool Device::IsValidInputPin(PinNameValue pinNameValue)
 {
     return IsValidInputDriveMode(GPIOPins[FindPin(pinNameValue)].Mode);
 }
-bool DeviceRegistration::IsValidOutputDriveMode(PinMode driveMode)
+bool Device::IsValidOutputDriveMode(PinMode driveMode)
 {
     return (
         driveMode == PinMode_Output || driveMode == PinMode_OutputOpenDrain ||
         driveMode == PinMode_OutputOpenDrainPullUp || driveMode == PinMode_OutputOpenSource ||
         driveMode == PinMode_OutputOpenSourcePullDown);
 }
-bool DeviceRegistration::IsValidInputDriveMode(PinMode driveMode)
+bool Device::IsValidInputDriveMode(PinMode driveMode)
 {
     return (driveMode == PinMode_Input || driveMode == PinMode_InputPullDown || driveMode == PinMode_InputPullUp);
 }
-bool DeviceRegistration::IsValidADCDevice(int deviceIndex)
+bool Device::IsValidADCDevice(int deviceIndex)
 {
     bool status = false;
     for (int iChannel = 0; iChannel < NumberOfADCChannels; iChannel++)
@@ -170,7 +170,7 @@ bool DeviceRegistration::IsValidADCDevice(int deviceIndex)
     }
     return status;
 }
-bool DeviceRegistration::IsValidDACDevice(int deviceIndex)
+bool Device::IsValidDACDevice(int deviceIndex)
 {
     bool status = false;
     for (int iChannel = 0; iChannel < NumberOfDACChannels; iChannel++)
@@ -183,7 +183,7 @@ bool DeviceRegistration::IsValidDACDevice(int deviceIndex)
     }
     return status;
 }
-bool DeviceRegistration::IsValidI2CDevice(int deviceIndex)
+bool Device::IsValidI2CDevice(int deviceIndex)
 {
     bool status = false;
     for (int iChannel = 0; iChannel < NumberOfI2CChannels; iChannel++)
@@ -196,7 +196,7 @@ bool DeviceRegistration::IsValidI2CDevice(int deviceIndex)
     }
     return status;
 }
-bool DeviceRegistration::IsValidPWMDevice(int deviceIndex)
+bool Device::IsValidPWMDevice(int deviceIndex)
 {
     bool status = false;
     for (int iChannel = 0; iChannel < NumberOfPWMChannels; iChannel++)
@@ -209,7 +209,7 @@ bool DeviceRegistration::IsValidPWMDevice(int deviceIndex)
     }
     return status;
 }
-bool DeviceRegistration::IsValidSPIDevice(int deviceIndex)
+bool Device::IsValidSPIDevice(int deviceIndex)
 {
     bool status = false;
     for (int iChannel = 0; iChannel < NumberOfSpiChannels; iChannel++)
@@ -222,7 +222,7 @@ bool DeviceRegistration::IsValidSPIDevice(int deviceIndex)
     }
     return status;
 }
-bool DeviceRegistration::IsValidSerialBus(int deviceIndex)
+bool Device::IsValidSerialBus(int deviceIndex)
 {
     bool status = false;
     for (int iChannel = 0; iChannel < NumberOfSerialChannels; iChannel++)
@@ -235,7 +235,7 @@ bool DeviceRegistration::IsValidSerialBus(int deviceIndex)
     }
     return status;
 }
-bool DeviceRegistration::SetPinMode(PinNameValue pinNameValue, PinMode pinMode)
+bool Device::SetPinMode(PinNameValue pinNameValue, PinMode pinMode)
 {
     int pinIndex = FindPin(pinNameValue);
     GPIOPins[pinIndex].Mode = pinMode;
@@ -252,7 +252,7 @@ bool DeviceRegistration::SetPinMode(PinNameValue pinNameValue, PinMode pinMode)
 //     }
 //     return status;
 // }
-bool DeviceRegistration::RemovePinParameters(PinNameValue pinNameValue)
+bool Device::RemovePinParameters(PinNameValue pinNameValue)
 {
     bool status = false;
     int pinIndex = FindPin(pinNameValue);
@@ -268,7 +268,7 @@ bool DeviceRegistration::RemovePinParameters(PinNameValue pinNameValue)
     }
     return status;
 }
-unsigned int DeviceRegistration::countSetBits(unsigned int num)
+unsigned int Device::countSetBits(unsigned int num)
 {
     unsigned int count = 0;
     while (num)
@@ -280,14 +280,14 @@ unsigned int DeviceRegistration::countSetBits(unsigned int num)
 }
 
 #ifdef FILEX
-static DeviceRegistration::SDPin *SDChannels;
+static Device::SDPin *SDChannels;
 static int NumberOfSDChannels;
-void DeviceRegistration::CreateSDChannelList(SDPin *BoardSDChannels, int BoardnumberOfSDChannels)
+void Device::CreateSDChannelList(SDPin *BoardSDChannels, int BoardnumberOfSDChannels)
 {
     SDChannels = BoardSDChannels;
     NumberOfSDChannels = BoardnumberOfSDChannels;
 }
-bool DeviceRegistration::IsValidSDBus(int deviceIndex)
+bool Device::IsValidSDBus(int deviceIndex)
 {
     bool status = false;
     for (int iChannel = 0; iChannel < NumberOfSDChannels; iChannel++)

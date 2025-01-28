@@ -79,7 +79,10 @@ bool FlashDriver_IsBlockErased(void *context, ByteAddress blockAddress,
 {
     return false;
 }
-// On the RP2XXX, flash blocks are 4096 bytes, and all operations are aligned to and in multiples of 4096 bytes
+// On the RP2XXX, sector sizes are 4096 bytes and all operations are aligned to and in multiples of 4096 bytes
+// with support to erase in 4KB, 32KB or 64KB erase sizes
+// The support comes from the WINBOND flash chips used
+
 bool FlashDriver_EraseBlock(void *context, ByteAddress address)
 {
  
@@ -89,7 +92,11 @@ bool FlashDriver_EraseBlock(void *context, ByteAddress address)
 
   GLOBAL_LOCK()
 
+  // Use 4KB size blocks
   flash_range_erase(flashOffset, FLASH_SECTOR_SIZE);
+
+  // Use 64KB size blocks
+//  flash_range_erase(flashOffset, FLASH_BLOCK_SIZE);
 
   GLOBAL_UNLOCK()
 

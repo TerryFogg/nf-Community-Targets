@@ -6,7 +6,7 @@
 #include "nanoCLR_Types.h"
 #include "sys_dev_pwm_native.h"
 #include "DeviceIO.h"
-#include "DeviceRegistration.h"
+#include "Device.h"
 
 HRESULT Library_sys_dev_pwm_native_System_Device_Pwm_PwmChannel::NativeInit___VOID(CLR_RT_StackFrame &stack)
 {
@@ -20,7 +20,7 @@ HRESULT Library_sys_dev_pwm_native_System_Device_Pwm_PwmChannel::NativeInit___VO
         CLR_INT32 desiredFrequency = stack.This()[FIELD___frequency].NumericByRef().s4;
         CLR_INT32 dutyCycle = stack.This()[FIELD___dutyCycle].NumericByRef().s4;
 
-        if (DeviceRegistration::IsValidPWMDevice(channelId))
+        if (Device::IsValidPWMDevice(channelId))
         {
             PwmIO::Initialize(channelId, timerId, pinNumber, polarity, desiredFrequency, dutyCycle);
         }
@@ -37,7 +37,7 @@ HRESULT Library_sys_dev_pwm_native_System_Device_Pwm_PwmChannel::DisposeNative__
     {
         FAULT_ON_NULL(stack.This());
         CLR_INT32 channelId = stack.This()[FIELD___channelNumber].NumericByRef().s4;
-        if (DeviceRegistration::IsValidPWMDevice(channelId))
+        if (Device::IsValidPWMDevice(channelId))
         {
             PwmIO::Dispose(channelId);
         }

@@ -7,7 +7,7 @@
 #include <tx_api.h>
 #include <tx_port.h>
 #include "DeviceIO.h"
-#include "DeviceRegistration.h"
+#include "Device.h"
 
 HRESULT Library_sys_dev_adc_native_System_Device_Adc_AdcController::NativeInit___VOID(CLR_RT_StackFrame &stack)
 {

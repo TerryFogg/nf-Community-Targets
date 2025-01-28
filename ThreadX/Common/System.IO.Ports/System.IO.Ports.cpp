@@ -6,7 +6,7 @@
 #include "sys_io_ser_native.h"
 #include "board.h"
 #include "DeviceIO.h"
-#include "DeviceRegistration.h"
+#include "Device.h"
 
 // An Events_Get clears the event
 #define CLEAR_SERIAL_IN_EVENT Events_Get(SYSTEM_EVENT_FLAG_COM_IN)
@@ -22,7 +22,7 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::NativeInit___VOID(
         CLR_INT32 baudRate = ((int)stack.This()[Library_sys_io_ser_native_System_IO_Ports_SerialPort::FIELD___baudRate]
                                   .NumericByRef()
                                   .s4);
-        if (DeviceRegistration::IsValidSerialBus(UsartDeviceNumber))
+        if (Device::IsValidSerialBus(UsartDeviceNumber))
         {
             SerialIO::Initialize(UsartDeviceNumber, baudRate);
         }
@@ -463,7 +463,7 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::NativeConfig___VOI
         Handshake RequestedHandshake = (Handshake)stack.This()[FIELD___handshake].NumericByRef().s4;
         SerialMode RequestedMode = (SerialMode)stack.This()[FIELD___mode].NumericByRef().s4;
 
-        if (DeviceRegistration::IsValidSerialBus(usartDeviceNumber))
+        if (Device::IsValidSerialBus(usartDeviceNumber))
         {
             if (RequestedMode != SerialMode::SerialMode_Normal)
             {

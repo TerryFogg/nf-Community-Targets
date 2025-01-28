@@ -198,7 +198,7 @@ TIM_TypeDef *PWM_Channel[] = {
     TIM3,
     TIM4,
     TIM5};
-DeviceRegistration::SerialChannel Serial_Channel[] = {
+Device::SerialChannel Serial_Channel[] = {
     {NULL, ' '}, // No Channel zero
     {USART1, 0x0D},
     {USART2, 0x0D},
@@ -263,26 +263,26 @@ uint32_t DmaStreamNumber[] = {
 int GetI2CPin_AlternateFunctionNumber(
     GPIO_PIN GPIOPortByNumber,
     int pinNumber,
-    DeviceRegistration::DevicePinFunction dpf);
+    Device::DevicePinFunction dpf);
 
 int GetI2CPin_AlternateFunctionNumber(
     GPIO_PIN GPIOPortByNumber,
     int pinNumber,
-    DeviceRegistration::DevicePinFunction dpf)
+    Device::DevicePinFunction dpf)
 {
     uint32_t alternate = -1;
     switch (dpf)
     {
-        case DeviceRegistration::DevicePinFunction::NONE:
-        case DeviceRegistration::DevicePinFunction::GPIO:
-        case DeviceRegistration::DevicePinFunction::ADC:
-        case DeviceRegistration::DevicePinFunction::CAN:
-        case DeviceRegistration::DevicePinFunction::DAC:
-        case DeviceRegistration::DevicePinFunction::SPI:
-        case DeviceRegistration::DevicePinFunction::COUNTER:
-        case DeviceRegistration::DevicePinFunction::PWM:
-        case DeviceRegistration::DevicePinFunction::TIMER:
-        case DeviceRegistration::DevicePinFunction::I2C:
+        case Device::DevicePinFunction::NONE:
+        case Device::DevicePinFunction::GPIO:
+        case Device::DevicePinFunction::ADC:
+        case Device::DevicePinFunction::CAN:
+        case Device::DevicePinFunction::DAC:
+        case Device::DevicePinFunction::SPI:
+        case Device::DevicePinFunction::COUNTER:
+        case Device::DevicePinFunction::PWM:
+        case Device::DevicePinFunction::TIMER:
+        case Device::DevicePinFunction::I2C:
             if (GPIOPortByNumber == 2 && pinNumber == 8)
             {
                 // PB8 - I2C1_SCL,AF4
@@ -304,11 +304,11 @@ int GetI2CPin_AlternateFunctionNumber(
                 alternate = LL_GPIO_AF_4;
             }
             break;
-        case DeviceRegistration::DevicePinFunction::I2S:
-        case DeviceRegistration::DevicePinFunction::SD:
-        case DeviceRegistration::DevicePinFunction::USART:
-        case DeviceRegistration::DevicePinFunction::WAKEUP:
-        case DeviceRegistration::DevicePinFunction::LCD:
+        case Device::DevicePinFunction::I2S:
+        case Device::DevicePinFunction::SD:
+        case Device::DevicePinFunction::USART:
+        case Device::DevicePinFunction::WAKEUP:
+        case Device::DevicePinFunction::LCD:
             break;
     }
     return alternate;
@@ -392,7 +392,7 @@ bool GpioIO::Toggle(PinNameValue pinNameValue)
 }
 bool GpioIO::SetFunction(
     PinNameValue pinNameValue,
-    DeviceRegistration::DevicePinFunction PinFunction,
+    Device::DevicePinFunction PinFunction,
     int alternateFunctionNumber)
 {
     int GPIOPortByNumber = PORT_INDEX(pinNameValue);
@@ -401,39 +401,39 @@ bool GpioIO::SetFunction(
     bool status = false;
     switch (PinFunction)
     {
-        case DeviceRegistration::DevicePinFunction::NONE:
+        case Device::DevicePinFunction::NONE:
             status = true;
             break;
-        case DeviceRegistration::DevicePinFunction::ADC:
+        case Device::DevicePinFunction::ADC:
             LL_GPIO_InitTypeDef GPIO_InitStruct;
             LL_GPIO_SetPinMode(Port[GPIOPortByNumber], gpioPortPinNumber, LL_GPIO_MODE_ANALOG);
             break;
-        case DeviceRegistration::DevicePinFunction::CAN:
+        case Device::DevicePinFunction::CAN:
             // Not supported on this MCU
             status = false;
             break;
-        case DeviceRegistration::DevicePinFunction::DAC:
+        case Device::DevicePinFunction::DAC:
             status = false;
             break;
-        case DeviceRegistration::DevicePinFunction::GPIO:
+        case Device::DevicePinFunction::GPIO:
             status = true;
             break;
-        case DeviceRegistration::DevicePinFunction::SPI:
+        case Device::DevicePinFunction::SPI:
             status = true;
             break;
-        case DeviceRegistration::DevicePinFunction::COUNTER:
+        case Device::DevicePinFunction::COUNTER:
             status = true;
             break;
-        case DeviceRegistration::DevicePinFunction::PWM:
+        case Device::DevicePinFunction::PWM:
             status = true;
             break;
-        case DeviceRegistration::DevicePinFunction::SD:
+        case Device::DevicePinFunction::SD:
             status = true;
             break;
-        case DeviceRegistration::DevicePinFunction::TIMER:
+        case Device::DevicePinFunction::TIMER:
             status = true;
             break;
-        case DeviceRegistration::DevicePinFunction::I2C:
+        case Device::DevicePinFunction::I2C:
         {
             LL_AHB4_GRP1_EnableClock(GpioPortClockEnable[GPIOPortByNumber]);
             LL_GPIO_SetPinMode(Port[GPIOPortByNumber], gpioPortPinNumber, LL_GPIO_MODE_ALTERNATE);
@@ -450,10 +450,10 @@ bool GpioIO::SetFunction(
         }
             status = true;
             break;
-        case DeviceRegistration::DevicePinFunction::I2S:
+        case Device::DevicePinFunction::I2S:
             status = true;
             break;
-        case DeviceRegistration::DevicePinFunction::USART:
+        case Device::DevicePinFunction::USART:
             LL_AHB4_GRP1_EnableClock(GpioPortClockEnable[GPIOPortByNumber]);
             GPIO_InitStruct.Alternate = alternateFunctionNumber;
             GPIO_InitStruct.Pin = gpioPortPinNumber;
@@ -464,7 +464,7 @@ bool GpioIO::SetFunction(
             LL_GPIO_Init(Port[GPIOPortByNumber], &GPIO_InitStruct);
             status = true;
             break;
-        case DeviceRegistration::DevicePinFunction::WAKEUP:
+        case Device::DevicePinFunction::WAKEUP:
             status = true;
             break;
         default:
@@ -1269,9 +1269,9 @@ bool I2cIO::Dispose(CLR_INT32 I2C_deviceId)
     if (status)
     {
         PinNameValue pinNameValueSCL =
-            DeviceRegistration::FindPinWithFunctionAndChannel(DeviceRegistration::DevicePinFunction::I2C, I2C_deviceId);
+            Device::FindPinWithFunctionAndChannel(Device::DevicePinFunction::I2C, I2C_deviceId);
         PinNameValue pinNameValueSDA =
-            DeviceRegistration::FindPinWithFunctionAndChannel(DeviceRegistration::DevicePinFunction::I2C, I2C_deviceId);
+            Device::FindPinWithFunctionAndChannel(Device::DevicePinFunction::I2C, I2C_deviceId);
         GpioIO::SetLowPower(pinNameValueSCL);
         GpioIO::SetLowPower(pinNameValueSDA);
     }

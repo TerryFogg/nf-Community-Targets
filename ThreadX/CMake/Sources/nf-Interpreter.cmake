@@ -274,7 +274,7 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/sys_calls.c
 
                     # These device I/O are typical and have not been made optional
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/DeviceRegistration.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/Device.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Adc.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Dac.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Gpio.cpp

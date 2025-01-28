@@ -7,7 +7,7 @@
 #include "CPU_SPI_DEcl.h"
 #include "board.h"
 #include "DeviceIO.h"
-#include "DeviceRegistration.h"
+#include "Device.h"
 #include "sys_dev_spi_native.h"
 #include <string.h>
 #include <targetPAL.h>

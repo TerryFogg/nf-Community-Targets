@@ -9,7 +9,7 @@
 
 #include "TouchDevice.h"
 #include "TouchInterface.h"
-#include <DeviceRegistration.h>
+#include <Device.h>
 #include <DeviceIO.h>
 
 struct TouchDevice g_TouchDevice;
@@ -82,7 +82,6 @@ enum FT6X06_VALUES : CLR_UINT8
 };
 
 static GPIO_INTERRUPT_SERVICE_ROUTINE touchInterrupt = NULL;
-
 void gpio_callback(uint gpio, uint32_t events)
 {
     bool pinState = (events == 4) ? true : false;
@@ -91,7 +90,6 @@ void gpio_callback(uint gpio, uint32_t events)
         touchInterrupt(gpio, pinState, NULL);
     }
 }
-
 bool TouchDevice::Initialize()
 {
     // Check device type correct
@@ -110,40 +108,30 @@ bool TouchDevice::Initialize()
             g_TouchInterface.Write_Read(set_interrupt_mode, 2, 0);
         }
     }
+    Device::ReservePin(
+        (PinNameValue)TOUCH_INTERFACE_INTERRUPT,
+        Device::DevicePinFunction::GPIO);
+    GpioIO::InitializePin((PinNameValue)TOUCH_INTERFACE_INTERRUPT);
+    Device::SetPinMode((PinNameValue)TOUCH_INTERFACE_INTERRUPT, PinMode_Input);
+    GpioIO::SetMode((PinNameValue)TOUCH_INTERFACE_INTERRUPT, PinMode_Input);
+
+    Device::GpioParameter *newGpioParameter =
+        (Device::GpioParameter *)platform_malloc(sizeof(Device::GpioParameter));
+    memset(newGpioParameter, 0, sizeof(Device::GpioParameter));
+    Device::AddPinParameters((PinNameValue)TOUCH_INTERFACE_INTERRUPT, newGpioParameter);
+    newGpioParameter->callBack = true;
+    newGpioParameter->edgeTrigger = GPIO_INT_EDGE_HIGH;
+
     return result;
 }
 bool TouchDevice::Enable(GPIO_INTERRUPT_SERVICE_ROUTINE touchIsrProc)
 {
-    // The FT6X06 doesn't appear to have a enable/disable command ( at least not
-    // what can be seen in the poor documentation)
-    // Enable interrupt detection on the GPIO pin
     touchInterrupt = touchIsrProc;
-
-    DeviceRegistration::ReservePin(
-        (PinNameValue)TOUCH_INTERFACE_INTERRUPT,
-        DeviceRegistration::DevicePinFunction::GPIO);
-    GpioIO::InitializePin((PinNameValue)TOUCH_INTERFACE_INTERRUPT);
-    DeviceRegistration::SetPinMode((PinNameValue)TOUCH_INTERFACE_INTERRUPT, PinMode_Input);
-    GpioIO::SetMode((PinNameValue)TOUCH_INTERFACE_INTERRUPT, PinMode_Input);
-
-    DeviceRegistration::GpioParameter *newGpioParameter =
-        (DeviceRegistration::GpioParameter *)platform_malloc(sizeof(DeviceRegistration::GpioParameter));
-    memset(newGpioParameter, 0, sizeof(DeviceRegistration::GpioParameter));
-    DeviceRegistration::AddPinParameters((PinNameValue)TOUCH_INTERFACE_INTERRUPT, newGpioParameter);
-    newGpioParameter->callBack = true;
-    newGpioParameter->edgeTrigger = GPIO_INT_EDGE_HIGH;
-    GpioIO::InterruptEnable(
-        (PinNameValue)TOUCH_INTERFACE_INTERRUPT,
-        GPIO_INT_EDGE_BOTH,
-        (void * )gpio_callback);
-
+    GpioIO::InterruptEnable((PinNameValue)TOUCH_INTERFACE_INTERRUPT, GPIO_INT_EDGE_BOTH, (void *)gpio_callback);
     return TRUE;
 }
 bool TouchDevice::Disable()
 {
-    // The FT6X06 doesn't appear to have a enable/disable command ( at least not
-    // what can be seen in the poor documentation)
-    // Disable interrupt detection on the GPIO pin
     GpioIO::InterruptDisable((PinNameValue)TOUCH_INTERFACE_INTERRUPT);
     return true;
 }
@@ -175,6 +163,6 @@ TouchPointDevice TouchDevice::GetPoint()
     // Upper 2 bits of high X1 coord is (touch Up/Down)
     int touch1Event = (touchValues[2] & 0xC0) >> 6;
 
-    tp.TouchDown = (touch1Event == PRESS_DOWN);
+    //    tp.TouchDown = (touch1Event == PRESS_DOWN);
     return tp;
 }

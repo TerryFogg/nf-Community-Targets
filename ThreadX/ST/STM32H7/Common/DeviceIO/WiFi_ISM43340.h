@@ -5,7 +5,7 @@
 //
 #include "board.h"
 #include "DeviceIO.h"
-#include "DeviceRegistration.h"
+#include "Device.h"
 #include "wifi.h"
 
 

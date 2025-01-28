@@ -4,7 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //
 #include "nanoCLR_Types.h"
-#include "DeviceRegistration.h"
+#include "Device.h"
 #include "board.h"
 
 #include "sys_dev_adc_native.h"
@@ -40,7 +40,7 @@ class GpioIO
     static bool Read(PinNameValue pinNumber);
     static bool Write(PinNameValue pinNumber, bool pinState);
     static bool Toggle(PinNameValue pinNumber);
-    static bool SetFunction(DeviceRegistration::DevicePin);
+    static bool SetFunction(Device::DevicePin);
     static bool SetLowPower(PinNameValue pinNumber);
     static bool SetMode(PinNameValue pinNumber, PinMode pinMode);
     static bool InterruptEnable(PinNameValue pinNumber, GPIO_INT_EDGE events, void *interruptRoutine = NULL);

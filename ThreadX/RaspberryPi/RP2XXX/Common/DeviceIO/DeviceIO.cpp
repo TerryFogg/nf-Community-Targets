@@ -11,6 +11,10 @@ bool GpioIO::Initialize()
 }
 bool GpioIO::InitializePin(PinNameValue pinNameValue)
 {
+    Device::ReservePin(
+        (PinNameValue)TOUCH_INTERFACE_INTERRUPT,
+        Device::DevicePinFunction::GPIO);
+
     // Sets pin as input, sets output to low and function as SIO
     int pinNumber = pinNameValue;
     gpio_init(pinNumber);
@@ -45,19 +49,19 @@ static void gpio_wakup_callback(uint gpio, uint32_t events)
   // Interrupt callback has woken the MCU
   //  ....  continue
 }
-bool GpioIO::SetFunction(DeviceRegistration::DevicePin devicePin)
+bool GpioIO::SetFunction(Device::DevicePin devicePin)
 {
     bool status = false;
     int pinNumber = devicePin.pinNameValue;
 
     switch (devicePin.CurrentFunction)
     {
-        case DeviceRegistration::DevicePinFunction::NONE:
+        case Device::DevicePinFunction::NONE:
             // basic input/output mode with output disabled
             gpio_set_function(pinNumber, GPIO_FUNC_NULL);
             status = true;
             break;
-        case DeviceRegistration::DevicePinFunction::ADC:
+        case Device::DevicePinFunction::ADC:
 
             if (PinSupportsADC(pinNumber))
             {
@@ -72,52 +76,52 @@ bool GpioIO::SetFunction(DeviceRegistration::DevicePin devicePin)
                 status = false;
             }
             break;
-        case DeviceRegistration::DevicePinFunction::CAN:
+        case Device::DevicePinFunction::CAN:
             // Not supported on this MCU
             status = false;
             break;
-        case DeviceRegistration::DevicePinFunction::DAC:
+        case Device::DevicePinFunction::DAC:
             // Not supported on this MCU
             status = false;
             break;
-        case DeviceRegistration::DevicePinFunction::GPIO:
+        case Device::DevicePinFunction::GPIO:
             // basic input/output mode with output disabled
             gpio_set_function(pinNumber, GPIO_FUNC_NULL);
             status = true;
             break;
-        case DeviceRegistration::DevicePinFunction::SPI:
+        case Device::DevicePinFunction::SPI:
             gpio_set_function(pinNumber, GPIO_FUNC_SPI);
             status = true;
             break;
-        case DeviceRegistration::DevicePinFunction::COUNTER:
+        case Device::DevicePinFunction::COUNTER:
             // Not supported on this MCU
             status = false;
             break;
-        case DeviceRegistration::DevicePinFunction::PWM:
+        case Device::DevicePinFunction::PWM:
             gpio_set_function(pinNumber, GPIO_FUNC_PWM);
             status = true;
             break;
-        case DeviceRegistration::DevicePinFunction::SD:
+        case Device::DevicePinFunction::SD:
             status = true;
             break;
-        case DeviceRegistration::DevicePinFunction::TIMER:
+        case Device::DevicePinFunction::TIMER:
             gpio_set_function(pinNumber, GPIO_FUNC_GPCK);
             status = true;
             break;
-        case DeviceRegistration::DevicePinFunction::I2C:
+        case Device::DevicePinFunction::I2C:
             gpio_set_function(pinNumber, GPIO_FUNC_I2C);
             gpio_pull_up(pinNumber);
             status = true;
             break;
-        case DeviceRegistration::DevicePinFunction::I2S:
+        case Device::DevicePinFunction::I2S:
             // Not supported on this MCU
             status = false;
             break;
-        case DeviceRegistration::DevicePinFunction::USART:
+        case Device::DevicePinFunction::USART:
             gpio_set_function(pinNumber, GPIO_FUNC_UART);
             status = true;
             break;
-        case DeviceRegistration::DevicePinFunction::WAKEUP:
+        case Device::DevicePinFunction::WAKEUP:
             // No formal pin wakeup function but we can set an interrupt to return from low power mode
             gpio_init(pinNumber);
             gpio_set_dir(pinNumber, GPIO_IN);

@@ -1,0 +1,564 @@
+﻿{
+    "version": 4,
+    "configurePresets": [
+        {
+            "name": "THREADX_AND_COMPONENT_PATHS",
+            "description": "Configuration for setting up locations where external source repositories have been copied to local disk",
+            "hidden": true,
+            "cacheVariables": {
+                "THREADX_PATH": "C:/nftools/ThreadX",
+                "FILEX_PATH": "C:/nftools/FileX",
+                "USBX_PATH": "C:/nftools/UsbX",
+                "NETXDUO_PATH": "C:/nftools/netxduo",
+                "LEVELX_PATH": "C:/nftools/levelx"
+            }
+        },
+        {
+            "name": "GCC_ARM_COMMON_BUILD",
+            "inherits": "general-preset",
+            "description": "Configuration common to all arm series processors",
+            "hidden": true,
+            "generator": "Ninja",
+            "cacheVariables": {
+                "RTOS": "ThreadX",
+                "COMMUNITY_TARGET": "ThreadX",
+                "CMAKE_SYSTEM_NAME": "Generic",
+
+                "CMAKE_AR": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-ar.exe",
+                "CMAKE_ASM_COMPILER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc.exe",
+                "CMAKE_ASM_COMPILER_AR": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc-ar.exe",
+                "CMAKE_RANLIB": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-ranlib.exe",
+                "CMAKE_CXX_COMPILER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-g++.exe",
+                "CMAKE_CXX_COMPILER_AR": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc-ar.exe",
+                "CMAKE_CXX_COMPILER_RANLIB": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc-ranlib.exe",
+                "CMAKE_C_COMPILER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc.exe",
+                "CMAKE_C_COMPILER_AR": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-gcc-ar.exe",
+                "CMAKE_C_COMPILER_RANLIB": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-gcc-ranlib.exe",
+                "CMAKE_LINKER": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-ld.exe",
+                "CMAKE_NM": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-nm.exe",
+                "CMAKE_READELF": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-readelf.exe",
+                "CMAKE_STRIP": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-strip.exe",
+                "CMAKE_TRY_COMPILE_TARGET_TYPE": "STATIC_LIBRARY",
+
+                "CMAKE_OBJCOPY": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-objcopy.exe",
+                "CMAKE_OBJDUMP": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-objdump.exe",
+                // Can set verbose in build preset below
+                //      "CMAKE_VERBOSE_MAKEFILE": "1",
+
+                "CMAKE_NM_UTIL": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-nm.exe",
+                "CMAKE_SIZE_UTIL": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-size.exe"
+            }
+        },
+        {
+            "name": "LIGHT_MATHEMATICS",
+            "description": "Configuration for setting up what hardware/software support for mathematics",
+            "hidden": true,
+            "cacheVariables": {
+                "NF_FEATURE_LIGHT_MATH": true,
+                "DP_FLOATINGPOINT": false
+            }
+        },
+        {
+            "name": "FULL_MATHEMATICS",
+            "description": "Configuration for setting up what hardware/software support for mathematics",
+            "hidden": true,
+            "cacheVariables": {
+                "NF_FEATURE_LIGHT_MATH": false,
+                "DP_FLOATINGPOINT": true
+            }
+        },
+        {
+            "name": "STM32H7",
+            "description": "Common to all STM32H7 series",
+            "hidden": true,
+            "inherits": [
+                "FULL_MATHEMATICS",
+                "THREADX_AND_COMPONENT_PATHS",
+                "GCC_ARM_COMMON_BUILD"
+            ],
+            "cacheVariables": {
+                "TARGET_VENDOR": "ST",
+                "TARGET_FAMILY": "STM32H7",
+                "ARM_PROCESSOR": "cortex-m7",
+                "TARGET_GIT_REPOSITORY": "https://github.com/STMicroelectronics/STM32CubeH7.git",
+                "TARGET_GIT_TAG": "v1.11.1",
+                "TARGET_GIT_LOCAL_PATH": "C:/nftools/STM32CubeH7",
+                "BUILD_VERSION": "1.0.0.0",
+                "INFOSTRING": "Built with ThreadX 6.1.12"
+            }
+        },
+        {
+            "name": "STM32U5",
+            "description": "Common to all STM32U5 series",
+            "hidden": true,
+            "inherits": [
+                "FULL_MATHEMATICS",
+                "THREADX_AND_COMPONENT_PATHS",
+                "GCC_ARM_COMMON_BUILD"
+            ],
+            "cacheVariables": {
+                "TARGET_VENDOR": "ST",
+                "TARGET_FAMILY": "STM32U5",
+                "ARM_PROCESSOR": "cortex-m33",
+                "TARGET_GIT_REPOSITORY": "https://github.com/STMicroelectronics/STM32CubeU5.git",
+                "TARGET_GIT_TAG": "v1.11.1",
+                "TARGET_GIT_LOCAL_PATH": "C:/nftools/STM32CubeU5",
+                "BUILD_VERSION": "1.0.0.0",
+                "INFOSTRING": "Built with ThreadX 6.1.12"
+            }
+        },
+        {
+            "name": "PICO_SDK",
+            "description": "Pico sdk support variables",
+            "hidden": true,
+            "cacheVariables": {
+                "PICO_TOOLCHAIN_PATH": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1",
+                "picotool_DIR": "C:/nftools/picotool",
+                "PICO_TOOLS_DIR": "C:/nftools/pico-sdk/tools",
+                "PICOTOOL_EXECUTABLE": "C:/nftools/picotool/build/picotool.exe",
+                "PICO_ARM": "1",
+                "PICO_SDK_PATH": "C:/nftools/pico-sdk",
+                "PICO_NO_PICOTOOL": true
+            }
+        },
+        {
+            "name": "DEBUG",
+            "description": "This is non-optimized and contains all the debug symbols",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "RELEASE",
+            "description": "This is optimized for speed without debugging symbols and with asserts disabled.",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "STM32H735G_DK",
+            "description": "Configuration for the STM32H735G_DK (Cortex M-7) discovery board from STMicroelectronics",
+            "hidden": false,
+            "inherits": [
+                "STM32H7"
+            ],
+            "cacheVariables": {
+                "TARGET_BOARD": "STM32H735G_DK",
+                "TARGET_SERIES": "STM32H735xx",
+                "HAS_CONFIG_BLOCK": false,
+                "RANDOM_NUMBER_GENERATOR": true,
+                "NANOCLR_SYSTEM_COLLECTIONS": true,
+                "NANOCLR_REFLECTION": true,
+                "REALTIME_CLOCK": false,
+                "WATCHDOG": false,
+                "ADVANCED_PROFILING": false,
+                "NETWORKING": false,
+                "FILEX_SYSTEM_SD": false,
+                "FILEX_SYSTEM_NAND": false,
+                "FILEX_SYSTEM_NOR": false,
+                "FILEX_SYSTEM_RAM": false,
+                "USB_DEVICE": false,
+                "USB_HOST": false,
+                "USB_HOST_CONTROLLER": false,
+                "USB_NETWORK": false,
+                "USB_PICTBRIDGE": false
+            }
+        },
+        {
+            "name": "STM32H7B3I_DK",
+            "description": "Configuration for the STM32H7B3I_DK (Cortex M-7) discovery board from STMicroelectronics",
+            "hidden": false,
+            "inherits": [
+                "STM32H7"
+            ],
+            "cacheVariables": {
+                "TARGET_BOARD": "STM32H7B3I_DK",
+                "TARGET_FAMILY": "STM32H7",
+                "TARGET_SERIES": "STM32H7B3xxQ",
+                "HAS_CONFIG_BLOCK": false,
+                "RANDOM_NUMBER_GENERATOR": true,
+                "NANOCLR_SYSTEM_COLLECTIONS": true,
+                "NANOCLR_REFLECTION": true,
+                "REALTIME_CLOCK": false,
+                "WATCHDOG": false,
+                "ADVANCED_PROFILING": false,
+                "NETWORKING": false,
+                "FILEX_SYSTEM_SD": false,
+                "FILEX_SYSTEM_NAND": false,
+                "FILEX_SYSTEM_NOR": false,
+                "FILEX_SYSTEM_RAM": false,
+                "USB_DEVICE": false,
+                "USB_HOST": false,
+                "USB_HOST_CONTROLLER": false,
+                "USB_NETWORK": false,
+                "USB_PICTBRIDGE": false
+            }
+        },
+        {
+            "name": "NUCLEO_H743ZI2",
+            "description": "Configuration for the NUCLEO-H743ZI2 (Cortex M-7) nucleo board from STMicroelectronics",
+            "hidden": false,
+            "inherits": [
+                "STM32H7"
+            ],
+            "cacheVariables": {
+                "TARGET_BOARD": "NUCLEO_H743ZI2",
+                "TARGET_SERIES": "STM32H743xx",
+                "HAS_CONFIG_BLOCK": false,
+                "RANDOM_NUMBER_GENERATOR": true,
+                "NANOCLR_SYSTEM_COLLECTIONS": true,
+                "NANOCLR_REFLECTION": true,
+                "REALTIME_CLOCK": false,
+                "WATCHDOG": false,
+                "ADVANCED_PROFILING": false,
+                "NETWORKING": false,
+                "FILEX_SYSTEM_SD": false,
+                "FILEX_SYSTEM_NAND": false,
+                "FILEX_SYSTEM_NOR": false,
+                "FILEX_SYSTEM_RAM": false,
+                "USB_DEVICE": false,
+                "USB_HOST": false,
+                "USB_HOST_CONTROLLER": false,
+                "USB_NETWORK": false,
+                "USB_PICTBRIDGE": false
+            }
+        },
+        {
+            "name": "STM32U5A9J_DK",
+            "description": "Configuration for the STM32U5A9J_DK (Cortex-M33) from STMicroelectronics",
+            "hidden": false,
+            "inherits": [
+                "STM32U5"
+            ],
+            "cacheVariables": {
+                "TARGET_BOARD": "STM32U5A9J_DK",
+                "TARGET_SERIES": "STM32U5A9xx",
+                "SECURE_CODE": false,
+                "HAS_CONFIG_BLOCK": false,
+                "RANDOM_NUMBER_GENERATOR": true,
+                "NANOCLR_SYSTEM_COLLECTIONS": true,
+                "NANOCLR_REFLECTION": true,
+                "REALTIME_CLOCK": false,
+                "WATCHDOG": false,
+                "ADVANCED_PROFILING": false,
+                "NETWORKING": false,
+                "FILEX_SYSTEM_SD": false,
+                "FILEX_SYSTEM_NAND": false,
+                "FILEX_SYSTEM_NOR": false,
+                "FILEX_SYSTEM_RAM": false,
+                "USB_DEVICE": false,
+                "USB_HOST": false,
+                "USB_HOST_CONTROLLER": false,
+                "USB_NETWORK": false,
+                "USB_PICTBRIDGE": false
+            }
+        },
+        {
+            "name": "RP2040",
+            "description": "Configuration for the Raspberry Pi Pico",
+            "hidden": true,
+            "inherits": [
+                "THREADX_AND_COMPONENT_PATHS",
+                "GCC_ARM_COMMON_BUILD",
+                "FULL_MATHEMATICS",
+                "PICO_SDK"
+            ],
+            "cacheVariables": {
+                "TARGET_VENDOR": "RaspberryPi",
+                "TARGET_BOARD": "RP2040",
+                "TARGET_FAMILY": "RP2XXX",
+                "TARGET_SERIES": "RP2040",
+                "TARGET_TYPE": "PICO_RP2040",
+                "ARM_PROCESSOR": "cortex-m0plus",
+                "PICO_BOARD": "pico",
+                "PICO_RP2040": "1",
+                "TARGET_GIT_REPOSITORY": "https://github.com/raspberrypi/pico-sdk.git",
+                "TARGET_GIT_TAG": "2.0.0",
+                "TARGET_GIT_LOCAL_PATH": "C:/nftools/pico-sdk",
+
+                "BUILD_VERSION": "1.0.0.0",
+                "INFOSTRING": "Built with ThreadX 6.1.12",
+                "HAS_CONFIG_BLOCK": false,
+                "RANDOM_NUMBER_GENERATOR": true,
+                "NANOCLR_SYSTEM_COLLECTIONS": true,
+                "NANOCLR_REFLECTION": true,
+                "REALTIME_CLOCK": false,
+                "WATCHDOG": false,
+                "ADVANCED_PROFILING": false,
+
+                "GRAPHICS_SUPPORT": true,
+                "TOUCH_DISPLAY_SUPPORT": false,
+
+                "FILEX_SYSTEM_SD": false,
+                "FILEX_SYSTEM_NAND": false,
+                "FILEX_SYSTEM_NOR": false,
+                "FILEX_SYSTEM_RAM": false,
+
+                "USB_DEVICE": false,
+                "USB_HOST": false,
+                "USB_HOST_CONTROLLER": false,
+                "USB_NETWORK": false,
+                "USB_PICTBRIDGE": false,
+                "NETWORKING": false,
+
+                "HARD_FAULT_DEBUG_HANDLER": true,
+                "CFG_USB_USE_DTR": false
+            }
+        },
+        {
+            "name": "RP2350",
+            "description": "Configuration for the Raspberry Pi Pico",
+            "hidden": true,
+            "inherits": [
+                "THREADX_AND_COMPONENT_PATHS",
+                "GCC_ARM_COMMON_BUILD",
+                "FULL_MATHEMATICS",
+                "PICO_SDK"
+            ],
+            "cacheVariables": {
+                "TARGET_VENDOR": "RaspberryPi",
+                "TARGET_BOARD": "RP2350",
+                "TARGET_FAMILY": "RP2XXX",
+                "TARGET_SERIES": "RP2350",
+                "TARGET_TYPE": "PICO_RP2350",
+                "ARM_PROCESSOR": "cortex-m33",
+                "PICO_BOARD": "pico2",
+                "PICO_RP2350": "1",
+                "TARGET_GIT_REPOSITORY": "https://github.com/raspberrypi/pico-sdk.git",
+                "TARGET_GIT_TAG": "2.0.0",
+                "TARGET_GIT_LOCAL_PATH": "C:/nftools/pico-sdk",
+                "SECURE_CODE": false,
+
+                "BUILD_VERSION": "1.0.0.0",
+                "INFOSTRING": "Built with ThreadX 6.1.12",
+                "HAS_CONFIG_BLOCK": false,
+                "RANDOM_NUMBER_GENERATOR": true,
+                "NANOCLR_SYSTEM_COLLECTIONS": true,
+                "NANOCLR_REFLECTION": true,
+
+                "REALTIME_CLOCK": false,
+                "WATCHDOG": false,
+
+                "ADVANCED_PROFILING": false,
+                "HARD_FAULT_DEBUG_HANDLER": true,
+
+                "NETWORKING": false,
+                "GRAPHICS_HEAP_FAST": false,
+                "CFG_USB_USE_DTR": false,
+                "CAN_SUPPORT": false,
+                "ONE_WIRE": false,
+                "IO_HASHING": false,
+                "CRYPTOGRAPHY": false,
+                "WIFI": false,
+                "BLUETOOTH": false
+            }
+        },
+        //
+        // Displays
+        //
+        {
+            "name": "MB1315A(ST)",
+            "description": "https://www.st.com/resource/en/schematic_pack/mb1315-default-a02_schematic.pdf",
+            "hidden": true,
+            "cacheVariables": {
+                "GRAPHICS_SUPPORT": true,
+                "TOUCH_DISPLAY_SUPPORT": true,
+                "GRAPHICS_LCD": "LTDC_PARALLEL_DMA2D_To_Video.cpp",
+                "LCD_WIDTH": "480",
+                "LCD_HEIGHT": "272",
+                "LCD_BACKLIGHT": "13",
+                "LCD_RESET": "12"
+            }
+        },
+        {
+            "name": "Waveshare-LCD-1.14",
+            "description": "https://www.waveshare.com/SPI-LCD-1.14.htm",
+            "hidden": true,
+            "cacheVariables": {
+                "GRAPHICS_SUPPORT": true,
+                "TOUCH_DISPLAY_SUPPORT": false,
+                "GRAPHICS_LCD": "SPI-LCD-1.14V2-ST7789VW.cpp",
+                "LCD_WIDTH": "240",
+                "LCD_HEIGHT": "135",
+                "LCD_BACKLIGHT": "13",
+                "LCD_RESET": "12",
+                "LDC_DC": "8",
+                "SPI_BUS": "1",
+                "SPI_TX": "11",
+                "SPI_CLK": "10",
+                "SPI_CS": "9"
+            }
+        },
+        {
+            "name": "BUYDISPLAY-ER-TFTM028",
+            "description": "https://www.buydisplay.com/2-8-inch-tft-touch-shield-for-arduino-w-capacitive-touch-screen-module",
+            "hidden": true,
+            "cacheVariables": {
+                "GRAPHICS_SUPPORT": true,
+                "TOUCH_DISPLAY_SUPPORT": true,
+
+                "GRAPHICS_LCD": "SPI-LCD-ER-TFTM028-4.cpp",
+
+                "TOUCH_INTERFACE_CONTROLLER": "FT6X06.cpp",
+                "TOUCH_INTERFACE_DRIVER": "I2C_To_TouchPanel.cpp",
+                "TOUCH_INTERFACE_BUS": "0",
+                "TOUCH_INTERFACE_SLAVE_ADDRESS": "56", // 0x38
+                "TOUCH_INTERFACE_I2C_SDA": "20",
+                "TOUCH_INTERFACE_I2C_SCL": "21",
+                "TOUCH_INTERFACE_INTERRUPT": "22",
+                "TOUCH_INTERFACE_WIDTH": "240",
+                "TOUCH_INTERFACE_HEIGHT": "320",
+                "TOUCH_INVERT_X": true,
+                "TOUCH_INVERT_Y": true,
+
+                "LCD_WIDTH": "240",
+                "LCD_HEIGHT": "320",
+                "LCD_BACKLIGHT": "26",
+                "LCD_RESET": "27",
+                "LDC_DC": "16",
+
+                "SPI_BUS": "0",
+                "SPI_TX": "19",
+                "SPI_CLK": "18",
+                "SPI_CS": "17"
+            }
+        },
+        //
+        // Flash configurations
+        //
+        // W25Qxxxx Series
+        // Program 1 to 256 bytes per programmable page,
+        // Pages can be erased in
+        // Groups of 16  (4KB sector erase)
+        // Groups of 128 (32KB block erase)
+        // *Groups of 256 (64KB block erase)
+        // Or the entire chip (chip erase)
+        {
+            "name": "W25Q16JV",
+            "description": "2MB Flash chip as used by Pico",
+            "hidden": true,
+            "cacheVariables": {
+                // Groups of 16 (4096 byte) (64KB block erase)
+                "FLASH_ERASE_SIZE": "64",
+                "FLASH_SIZE": "2",
+                "FLASH_CHIP": "W25Q32RV",
+                // Following variable used in the Pico-sdk for checking byte limit
+                "PICO_FLASH_SIZE_BYTES": "2097152"
+            }
+        },
+        {
+            "name": "W25Q32RV",
+            "description": "4MB Flash chip as used by Pico2",
+            "hidden": true,
+            "cacheVariables": {
+                // Groups of 16 (4096 byte) (64KB block erase)
+                "FLASH_ERASE_SIZE": "64",
+                "FLASH_SIZE": "4",
+                "FLASH_CHIP": "W25Q32RV",
+                // Following variable used in the Pico-sdk for checking byte limit
+                "PICO_FLASH_SIZE_BYTES": "4194304"
+            }
+        },
+        {
+            "name": "W25Q128JV",
+            "description": "16MB Flash chip as used by Pimoroni Pico Plus 2W",
+            "hidden": true,
+            "cacheVariables": {
+                // Groups of 16 (4096 byte) (64KB block erase)
+                "FLASH_ERASE_SIZE": "64",
+                "FLASH_SIZE": "16",
+                "FLASH_CHIP": "W25Q128JV",
+                // Following variable used in the Pico-sdk for checking byte limit
+                "PICO_FLASH_SIZE_BYTES": "16777216"
+            }
+        },
+        //
+        // PSRAM Configurations
+        //
+        // APSxx04L - Frequencies up to 133MHz
+        // Seamless self-managed refresh mechanism,does not require the support of DRAM refresh
+        {
+            "name": "APS6404L",
+            "description": "8MB PSRAM chip",
+            "hidden": true,
+            "cacheVariables": {
+                "PSRAM": true,
+                "PSRAM_SIZE": "8",
+                "PSRAM_CHIP": "APS6404L"
+            }
+        },
+        //
+        // Configurations to build
+        //
+        {
+            "name": "RP2040 + Waveshare LCD-1.14",
+            "description": "Pico2 board with 1.14 inch LCD",
+            "hidden": false,
+            "inherits": [
+                "RP2040",
+                "Waveshare-LCD-1.14",
+                "DEBUG"
+            ]
+        },
+        {
+            "name": "RP2350 + Waveshare LCD-1.14",
+            "description": "Pico2 board with 1.14 inch LCD",
+            "hidden": false,
+            "inherits": [
+                "RP2350",
+                "W25Q32RV",
+                "Waveshare-LCD-1.14",
+                "DEBUG"
+            ]
+        },
+        {
+            "name": "RP2350(16MB,8MB) + Waveshare LCD-1.14",
+            "description": "Pico2 board with 1.14 inch LCD",
+            "hidden": false,
+            "inherits": [
+                "RP2350",
+                "W25Q128JV",
+                "APS6404L",
+                "Waveshare-LCD-1.14",
+                "DEBUG"
+            ]
+        },
+        {
+            "name": "RP2350 + BuyDisplay-ER-TFTM028",
+            "description": "Pico2 board with 2.8 inch LCD and capacitive touch",
+            "hidden": false,
+            "inherits": [
+                "RP2350",
+                "BUYDISPLAY-ER-TFTM028",
+                "DEBUG"
+            ]
+        },
+        {
+            "name": "RP2350(16MB,8MB) + BuyDisplay-ER-TFTM028",
+            "description": "Pico2 board with 2.8 inch LCD and capacitive touch",
+            "hidden": false,
+            "inherits": [
+                "RP2350",
+                "W25Q128JV",
+                "APS6404L",
+                "BUYDISPLAY-ER-TFTM028",
+                "DEBUG"
+            ]
+        },
+        {
+            "name": "STM32H7B3I + MB1315A(ST)",
+            "description": "STM32H7B3I with Display",
+            "hidden": false,
+            "inherits": [
+                "STM32H7B3I_DK",
+                "MB1315A(ST)",
+                "DEBUG"
+            ]
+        }
+
+    ],
+    "buildPresets": [
+    ]
+}

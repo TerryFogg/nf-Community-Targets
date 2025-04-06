@@ -366,10 +366,32 @@
                 "GRAPHICS_SUPPORT": true,
                 "TOUCH_DISPLAY_SUPPORT": true,
                 "GRAPHICS_LCD": "LTDC_PARALLEL_DMA2D_To_Video.cpp",
+                "INTERFACE_TYPE": "VIDEO",
                 "LCD_WIDTH": "480",
                 "LCD_HEIGHT": "272",
-                "LCD_BACKLIGHT": "13",
-                "LCD_RESET": "12"
+                "LCD_BACKLIGHT": "15",
+                "LCD_RESET": "12",
+                "LCD_ENABLE": "13", // LL_GPIO_PIN_13
+                "LCD_CONTROL": "10", //LL_GPIO_PIN_10
+                "VIDEO_FREQUENCY_DIVIDER": "5",
+                "VIDEO_HORIZONTAL_SYNC": "41",
+                "VIDEO_HORIZONTAL_BACK_PORCH": "13",
+                "VIDEO_HORIZONTAL_FRONT_PORCH": "32",
+                "VIDEO_VERTICAL_SYNC": "10",
+                "VIDEO_VERTICAL_BACK_PORCH": "2",
+                "VIDEO_VERTICAL_FRONT_PORCH": "2",
+
+                "TOUCH_INTERFACE_CONTROLLER": "FT6X06.cpp",
+                "TOUCH_INTERFACE_DRIVER": "I2C_To_TouchPanel.cpp",
+                "TOUCH_INTERFACE_BUS": "4",                       // I2C4 
+                "TOUCH_INTERFACE_SLAVE_ADDRESS": "112",           // 0x70
+                "TOUCH_INTERFACE_I2C_SDA": "61",
+                "TOUCH_INTERFACE_I2C_SCL": "60",
+                "TOUCH_INTERFACE_INTERRUPT": "115",               // PH2
+                "TOUCH_INTERFACE_WIDTH": "472",
+                "TOUCH_INTERFACE_HEIGHT": "280",
+                "TOUCH_INVERT_X": true,
+                "TOUCH_INVERT_Y": true
             }
         },
         {
@@ -378,6 +400,7 @@
             "hidden": true,
             "cacheVariables": {
                 "GRAPHICS_SUPPORT": true,
+                "INTERFACE_TYPE": "SPI",
                 "TOUCH_DISPLAY_SUPPORT": false,
                 "GRAPHICS_LCD": "SPI-LCD-1.14V2-ST7789VW.cpp",
                 "LCD_WIDTH": "240",
@@ -398,15 +421,12 @@
             "cacheVariables": {
                 "GRAPHICS_SUPPORT": true,
                 "TOUCH_DISPLAY_SUPPORT": true,
-
                 "GRAPHICS_LCD": "SPI-LCD-ER-TFTM028-4.cpp",
-
+                "INTERFACE_TYPE": "SPI",
                 "TOUCH_INTERFACE_CONTROLLER": "FT6X06.cpp",
                 "TOUCH_INTERFACE_DRIVER": "I2C_To_TouchPanel.cpp",
-                "TOUCH_INTERFACE_BUS": "0",
+                "TOUCH_INTERFACE_BUS": "1",
                 "TOUCH_INTERFACE_SLAVE_ADDRESS": "56", // 0x38
-                "TOUCH_INTERFACE_I2C_SDA": "20",
-                "TOUCH_INTERFACE_I2C_SCL": "21",
                 "TOUCH_INTERFACE_INTERRUPT": "22",
                 "TOUCH_INTERFACE_WIDTH": "240",
                 "TOUCH_INTERFACE_HEIGHT": "320",

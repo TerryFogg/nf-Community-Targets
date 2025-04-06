@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
@@ -32,12 +32,12 @@
 
 struct DisplayInterface g_DisplayInterface;
 // Framebuffer set externally
-extern CLR_UINT32 Graphics_frame_buffer;
+extern CLR_UINT32 GRAPHICS_FRAME_BUFFER;
 
 CLR_UINT32 Width;
 CLR_UINT32 Height;
 
-void SetLcdPin(GPIO_TypeDef *GpioPort, CLR_UINT32 GpioPin, CLR_UINT32 AlternateFunction, CLR_UINT32 Mode)
+void SetLcdPin(GPIO_TypeDef *GpioPort, CLR_UINT32 DeviceGpioPin, CLR_UINT32 AlternateFunction, CLR_UINT32 Mode)
 {
     // LTDC Pins configuration
     LL_GPIO_InitTypeDef GPIO_InitStruct;
@@ -47,7 +47,7 @@ void SetLcdPin(GPIO_TypeDef *GpioPort, CLR_UINT32 GpioPin, CLR_UINT32 AlternateF
     // GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
     GPIO_InitStruct.Alternate = AlternateFunction;
     GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Pin = GpioPin;
+    GPIO_InitStruct.Pin = DeviceGpioPin;
     ErrorStatus result = LL_GPIO_Init(GpioPort, &GPIO_InitStruct);
     if (result == ErrorStatus::ERROR)
     {
@@ -247,7 +247,7 @@ void DisplayInterface::Initialize(DisplayInterfaceConfig &config)
 
 void DisplayInterface::GetTransferBuffer(CLR_UINT8 *&TransferBuffer, CLR_UINT32 &TransferBufferSize)
 {
-    TransferBuffer = (CLR_UINT8 *)&Graphics_frame_buffer;
+    TransferBuffer = (CLR_UINT8 *)&GRAPHICS_FRAME_BUFFER;
     TransferBufferSize = (Width * Height * 2);
 }
 
@@ -259,7 +259,7 @@ void DisplayInterface::ClearFrameBuffer()
     // Setup DMA to clear the graphic frame buffer
     LL_DMA2D_SetMode(DMA2D, LL_DMA2D_MODE_R2M);
     LL_DMA2D_SetOutputColor(DMA2D, LCD_COLOR_RGB565_BLACK);
-    LL_DMA2D_SetOutputMemAddr(DMA2D, (uint32_t)&Graphics_frame_buffer);
+    LL_DMA2D_SetOutputMemAddr(DMA2D, (uint32_t)&GRAPHICS_FRAME_BUFFER);
     LL_DMA2D_SetLineOffset(DMA2D, 0);
     LL_DMA2D_ConfigSize(DMA2D, Height, Width);
     DMA2D->OPFCCR = PIXEL_FORMAT_RGB565;
@@ -284,7 +284,7 @@ void DisplayInterface::WriteToFrameBuffer(
     // Setup DMA to transfer data to the graphic frame buffer
     LL_DMA2D_SetMode(DMA2D, LL_DMA2D_MODE_M2M);
     LL_DMA2D_FGND_SetMemAddr(DMA2D, (uint32_t)data);
-    LL_DMA2D_SetOutputMemAddr(DMA2D, (uint32_t)&Graphics_frame_buffer);
+    LL_DMA2D_SetOutputMemAddr(DMA2D, (uint32_t)&GRAPHICS_FRAME_BUFFER);
     LL_DMA2D_ConfigSize(DMA2D, Height, Width);
     LL_DMA2D_SetLineOffset(DMA2D, 0);
 

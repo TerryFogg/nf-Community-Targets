@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
 // See LICENSE file in the project root for full license information.
@@ -44,13 +44,13 @@ void InitializeSD_Bus(
     SDMMC_TypeDef *SDMMC=NULL;
     SDMMC_InitTypeDef SDMMCInit;
 
-    Device::SetPinFunction(SDMMC_D0, Device::DevicePinFunction::SD);
-    Device::SetPinFunction(SDMMC_D1, Device::DevicePinFunction::SD);
-    Device::SetPinFunction(SDMMC_D2, Device::DevicePinFunction::SD);
-    Device::SetPinFunction(SDMMC_D3, Device::DevicePinFunction::SD);
-    Device::SetPinFunction(SDMMC_CLK, Device::DevicePinFunction::SD);
-    Device::SetPinFunction(SDMMC_CMD, Device::DevicePinFunction::SD);
-    Device::SetPinFunction(SDMMC_DETECT, Device::DevicePinFunction::GPIO);
+    Device::SetPinFunction(SDMMC_D0, DevicePinFunction::SD);
+    Device::SetPinFunction(SDMMC_D1, DevicePinFunction::SD);
+    Device::SetPinFunction(SDMMC_D2, DevicePinFunction::SD);
+    Device::SetPinFunction(SDMMC_D3, DevicePinFunction::SD);
+    Device::SetPinFunction(SDMMC_CLK, DevicePinFunction::SD);
+    Device::SetPinFunction(SDMMC_CMD, DevicePinFunction::SD);
+    Device::SetPinFunction(SDMMC_DETECT, DevicePinFunction::GPIO);
 
     switch (SDBus_index)
     {

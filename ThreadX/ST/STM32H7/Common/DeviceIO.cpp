@@ -3,10 +3,20 @@
 // See LICENSE file in the project root for full license information.
 //
 #include "DeviceIO.h"
-#include "board.h"
-#include "nf_rt_events_native.h"
+#include "Device.h"
+
+#pragma region On board control
+
+#pragma endregion
 
 #pragma region STM32 definitions
+
+typedef struct
+{
+    GPIO_TypeDef *port;       // GPIO Port (e.g., GPIOA, GPIOB)
+    uint16_t pin;             // GPIO Pin (e.g., GPIO_PIN_2)
+    uint8_t altFunctionValue; // Alternate Function (e.g., AF7)
+} GPIO_PinConfig;
 
 #define INTERRUPT_PIN_NOT_ASSIGNED -1
 #define EXTI0                      0
@@ -39,7 +49,7 @@ const uint32_t GpioPortClockEnable[] = {
 #ifdef GPIOI
     LL_AHB4_GRP1_PERIPH_GPIOI,
 #else
-    0,
+    NULL,
 #endif
     LL_AHB4_GRP1_PERIPH_GPIOJ,
     LL_AHB4_GRP1_PERIPH_GPIOK};
@@ -88,7 +98,7 @@ GPIO_TypeDef *Port[] = {
 #ifdef GPIOI
     GPIOI,
 #else
-    (GPIO_TypeDef *)-1,
+    NULL,
 #endif
     GPIOJ,
     GPIOK};
@@ -121,11 +131,10 @@ const uint32_t SyscfgPorts[] = {
 #ifdef GPIOI
     LL_SYSCFG_EXTI_PORTI,
 #else
-    (uint32_t)-1,
+    NULL,
 #endif
     LL_SYSCFG_EXTI_PORTJ,
     LL_SYSCFG_EXTI_PORTK};
-// Arranged so index 1 == I2C1, etc...
 IRQn_Type I2C_Interrupt_Channel[] = {
     I2C1_ER_IRQn,
     I2C2_ER_IRQn,
@@ -136,33 +145,23 @@ IRQn_Type I2C_Interrupt_Channel[] = {
 #endif
 };
 ADC_TypeDef *ADC_Channel[] = {
-    NULL, // No Channel zero
     ADC1,
     ADC2,
 #ifdef ADC3
     ADC3,
-#else
-    (ADC_TypeDef *)-1,
 #endif
 };
-DMA_TypeDef *DMA_Channel[] = {
-    NULL, // No Channel zero
-    DMA1,
-    DMA2};
+DMA_TypeDef *DMA_Channel[] = {DMA1, DMA2};
 DAC_TypeDef *DAC_Channel[] = {
-    NULL, // No Channel zero
     DAC1,
 #ifdef DAC2
     DAC2,
 #endif
 #ifdef DAC3
     DAC3,
-#else
-    (DAC_TypeDef *)-1,
 #endif
 };
 I2C_TypeDef *I2C_Channel[] = {
-    NULL, // No Channel zero
     I2C1,
     I2C2,
     I2C3,
@@ -170,16 +169,13 @@ I2C_TypeDef *I2C_Channel[] = {
 #ifdef I2C5
     I2C5,
 #else
-    (I2C_TypeDef *)-1,
+    NULL,
 #endif
 #ifdef I2C6
     I2C6,
-#else
-    (I2C_TypeDef *)-1,
 #endif
 };
 SPI_TypeDef *SPI_Channel[] = {
-    NULL, // No Channel zero
     SPI1,
     SPI2,
     SPI2,
@@ -188,50 +184,43 @@ SPI_TypeDef *SPI_Channel[] = {
     SPI5,
 #ifdef SPI6
     SPI6,
-#else
-    (SPI_TypeDef *)-1,
 #endif
 };
-TIM_TypeDef *PWM_Channel[] = {
-    NULL, // No Channel zero
-    TIM2,
-    TIM3,
-    TIM4,
-    TIM5};
+TIM_TypeDef *PWM_Channel[] = {TIM2, TIM3, TIM4, TIM5};
 Device::SerialChannel Serial_Channel[] = {
-    {NULL, ' '}, // No Channel zero
     {USART1, 0x0D},
     {USART2, 0x0D},
     {USART2, 0x0D},
     {USART3, 0x0D},
-#ifdef USART4
-    USART4,
-#else
-    {(USART_TypeDef *)-1, ' '},
+    #if defined (USART4)
+     {USART4, 0x0D }, #else {NULL,''},
+    #endif
+#if defined(USART4)
+    {USART4, 0x0D},
+    #else
+    {NULL,' '},
 #endif
-#ifdef USART5
+#if defined(USART5)
     {USART5, 0x0D},
-    USART5,
-#else
-    {(USART_TypeDef *)-1, ' '},
+    #else
+    {NULL,' '},
 #endif
+#if defined(USART6)
     {USART6, 0x0D},
-#ifdef USART7
+    #else
+    {NULL,' '},
+#endif
+#if defined(USART7)
     {USART7, 0x0D},
-#else
-    {(USART_TypeDef *)-1, ' '},
+    #else
+    {NULL,' '},
 #endif
-#ifdef USART8
+#if defined(USART8)
     {USART8, 0x0D},
-#else
-    {(USART_TypeDef *)-1, ' '},
+    #else
+    {NULL,' '},
 #endif
-#ifdef USART9
-    {USART9, 0x0D},
-#else
-    {(USART_TypeDef *)-1, ' '},
-#endif
-    {USART10, 0x0D},
+
 };
 uint32_t AdcChannelNumber[] = {
     LL_ADC_CHANNEL_1,
@@ -259,54 +248,6 @@ uint32_t DmaStreamNumber[] = {
     LL_DMA_STREAM_5,
     LL_DMA_STREAM_6,
     LL_DMA_STREAM_7};
-
-int GetI2CPin_AlternateFunctionNumber(GPIO_PIN GPIOPortByNumber, int pinNumber, Device::DevicePinFunction dpf);
-
-int GetI2CPin_AlternateFunctionNumber(GPIO_PIN GPIOPortByNumber, int pinNumber, Device::DevicePinFunction dpf)
-{
-    uint32_t alternate = -1;
-    switch (dpf)
-    {
-        case Device::DevicePinFunction::NONE:
-        case Device::DevicePinFunction::GPIO:
-        case Device::DevicePinFunction::ADC:
-        case Device::DevicePinFunction::CAN:
-        case Device::DevicePinFunction::DAC:
-        case Device::DevicePinFunction::SPI:
-        case Device::DevicePinFunction::COUNTER:
-        case Device::DevicePinFunction::PWM:
-        case Device::DevicePinFunction::TIMER:
-        case Device::DevicePinFunction::I2C:
-            if (GPIOPortByNumber == 2 && pinNumber == 8)
-            {
-                // PB8 - I2C1_SCL,AF4
-                alternate = LL_GPIO_AF_4;
-            }
-            else if (GPIOPortByNumber == 2 && pinNumber == 9)
-            {
-                // PB9 - I2C1_SDA,AF4
-                alternate = LL_GPIO_AF_4;
-            }
-            else if (GPIOPortByNumber == 4 && pinNumber == 12)
-            {
-                // PD12 - I2C4_SCL,AF4
-                alternate = LL_GPIO_AF_4;
-            }
-            else if (GPIOPortByNumber == 4 && pinNumber == 13)
-            {
-                // PD13 - I2C4_SCL,AF4
-                alternate = LL_GPIO_AF_4;
-            }
-            break;
-        case Device::DevicePinFunction::I2S:
-        case Device::DevicePinFunction::SD:
-        case Device::DevicePinFunction::USART:
-        case Device::DevicePinFunction::WAKEUP:
-        case Device::DevicePinFunction::LCD:
-            break;
-    }
-    return alternate;
-}
 uint32_t I2C_GetTiming(I2cBusSpeed busSpeed)
 {
     uint32_t timing;
@@ -327,15 +268,14 @@ uint32_t I2C_GetTiming(I2cBusSpeed busSpeed)
     }
     return timing;
 }
-
 #pragma endregion
 
 #pragma region GPIO
-bool GpioIO::Initialize()
+// Clear the active interrupt pin tracking,only 16 interrupts, one per pin number (0...15)
+// With the STM32 you can't have PA0 and PB0 but you can have PA0,PA1 or PA0,PB1 for example
+GpioIO::GpioIO()
 {
-    // Track the Pin usage as only 1 interrupt per PIN number 0..16
     memset(ActiveInterruptPin, PinNameValue::NONE, sizeof(PinNameValue::NONE));
-    return true;
 }
 bool GpioIO::InitializePin(PinNameValue pinNameValue)
 {
@@ -384,48 +324,49 @@ bool GpioIO::Toggle(PinNameValue pinNameValue)
     status = true;
     return status;
 }
-bool GpioIO::SetFunction(Device::DevicePin devicePin)
+bool GpioIO::SetFunction(Device::DeviceGpioPin devicePin, DevicePinFunction function)
 {
     int pinNumber = devicePin.pinNameValue;
     int GPIOPortByNumber = PORT_INDEX(pinNumber);
     uint32_t gpioPortPinNumber = PIN_INDEX(pinNumber);
 
     bool status = false;
-    switch (devicePin.CurrentFunction)
+    int alternateFunctionNumber = 0;
+    switch (function)
     {
-        case Device::DevicePinFunction::NONE:
+        case DevicePinFunction::LOW_POWER:
             status = true;
             break;
-        case Device::DevicePinFunction::ADC:
+        case DevicePinFunction::ADC:
             LL_GPIO_InitTypeDef GPIO_InitStruct;
             LL_GPIO_SetPinMode(Port[GPIOPortByNumber], gpioPortPinNumber, LL_GPIO_MODE_ANALOG);
             break;
-        case Device::DevicePinFunction::CAN:
+        case DevicePinFunction::CAN:
             // Not supported on this MCU
             status = false;
             break;
-        case Device::DevicePinFunction::DAC:
+        case DevicePinFunction::DAC:
             status = false;
             break;
-        case Device::DevicePinFunction::GPIO:
+        case DevicePinFunction::GPIO:
             status = true;
             break;
-        case Device::DevicePinFunction::SPI:
+        case DevicePinFunction::SPI:
             status = true;
             break;
-        case Device::DevicePinFunction::COUNTER:
+        case DevicePinFunction::COUNTER:
             status = true;
             break;
-        case Device::DevicePinFunction::PWM:
+        case DevicePinFunction::PWM:
             status = true;
             break;
-        case Device::DevicePinFunction::SD:
+        case DevicePinFunction::SD:
             status = true;
             break;
-        case Device::DevicePinFunction::TIMER:
+        case DevicePinFunction::TIMER:
             status = true;
             break;
-        case Device::DevicePinFunction::I2C:
+        case DevicePinFunction::I2C:
         {
             LL_AHB4_GRP1_EnableClock(GpioPortClockEnable[GPIOPortByNumber]);
             LL_GPIO_SetPinMode(Port[GPIOPortByNumber], gpioPortPinNumber, LL_GPIO_MODE_ALTERNATE);
@@ -442,10 +383,10 @@ bool GpioIO::SetFunction(Device::DevicePin devicePin)
         }
             status = true;
             break;
-        case Device::DevicePinFunction::I2S:
+        case DevicePinFunction::I2S:
             status = true;
             break;
-        case Device::DevicePinFunction::USART:
+        case DevicePinFunction::USART:
             LL_AHB4_GRP1_EnableClock(GpioPortClockEnable[GPIOPortByNumber]);
             GPIO_InitStruct.Alternate = alternateFunctionNumber;
             GPIO_InitStruct.Pin = gpioPortPinNumber;
@@ -456,12 +397,23 @@ bool GpioIO::SetFunction(Device::DevicePin devicePin)
             LL_GPIO_Init(Port[GPIOPortByNumber], &GPIO_InitStruct);
             status = true;
             break;
-        case Device::DevicePinFunction::WAKEUP:
+        case DevicePinFunction::WAKEUP:
             status = true;
+            break;
+        case DevicePinFunction::LED:
+        case DevicePinFunction::BUTTON:
+        case DevicePinFunction::MEMORY_INTERFACE:
+        case DevicePinFunction::USB:
+        case DevicePinFunction::WIFI_INTERFACE:
+            status = false;
             break;
         default:
             status = false;
             break;
+    }
+    if (status)
+    {
+        devicePin.Function = function;
     }
     return status;
 }
@@ -564,21 +516,15 @@ bool GpioIO::SetMode(PinNameValue pinNameValue, PinMode pinMode)
     }
     return status;
 }
-bool GpioIO::InterruptEnable(PinNameValue pinNumber, GPIO_INT_EDGE events, void *interruptRoutine)
+bool GpioIO::InterruptEnable(PinNameValue pinNameValue, GPIO_INT_EDGE events, void *interruptRoutine)
 {
     // NOTE: There is a limitation of 16 external interrupts on the GPIO lines with one 1 interrupt per line number.
     //      One interrupt on (PA0 or PB0 or PC0 or PD0...) and one interrupt on (PA1, or PB1 or PC1 ...) etc.
     bool result = false;
 
-
-    int GPIOPortByNumber = PORT_INDEX(pinNameValue);
-    uint32_t gpioPortPinNumber = PIN_INDEX(pinNameValue);
-
-
-    int GPIOPortByNumber = PORT_INDEX(pinNameValue);
     uint32_t gpioPortPinNumber = PIN_INDEX(pinNameValue);
     uint32_t priority = 0;
-    LL_SYSCFG_SetEXTISource(SyscfgPorts[GPIOPortByNumber], PinMask[gpioPortPinNumber]);
+    LL_SYSCFG_SetEXTISource(SyscfgPorts[gpioPortPinNumber], PinMask[gpioPortPinNumber]);
     switch (events)
     {
         case GPIO_INT_NONE:
@@ -805,6 +751,14 @@ bool GpioIO::InterruptEnable(PinNameValue pinNumber, GPIO_INT_EDGE events, void 
             }
             break;
     }
+
+    if (interruptRoutine != NULL)
+    {
+    }
+    else
+    {
+    }
+
     LL_EXTI_EnableIT_0_31(EXTI_Line[gpioPortPinNumber]);
 
     return result;
@@ -1170,64 +1124,93 @@ PinNameValue DacIO::ChannelToPin(CLR_INT32 dac_channel_number)
 #pragma region I2C
 bool I2cIO::Initialize(CLR_INT32 I2C_deviceId, I2cBusSpeed I2C_speed)
 {
-    LL_RCC_ClocksTypeDef RCC_Clocks;
-    LL_RCC_GetSystemClocksFreq(&RCC_Clocks);
+    I2C_Pin_Definition *i2cBusPins = GetI2cBusPins();
+    uint32_t gpioPin_scl = i2cBusPins[I2C_deviceId - 1].scl_Pin;
+    uint32_t gpio_alternate_scl = i2cBusPins[I2C_deviceId - 1].alternateFunction;
+    uint32_t gpioPin_sda = i2cBusPins[I2C_deviceId - 1].sda_Pin;
+    uint32_t gpio_alternate_sda = i2cBusPins[I2C_deviceId - 1].alternateFunction;
+    GPIO_TypeDef *GPIO_SCL = Port[PORT_INDEX(gpioPin_scl)];
+    GPIO_TypeDef *GPIO_SDA = Port[PORT_INDEX(gpioPin_sda)];
 
+    // SCL Pin as : Alternate function, High Speed, Open drain, No Pull
+    LL_GPIO_SetPinMode(GPIO_SCL, gpioPin_scl, LL_GPIO_MODE_ALTERNATE);
+    LL_GPIO_SetPinSpeed(GPIO_SCL, gpioPin_scl, LL_GPIO_SPEED_FREQ_HIGH);
+    LL_GPIO_SetPinOutputType(GPIO_SCL, gpioPin_scl, LL_GPIO_OUTPUT_OPENDRAIN);
+    LL_GPIO_SetPinPull(GPIO_SCL, gpioPin_scl, LL_GPIO_PULL_NO);
+    if (gpioPin_scl <= 7)
+    {
+        LL_GPIO_SetAFPin_0_7(GPIO_SCL, gpioPin_scl, gpio_alternate_scl);
+    }
+    if (gpioPin_scl >= 8)
+    {
+        LL_GPIO_SetAFPin_8_15(GPIO_SCL, gpioPin_scl, gpio_alternate_scl);
+    }
+
+    // SDA Pin as : Alternate function, High Speed, Open drain, No Pull
+    LL_GPIO_SetPinMode(GPIO_SDA, gpioPin_sda, LL_GPIO_MODE_ALTERNATE);
+    LL_GPIO_SetPinSpeed(GPIO_SDA, gpioPin_sda, LL_GPIO_SPEED_FREQ_HIGH);
+    LL_GPIO_SetPinOutputType(GPIO_SDA, gpioPin_sda, LL_GPIO_OUTPUT_OPENDRAIN);
+    LL_GPIO_SetPinPull(GPIO_SDA, gpioPin_sda, LL_GPIO_PULL_NO);
+    if (gpioPin_sda <= 7)
+    {
+        LL_GPIO_SetAFPin_0_7(GPIO_SDA, gpioPin_sda, gpio_alternate_sda);
+    }
+    if (gpioPin_sda >= 8)
+    {
+        LL_GPIO_SetAFPin_0_7(GPIO_SDA, gpioPin_sda, gpio_alternate_sda);
+    }
+    I2C_TypeDef *I2C_CHANNEL = NULL;
     switch (I2C_deviceId)
     {
         case 1:
             LL_APB4_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_I2C1);
             LL_RCC_SetI2CClockSource(LL_RCC_I2C123_CLKSOURCE_PCLK1);
+            I2C_CHANNEL = I2C1;
             break;
         case 2:
             LL_APB4_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_I2C2);
             LL_RCC_SetI2CClockSource(LL_RCC_I2C123_CLKSOURCE_PCLK1);
+            I2C_CHANNEL = I2C2;
             break;
         case 3:
             LL_APB4_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_I2C3);
             LL_RCC_SetI2CClockSource(LL_RCC_I2C123_CLKSOURCE_PCLK1);
+            I2C_CHANNEL = I2C3;
             break;
         case 4:
             LL_APB4_GRP1_EnableClock(LL_APB4_GRP1_PERIPH_I2C4);
             LL_RCC_SetI2CClockSource(LL_RCC_I2C4_CLKSOURCE_PCLK4);
+            I2C_CHANNEL = I2C4;
             break;
 #ifdef I2C5
         case 5:
             LL_APB4_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_I2C5);
             // LL_RCC_SetI2CClockSource(LL_RCC_I2C5_CLKSOURCE_PCLK1);
+            I2C_CHANNEL = I2C5;
             break;
 #endif
     }
-    LL_I2C_Disable(I2C_Channel[I2C_deviceId]);
+
+    ENABLE_CLOCK_ON_PORT_GPIOF;
+    I2C_ENABLE_TOUCH_CLOCK;
+    I2C_TOUCH_FORCE_RESET;
+    I2C_TOUCH_FORCE_RELEASE_RESET;
+
+    LL_I2C_Disable(I2C4);
     {
-        LL_I2C_ConfigFilters(I2C_Channel[I2C_deviceId], LL_I2C_ANALOGFILTER_ENABLE, 0);
-        LL_I2C_SetTiming(I2C_Channel[I2C_deviceId], I2C_GetTiming(I2C_speed));
-        LL_I2C_SetMode(I2C_Channel[I2C_deviceId], LL_I2C_MODE_I2C);
-        LL_I2C_DisableClockStretching(I2C_Channel[I2C_deviceId]);
-        LL_I2C_DisableGeneralCall(I2C_Channel[I2C_deviceId]);
-
-        LL_I2C_SetOwnAddress1(I2C_Channel[I2C_deviceId], 0, LL_I2C_OWNADDRESS1_7BIT);
-        LL_I2C_SetMasterAddressingMode(I2C_Channel[I2C_deviceId], LL_I2C_ADDRESSING_MODE_7BIT);
-        LL_I2C_AcknowledgeNextData(I2C_Channel[I2C_deviceId], LL_I2C_ACK);
-        LL_I2C_DisableOwnAddress1(I2C_Channel[I2C_deviceId]);
-        LL_I2C_DisableOwnAddress2(I2C_Channel[I2C_deviceId]);
-
-        // Interrupt versions ( TO BE CONTINUED )
-        //// Enable Receive Interrupt
-        // LL_I2C_EnableIT_RX(I2C_Channel[busIndex]);
-        //// Enable Not acknowledge received interrupt
-        // LL_I2C_EnableIT_NACK(I2C_Channel[busIndex]);
-        //// Enable Error interrupts
-        // LL_I2C_EnableIT_ERR(I2C_Channel[busIndex]);
-        //// Enable Stop interrupt
-        // LL_I2C_EnableIT_STOP(I2C_Channel[busIndex]);
+        LL_I2C_SetTiming(I2C_CHANNEL, I2C_GetTiming(I2C_speed));
+        LL_I2C_SetOwnAddress1(I2C_CHANNEL, 0x00, LL_I2C_OWNADDRESS1_7BIT);
+        LL_I2C_EnableAutoEndMode(I2C_CHANNEL);
+        LL_I2C_AcknowledgeNextData(I2C_CHANNEL, LL_I2C_NACK);
+        LL_I2C_DisableOwnAddress1(I2C_CHANNEL);
+        LL_I2C_SetOwnAddress2(I2C_CHANNEL, 0x00, LL_I2C_OWNADDRESS2_NOMASK);
+        LL_I2C_EnableClockStretching(I2C_CHANNEL);
+        LL_I2C_DisableGeneralCall(I2C_CHANNEL);
     }
-    LL_I2C_Enable(I2C_Channel[I2C_deviceId]);
-    NVIC_SetPriority(I2C_Interrupt_Channel[I2C_deviceId], 0);
-    NVIC_EnableIRQ(I2C_Interrupt_Channel[I2C_deviceId]);
-
+    LL_I2C_Enable(I2C_CHANNEL);
     return true;
 }
+
 bool I2cIO::Dispose(CLR_INT32 I2C_deviceId)
 {
     bool status = false;
@@ -1266,23 +1249,19 @@ bool I2cIO::Dispose(CLR_INT32 I2C_deviceId)
     }
     if (status)
     {
-        PinNameValue pinNameValueSCL =
-            Device::FindPinWithFunctionAndChannel(Device::DevicePinFunction::I2C, I2C_deviceId);
-        PinNameValue pinNameValueSDA =
-            Device::FindPinWithFunctionAndChannel(Device::DevicePinFunction::I2C, I2C_deviceId);
         GpioIO::SetLowPower(pinNameValueSCL);
         GpioIO::SetLowPower(pinNameValueSDA);
     }
     return status;
 }
-CLR_INT32 I2cIO::Write(
+I2cTransferStatus I2cIO::Write(
     CLR_INT32 I2C_deviceId,
     CLR_INT32 slaveAddress,
     CLR_UINT8 *writeBuffer,
-    CLR_INT32 writeSize,
-    CLR_INT32 *transferResult)
+    CLR_INT32 writeSize)
 {
-    bool status = false;
+    I2cTransferStatus return_status = I2cTransferStatus_UnknownError;
+
     LL_I2C_HandleTransfer(
         I2C_Channel[I2C_deviceId],
         slaveAddress,
@@ -1300,43 +1279,40 @@ CLR_INT32 I2cIO::Write(
         while (!LL_I2C_IsActiveFlag_TXE(I2C_Channel[I2C_deviceId]))
             writeBuffer++;
     }
-    status = true;
-    *transferResult = 1;
-    return status;
+    return_status = I2cTransferStatus_FullTransfer;
+    return return_status;
 }
 
-bool I2cIO::Read(
-    CLR_INT32 I2C_deviceId,
-    CLR_INT32 slaveAddress,
-    CLR_UINT8 *readBuffer,
-    CLR_INT32 readSize,
-    CLR_INT32 *transferResult)
+I2cTransferStatus I2cIO::Read(CLR_INT32 I2C_deviceId, CLR_INT32 slaveAddress, CLR_UINT8 *readBuffer, CLR_INT32 readSize)
 {
-    (void)transferResult;
-
-    bool status = false;
-    LL_I2C_AcknowledgeNextData(I2C_Channel[I2C_deviceId], LL_I2C_ACK);
-    LL_I2C_HandleTransfer(
-        I2C_Channel[I2C_deviceId],
-        (slaveAddress | 1),
-        LL_I2C_ADDRSLAVE_7BIT,
-        readSize,
-        LL_I2C_MODE_AUTOEND,
-        LL_I2C_GENERATE_START_READ);
-    for (uint8_t i = 0; i < readSize; i++)
+    I2cTransferStatus return_status = I2cTransferStatus_UnknownError;
     {
-        if (i < readSize - 1)
-            LL_I2C_AcknowledgeNextData(I2C_Channel[I2C_deviceId], LL_I2C_ACK);
-        else
-            LL_I2C_AcknowledgeNextData(I2C_Channel[I2C_deviceId], LL_I2C_NACK);
-        while (LL_I2C_IsActiveFlag_RXNE(I2C_Channel[I2C_deviceId]) == 0)
-            ;
-        readBuffer[i] = LL_I2C_ReceiveData8(I2C_Channel[I2C_deviceId]);
+        LL_I2C_AcknowledgeNextData(I2C_Channel[I2C_deviceId], LL_I2C_ACK);
+        LL_I2C_HandleTransfer(
+            I2C_Channel[I2C_deviceId],
+            (slaveAddress | 1),
+            LL_I2C_ADDRSLAVE_7BIT,
+            readSize,
+            LL_I2C_MODE_AUTOEND,
+            LL_I2C_GENERATE_START_READ);
+        for (uint8_t i = 0; i < readSize; i++)
+        {
+            if (i < readSize - 1)
+            {
+                LL_I2C_AcknowledgeNextData(I2C_Channel[I2C_deviceId], LL_I2C_ACK);
+            }
+            else
+            {
+                LL_I2C_AcknowledgeNextData(I2C_Channel[I2C_deviceId], LL_I2C_NACK);
+            }
+            while (LL_I2C_IsActiveFlag_RXNE(I2C_Channel[I2C_deviceId]) == 0)
+                ;
+            readBuffer[i] = LL_I2C_ReceiveData8(I2C_Channel[I2C_deviceId]);
+        }
+        // Optional?
+        // LL_I2C_GenerateStopCondition(I2C_Channel[busIndex]);
+        return return_status;
     }
-    status = true;
-    // Optional?
-    // LL_I2C_GenerateStopCondition(I2C_Channel[busIndex]);
-    return status;
 }
 #pragma endregion
 
@@ -1417,37 +1393,33 @@ bool I2cIO_Slave::Dispose(CLR_INT32 I2C_deviceId)
     (void)I2C_deviceId;
     return true;
 }
-bool I2cIO_Slave::Write(
+I2cTransferStatus Write(
     CLR_INT32 I2C_deviceId,
     CLR_UINT8 *writeBuffer,
     CLR_INT32 writeSize,
     CLR_INT32 timeoutMilliseconds,
-    CLR_INT32 *readCount,
-    CLR_INT32 *transferResult)
+    CLR_INT32 *readCount)
 {
     (void)I2C_deviceId;
     (void)writeBuffer;
     (void)writeSize;
     (void)timeoutMilliseconds;
     (void)readCount;
-    (void)transferResult;
-    return true;
+    return I2cTransferStatus_FullTransfer;
 }
-bool I2cIO_Slave::Read(
+I2cTransferStatus Read(
     CLR_INT32 I2C_deviceId,
     CLR_UINT8 *readBuffer,
     CLR_INT32 readSize,
     CLR_INT32 timeoutMilliseconds,
-    CLR_INT32 *readCount,
-    CLR_INT32 *transferResult)
+    CLR_INT32 *readCount)
 {
     (void)I2C_deviceId;
     (void)readBuffer;
     (void)readSize;
     (void)timeoutMilliseconds;
     (void)readCount;
-    (void)transferResult;
-    return true;
+    return I2cTransferStatus_FullTransfer;
 }
 #pragma endregion
 
@@ -1541,7 +1513,6 @@ int GetSerialDeviceBufferIndex(int UsartDeviceNumber)
 {
     return CircularBufferAssignments[UsartDeviceNumber];
 }
-
 bool SerialIO::Initialize(CLR_INT32 usartDeviceNumber, CLR_INT32 baudrate)
 {
     bool status = false;
@@ -1742,9 +1713,15 @@ bool SerialIO::SetBaudRate(CLR_INT32 usartDeviceNumber, CLR_INT32 baudRate)
     UNUSED(baudRate);
     return true;
 }
-bool SerialIO::SetConfig(CLR_INT32 usartDeviceNumber, CLR_INT32 stopBits, CLR_INT32 dataBits, CLR_INT32 RequestedParity)
+bool SerialIO::SetConfig(
+    CLR_INT32 usartDeviceNumber,
+    SerialMode serialMode,
+    CLR_INT32 stopBits,
+    CLR_INT32 dataBits,
+    CLR_INT32 RequestedParity)
 {
     UNUSED(usartDeviceNumber);
+    UNUSED(serialMode);
     UNUSED(stopBits);
     UNUSED(dataBits);
     UNUSED(RequestedParity);
@@ -1777,7 +1754,6 @@ bool SerialIO::SetMode(CLR_INT32 usartDeviceNumber, CLR_INT32 mode)
     UNUSED(mode);
     return true;
 }
-
 HRESULT SerialIO::SetupWriteLine(CLR_RT_StackFrame &stack, char **buffer, uint32_t *length, bool *isNewAllocation)
 {
     UNUSED(stack);
@@ -1832,7 +1808,6 @@ bool SpiIO::Open(SPI_DEVICE_CONFIGURATION spiConfig, CLR_UINT32 handle)
 
     return false;
 }
-
 CLR_INT32 SpiIO::ByteTime()
 {
     return 1;

@@ -1,72 +1,22 @@
-/*
-   Copyright (c) .NET Foundation and Contributors
-   See LICENSE file in the project root for full license information.
-*/
-
-/* NOTE */
-/* Division of internal flash is limited by the smallest erase size of 8K */
-
-/* Entry point */
-ENTRY(Reset_Handler)
-
-/* _estack is used in ThreadX to define the end of the stack memory for the main thread */
-_estack = ORIGIN(DTCM_SRAM) + LENGTH(DTCM_SRAM);
-
-/* _sidata is used in ThreadX to copy the data segment from ROM to RAM during initialization */
-_sidata = LOADADDR(.data);
-
-/* Stack and heap size */
-_Min_Heap_Size  = 0x200; 
-_Min_Stack_Size = 0x400; 
-
-/* Define the availability of FLASH                                                                  */
-/* The flash memory is organized as 137-bit flash words memory that can be used for                  */
-/* storing both code and data constants.                                                             */
-/* Each word consists of:                                                                            */
-/*    One flash word (4 words, 16 bytes or 128 bits)                                                 */
-/*    9 ECC bits                                                                                     */
-/* The flash memory is organized as follows:                                                         */
-/*  1.  Two independent 1 Mbyte banks containing 128 user sectors of 8 Kbytes each.                  */
-/*  2.  128 Kbytes of System flash memory from which the device can boot.                            */
-/*  3.  1 Kbyte of OTP (one-time programmable) memory containing option bytes for user configuration */
-
-/* Minimum flash erase size is defined as a sector (8K) for STM32H7B series */
-
-flash_block_1 = 0x08000000;
-sector_size = 8K;
-block_size = sector_size;
-number_of_banks = 2;
-total_blocks = 128*number_of_banks;
-clr_block_start = 0;
-clr_block_end = 79;
-clr_total_blocks = clr_block_end - clr_block_start + 1;
-
-deployment_block_start = 80;
-deployment_block_end = 253;
-deployment_total_blocks = deployment_block_end - deployment_block_start + 1;
-
-config_block_start = 254;
-config_block_end = 255;
-config_total_blocks = config_block_end - config_block_start + 1;
+/* Copyright (c) .NET Foundation and Contributors                     */
+/*   See LICENSE file in the project root for full license information. */
 
 MEMORY
 {
-  /* ===============*/
-  /* PHYSICAL MEMORY*/
-  /* ===============*/
-
-    /* ===============*/
-    /* STM32H7B3LIH6QU*/
-    /* ===============*/
-
+   /* Physical memory - STM32H7B3LIH6QU */
+   /* --------------------------------- */
      FLASH      (rx) :ORIGIN = 0x08000000,LENGTH = 2048k
      OTP        (rx) :ORIGIN = 0x08FFF000,LENGTH = 1024
 
      ITCM_SRAM  (rxw):ORIGIN = 0x00000000,LENGTH = 64K 
-     DTCM_SRAM  (rxw):ORIGIN = 0x20000000,LENGTH = 128K 
+     DTCM_SRAM  (rxw):ORIGIN = 0x20000000,LENGTH = 128K
+
      AXI_RAM1   (rxw):ORIGIN = 0x24000000,LENGTH = 256K
      AXI_RAM2   (rxw):ORIGIN = 0x24040000,LENGTH = 384K
      AXI_RAM3   (rxw):ORIGIN = 0x240A0000,LENGTH = 384K
+     /* Contiguous ram base on AXI group */
+     RAM        (rxw):ORIGIN = ORIGIN(AXI_RAM1)  ,LENGTH = LENGTH(AXI_RAM1) + LENGTH(AXI_RAM2) + LENGTH(AXI_RAM3)
+
      AHB_RAM    (rxw):ORIGIN = 0x30000000,LENGTH = 128K   /* (64K + 64K) */
      SRD_RAM    (rxw):ORIGIN = 0x38000000,LENGTH = 32K
      BACKUP_RAM (rxw):ORIGIN = 0x38800000,LENGTH = 4k
@@ -75,55 +25,97 @@ MEMORY
      OCTOSPI1_FLASH (xrw) : ORIGIN = 0x09000000, LENGTH = 64M
      FMC_SDRAM      (xrw) : ORIGIN = 0xD0000000, LENGTH = 16M
 
-  /* ============================= */
-  /* Memory usage by nanoFramework */
-  /* ============================= */
+   /* Allocated memory */
+   /* ---------------- */
+     NATIVE_FLASH     (rx)  : ORIGIN = ORIGIN(FLASH), LENGTH = (320 * 1024)
+     CONFIG_FLASH     (rx)  : ORIGIN = ORIGIN(NATIVE_FLASH) + LENGTH(NATIVE_FLASH), LENGTH = (64 * 1024)
+     DEPLOYMENT_FLASH (rx)  : ORIGIN = ORIGIN(CONFIG_FLASH) + LENGTH(CONFIG_FLASH), LENGTH = LENGTH(FLASH) - LENGTH(CONFIG_FLASH) - LENGTH(NATIVE_FLASH)
 
-     nanoCLR    (rx) : ORIGIN = ORIGIN(FLASH), LENGTH = clr_total_blocks*sector_size
-     deployment (rx) : ORIGIN = ORIGIN(nanoCLR) + LENGTH(nanoCLR), LENGTH = deployment_total_blocks*sector_size
-     config     (rx) : ORIGIN = ORIGIN(deployment) + LENGTH(deployment), LENGTH = config_total_blocks*sector_size
+     FLASH_DISK       (rx)  : ORIGIN = ORIGIN(OCTOSPI1_FLASH),LENGTH = LENGTH(OCTOSPI1_FLASH)
 
-     /* Native code ram (ThreadX, nativeCLR) */
-     NATIVE_RAM   (rxw) : ORIGIN = ORIGIN(AXI_RAM1), LENGTH = LENGTH(AXI_RAM1)
-     CLR_RAM  (rxw) : ORIGIN = ORIGIN(AXI_RAM2), LENGTH =  LENGTH(AXI_RAM2) + LENGTH(AXI_RAM3) 
+     NATIVE_RAM       (rxw) : ORIGIN = ORIGIN(RAM),     LENGTH = (120 * 1024)
+     CLR_MANAGED_RAM  (rxw) : ORIGIN = ORIGIN(NATIVE_RAM), LENGTH =  LENGTH(RAM) - LENGTH(NATIVE_RAM) 
+     RAM_DMA          (rxw) : ORIGIN = ORIGIN(AHB_RAM), LENGTH = LENGTH(AHB_RAM)
 
-     /* RAM accessible by the DMA controller */
-     RAM_DMA      (rxw) : ORIGIN = ORIGIN(AHB_RAM), LENGTH = LENGTH(AHB_RAM)
-
-     graphics_vfb (rxw) : ORIGIN = ORIGIN(FMC_SDRAM), LENGTH = 255K
-     graphics_ram (rxw) : ORIGIN = ORIGIN(graphics_vfb) + LENGTH(graphics_vfb), LENGTH = 4M
-
+     GRAPHICS_FRAME_BUFFER (rxw) : ORIGIN = ORIGIN(FMC_SDRAM), LENGTH = 255K
+     GRAPHICS_HEAP         (rxw) : ORIGIN = ORIGIN(GRAPHICS_FRAME_BUFFER) + LENGTH(GRAPHICS_FRAME_BUFFER), LENGTH = 4M
+     /* Not used */
+     GRAPHICS_HEAP_FAST    (rxw) : ORIGIN = 0, LENGTH = 0
 }
 
-/* The CLR managed heap for CLR */
-HeapBegin             = ORIGIN(CLR_RAM); 
-HeapEnd               = ORIGIN(CLR_RAM) + LENGTH(CLR_RAM); 
+/* NOTE */
+/* Division of internal flash is limited by the smallest erase size of 8K */
+/* ------------------------------------ */
+/* Allocation by number of erase blocks */
+/* ------------------------------------ */
+FLASH_ERASE_SIZE = 8;
+FLASH_DISK_ERASE_SIZE = 8;
 
-/* The CLR native Image */
-__nanoImage_start__   = ORIGIN(nanoCLR); 
-__nanoImage_end__     = ORIGIN(nanoCLR) + LENGTH(nanoCLR); 
- 
-/*  C# Portable Executable (PE) file is stored */
-__deployment_start__  = ORIGIN(deployment); 
-__deployment_end__    = ORIGIN(deployment) + LENGTH(deployment); 
- 
-/* Small area of persistent storage */
-__nanoConfig_start__  = ORIGIN(config);
-__nanoConfig_end__    = ORIGIN(config) + LENGTH(config);
- 
-/* Bit pixel copy of the screen */
-Graphics_frame_buffer = ORIGIN(graphics_vfb); 
-  
-/*  Bitmap objects */
-Graphics_managed_heap = ORIGIN(graphics_ram); 
-Graphics_managed_end  = ORIGIN(graphics_ram) + LENGTH(graphics_ram);   
+erase_block_size = (FLASH_ERASE_SIZE * 1024);
+flash_start = ORIGIN(FLASH);
+total_flash_size = LENGTH(FLASH); 
 
-/* Define output sections */
+
+ASSERT( LENGTH(NATIVE_FLASH) % (FLASH_ERASE_SIZE * 1024) == 0, "Native flash allocation must be an integral number block erase size");
+ASSERT( LENGTH(DEPLOYMENT_FLASH) % (FLASH_ERASE_SIZE * 1024) == 0, "Deployment flash allocation must be an integral number block erase size");
+ASSERT( LENGTH(CONFIG_FLASH) % (FLASH_ERASE_SIZE * 1024) == 0, "Config flash allocation must be an integral number block erase size");
+
+ASSERT( LENGTH(FLASH_DISK) % (FLASH_DISK_ERASE_SIZE * 1024) == 0, "Flash disk allocation must be an integral number block erase size");
+
+total_flash_blocks = LENGTH(FLASH)/(FLASH_ERASE_SIZE * 1024); 
+native_flash_blocks = LENGTH(NATIVE_FLASH)/(FLASH_ERASE_SIZE * 1024); 
+deployment_flash_blocks = LENGTH(DEPLOYMENT_FLASH)/(FLASH_ERASE_SIZE * 1024);
+config_flash_blocks = LENGTH(CONFIG_FLASH)/(FLASH_ERASE_SIZE * 1024);
+
+
+/* ----------------------------- */
+/* Variables used by 'memory.cpp' */
+/* ----------------------------- */
+HeapBegin             = ORIGIN(CLR_MANAGED_RAM); 
+HeapEnd               = HeapBegin + LENGTH(CLR_MANAGED_RAM); 
+/*----------------------------------------------------------*/
+
+/* -------------------------------------------- */
+/* Variables used by 'Device_BlockStorage.c'
+/* -------------------------------------------- */
+native_flash_start_address = ORIGIN(NATIVE_FLASH);
+native_flash_size = LENGTH(NATIVE_FLASH);
+native_block_start = 0;
+native_block_end   = native_block_start + native_flash_blocks - 1;
+deployment_block_start = native_block_end + 1;
+deployment_block_end   = deployment_block_start + deployment_flash_blocks - 1;
+config_block_start = deployment_block_end + 1;
+config_block_end   = config_block_start + config_flash_blocks - 1;
+/*----------------------------------------------------------------------------*/
+
+/* -------------------------------------- */
+/* Variables used by 'Graphics_Memory.cpp'
+/* -------------------------------------- */
+Graphics_managed_heap          = ORIGIN(GRAPHICS_HEAP); 
+Graphics_managed_end           = Graphics_managed_heap + LENGTH(GRAPHICS_HEAP);   
+Graphics_heap_fast_address     = ORIGIN(GRAPHICS_HEAP_FAST); 
+Graphics_heap_end_fast_address = Graphics_heap_fast_address + LENGTH(GRAPHICS_HEAP_FAST);
+
+/* For Video controller this is a bit pixel copy of the screen */
+GRAPHICS_FRAME_BUFFER = ORIGIN(GRAPHICS_FRAME_BUFFER); 
+
+/*--------------------------------------------------------------------------------------*/
+
+ENTRY(Reset_Handler)
+
+/* _estack is used in ThreadX to define the end of the stack memory for the main thread */
+_estack = ORIGIN(DTCM_SRAM) + LENGTH(DTCM_SRAM);
+
+/* _sidata is used in ThreadX to copy the data segment from ROM to RAM during initialization */
+_sidata = LOADADDR(.data);
+
+ /* Stack and heap size */
+_Min_Heap_Size = 0x200; 
+_Min_Stack_Size = 0x400; 
+
+
 SECTIONS
 {
-  /*----------------------------------------*/
-  /* The startup code goes first into FLASH */
-  /*----------------------------------------*/
   .isr_vector :
   {
     . = ALIGN(4);
@@ -131,14 +123,6 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
-  /*-----------------------------------------------------*/
-  /* The program code and other data goes into FLASH     */
-  /* executable instructions, of a program               */
-  /* glue arm to thumb code                              */
-  /* glue thumb to arm code                              */
-  /* the system arranges to execute the code in this     */
-  /* section before calling the main program entry point */
-  /*-----------------------------------------------------*/
   .text :
   {
     . = ALIGN(4);
@@ -155,9 +139,6 @@ SECTIONS
     _etext = .;        /* define a global symbol at end of code */
   } >FLASH
 
-  /*-----------------------------------------*/
-  /* Read only data, constants, strings etc. */
-  /*-----------------------------------------*/
   .rodata :
   {
     . = ALIGN(4);
@@ -166,11 +147,6 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
-  /* --------------------------------------------------------------------------------------*/
-  /* ARM special sections                                                                  */
-  /* Each function that can throw an exception will have entries in the following sections */
-  /* used for C++ and for C programs that try to examine backtraces                        */
-  /* --------------------------------------------------------------------------------------*/
   .ARM.extab :                 /* extab names sections containing exception unwinding information */
   {
    *(.ARM.extab* .gnu.linkonce.armextab.*) 
@@ -183,10 +159,6 @@ SECTIONS
     __exidx_end = .;
   } >FLASH
 
-
-  /* ----------------------------------*/
-  /*   Initialization of C/C++ objects
-  /* ----------------------------------*/
   .preinit_array :
   {
     PROVIDE_HIDDEN (__preinit_array_start = .);
@@ -201,11 +173,7 @@ SECTIONS
     KEEP (*(.init_array*))
     PROVIDE_HIDDEN (__init_array_end = .);
   } >FLASH
-  
-  /* ----------------------------------------------------------------------*/
-  /* Tear down of C/C++ objects                                            */
-  /* C++ runtime destructors for static variables, C designated finalizers */
-  /* ----------------------------------------------------------------------*/
+
   .fini_array : /*  */
   {
     PROVIDE_HIDDEN (__fini_array_start = .);
@@ -213,11 +181,7 @@ SECTIONS
     KEEP (*(.fini_array*))
     PROVIDE_HIDDEN (__fini_array_end = .);
   } >FLASH
-  
 
-  /* -----------------------------------------------------------------------*/
-  /* Holds initialized data that contributes to the program's memory image  */
-  /* -----------------------------------------------------------------------*/
   .data :   
   {
     . = ALIGN(4);
@@ -253,17 +217,11 @@ SECTIONS
 /* Not using "DYNAMIC_MEMORY" so no need for a ._threadx_heap here.
 /* -----------------------------------------------------------------*/
 
-/* ------------------------------------------------------------------*/
-/* Application defined for use as memory accessible by DMA1 and DMA2 */
-/* ------------------------------------------------------------------*/
   .dma_buffer :
 {
   *(.dma_buffer)
 } >RAM_DMA
 
-/* ---------------------------------------------------------------------*/
-/* User_heap_stack section, used to check that there is enough RAM left */
-/* ---------------------------------------------------------------------*/
   ._user_heap_stack :
   {
     . = ALIGN(8);

@@ -1,4 +1,4 @@
-// Copyright (c) .NET Foundation and Contributors
+﻿// Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 
 #include "I2C_To_Touch_STM32.h"
@@ -42,7 +42,6 @@ void Initialize_I2C()
     }
     LL_I2C_Enable(I2C4);
 }
-
 bool Write8_Read_I2C(
     CLR_INT8 slaveAddress,
     CLR_UINT8 I2cRegister,
@@ -170,7 +169,6 @@ bool I2C_WaitOnTXISFlagUntilTimeout()
     }
     return true;
 }
-
 bool Write8Bits(CLR_UINT16 I2CAddress, uint8_t I2CRegister, uint8_t I2CData)
 {
     // Check bus busy flag

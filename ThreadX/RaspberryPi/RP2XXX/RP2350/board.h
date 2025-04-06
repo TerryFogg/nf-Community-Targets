@@ -46,14 +46,12 @@ extern "C"
 #endif
     void Startup_Rtos(bool debuggerRequested);
     void Initialize_Board();
-    void ResetPinList();
+    void SetupPinList();
     void Initialize64BitMicrosecondTimer();
     void InitializeDevicePins();
     uint64_t ReadMicrosecondCounter();
     void SystemClock_Config();
-    bool PinSupportsADC(int pinNumber);
     void InitializePSRAM();
-    void InitializeBoardPeripherals();
 
 #ifdef __cplusplus
 }

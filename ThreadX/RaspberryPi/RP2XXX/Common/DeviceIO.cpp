@@ -4,17 +4,12 @@
 //
 #include "DeviceIO.h"
 
-#pragma region GPIO Pins
-bool GpioIO::Initialize()
+#pragma region System.Device.Gpio
+GpioIO::GpioIO()
 {
-    return true;
 }
 bool GpioIO::InitializePin(PinNameValue pinNameValue)
 {
-    Device::ReservePin(
-        (PinNameValue)TOUCH_INTERFACE_INTERRUPT,
-        Device::DevicePinFunction::GPIO);
-
     // Sets pin as input, sets output to low and function as SIO
     int pinNumber = pinNameValue;
     gpio_init(pinNumber);
@@ -48,96 +43,6 @@ static void gpio_wakup_callback(uint gpio, uint32_t events)
 { // Code to handle the interrupt
   // Interrupt callback has woken the MCU
   //  ....  continue
-}
-bool GpioIO::SetFunction(Device::DevicePin devicePin)
-{
-    bool status = false;
-    int pinNumber = devicePin.pinNameValue;
-
-    switch (devicePin.CurrentFunction)
-    {
-        case Device::DevicePinFunction::NONE:
-            // basic input/output mode with output disabled
-            gpio_set_function(pinNumber, GPIO_FUNC_NULL);
-            status = true;
-            break;
-        case Device::DevicePinFunction::ADC:
-
-            if (PinSupportsADC(pinNumber))
-            {
-                // Set pin to input (as far as SIO is concerned)
-                gpio_set_function(pinNumber, GPIO_FUNC_SIO);
-                gpio_disable_pulls(pinNumber);
-                gpio_set_input_enabled(pinNumber, false);
-                status = true;
-            }
-            else
-            {
-                status = false;
-            }
-            break;
-        case Device::DevicePinFunction::CAN:
-            // Not supported on this MCU
-            status = false;
-            break;
-        case Device::DevicePinFunction::DAC:
-            // Not supported on this MCU
-            status = false;
-            break;
-        case Device::DevicePinFunction::GPIO:
-            // basic input/output mode with output disabled
-            gpio_set_function(pinNumber, GPIO_FUNC_NULL);
-            status = true;
-            break;
-        case Device::DevicePinFunction::SPI:
-            gpio_set_function(pinNumber, GPIO_FUNC_SPI);
-            status = true;
-            break;
-        case Device::DevicePinFunction::COUNTER:
-            // Not supported on this MCU
-            status = false;
-            break;
-        case Device::DevicePinFunction::PWM:
-            gpio_set_function(pinNumber, GPIO_FUNC_PWM);
-            status = true;
-            break;
-        case Device::DevicePinFunction::SD:
-            status = true;
-            break;
-        case Device::DevicePinFunction::TIMER:
-            gpio_set_function(pinNumber, GPIO_FUNC_GPCK);
-            status = true;
-            break;
-        case Device::DevicePinFunction::I2C:
-            gpio_set_function(pinNumber, GPIO_FUNC_I2C);
-            gpio_pull_up(pinNumber);
-            status = true;
-            break;
-        case Device::DevicePinFunction::I2S:
-            // Not supported on this MCU
-            status = false;
-            break;
-        case Device::DevicePinFunction::USART:
-            gpio_set_function(pinNumber, GPIO_FUNC_UART);
-            status = true;
-            break;
-        case Device::DevicePinFunction::WAKEUP:
-            // No formal pin wakeup function but we can set an interrupt to return from low power mode
-            gpio_init(pinNumber);
-            gpio_set_dir(pinNumber, GPIO_IN);
-            gpio_pull_up(pinNumber);
-            gpio_set_irq_enabled_with_callback(
-                pinNumber,
-                GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE,
-                true,
-                &gpio_wakup_callback);
-            status = true;
-            break;
-        default:
-            status = false;
-            break;
-    }
-    return status;
 }
 bool GpioIO::SetLowPower(PinNameValue pinNameValue)
 {
@@ -254,7 +159,12 @@ bool GpioIO::InterruptRemove(PinNameValue pinNameValue)
 }
 #pragma endregion
 
-#pragma region System.Device.ADC
+#pragma region System.Device.Adc
+static ADC_Properties *mcuADC;
+void AdcIO::SetupAdcList(ADC_Properties *boardAdcDefinitions)
+{
+    mcuADC = boardAdcDefinitions;
+}
 int AdcIO::MaximumValue()
 {
     return 4095;
@@ -270,60 +180,34 @@ int AdcIO::Resolution()
 }
 int AdcIO::ChannelCount()
 {
-    return 4;
+    return 3;
 }
-
 bool AdcIO::Initialize()
 {
     adc_init();
     return true;
 }
-bool AdcIO::Dispose(CLR_INT32 adc_channel_number)
-{
-    PinNameValue pinNameValue = AdcIO::ChannelToPin(adc_channel_number);
-    GpioIO::SetLowPower(pinNameValue);
-    return true;
-}
 bool AdcIO::Open(CLR_INT32 adc_channel_number)
 {
-    // Channel 0 --> GPIO26
-    // Channel 1 --> GPIO27
-    // Channel 2 --> GPIO28
-    // Channel 3 --> GPIO29
-    // Channel 4 --> Temperature Sensor
-    return (adc_channel_number >= 0 and adc_channel_number <= 4);
+    if (!mcuADC[adc_channel_number].ADC_Initialized)
+    {
+        adc_gpio_init(mcuADC[adc_channel_number].adc);
+        mcuADC[adc_channel_number].ADC_Initialized = true;
+    }
+    return true;
+}
+bool AdcIO::Dispose(CLR_INT32 adc_channel_number)
+{
+    if (mcuADC[adc_channel_number].ADC_Initialized)
+    {
+        GpioIO::SetLowPower(mcuADC[adc_channel_number].adc);
+    }
+    return true;
 }
 CLR_UINT16 AdcIO::Read(CLR_INT32 adc_channel_number)
 {
     adc_select_input(adc_channel_number);
     return adc_read();
-}
-PinNameValue AdcIO::ChannelToPin(CLR_INT32 adc_channel_number)
-{
-    // Channel 0 --> GPIO26
-    // Channel 1 --> GPIO27
-    // Channel 2 --> GPIO28
-    // Channel 3 --> GPIO29
-    // Channel 4 --> Temperature Sensor
-    PinNameValue pinNameValue;
-    switch (adc_channel_number)
-    {
-        case 0:
-            pinNameValue = GP26;
-            break;
-        case 1:
-            pinNameValue = GP27;
-            break;
-        case 2:
-            pinNameValue = GP28;
-            break;
-        case 3:
-            pinNameValue = GP29;
-            break;
-        default:
-            break;
-    }
-    return pinNameValue;
 }
 CLR_UINT16 AdcIO::IsModeSupported(AdcChannelMode requestedMode)
 {
@@ -340,14 +224,15 @@ CLR_UINT16 AdcIO::IsModeSupported(AdcChannelMode requestedMode)
 }
 #pragma endregion
 
-#pragma region DAC
-
+#pragma region System.Device.Dac
 int DacIO::Resolution()
 {
+    // No DAC
     return 0;
 }
 int DacIO::ChannelCount()
 {
+    // No DAC
     return 0;
 }
 bool DacIO::Initialize(CLR_INT32 dac_channel_number)
@@ -356,118 +241,155 @@ bool DacIO::Initialize(CLR_INT32 dac_channel_number)
     (void)dac_channel_number;
     return false;
 }
-bool DacIO::Open(CLR_INT32 controllerId, CLR_INT32 dac_channel_number)
+bool DacIO::Open(CLR_INT32 dac_channel_number)
 {
     // No DAC
-    (void)controllerId;
     (void)dac_channel_number;
     return false;
 }
 char *DacIO::DeviceSelector(int dac_channel_number)
 {
+    // No DAC
+    (void)dac_channel_number;
     static char DeviceNameDummy[] = "NotSupported\0";
-    switch (dac_channel_number)
-    {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-            break;
-    }
     return DeviceNameDummy;
 }
 void DacIO::Write(CLR_INT32 dac_channel_number, CLR_INT32 value)
 {
+    // No DAC
     (void)dac_channel_number;
     (void)value;
 }
 PinNameValue DacIO::ChannelToPin(CLR_INT32 dac_channel_number)
 {
+    // No DAC
+    (void)dac_channel_number;
     return (PinNameValue)-1;
 }
 bool DacIO::Dispose(CLR_INT32 dac_channel_number)
 {
-    PinNameValue pinNameValue = DacIO::ChannelToPin(dac_channel_number);
-    GpioIO::SetLowPower(pinNameValue);
+    // No DAC
+    (void)dac_channel_number;
     return true;
 }
 #pragma endregion
 
 #pragma region System.Device.I2c
-
-i2c_inst *Get_I2C_Instance(uint32_t busIndex)
+// Reserve 256 byte memory for the I2C slave.
+// To write a series of bytes, the master first writes the memory address, followed by the data.
+// The address is automatically incremented for each byte transferred, looping back to 0 upon reaching the end.
+// Reading is done sequentially from the current memory address.
+static struct
 {
-    i2c_inst *i2c_instance = i2c_get_instance(busIndex);
-    switch (busIndex)
+    uint8_t mem[256];
+    uint8_t mem_address;
+    bool mem_address_written;
+} context;
+
+static I2C_Properties *mcuI2C;
+void I2cIO::SetupI2CList(I2C_Properties *boardMcuI2C)
+{
+    mcuI2C = boardMcuI2C;
+}
+
+// The handler is called from the I2C ISR, so it must complete quickly.
+static void i2c_slave_handler(i2c_inst_t *i2c, i2c_slave_event_t event)
+{
+    switch (event)
     {
-        case 0:
-            return i2c0;
+        case I2C_SLAVE_RECEIVE:
+            if (!context.mem_address_written)
+            {
+                context.mem_address = i2c_read_byte_raw(i2c);
+                context.mem_address_written = true;
+            }
+            else
+            {
+                context.mem[context.mem_address] = i2c_read_byte_raw(i2c);
+                context.mem_address++;
+            }
             break;
-        case 1:
-            return i2c1;
+        case I2C_SLAVE_REQUEST:
+            i2c_write_byte_raw(i2c, context.mem[context.mem_address]);
+            context.mem_address++;
+            break;
+        case I2C_SLAVE_FINISH:
+            context.mem_address_written = false;
             break;
         default:
-            // Only two I2C units ( 0 and 1)
-            return NULL;
+            break;
     }
 }
-bool I2cIO::Initialize(CLR_INT32 I2C_deviceId, I2cBusSpeed I2C_speed)
+bool I2cIO::Initialize(
+    CLR_INT32 I2C_deviceId,
+    I2cBusSpeed I2C_speed,
+    I2C_CONTROL_TYPE I2C_control_type,
+    CLR_INT32 deviceAddress)
 {
-    i2c_inst_t *I2C_Instance = Get_I2C_Instance(I2C_deviceId);
-    CLR_INT32 baud;
-    switch (I2C_speed)
+    if (!mcuI2C[I2C_deviceId].I2C_Initialized)
     {
-        case I2cBusSpeed::I2cBusSpeed_StandardMode:
-            baud = 100000;
-            break;
-        case I2cBusSpeed::I2cBusSpeed_FastMode:
-            baud = 400000;
-            break;
-        case I2cBusSpeed::I2cBusSpeed_FastModePlus:
-            baud = 1000000;
-            break;
+        CLR_INT32 baud;
+        switch (I2C_speed)
+        {
+            case I2cBusSpeed::I2cBusSpeed_StandardMode:
+                baud = 100000;
+                break;
+            case I2cBusSpeed::I2cBusSpeed_FastMode:
+                baud = 400000;
+                break;
+            case I2cBusSpeed::I2cBusSpeed_FastModePlus:
+                baud = 1000000;
+                break;
+        }
+
+        gpio_set_function(mcuI2C[I2C_deviceId].sda, GPIO_FUNC_I2C);
+        gpio_pull_up(mcuI2C[I2C_deviceId].sda);
+        gpio_set_function(mcuI2C[I2C_deviceId].scl, GPIO_FUNC_I2C);
+        gpio_pull_up(mcuI2C[I2C_deviceId].scl);
+
+        switch (I2C_control_type)
+        {
+            case I2C_CONTROL_TYPE::MASTER:
+                i2c_init((i2c_inst *)(mcuI2C[I2C_deviceId].i2c_instance), baud);
+                break;
+            case I2C_CONTROL_TYPE::SLAVE:
+                i2c_slave_init((i2c_inst *)(mcuI2C[I2C_deviceId].i2c_instance), deviceAddress, &i2c_slave_handler);
+                break;
+        }
+        mcuI2C[I2C_deviceId].I2C_Initialized = true;
     }
-    i2c_init(I2C_Instance, baud);
-
-#ifdef TEST_CODE
-    gpio_init(I2C_MASTER_SDA_PIN);
-    gpio_set_function(I2C_MASTER_SDA_PIN, GPIO_FUNC_I2C);
-    // pull-ups are already active on slave side, this is just a fail-safe in case the wiring is faulty
-    gpio_pull_up(I2C_MASTER_SDA_PIN);
-
-    gpio_init(I2C_MASTER_SCL_PIN);
-    gpio_set_function(I2C_MASTER_SCL_PIN, GPIO_FUNC_I2C);
-    gpio_pull_up(I2C_MASTER_SCL_PIN);
-
-    i2c_init(i2c1, I2C_BAUDRATE);
-#endif
     return true;
 }
 bool I2cIO::Dispose(CLR_INT32 I2C_deviceId)
 {
-    i2c_inst *I2C_Instance = Get_I2C_Instance(I2C_deviceId);
-    i2c_deinit(I2C_Instance);
+    if (!mcuI2C[I2C_deviceId].I2C_Initialized)
+    {
+        i2c_deinit((i2c_inst *)(mcuI2C[I2C_deviceId].i2c_instance));
+    }
     return true;
 }
 I2cTransferStatus I2cIO::Write(
     CLR_INT32 I2C_deviceId,
     CLR_INT32 slaveAddress,
     CLR_UINT8 *writeBuffer,
-    CLR_INT32 writeSize)
+    CLR_INT32 writeSize,
+    I2C_CONTROL_TYPE busType)
 {
     I2cTransferStatus return_status = I2cTransferStatus_UnknownError;
-    i2c_inst *I2C_Instance = Get_I2C_Instance(I2C_deviceId);
+    bool is_master = (busType == I2C_CONTROL_TYPE::MASTER) ? true : false;
+
     int returnValue = i2c_write_blocking(
-        I2C_Instance,
+        (i2c_inst *)(mcuI2C[I2C_deviceId].i2c_instance),
         slaveAddress,
         writeBuffer,
         writeSize,
-        false); // true to keep master control of bus
+        is_master); // true to keep master control of bus
 
     if (returnValue == PICO_ERROR_TIMEOUT)
         return_status = I2cTransferStatus_ClockStretchTimeout;
     if (returnValue == PICO_ERROR_GENERIC)
         return_status = I2cTransferStatus_UnknownError;
+
     if (returnValue != writeSize)
         return_status = I2cTransferStatus_PartialTransfer;
     if (returnValue = writeSize)
@@ -477,12 +399,14 @@ I2cTransferStatus I2cIO::Write(
 I2cTransferStatus I2cIO::Read(CLR_INT32 I2C_deviceId, CLR_INT32 slaveAddress, CLR_UINT8 *readBuffer, CLR_INT32 readSize)
 {
     I2cTransferStatus return_status = I2cTransferStatus_UnknownError;
-    i2c_inst_t *I2C_Instance = Get_I2C_Instance(I2C_deviceId);
-    int returnValue = i2c_read_blocking(I2C_Instance, slaveAddress, readBuffer, readSize, false);
+    int returnValue =
+        i2c_read_blocking((i2c_inst *)(mcuI2C[I2C_deviceId].i2c_instance), slaveAddress, readBuffer, readSize, false);
+
     if (returnValue == PICO_ERROR_TIMEOUT)
         return_status = I2cTransferStatus_ClockStretchTimeout;
     if (returnValue == PICO_ERROR_GENERIC)
         return_status = I2cTransferStatus_UnknownError;
+
     if (returnValue != readSize)
         return_status = I2cTransferStatus_PartialTransfer;
     if (returnValue = readSize)
@@ -491,126 +415,35 @@ I2cTransferStatus I2cIO::Read(CLR_INT32 I2C_deviceId, CLR_INT32 slaveAddress, CL
 }
 #pragma endregion
 
-#pragma region System.Device.I2c.Slave
-CLR_INT32 I2cIO_Slave::TimeoutMaximum()
-{
-    return 10000;
-}
-CLR_INT32 I2cIO_Slave::Timeout()
-{
-    return 100;
-}
-bool I2cIO_Slave::Initialize(CLR_INT32 I2C_deviceId, CLR_INT32 deviceAddress)
-{
-    i2c_slave_handler_t handler;
-    i2c_inst_t *I2C_Instance = Get_I2C_Instance(I2C_deviceId);
-    i2c_slave_init(I2C_Instance, deviceAddress, handler);
-
-#ifdef TEST_CODE
-    gpio_set_function(I2C_SLAVE_SDA_PIN, GPIO_FUNC_I2C);
-    gpio_set_function(I2C_SLAVE_SCL_PIN, GPIO_FUNC_I2C);
-
-    gpio_init(I2C_SLAVE_SDA_PIN);
-    gpio_init(I2C_SLAVE_SCL_PIN);
-
-    gpio_pull_up(I2C_SLAVE_SDA_PIN);
-    gpio_pull_up(I2C_SLAVE_SCL_PIN);
-
-    i2c_init(I2C_Instance, I2C_BAUDRATE);
-    i2c_slave_init(I2C_Instance, I2C_SLAVE_ADDRESS, &i2c_slave_handler);
-    irq_set_exclusive_handler(num, I2C_deviceId == 0 ? i2c0_slave_irq_handler : i2c1_slave_irq_handler);
-    irq_set_enabled(num, true);
-#endif
-    return true;
-}
-bool I2cIO_Slave::Dispose(CLR_INT32 I2C_deviceId)
-{
-    i2c_inst_t *I2C_Instance = Get_I2C_Instance(I2C_deviceId);
-    i2c_slave_deinit(I2C_Instance);
-
-#ifdef TEST_CODE
-
-    irq_set_enabled(num, false);
-    irq_remove_handler(num, i2c_slave_handler);
-
-    i2c_hw_t *hw = i2c_get_hw(i2c);
-    hw->intr_mask = I2C_IC_INTR_MASK_RESET;
-    i2c_set_slave_mode(I2C_Instance, false, 0);
-#endif
-
-    return true;
-}
-I2cTransferStatus I2cIO_Slave::Write(
-    CLR_INT32 I2C_deviceId,
-    CLR_UINT8 *writeBuffer,
-    CLR_INT32 writeSize,
-    CLR_INT32 timeoutMilliseconds,
-    CLR_INT32 *readCount)
-{
-    uint8_t deviceAddress;
-    I2cTransferStatus return_status = I2cTransferStatus::I2cTransferStatus_UnknownError;
-    i2c_inst_t *I2C_Instance = Get_I2C_Instance(I2C_deviceId);
-    int i2cWriteResult = i2c_write_blocking(I2C_Instance, deviceAddress, writeBuffer, writeSize, true);
-    if (i2cWriteResult == PICO_ERROR_TIMEOUT || i2cWriteResult == PICO_ERROR_GENERIC)
-    {
-        return_status = I2cTransferStatus::I2cTransferStatus_UnknownError;
-    }
-    else
-    {
-        return_status = I2cTransferStatus::I2cTransferStatus_FullTransfer;
-    }
-    return return_status;
-}
-I2cTransferStatus I2cIO_Slave::Read(
-    CLR_INT32 I2C_deviceId,
-    CLR_UINT8 *readBuffer,
-    CLR_INT32 readSize,
-    CLR_INT32 timeoutMilliseconds,
-    CLR_INT32 *readCount)
-{
-    I2cTransferStatus return_status = I2cTransferStatus::I2cTransferStatus_UnknownError;
-    uint8_t deviceAddress;
-    i2c_inst_t *I2C_Instance = Get_I2C_Instance(I2C_deviceId);
-    int i2cReadResult = i2c_read_blocking(
-        I2C_Instance,
-        deviceAddress,
-        readBuffer,
-        readSize,
-        true); // true to keep master control of bus
-
-    if (i2cReadResult == PICO_ERROR_TIMEOUT || i2cReadResult == PICO_ERROR_GENERIC)
-    {
-        return_status = I2cTransferStatus::I2cTransferStatus_UnknownError;
-    }
-    else
-    {
-        return_status = I2cTransferStatus::I2cTransferStatus_FullTransfer;
-    }
-    return return_status;
-}
-
-#pragma endregion
-
 #pragma region System.Device.Pwm
+static PWM_Properties *mcuPWM;
+void PwmIO::SetupPwmList(PWM_Properties *boardPWMDefinitions)
+{
+    mcuPWM = boardPWMDefinitions;
+}
+
 bool PwmIO::Initialize(
-    CLR_INT32 channelId,
+    CLR_INT32 sliceNumber,
     CLR_INT32 timerId,
     CLR_INT32 pinNameValue,
     CLR_INT32 polarity,
     CLR_INT32 desiredFrequency,
     CLR_INT32 dutyCycle)
 {
-    uint slice_num;
-    gpio_set_function(pinNameValue, GPIO_FUNC_PWM);
+    if (!mcuPWM[sliceNumber].PWM_Initialized)
+    {
+        gpio_set_function(mcuPWM[sliceNumber].channelA, GPIO_FUNC_PWM);
+        gpio_set_function(mcuPWM[sliceNumber].channelB, GPIO_FUNC_PWM);
+    }
     if (polarity == 0)
     {
-        pwm_set_output_polarity(slice_num, true, true);
+        pwm_set_output_polarity(sliceNumber, true, true);
     }
     else
     {
-        pwm_set_output_polarity(slice_num, false, false);
+        pwm_set_output_polarity(sliceNumber, false, false);
     }
-    slice_num = pwm_gpio_to_slice_num(pinNameValue);
+    CLR_INT32 slice_num = pwm_gpio_to_slice_num(mcuPWM[sliceNumber].channelA);
 
     // Set period of 4 cycles (0 to 3 inclusive)
     int wrapNumber = dutyCycle; // ??????????????????????
@@ -619,8 +452,14 @@ bool PwmIO::Initialize(
 
     return true;
 }
-bool PwmIO::Dispose(CLR_INT32 I2C_deviceId)
+bool PwmIO::Dispose(CLR_INT32 sliceNumber)
 {
+    if (!mcuPWM[sliceNumber].PWM_Initialized)
+    {
+        gpio_set_function(mcuPWM[sliceNumber].channelA, GPIO_FUNC_PWM);
+        gpio_set_function(mcuPWM[sliceNumber].channelB, GPIO_FUNC_PWM);
+        mcuPWM[sliceNumber].PWM_Initialized = false;
+    }
     // TODO: Deactive PWM, set pins to low power
     // Get each pin and set to low power function
     return true;
@@ -656,10 +495,20 @@ CLR_UINT32 PwmIO::GetChannel(CLR_INT32 timerId, CLR_INT32 pin_number)
 #pragma endregion
 
 #pragma region System.IO.Ports
-
+static USART_Properties *mcuUSART;
+void SerialIO::SetupUsartList(USART_Properties *boardMcuUsart)
+{
+    mcuUSART = boardMcuUsart;
+}
 bool SerialIO::Initialize(CLR_INT32 usartDeviceNumber, CLR_INT32 baudrate)
 {
-    uart_init(uart_get_instance(usartDeviceNumber), baudrate);
+    if (!mcuUSART[usartDeviceNumber].USART_Initialized)
+    {
+        uart_init(uart_get_instance(usartDeviceNumber), baudrate);
+        gpio_set_function(mcuUSART[usartDeviceNumber].tx, GPIO_FUNC_UART);
+        gpio_set_function(mcuUSART[usartDeviceNumber].rx, GPIO_FUNC_UART);
+        mcuUSART[usartDeviceNumber].USART_Initialized = true;
+    }
     return true;
 }
 bool SerialIO::Dispose(CLR_INT32 usartDeviceNumber)
@@ -746,7 +595,12 @@ bool SerialIO::SetBaudRate(CLR_INT32 usartDeviceNumber, CLR_INT32 baudRate)
     int actualBaudRate = uart_set_baudrate(uart_get_instance(usartDeviceNumber), baudRate);
     return true;
 }
-bool SerialIO::SetConfig(CLR_INT32 usartDeviceNumber, CLR_INT32 stopBits, CLR_INT32 dataBits, CLR_INT32 RequestedParity)
+bool SerialIO::SetConfig(
+    CLR_INT32 usartDeviceNumber,
+    SerialMode serialMode,
+    CLR_INT32 stopBits,
+    CLR_INT32 dataBits,
+    CLR_INT32 RequestedParity)
 {
     uart_parity_t parity = (uart_parity_t)RequestedParity;
     uart_set_format(uart_get_instance(usartDeviceNumber), dataBits, stopBits, parity);
@@ -780,13 +634,12 @@ bool SerialIO::SetHandshake(CLR_INT32 usartDeviceNumber, Handshake handshake)
 }
 HRESULT SerialIO::SetupWriteLine(CLR_RT_StackFrame &stack, char **buffer, uint32_t *length, bool *isNewAllocation)
 {
-    UNUSED(stack);
-    UNUSED(buffer);
-    UNUSED(length);
-    UNUSED(isNewAllocation);
+    (void)stack;
+    (void)buffer;
+    (void)length;
+    (void)isNewAllocation;
     return 1;
 }
-
 bool SerialIO::SetMode(CLR_INT32 UsartDeviceNumber, CLR_INT32 mode)
 {
     return true;
@@ -794,6 +647,12 @@ bool SerialIO::SetMode(CLR_INT32 UsartDeviceNumber, CLR_INT32 mode)
 #pragma endregion
 
 #pragma region System.Device.SPI
+
+static SPI_Properties *mcuSPI;
+void SpiIO::SetupSpiList(SPI_Properties *boardMcuSPI)
+{
+    mcuSPI = boardMcuSPI;
+}
 CLR_INT32 SpiIO::MaximumClockFrequency(CLR_INT32 controllerID)
 {
     return 1;
@@ -830,8 +689,7 @@ CLR_INT32 SpiIO::ByteTime()
 }
 SPI_OP_STATUS SpiIO::Completed(CLR_INT32 deviceId)
 {
-    UNUSED(deviceId);
+    (void)deviceId;
     return SPI_OP_STATUS::SPI_OP_COMPLETE;
 }
-
 #pragma endregion

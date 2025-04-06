@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) 2017 The nanoFramework project contributors
 // See LICENSE file in the project root for full license information.
 //
@@ -20,10 +20,6 @@ extern "C"
         DisplayInterfaceConfig display_config;
         display_config.Screen.width = 480;
         display_config.Screen.height = 480;
-
-
-        //??????????????????????????????????
-
 
         display_config.VideoDisplay.Frequency_Divider = 5;
         display_config.VideoDisplay.enable = LL_GPIO_PIN_13;

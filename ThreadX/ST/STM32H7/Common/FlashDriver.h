@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 //
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
@@ -22,6 +22,7 @@ extern "C"
         unsigned int numBytes,
         unsigned char *buffer,
         bool readModifyWrite);
+    bool FlashDriver_Memset(void *, ByteAddress startAddress, unsigned char data, unsigned int numBytes);
     bool FlashDriver_IsBlockErased(void *, ByteAddress blockAddress, unsigned int length);
     bool FlashDriver_EraseBlock(void *, ByteAddress address);
     bool FlashUnlock();

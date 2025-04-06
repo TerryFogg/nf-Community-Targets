@@ -18,6 +18,7 @@ extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_System
 
 extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_Graphics;
 extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_System_Device_Gpio;
+extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_System_Device_I2c;
 
 const CLR_RT_NativeAssemblyData *g_CLR_InteropAssembliesNativeData[] = {
     &g_CLR_AssemblyNative_mscorlib,
@@ -34,9 +35,9 @@ const CLR_RT_NativeAssemblyData *g_CLR_InteropAssembliesNativeData[] = {
     &g_CLR_AssemblyNative_nanoFramework_System_Text,
 
     &g_CLR_AssemblyNative_System_Device_Gpio,
+    &g_CLR_AssemblyNative_System_Device_I2c,
     NULL};
 
-//const uint16_t g_CLR_InteropAssembliesCount = (8 + 2);
 
 const uint16_t g_CLR_InteropAssembliesCount =
     sizeof(g_CLR_InteropAssembliesNativeData) / sizeof(g_CLR_InteropAssembliesNativeData[0]) - 1;

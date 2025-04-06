@@ -61,16 +61,18 @@ endif()
 
 
 
-# Per Board fileX sources    
-if( "${TARGET_FAMILY}" STREQUAL "STM32H7")
-    list(APPEND FILEX_SOURCES
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/SD_DoubleBufferedDMA.cpp
-    )
-endif()
-if( "${TARGET_FAMILY}" STREQUAL "STM32U5")
-    list(APPEND FILEX_INCLUDES
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/STM32U5/DeviceIO
-    )
+# Per Board fileX sources
+if(${FILEX})
+    if( "${TARGET_FAMILY}" STREQUAL "STM32H7")
+        list(APPEND FILEX_SOURCES
+             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/SD_DoubleBufferedDMA.cpp
+        )
+    endif()
+    if( "${TARGET_FAMILY}" STREQUAL "STM32U5")
+        list(APPEND FILEX_INCLUDES
+             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/STM32U5/DeviceIO
+        )
+    endif()
 endif()
 
 # Usb

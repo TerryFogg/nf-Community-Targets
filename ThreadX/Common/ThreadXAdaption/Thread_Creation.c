@@ -18,6 +18,7 @@ void CLRStartupThread(uint32_t parameter);
 void ReceiverThread_entry(uint32_t parameter);
 void CreateReceiverThread();
 void CreateCLRThread();
+void CreateI2CThread();
 void CreateUsbXThreads();
 void usbx_cdc_acm_read_thread_entry(ULONG thread_input);
 void usbx_cdc_acm_write_thread_entry(ULONG thread_input);
@@ -32,6 +33,7 @@ TX_BYTE_POOL byte_pool_0;
 uint8_t memory_area[DEFAULT_BYTE_POOL_SIZE];
 TX_THREAD receiverThread;
 TX_THREAD CLRThread;
+TX_THREAD I2CWorkerThread;
 TX_THREAD ux_cdc_read_thread;
 TX_THREAD ux_cdc_write_thread;
 TX_EVENT_FLAGS_GROUP usbx_cdc_event_flag_group;
@@ -104,6 +106,31 @@ void CreateCLRThread()
         }
     }
 }
+#define I2C_WORKER_STACK_SIZE  500
+
+void CreateI2CThread()
+{
+    CHAR *pointer = TX_NULL;
+    tx_byte_allocate(&byte_pool_0, (VOID **)&pointer, I2C_WORKER_STACK_SIZE, TX_DONT_START);
+    uint16_t status = tx_thread_create(
+        &I2CWorkerThread,
+        "I2C_Worker_Thread",
+        CLRStartupThread,
+        g_waitForDebuggerRequested,
+        pointer,
+        CLR_THREAD_STACK_SIZE,
+        CLR_THREAD_PRIORITY,
+        CLR_THREAD_PRIORITY,
+        TX_NO_TIME_SLICE,
+        TX_AUTO_START);
+    if (status != TX_SUCCESS)
+    {
+        while (1)
+        {
+        }
+    }
+}
+
 
 #pragma region Thread startup programs
 
@@ -140,6 +167,11 @@ void ReceiverThread_entry(uint32_t parameter)
         tx_thread_relinquish();
     }
 }
+void I2CWorkerStartupThread(uint32_t parameter)
+{
+    (void)parameter;
+}
+
 #pragma endregion
 
 #ifdef USING_USBX

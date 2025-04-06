@@ -16,18 +16,13 @@ HRESULT Library_sys_dev_i2c_native_System_Device_I2c_I2cDevice::NativeInit___VOI
 {
     NANOCLR_HEADER();
     {
-
         FAULT_ON_NULL(stack.This());
         CLR_RT_HeapBlock *connectionSettings = stack.This()[FIELD___connectionSettings].Dereference();
-        CLR_INT32 deviceId = connectionSettings[I2cConnectionSettings::FIELD___busId].NumericByRef().s4;
+        CLR_INT32 I2Cbus = connectionSettings[I2cConnectionSettings::FIELD___busId].NumericByRef().s4;
+        I2cBusSpeed I2cSpeed =
+            (I2cBusSpeed)connectionSettings[I2cConnectionSettings::FIELD___busSpeed].NumericByRef().s4;
 
-        if (Device::IsValidI2CDevice(deviceId))
-        {
-            I2cBusSpeed I2cSpeed =
-                (I2cBusSpeed)connectionSettings[I2cConnectionSettings::FIELD___busSpeed].NumericByRef().s4;
-            I2cIO::Initialize(deviceId, I2cSpeed);
-        }
-        else
+        if (!I2cIO::Initialize(I2Cbus, I2cSpeed, I2C_CONTROL_TYPE::MASTER))
         {
             NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_OPERATION);
         }
@@ -55,12 +50,14 @@ HRESULT Library_sys_dev_i2c_native_System_Device_I2c_I2cDevice::
     {
         FAULT_ON_NULL(stack.This());
 
+        uint8_t *readBuffer;
+        uint8_t *writeBuffer;
+
+        // create the return object (I2cTransferResult)
         CLR_RT_HeapBlock &top = stack.PushValueAndClear();
+        g_CLR_RT_ExecutionEngine.NewObjectFromIndex(top, g_CLR_RT_WellKnownTypes.m_I2cTransferResult);
         CLR_RT_HeapBlock *result = top.Dereference();
         FAULT_ON_NULL(result);
-
-        uint8_t *writeBuffer;
-        uint8_t *readBuffer;
 
         CLR_RT_HeapBlock *readSpanByte = stack.Arg2().Dereference();
         CLR_RT_HeapBlock *writeSpanByte = stack.Arg1().Dereference();
@@ -81,47 +78,48 @@ HRESULT Library_sys_dev_i2c_native_System_Device_I2c_I2cDevice::
 
         uint8_t deviceId = (uint8_t)connectionSettings[I2cConnectionSettings::FIELD___busId].NumericByRef().s4;
 
-        if (!Device::IsValidI2CDevice(deviceId))
-        {
-            NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_OPERATION);
-        }
-
         if (IsWrite)
         {
-            // Take a copy of the data from the managed heap to local store ( future?, maybe execute this on an
-            // async thread)
-            if ((writeBuffer = (uint8_t *)platform_malloc(writeSize)) != NULL)
+            // Allocate memory for a write buffer
+            writeBuffer = (uint8_t *)platform_malloc(writeSize);
             {
+                if (writeBuffer == NULL)
+                {
+                    NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_MEMORY);
+                }
+                // Take a local copy of the data from the managed heap
                 memcpy(writeBuffer, (uint8_t *)writeData->GetElement(writeOffset), writeSize);
-                I2cTransferStatus transferResult = I2cIO::Write(deviceId, slaveAddress, writeBuffer, writeSize);
-                platform_free(writeBuffer);
+                I2cTransferStatus transferResult =
+                    I2cIO::Write(deviceId, slaveAddress, writeBuffer, writeSize, I2C_CONTROL_TYPE::MASTER);
                 result[I2cTransferResult::FIELD___status].SetInteger(transferResult);
                 result[I2cTransferResult::FIELD___bytesTransferred].SetInteger(0);
             }
-            else
-            {
-                NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_MEMORY);
-            }
+            platform_free(writeBuffer);
         }
+
         if (IsRead)
         {
-            // Take a copy of the data from the managed heap to local store ( future?, maybe execute this on an
-            // async thread)
-            if ((readBuffer = (uint8_t *)platform_malloc(readSize)) != NULL)
+            // Allocate memory for a read buffer
+            readBuffer = (uint8_t *)platform_malloc(readSize);
             {
-                memset(readBuffer, 0, readSize);
+                if (readBuffer == NULL)
+                {
+                    NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_MEMORY);
+                }
                 I2cTransferStatus transferResult = I2cIO::Read(deviceId, slaveAddress, readBuffer, readSize);
-                memcpy(readData->GetElement(readOffset), readBuffer, readSize);
-                result[I2cTransferResult::FIELD___status].SetInteger((CLR_UINT32)I2cTransferStatus_FullTransfer);
-                result[I2cTransferResult::FIELD___bytesTransferred].SetInteger((CLR_UINT32)(writeSize + readSize));
-                platform_free(readBuffer);
-                result[I2cTransferResult::FIELD___status].SetInteger(transferResult);
-                result[I2cTransferResult::FIELD___bytesTransferred].SetInteger(0);
+                if (transferResult != I2cTransferStatus::I2cTransferStatus_FullTransfer)
+                {
+                    result[I2cTransferResult::FIELD___bytesTransferred].SetInteger(0);
+                }
+                else
+                {
+                    memcpy(readData->GetElement(readOffset), readBuffer, readSize);
+                    result[I2cTransferResult::FIELD___status].SetInteger((CLR_UINT32)I2cTransferStatus_FullTransfer);
+                    result[I2cTransferResult::FIELD___bytesTransferred].SetInteger((CLR_UINT32)(writeSize + readSize));
+                    result[I2cTransferResult::FIELD___status].SetInteger(transferResult);
+                }
             }
-            else
-            {
-                NANOCLR_SET_AND_LEAVE(CLR_E_OUT_OF_MEMORY);
-            }
+            platform_free(readBuffer);
         }
     }
     NANOCLR_NOCLEANUP();

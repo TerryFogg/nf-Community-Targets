@@ -8,7 +8,6 @@
 #include <targetPAL.h>
 #include <corlib_native.h>
 #include "nf_rt_events_native.h"
-#include "sys_dev_gpio_native.h"
 #include "DeviceIO.h"
 #include "Device.h"
 #include "tx_api.h"
@@ -17,7 +16,6 @@ typedef Library_sys_dev_gpio_native_System_Device_Gpio_PinValue PinValue;
 typedef Library_sys_dev_gpio_native_System_Device_Gpio_GpioPin GpioPin;
 typedef Library_sys_dev_gpio_native_System_Device_Gpio_GpioPinBundle GpioPinBundle;
 
-static bool GeneralInitialize = false;
 CLR_INT32 NearestThreadxTicks(int value);
 void DebounceTimerCallback(ULONG pinNumber);
 
@@ -29,16 +27,8 @@ HRESULT Library_sys_dev_gpio_native_System_Device_Gpio_GpioPin::NativeInit___BOO
         FAULT_ON_NULL(stack.This());
         FAULT_ON_OBJECT_DISPOSED(stack.This()[FIELD___disposedValue].NumericByRef().u1);
 
-        if (!GeneralInitialize)
-        {
-            GpioIO::Initialize();
-            GeneralInitialize = true;
-        }
-
         PinNameValue pinNumber = (PinNameValue)stack.Arg1().NumericByRef().s4;
-
-        if (Device::IsValidPin(pinNumber) &&
-            Device::ReservePin(pinNumber, Device::DevicePinFunction::GPIO))
+        if (Device::IsValidPin(pinNumber) && Device::ReservePin(pinNumber))
         {
             GpioIO::InitializePin(pinNumber);
             stack.SetResult_Boolean(true);
@@ -59,14 +49,14 @@ HRESULT Library_sys_dev_gpio_native_System_Device_Gpio_GpioPin::DisposeNative___
         PinNameValue pinNumber = (PinNameValue)stack.This()[FIELD___pinNumber].NumericByRefConst().s4;
         if (Device::IsValidPin(pinNumber))
         {
-            Device::DevicePin devicePin = Device::GetPin(pinNumber);
-            Device::GpioParameter *gpioParameters = devicePin.GpioParameterData;
+            DeviceGpioPin gpioPin = Device::GetPin(pinNumber);
+            GpioCallbackParameter *gpioParameters = gpioPin.GpioCallbackParameters;
             if (gpioParameters->debounceTimer.tx_timer_id != 0)
             {
                 // Delete existing debounce timer
                 tx_timer_delete(&gpioParameters->debounceTimer);
             }
-            Device::RemovePinParameters(pinNumber);
+            Device::RemovePinCallbackParameters(pinNumber);
             GpioIO::Dispose(pinNumber);
         }
         else
@@ -111,8 +101,7 @@ HRESULT Library_sys_dev_gpio_native_System_Device_Gpio_GpioPin::
         if (Device::IsValidPin(pinNumber))
         {
             stack.SetResult_Boolean(
-                Device::IsValidOutputDriveMode(driveMode) ||
-                Device::IsValidInputDriveMode(driveMode));
+                Device::IsValidOutputDriveMode(driveMode) || Device::IsValidInputDriveMode(driveMode));
         }
     }
     NANOCLR_NOCLEANUP();
@@ -137,8 +126,8 @@ HRESULT Library_sys_dev_gpio_native_System_Device_Gpio_GpioPin::NativeSetPinMode
             FAULT_ON_NULL(ptrDebounceValue);
             CLR_UINT64 debounceTimeoutTicks = NearestThreadxTicks(*ptrDebounceValue);
 
-            Device::DevicePin devicePin = Device::GetPin(pinNameValue);
-            Device::GpioParameter *gpioParameter = devicePin.GpioParameterData;
+            DeviceGpioPin gpioPin = Device::GetPin(pinNameValue);
+            GpioCallbackParameter *gpioParameter = gpioPin.GpioCallbackParameters;
             bool debounceRequested = debounceTimeoutTicks > 0;
             bool previouslyUsed = gpioParameter != NULL;
 
@@ -150,19 +139,19 @@ HRESULT Library_sys_dev_gpio_native_System_Device_Gpio_GpioPin::NativeSetPinMode
                     tx_timer_delete(&gpioParameter->debounceTimer);
                 }
                 // Remove previous parameters
-                Device::RemovePinParameters(pinNameValue);
+                Device::RemovePinCallbackParameters(pinNameValue);
                 GpioIO::InterruptRemove(pinNameValue);
             }
 
-            Device::SetPinMode(pinNameValue, pinMode);
+            Device::RegisterPinMode(pinNameValue, pinMode);
             GpioIO::SetMode(pinNameValue, pinMode);
 
             if (debounceRequested || callbacksRegistered)
             {
-                Device::GpioParameter *newGpioParameter =
-                    (Device::GpioParameter *)platform_malloc(sizeof(Device::GpioParameter));
-                memset(newGpioParameter, 0, sizeof(Device::GpioParameter));
-                Device::AddPinParameters(pinNameValue, newGpioParameter);
+                GpioCallbackParameter *newGpioParameter =
+                    (GpioCallbackParameter *)platform_malloc(sizeof(GpioCallbackParameter));
+                memset(newGpioParameter, 0, sizeof(GpioCallbackParameter));
+                Device::AddPinCallbackParameter(pinNameValue, newGpioParameter);
 
                 newGpioParameter->callBack = false;
                 newGpioParameter->debounceMs = 0;
@@ -212,8 +201,8 @@ HRESULT Library_sys_dev_gpio_native_System_Device_Gpio_GpioPin::NativeSetDebounc
         FAULT_ON_NULL(debounceValue);
         if (Device::IsValidPin(pinNumber))
         {
-            Device::DevicePin devicePin = Device::GetPin(pinNumber);
-            Device::GpioParameter *gpioParameter = devicePin.GpioParameterData;
+            DeviceGpioPin gpioPin = Device::GetPin(pinNumber);
+            GpioCallbackParameter *gpioParameter = gpioPin.GpioCallbackParameters;
 
             if (gpioParameter != NULL)
             {
@@ -283,20 +272,7 @@ HRESULT Library_sys_dev_gpio_native_System_Device_Gpio_GpioPin::NativeSetAlterna
     NANOCLR_HEADER();
     {
         FAULT_ON_NULL(stack.This());
-        FAULT_ON_OBJECT_DISPOSED(stack.This()[FIELD___disposedValue].NumericByRef().u1);
-        PinNameValue pinNameValue = (PinNameValue)stack.This()[FIELD___pinNumber].NumericByRefConst().s4;
-        Device::DevicePinFunction deviceFunction =
-            (Device::DevicePinFunction)stack.Arg1().NumericByRef().s4;
-
-        Device::ReservePin(pinNameValue, deviceFunction, pinNameValue);
-        if (Device::IsValidPin(pinNameValue))
-        {
-            GpioIO::SetFunction(Device::GetPin(pinNameValue));
-        }
-        else
-        {
-            NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
-        }
+        NANOCLR_SET_AND_LEAVE(stack.NotImplementedStub());
     }
     NANOCLR_NOCLEANUP();
 }
@@ -331,9 +307,7 @@ HRESULT Library_sys_dev_gpio_native_System_Device_Gpio_GpioController::
         FAULT_ON_OBJECT_DISPOSED(stack.This()[FIELD___disposedValue].NumericByRef().u1);
         PinMode driveMode;
         driveMode = (PinMode)stack.Arg2().NumericByRef().s4;
-        stack.SetResult_Boolean(
-            Device::IsValidOutputDriveMode(driveMode) ||
-            Device::IsValidInputDriveMode(driveMode));
+        stack.SetResult_Boolean(Device::IsValidOutputDriveMode(driveMode) || Device::IsValidInputDriveMode(driveMode));
     }
     NANOCLR_NOCLEANUP();
 }
@@ -406,7 +380,6 @@ HRESULT Library_sys_dev_gpio_native_System_Device_Gpio_GpioController::NativeWri
 #pragma endregion
 
 #pragma region Local support code
-// Required, only if the Ticks per second is not 1000 ( 1 millisecond)
 CLR_INT32 NearestThreadxTicks(int milliseconds)
 {
     return milliseconds;
@@ -414,8 +387,8 @@ CLR_INT32 NearestThreadxTicks(int milliseconds)
 void DebounceTimerCallback(ULONG callBackValue)
 {
     PinNameValue pinNameValue = (PinNameValue)callBackValue;
-    Device::DevicePin devicePin = Device::GetPin(pinNameValue);
-    Device::GpioParameter *gpioParameter = devicePin.GpioParameterData;
+    DeviceGpioPin gpioPin = Device::GetPin(pinNameValue);
+    GpioCallbackParameter *gpioParameter = gpioPin.GpioCallbackParameters;
 
     if (gpioParameter != NULL)
     {

@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
@@ -47,7 +47,7 @@ HRESULT Library_sys_dev_dac_native_System_Device_Dac_DacController::NativeOpenCh
         FAULT_ON_NULL(stack.This());
         CLR_INT32 controllerId = stack.This()[FIELD___controllerId].NumericByRef().s4;
         int dac_channel_number = stack.Arg1().NumericByRef().s4;
-        if (!DacIO::Open(controllerId, dac_channel_number))
+        if (!DacIO::Open( dac_channel_number))
         {
             NANOCLR_SET_AND_LEAVE(CLR_E_NOT_SUPPORTED);
         }

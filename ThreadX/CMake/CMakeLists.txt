@@ -1,6 +1,7 @@
 ﻿# Copyright (c) .NET Foundation and Contributors
 # See LICENSE file in the project root for full license information.
 
+# The project command must come later for the RP2XXX series
 if( NOT ${TARGET_FAMILY} STREQUAL "RP2XXX")
   project(nanoFramework VERSION ${BUILD_VERSION} LANGUAGES C CXX ASM)
 endif()

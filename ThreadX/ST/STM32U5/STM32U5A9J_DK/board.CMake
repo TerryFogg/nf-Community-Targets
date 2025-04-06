@@ -14,7 +14,6 @@
     )
      if(GRAPHICS_SUPPORT)
        list(APPEND NF_INTERPRETER_SOURCES
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/Initialize_Graphics.cpp
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/LTDC_DSI_DMA2D_Controller.cpp
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/STM32U5A9J_DK/Stm32U5a9_Video_Controller.cpp
                                        

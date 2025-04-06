@@ -2,7 +2,6 @@
 # Copyright (c) .NET Foundation and Contributors
 # See LICENSE file in the project root for full license information.
 #
-
  # TODO: Set build type here as buildpresets, inherits in CMakePresets.json does not appear to be working
     set(CMAKE_BUILD_TYPE "Debug")
 
@@ -109,11 +108,34 @@
           target_compile_definitions(nanoCLR PUBLIC -DLCD_HEIGHT=${LCD_HEIGHT})
           target_compile_definitions(nanoCLR PUBLIC -DLCD_BACKLIGHT=${LCD_BACKLIGHT})
           target_compile_definitions(nanoCLR PUBLIC -DLCD_RESET=${LCD_RESET})
+
+          if( ${INTERFACE_TYPE} STREQUAL "SPI")
+            target_compile_definitions(nanoCLR PUBLIC -DINTERFACE_SPI=TRUE)
+            target_compile_definitions(nanoCLR PUBLIC -DINTERFACE_VIDEO=FALSE)
+          endif()
+            if( ${INTERFACE_TYPE} STREQUAL "VIDEO")
+            target_compile_definitions(nanoCLR PUBLIC -DINTERFACE_SPI=FALSE)
+            target_compile_definitions(nanoCLR PUBLIC -DINTERFACE_VIDEO=TRUE)
+          endif()
+
+          # For SPI interface
           target_compile_definitions(nanoCLR PUBLIC -DLCD_DC=${LDC_DC})
           target_compile_definitions(nanoCLR PUBLIC -DSPI_BUS=${SPI_BUS})
           target_compile_definitions(nanoCLR PUBLIC -DSPI_CLK=${SPI_CLK})
           target_compile_definitions(nanoCLR PUBLIC -DSPI_TX=${SPI_TX})
           target_compile_definitions(nanoCLR PUBLIC -DSPI_CS=${SPI_CS})
+
+          # For Video Interface
+          target_compile_definitions(nanoCLR PUBLIC -DLCD_ENABLE=${LCD_ENABLE})
+          target_compile_definitions(nanoCLR PUBLIC -DLCD_CONTROL=${LCD_CONTROL})
+          target_compile_definitions(nanoCLR PUBLIC -DVIDEO_FREQUENCY_DIVIDER=${VIDEO_FREQUENCY_DIVIDER})
+          target_compile_definitions(nanoCLR PUBLIC -DVIDEO_HORIZONTAL_SYNC=${VIDEO_HORIZONTAL_SYNC})
+          target_compile_definitions(nanoCLR PUBLIC -DVIDEO_HORIZONTAL_BACK_PORCH=${VIDEO_HORIZONTAL_BACK_PORCH})
+          target_compile_definitions(nanoCLR PUBLIC -DVIDEO_HORIZONTAL_FRONT_PORCH=${VIDEO_HORIZONTAL_FRONT_PORCH})
+          target_compile_definitions(nanoCLR PUBLIC -DVIDEO_VERTICAL_SYNC=${VIDEO_VERTICAL_SYNC})
+          target_compile_definitions(nanoCLR PUBLIC -DVIDEO_VERTICAL_BACK_PORCH=${VIDEO_VERTICAL_BACK_PORCH})
+          target_compile_definitions(nanoCLR PUBLIC -DVIDEO_VERTICAL_FRONT_PORCH=${VIDEO_VERTICAL_FRONT_PORCH})
+
           target_compile_definitions(nanoCLR PUBLIC -DGRAPHICS_HEAP_FAST=${GRAPHICS_HEAP_FAST})
 else()
           target_compile_definitions(nanoCLR PUBLIC -DNANOCLR_GRAPHICS=FALSE)
@@ -144,4 +166,3 @@ else()
            target_compile_definitions(nanoCLR PUBLIC -DPROFILE_NEW_ALLOCATIONS=1)
            target_compile_definitions(nanoCLR PUBLIC -DTRACE_MEMORY_STATS=1)
     endif()
-

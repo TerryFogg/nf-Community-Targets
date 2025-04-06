@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
@@ -21,7 +21,6 @@ void System_Device_nano_spi_callback(int busIndex)
     // fire event for SPI transaction complete
     Events_Set(SYSTEM_EVENT_FLAG_SPI_MASTER);
 }
-
 HRESULT Library_sys_dev_spi_native_System_Device_Spi_SpiBusInfo::NativeMaxClockFrequency___I4(CLR_RT_StackFrame &stack)
 {
     NANOCLR_HEADER();

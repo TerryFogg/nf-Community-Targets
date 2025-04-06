@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
@@ -338,4 +338,11 @@ bool WaitForLastOperation(uint32_t bank)
 #endif
     }
     return true;
+}
+bool FlashDriver_Memset(void *, ByteAddress startAddress, unsigned char data, unsigned int numBytes)
+{
+    (void)startAddress;
+    (void)data;
+    (void)numBytes;
+    return false;
 }

@@ -15,7 +15,6 @@
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H7/NUCLEO_H743ZI2/tx_initialize_low_level.s
 
                
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/Initialize_Graphics.cpp
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/Spi_To_Display.cpp
      )
 

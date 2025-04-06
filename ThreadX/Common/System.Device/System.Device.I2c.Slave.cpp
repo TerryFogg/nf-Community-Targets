@@ -16,9 +16,14 @@ HRESULT Library_sys_dev_i2c_slave_native_System_Device_I2c_I2cSlaveDevice::Nativ
     NANOCLR_HEADER();
     {
         FAULT_ON_NULL(stack.This());
-        CLR_INT32 deviceId = (stack.This())[FIELD___busId].NumericByRef().s4;
-        CLR_INT32 deviceAddress = stack.This()[FIELD___deviceAddress].NumericByRef().s4;
-        I2cIO_Slave::Initialize(deviceId, deviceAddress);
+        CLR_INT32 I2Cbus = (stack.This())[FIELD___busId].NumericByRef().s4;
+        CLR_INT32 I2cAddress = stack.This()[FIELD___deviceAddress].NumericByRef().s4;
+        // TODO - Check on speed selection for slave I2C ?
+        I2cBusSpeed I2cSpeed = I2cBusSpeed::I2cBusSpeed_StandardMode;
+        if (!I2cIO::Initialize(I2Cbus, I2cSpeed, I2C_CONTROL_TYPE::SLAVE, I2cAddress))
+        {
+            NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
+        }
     }
     NANOCLR_NOCLEANUP();
 }
@@ -30,7 +35,7 @@ HRESULT Library_sys_dev_i2c_slave_native_System_Device_I2c_I2cSlaveDevice::Nativ
     {
         FAULT_ON_NULL(stack.This());
         CLR_INT32 deviceId = (stack.This())[FIELD___busId].NumericByRef().s4;
-        I2cIO_Slave::Dispose(deviceId);
+        I2cIO::Dispose(deviceId);
     }
     NANOCLR_NOCLEANUP();
 }
@@ -69,13 +74,7 @@ HRESULT Library_sys_dev_i2c_slave_native_System_Device_I2c_I2cSlaveDevice::
         IsWrite = (writeOffset >= 0 && writeSize > 0);
         IsRead = (readOffset >= 0 && readSize > 0);
         uint8_t deviceId = (uint8_t)(stack.This())[FIELD___busId].NumericByRef().s4;
-
-        if (!Device::IsValidI2CDevice(deviceId))
-        {
-            NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_OPERATION);
-        }
-
-        timeoutMilliseconds = (timeoutMilliseconds == -1) ? I2cIO_Slave::TimeoutMaximum() : I2cIO_Slave::Timeout();
+        timeoutMilliseconds = (timeoutMilliseconds == -1) ? I2cIO::TimeoutMaximum : I2cIO::Timeout;
 
         if (IsWrite)
         {
@@ -85,7 +84,9 @@ HRESULT Library_sys_dev_i2c_slave_native_System_Device_I2c_I2cSlaveDevice::
             {
                 memset(writeBuffer, 0, bufferSize);
 
-                transferResult = I2cIO_Slave::Write(deviceId, writeBuffer, writeSize, timeoutMilliseconds, &readCount);
+                CLR_INT32 slaveAddress = 0;
+                I2cTransferStatus transferResult =
+                    I2cIO::Write(deviceId, slaveAddress, writeBuffer, writeSize, I2C_CONTROL_TYPE::MASTER);
                 platform_free(writeBuffer);
                 if (transferResult == I2cTransferStatus::I2cTransferStatus_FullTransfer)
                 {
@@ -110,8 +111,9 @@ HRESULT Library_sys_dev_i2c_slave_native_System_Device_I2c_I2cSlaveDevice::
             {
                 memset(readBuffer, 0, readSize);
 
-                // read data from I2C master
-                transferResult = I2cIO_Slave::Read(deviceId, readBuffer, bufferSize, timeoutMilliseconds, &readCount);
+                CLR_INT32 slaveAddress = 0;
+                I2cTransferStatus transferResult =
+                    I2cIO::Write(deviceId, slaveAddress, writeBuffer, writeSize, I2C_CONTROL_TYPE::MASTER);
                 platform_free(readBuffer);
                 if (transferResult == I2cTransferStatus::I2cTransferStatus_FullTransfer)
                 {

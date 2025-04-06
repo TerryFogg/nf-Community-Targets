@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
@@ -22,11 +22,7 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::NativeInit___VOID(
         CLR_INT32 baudRate = ((int)stack.This()[Library_sys_io_ser_native_System_IO_Ports_SerialPort::FIELD___baudRate]
                                   .NumericByRef()
                                   .s4);
-        if (Device::IsValidSerialBus(UsartDeviceNumber))
-        {
-            SerialIO::Initialize(UsartDeviceNumber, baudRate);
-        }
-        else
+        if (!SerialIO::Initialize(UsartDeviceNumber, baudRate))
         {
             NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
         }
@@ -463,13 +459,8 @@ HRESULT Library_sys_io_ser_native_System_IO_Ports_SerialPort::NativeConfig___VOI
         Handshake RequestedHandshake = (Handshake)stack.This()[FIELD___handshake].NumericByRef().s4;
         SerialMode RequestedMode = (SerialMode)stack.This()[FIELD___mode].NumericByRef().s4;
 
-        if (Device::IsValidSerialBus(usartDeviceNumber))
+        if (SerialIO::SetConfig(usartDeviceNumber, RequestedMode,RequestedStopBits, RequestedDataBits, RequestedParity))
         {
-            if (RequestedMode != SerialMode::SerialMode_Normal)
-            {
-                NANOCLR_SET_AND_LEAVE(CLR_E_NOTIMPL);
-            }
-            SerialIO::SetConfig(usartDeviceNumber, RequestedStopBits, RequestedDataBits, RequestedParity);
             SerialIO::SetBaudRate(usartDeviceNumber, RequestedBaudRate);
             SerialIO::SetHandshake(usartDeviceNumber, RequestedHandshake);
         }

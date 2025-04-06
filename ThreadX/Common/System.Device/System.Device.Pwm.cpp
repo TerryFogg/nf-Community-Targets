@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
@@ -14,17 +14,13 @@ HRESULT Library_sys_dev_pwm_native_System_Device_Pwm_PwmChannel::NativeInit___VO
     {
         FAULT_ON_NULL(stack.This());
         CLR_INT32 channelId = stack.This()[FIELD___channelNumber].NumericByRef().s4;
-        CLR_INT32 timerId = stack.This()[FIELD___pwmTimer].NumericByRef().s4;
         CLR_INT32 pinNumber = stack.This()[FIELD___pinNumber].NumericByRef().s4;
+        CLR_INT32 timerId = stack.This()[FIELD___pwmTimer].NumericByRef().s4;
         CLR_INT32 polarity = stack.This()[FIELD___polarity].NumericByRef().s4;
         CLR_INT32 desiredFrequency = stack.This()[FIELD___frequency].NumericByRef().s4;
         CLR_INT32 dutyCycle = stack.This()[FIELD___dutyCycle].NumericByRef().s4;
 
-        if (Device::IsValidPWMDevice(channelId))
-        {
-            PwmIO::Initialize(channelId, timerId, pinNumber, polarity, desiredFrequency, dutyCycle);
-        }
-        else
+        if (!PwmIO::Initialize(channelId, timerId, pinNumber, polarity, desiredFrequency, dutyCycle))
         {
             NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
         }
@@ -37,14 +33,7 @@ HRESULT Library_sys_dev_pwm_native_System_Device_Pwm_PwmChannel::DisposeNative__
     {
         FAULT_ON_NULL(stack.This());
         CLR_INT32 channelId = stack.This()[FIELD___channelNumber].NumericByRef().s4;
-        if (Device::IsValidPWMDevice(channelId))
-        {
-            PwmIO::Dispose(channelId);
-        }
-        else
-        {
-            NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
-        }
+        PwmIO::Dispose(channelId);
     }
     NANOCLR_NOCLEANUP();
 }
@@ -71,7 +60,7 @@ HRESULT Library_sys_dev_pwm_native_System_Device_Pwm_PwmChannel::NativeSetActive
 HRESULT Library_sys_dev_pwm_native_System_Device_Pwm_PwmChannel::NativeStart___VOID(CLR_RT_StackFrame &stack)
 {
     NANOCLR_HEADER();
-    {                                        
+    {
         FAULT_ON_NULL(stack.This());
         CLR_INT32 pinNumber = stack.This()[FIELD___pinNumber].NumericByRef().s4;
         CLR_INT32 timerId = stack.This()[FIELD___pwmTimer].NumericByRef().s4;

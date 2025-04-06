@@ -1,4 +1,4 @@
-//
+ï»¿//
 // Copyright (c) .NET Foundation and Contributors
 // Portions Copyright (c) 2021 STMicroelectronics.  All rights false.
 // See LICENSE file in the project root for full license information.
@@ -8,317 +8,193 @@
 #include "Device.h"
 #include "board.h"
 #include "SD_DoubleBufferedDMA.h"
+
+#ifdef FILEX
 #include "File_Drivers.h"
+#endif
 #include "Delays.h"
 
-Device::DevicePin mcuPins[] = {
+static DeviceGpioPin *mcuPins;
 
-    // -----------------
-    // Arduino connector
-    // -----------------
-    // A0 - ADC1 - channel 18
-    {PA4, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // A1 - ADC12 - channel 4
-    {PC4, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // A2 - ADC1 Channel 0
-    {PA0_C, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // A3 - ADC1 - channel 1
-    {PA1_C, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // A4 - ADC2 - channel 0
-    {PC2_C, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // A5 - ADC2 - channel 1
-    {PC3_C, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // D0
-    {PH14, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // D1
-    {PH13, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // D2
-    {PI9, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // D3
-    {PH9, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // D4
-    {PE2, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // D5
-    {PH11, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // D6
-    {PH10, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // D7
-    {PI10, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // D8
-    {PF10, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // D9
-    {PI7, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // D10
-    {PI0, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // D11
-    {PB15, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // D12
-    {PB14, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // D13
-    {PA12, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // D14
-    {PD13, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // D15
-    {PD12, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+void SetupPinList()
+{
+    mcuPins[0] = {PA0, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[1] = {PA0, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[2] = {PA1, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[3] = {PA2, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[4] = {PA3, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[5] = {PA4, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[6] = {PA5, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[7] = {PA6, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[8] = {PA7, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[9] = {PA8, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[10] = {PA9, true, NULL, PinMode::PinMode_Input, DevicePinFunction::USART1_TX};
+    mcuPins[11] = {PA10, true, NULL, PinMode::PinMode_Input, DevicePinFunction::USART1_RX};
+    mcuPins[12] = {PA11, true, NULL, PinMode::PinMode_Input, DevicePinFunction::CAN};
+    mcuPins[13] = {PA12, true, NULL, PinMode::PinMode_Input, DevicePinFunction::CAN};
+    mcuPins[14] = {PA13, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[15] = {PA14, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[16] = {PA15, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[17] = {PB0, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[18] = {PB1, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[19] = {PB2, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[20] = {PB3, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[21] = {PB4, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[22] = {PB5, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[23] = {PB6, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[24] = {PB7, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[25] = {PB8, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[26] = {PB9, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[27] = {PB10, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[28] = {PB11, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[29] = {PB12, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[30] = {PB13, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[31] = {PB14, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[32] = {PB15, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[33] = {PC0, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[34] = {PC1, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[35] = {PC2, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[36] = {PC3, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[37] = {PC4, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[38] = {PC5, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[39] = {PC6, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[40] = {PC7, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[41] = {PC8, true, NULL, PinMode::PinMode_Input, DevicePinFunction::SD};
+    mcuPins[42] = {PC9, true, NULL, PinMode::PinMode_Input, DevicePinFunction::SD};
+    mcuPins[43] = {PC10, true, NULL, PinMode::PinMode_Input, DevicePinFunction::SD};
+    mcuPins[44] = {PC11, true, NULL, PinMode::PinMode_Input, DevicePinFunction::SD};
+    mcuPins[45] = {PC12, true, NULL, PinMode::PinMode_Input, DevicePinFunction::SD};
+    mcuPins[46] = {PC13, true, NULL, PinMode::PinMode_Input, DevicePinFunction::BUTTON};
+    mcuPins[47] = {PC14, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[48] = {PC15, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[49] = {PD0, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[50] = {PD1, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[51] = {PD2, true, NULL, PinMode::PinMode_Input, DevicePinFunction::SD};
+    mcuPins[51] = {PD3, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[53] = {PD4, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[54] = {PD5, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[55] = {PD6, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[56] = {PD7, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[57] = {PD8, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[58] = {PD9, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[59] = {PD10, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[60] = {PD11, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[61] = {PD12, true, NULL, PinMode::PinMode_Input, DevicePinFunction::I2C4_SDA};
+    mcuPins[62] = {PD13, true, NULL, PinMode::PinMode_Input, DevicePinFunction::I2C4_SCL};
+    mcuPins[63] = {PD14, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[64] = {PD15, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[65] = {PE0, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[66] = {PE1, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[67] = {PE2, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[68] = {PE3, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[69] = {PE4, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[70] = {PE5, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[71] = {PE6, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[72] = {PE7, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[73] = {PE8, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[74] = {PE9, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[75] = {PE10, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[76] = {PE11, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[77] = {PE12, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[78] = {PE13, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[79] = {PE14, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[80] = {PE15, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[81] = {PF0, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[82] = {PF1, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[83] = {PF2, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[84] = {PF3, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[85] = {PF4, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[86] = {PF5, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[87] = {PF6, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[88] = {PF7, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[89] = {PF8, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[90] = {PF9, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[90] = {PF10, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[91] = {PF11, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[92] = {PF12, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[93] = {PF13, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[94] = {PF14, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[95] = {PF15, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[96] = {PG0, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[97] = {PG1, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[98] = {PG2, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LED};
+    mcuPins[99] = {PG3, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[100] = {PG4, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[101] = {PG5, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[102] = {PG6, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[103] = {PG7, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[104] = {PG8, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[105] = {PG9, true, NULL, PinMode::PinMode_Input, DevicePinFunction::MEMORY_INTERFACE};
+    mcuPins[106] = {PG10, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[107] = {PG11, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LED};
+    mcuPins[108] = {PG12, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[109] = {PG13, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[110] = {PG14, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[111] = {PG15, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[112] = {PH0, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[113] = {PH1, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[114] = {PH2, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[115] = {PH3, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[116] = {PH4, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[117] = {PH5, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[118] = {PH6, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[119] = {PH7, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[120] = {PH8, true, NULL, PinMode::PinMode_Input, DevicePinFunction::CAN};
+    mcuPins[121] = {PH9, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[122] = {PH10, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[123] = {PH11, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[124] = {PH12, true, NULL, PinMode::PinMode_Input, DevicePinFunction::USB};
+    mcuPins[125] = {PH13, true, NULL, PinMode::PinMode_Input, DevicePinFunction::USART4_TX};
+    mcuPins[126] = {PH14, true, NULL, PinMode::PinMode_Input, DevicePinFunction::USART4_RX};
+    mcuPins[127] = {PH15, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[128] = {PI0, true, NULL, PinMode::PinMode_Input, DevicePinFunction::SPI};
+    mcuPins[129] = {PI1, true, NULL, PinMode::PinMode_Input, DevicePinFunction::WIFI_INTERFACE};
+    mcuPins[130] = {PI2, true, NULL, PinMode::PinMode_Input, DevicePinFunction::WIFI_INTERFACE};
+    mcuPins[131] = {PI3, true, NULL, PinMode::PinMode_Input, DevicePinFunction::WIFI_INTERFACE};
+    mcuPins[132] = {PI4, true, NULL, PinMode::PinMode_Input, DevicePinFunction::WIFI_INTERFACE};
+    mcuPins[133] = {PI5, true, NULL, PinMode::PinMode_Input, DevicePinFunction::WIFI_INTERFACE};
+    mcuPins[134] = {PI6, true, NULL, PinMode::PinMode_Input, DevicePinFunction::WIFI_INTERFACE};
+    mcuPins[135] = {PI7, true, NULL, PinMode::PinMode_Input, DevicePinFunction::WIFI_INTERFACE};
+    mcuPins[136] = {PI8, true, NULL, PinMode::PinMode_Input, DevicePinFunction::SD};
+    mcuPins[137] = {PI9, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[138] = {PI10, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[139] = {PI11, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
+    mcuPins[140] = {PI12, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[141] = {PI13, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[142] = {PI14, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[143] = {PI15, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[144] = {PJ0, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[145] = {PJ1, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[146] = {PJ2, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[147] = {PJ3, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[148] = {PJ4, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[149] = {PJ5, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[150] = {PJ6, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[151] = {PJ7, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[152] = {PJ8, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[153] = {PJ9, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[154] = {PJ10, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[155] = {PJ11, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[156] = {PJ12, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[157] = {PJ13, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[158] = {PJ14, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[159] = {PJ15, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[160] = {PK0, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[161] = {PK1, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[162] = {PK2, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[163] = {PK3, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[164] = {PK4, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[165] = {PK5, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[166] = {PK6, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+    mcuPins[167] = {PK7, true, NULL, PinMode::PinMode_Input, DevicePinFunction::LCD};
+}
+I2C_Pin_Definition i2cPins[] = {
+    {1, PB7, PB8, LL_GPIO_AF_4},
+    {2, PB10, PB11, LL_GPIO_AF_4},
+    {3, PH8, PH7, LL_GPIO_AF_4},
+    {4, PD13, PD12, LL_GPIO_AF_4}};
 
-    // -----------------------------
-    // CN16 EXT_I2C connector pinout
-    // -----------------------------
-    // Pin1 - NC
-    // Pin2 - GND
-    // Pin3 - NC
-    // Pin4 - VDD(3V3)
-    // Pin5  -EX_RESET
-    {PB6, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::GPIO, 0},
-    // Pin6 - I2C4_SCL
-    {PD12, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::I2C, 0},
-    // Pin7 - NC
-    // Pin8 - I2C4_SDA
-    {PD13, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::I2C, 0},
-
-    // ----------------------------------
-    // CN3: Audio extension board (DFSDM)
-    // ----------------------------------
-    // Pin1 - GND
-    // Pin2 - 3V3
-    // Pin3 /  Pin4 - duplicate
-    {PB0, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin5
-    {PB9, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin6
-    {PB12, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin7
-    {PC7, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin8 - NC
-    // Pin9 - NC
-    // Pin10 - DETECTn
-    {PI6, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin11 - NC
-    // Pin12 - MEMS_LED
-    {PH15, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin13 - NC
-    // Pin14 - NC
-    // Pin15 - NC
-    // Pin16 - NC
-    // Pin17 - NC
-    // Pin18 - NC
-    // Pin19 - 3V3
-    // Pin20 - GND
-    // ----------------------------------
-
-    // ------------------------------
-    //  CN4 microSD™ connector pinout
-    // ------------------------------
-    // Pin1 - D2
-    {PC10, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::SD, 0},
-    // Pin2 - D3
-    {PC11, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::SD, 0},
-    // Pin3 - CMD
-    {PD2, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::SD, 0},
-    // Pin4 - VDD(3V3)
-    // Pin5 - CLK
-    {PC12, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::SD, 0},
-    // Pin6 - GND
-    // Pin7 - D0
-    {PC8, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::SD, 0},
-    // Pin8 - D1
-    {PC9, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::SD, 0},
-    // Pin9 - GND
-    // Pin10 uSD detect
-    {PI8, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::GPIO, 0},
-    // Pin11 - GND
-    // Pin12 - GND
-    // Pin13 - GND
-    // Pin14 - GND
-
-    // ------
-    // STMod+
-    // ------
-    // Pin1
-    {PA0, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin2
-    {PD5, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin3
-    {PD6, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin4
-    {PD4, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin5 - GND
-    // Pin6 - 5V
-    // Pin7
-    {PD12, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::I2C, 0},
-    // Pin8
-    {PB15, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::SPI, 0},
-    // Pin9
-    {PB14, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::SPI, 0},
-    // Pin10
-    {PD13, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::I2C, 0},
-    // Pin11
-    {PC6, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::GPIO, 0},
-    // Pin12
-    {PH8, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::GPIO, 0},
-    // Pin13
-    {PA4, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::ADC, 0},
-    // Pin14
-    {PF8, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::PWM, 0},
-    // Pin15 - 5V
-    // Pin16 - GND
-    // Pin17
-    {PC7, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::PWM, 0},
-    // Pin18
-    {PD3, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::GPIO, 0},
-    // Pin19
-    {PB9, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::GPIO, 0},
-    // Pin20
-    {PB8, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::GPIO, 0},
-    
-    // ---------------------
-    // CN1 TFT LCD connector
-    // ---------------------
-    // Pin1 - GND
-    // Pin2 - GND
-    // Pin3
-    {PI15, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin4
-    {PJ7, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin5
-    {PJ0, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin6
-    {PJ8, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin7
-    {PJ1, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin8
-    {PJ9, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin9
-    {PJ2, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin10
-    {PJ10, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin11
-    {PJ3, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin12
-    {PJ11, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin13
-    {PJ4, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin14
-    {PK0, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin15
-    {PJ5, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin16
-    {PK1, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin17
-    {PJ6, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin18
-    {PK2, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin19 - GND
-    // Pin20 - GND
-    // Pin21
-    {PJ12, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin22
-    {PK7, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin23
-    {PJ13, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin24
-    {PA2, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin25
-    {PJ14, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin26
-    {PI12, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin27
-    {PJ15, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin28
-    {PI13, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin29
-    {PK3, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin30 - GND
-    // Pin31
-    {PK4, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin32
-    {PI14, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin33
-    {PK5, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin34 - GND
-    // Pin35
-    {PK6, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin36 - NRST
-    // Pin37 - GND
-    // Pin38
-    {PD13, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin39
-    {PH2, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin40
-    {PD12, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin41 - NC
-    // Pin42 - NC
-    // Pin43
-    {PA1, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::LCD, 0},
-    // Pin44 - NC
-    // Pin45 - 5V
-    // Pin46 - NC
-    // Pin47 - GND
-    // Pin48 - NC
-    // Pin49 - GND
-    // Pin50 - 3V3
-
-    // ----------------------------------
-    // CN7 camera module connector pinout
-    // ----------------------------------
-    // Pin1 -  GND
-    // Pin2 -  NC 
-    // Pin3 -  NC 
-    // Pin4 -  DCMI_D0
-    {PC6, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin5 -  DCMI_D1 
-    {PC7, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin6 -  DCMI_D2
-    {PG10, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin7 -  DCMI_D3 
-    {PC9, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin8 -  DCMI_D4 
-    {PC11, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin9 -  DCMI_D5
-    {PD3, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin10 - DCMI_D6
-    {PB8, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin11 - DCMI_D7
-    {PB9, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin12 - NC
-    // Pin13 - NC
-    // Pin14 - GND
-    // Pin15 - DCMI_PIXCLK 
-    {PA6, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin16 - GND
-    // Pin17 - DCMI_HSYNC
-    {PA6, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin18 - NC
-    // Pin19 - DCMI_VSYNC
-    {PA6, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin20 - VDD (3V3)
-    // Pin21 - CAMERA_CLK
-    {PA6, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin22 - NC
-    // Pin23 - GND
-    // Pin24 - NC
-    // Pin25 - DCMI_PWR_EN
-    {PA6, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin26 - DCMI_NRST (NRST from MCU)
-    {PA6, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin27 - I2C4_SDA
-    {PA6, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin28 - I2C4_SCL
-    {PA6, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    // Pin29 - GND
-    // Pin30 - VDD(3V3)
-};
-
-Device::AdcPin BoardADCChannels[] = {{ADC1, 1, 1}, {ADC2, 11, 2}};
-Device::DacPin BoardDACChannels[] = {{DAC1, 1, 1}, {DAC2, 2, 2}};
-Device::I2cPin BoardI2CChannels[] = {{I2C1, 1, 4}, {I2C4, 1, 4}};
-Device::PwmPin BoardPWMChannels[] = {{TIM3, 3, 1}, {TIM4, 4, 1}};
-Device::SpiPin BoardSPIChannels[] = {{SPI1, 1, 1}, {SPI2, 1, 2}};
-Device::SerialPin BoardSerialChannels[] = {{USART1, 1, 1}, {USART2, 2, 2}};
-
-static TX_SEMAPHORE txs;
-static TX_SEMAPHORE rxs;
-
+#ifdef FILEX
 Device::SDPin BoardSDChannels[] = {
     {.controllerId = SDMMC1,
      .controllerNumber = 1,
@@ -327,6 +203,7 @@ Device::SDPin BoardSDChannels[] = {
      .status = File_Status::FILE_READY,
      .RX_semaphore = rxs,
      .TX_semaphore = txs}};
+#endif
 
 void Initialize_Board()
 {
@@ -339,22 +216,21 @@ void Initialize_Board()
     InitializeDelayCounter();
     Initialize64bit100nsTimer();
     Initialize_SDRAM(SDRAM_BANK_ADDR, SDRAM_RAM_REGION_SIZE);
-    //InitializeSD_Bus(
-    //    SD1_BUSIndex,
-    //    PC8,  // SDMMC D0
-    //    PC9,  // SDMMC D1
-    //    PC10, // SDMMC D2
-    //    PC11, // SDMMC D3
-    //    PC12, // SDMMC CLK
-    //    PD2,  // SDMMC CMD
-    //    PI8); // SDMMC uSD detect
-
+    // InitializeSD_Bus(
+    //     SD1_BUSIndex,
+    //     PC8,  // SDMMC D0
+    //     PC9,  // SDMMC D1
+    //     PC10, // SDMMC D2
+    //     PC11, // SDMMC D3
+    //     PC12, // SDMMC CLK
+    //     PD2,  // SDMMC CMD
+    //     PI8); // SDMMC uSD detect
 }
 void InitializeBoardPeripherals()
 {
     Initialize_Board_LEDS();
     Initialize_Board_Buttons();
-    InitializeDevicePins();
+    Device::CreatePinList(&mcuPins[0], ARRAY_LEN(mcuPins));
 }
 void CPU_CACHE_Enable(void)
 {
@@ -364,7 +240,6 @@ void CPU_CACHE_Enable(void)
 void Initialize_Board_LEDS()
 {
     ENABLE_CLOCK_ON_PORT_GPIOG;
-
     LL_GPIO_InitTypeDef gpio_InitStruct;
     gpio_InitStruct.Pin = LED3_RED | LED2_BLUE;
     gpio_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
@@ -387,7 +262,6 @@ void Initialize_Board_Buttons()
 }
 void Initialize64bit100nsTimer()
 {
-
     // TODO : Not working yet
     // Although we setup a "nanosecond" timer, the real resolution is less than
     // 1ns. To get 1ns resolution would require a clock speed of 1GHz.
@@ -468,15 +342,7 @@ bool BoardUserButton_Pressed()
         return false;
     }
 }
-void InitializeDevicePins()
+I2C_Pin_Definition *GetI2cBusPins()
 {
-    Device::CreatePinList(&mcuPins[0], ARRAY_LEN(mcuPins));
-    Device::CreateADCChannelList(BoardADCChannels, ARRAY_LEN(BoardADCChannels));
-    Device::CreateDACChannelList(BoardDACChannels, ARRAY_LEN(BoardDACChannels));
-    Device::CreateI2CChannelList(BoardI2CChannels, ARRAY_LEN(BoardI2CChannels));
-    Device::CreatePWMChannelList(BoardPWMChannels, ARRAY_LEN(BoardPWMChannels));
-    Device::CreateSPIChannelList(BoardSPIChannels, ARRAY_LEN(BoardSPIChannels));
-    Device::CreateSerialChannelList(BoardSerialChannels, ARRAY_LEN(BoardSerialChannels));
-    Device::CreateSDChannelList(BoardSDChannels, ARRAY_LEN(BoardSDChannels));
-};
-
+    return i2cPins;
+}

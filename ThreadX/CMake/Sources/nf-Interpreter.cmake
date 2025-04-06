@@ -262,7 +262,7 @@
         )
         list(APPEND NF_INTERPRETER_SOURCES 
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/other/CortexM_HardFaultHandler.c
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/CortexM_HardFaultHandler.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/CircularBuffer.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/nanoCRT.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/nanoHAL_Boot.c

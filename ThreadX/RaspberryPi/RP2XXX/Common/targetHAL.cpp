@@ -43,7 +43,7 @@ void nanoHAL_Initialize()
     unsigned char *heapStart = NULL;
     unsigned int heapSize = 0;
 
-    InitializeBoardPeripherals();
+    SetupPinList();
 
 #if (NANOCLR_GRAPHICS == TRUE)
     DisplayInterfaceConfig displayConfig = {0};
@@ -53,8 +53,13 @@ void nanoHAL_Initialize()
 #endif
 
 #if (TOUCH_DISPLAY_SUPPORT == TRUE)
-    g_TouchInterface.Initialize();
-    g_TouchDevice.Initialize();
+    g_TouchInterface.Initialize(TOUCH_INTERFACE_BUS, TOUCH_INTERFACE_SLAVE_ADDRESS);
+    g_TouchDevice.Initialize(
+        TOUCH_INTERFACE_INTERRUPT,
+        TOUCH_INTERFACE_WIDTH,
+        TOUCH_INTERFACE_HEIGHT,
+        TOUCH_INVERT_X,
+        TOUCH_INVERT_Y);
     g_TouchPanel.Initialize();
 #endif
 

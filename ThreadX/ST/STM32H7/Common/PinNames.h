@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 //
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
@@ -178,13 +178,5 @@ typedef enum PinNameValues
     PK4 = 164,
     PK5 = 165,
     PK6 = 166,
-    PK7 = 167,
-    PK8 = 168,
-    PK9 = 169,
-    PK10 = 170,
-    PK11 = 171,
-    PK12 = 172,
-    PK13 = 173,
-    PK14 = 174,
-    PK15 = 175
+    PK7 = 167
 } PinNameValue;

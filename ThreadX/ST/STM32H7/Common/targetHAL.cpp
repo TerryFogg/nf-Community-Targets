@@ -47,15 +47,53 @@ void nanoHAL_Initialize()
     InitializeBoardPeripherals();
 
 #if (NANOCLR_GRAPHICS == TRUE)
-    DisplayInterfaceConfig displayConfig = {0};
+    DisplayInterfaceConfig display_config;
+    display_config.Screen.width = LCD_WIDTH;
+    display_config.Screen.height = LCD_HEIGHT;
+
+#if (INTERFACE_SPI == TRUE)
+    display_config.spiBus = SPI_BUS;
+    display_config.chipSelect = SPI_CS;
+    display_config.dataCommand = LDC_DC;
+    display_config.reset = LCD_RESET;
+    display_config.backLight = LCD_BACKLIGHT;
+#endif
+
+#if (INTERFACE_VIDEO == TRUE)
+    display_config.VideoDisplay.Frequency_Divider = VIDEO_FREQUENCY_DIVIDER;
+    display_config.VideoDisplay.enable = LCD_ENABLE;
+    display_config.VideoDisplay.control = LCD_CONTROL;
+    display_config.VideoDisplay.backlight = LCD_BACKLIGHT;
+    display_config.VideoDisplay.Horizontal_synchronization = VIDEO_HORIZONTAL_SYNC;
+    display_config.VideoDisplay.Horizontal_back_porch = VIDEO_HORIZONTAL_BACK_PORCH;
+    display_config.VideoDisplay.Horizontal_front_porch = VIDEO_HORIZONTAL_FRONT_PORCH;
+    display_config.VideoDisplay.Vertical_synchronization = VIDEO_VERTICAL_SYNC;
+    display_config.VideoDisplay.Vertical_back_porch = VIDEO_VERTICAL_BACK_PORCH;
+    display_config.VideoDisplay.Vertical_front_porch = VIDEO_VERTICAL_FRONT_PORCH;
+#endif
+
+    //  TouchInterfaceConfig touch_config;
+    //    touch_config.i2c_touch_screen_bus_initialize = NULL;
+    //  touch_config.Address = 0x0070;
+    // touch_config.I2c_bus_number = 0;
+
+    //  g_TouchInterface.Initialize(touch_config);
+    //  g_TouchDevice.Initialize(display_config.Screen.width, display_config.Screen.height,
+    //  TranslateCoordinates::SWAP_X_Y); g_TouchPanelDriver.Initialize();
+
     g_GraphicsMemoryHeap.Initialize(0);
-    g_DisplayInterface.Initialize(displayConfig);
+    g_DisplayInterface.Initialize(display_config);
     g_DisplayDriver.Initialize();
 #endif
 
 #if (TOUCH_DISPLAY_SUPPORT == TRUE)
-    g_TouchInterface.Initialize();
-    g_TouchDevice.Initialize();
+    g_TouchInterface.Initialize(TOUCH_INTERFACE_BUS, TOUCH_INTERFACE_SLAVE_ADDRESS);
+    g_TouchDevice.Initialize(
+        TOUCH_INTERFACE_INTERRUPT,
+        TOUCH_INTERFACE_WIDTH,
+        TOUCH_INTERFACE_HEIGHT,
+        TOUCH_INVERT_X,
+        TOUCH_INVERT_Y);
     g_TouchPanel.Initialize();
 #endif
 

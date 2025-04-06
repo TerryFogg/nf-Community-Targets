@@ -1,4 +1,4 @@
-//
+ï»¿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
@@ -359,14 +359,15 @@ bool GpioIO::Toggle(PinNameValue pinNameValue)
     status = true;
     return status;
 }
-bool GpioIO::SetFunction(PinNameValue pinNameValue, DevicePinFunction PinFunction, int alternateFunctionNumber)
+bool GpioIO::SetFunction(PinNameValue pinNameValue, DevicePinFunction PinFunction)
 {
     int GPIOPortByNumber = pinNameValue / 16;
     uint32_t gpioPortPinNumber = pinNameValue % 16;
     bool status = false;
+
     switch (PinFunction)
     {
-        case DevicePinFunction::NONE:
+        case DevicePinFunction::NO_FUNCTION:
             status = true;
             break;
         case DevicePinFunction::ADC:
@@ -435,6 +436,10 @@ bool GpioIO::SetFunction(PinNameValue pinNameValue, DevicePinFunction PinFunctio
         default:
             status = false;
             break;
+    }
+    if (status)
+    {
+        devicePin.CurrentFunction = function;
     }
     return status;
 }
@@ -647,13 +652,13 @@ bool GpioIO::InterruptRemove(PinNameValue pinNameValue)
 
 #pragma region ADC
 
-// 2× ADCs with 16-bit max. resolution (up to 24 channels, up to 3.6 MSPS)
-// 1× Analog and 1x Digital temperature sensors
+// 2Ã— ADCs with 16-bit max. resolution (up to 24 channels, up to 3.6 MSPS)
+// 1Ã— Analog and 1x Digital temperature sensors
 // 3x Channels (1 single channel + 1 dual-channel interfaces)
 // Analog temperature sensor generates a voltage that varies linearly with the temperature.
 // This temperature sensor is internally connected to ADC2_IN18.
 // The conversion range is between 1.7 V and 3.6 V.It can measure
-// the device junction temperature ranging from ?40 to + 125 °C.bool
+// the device junction temperature ranging from ?40 to + 125 Â°C.bool
 //
 
 CLR_INT32 AdcIO::MaximumValue()
@@ -823,8 +828,8 @@ CLR_UINT16 AdcIO::IsModeSupported(AdcChannelMode requestedMode)
 #pragma endregion
 
 #pragma region DAC
-// 1× 12-bit single-channel DAC (in SRD domain)
-// 1× 12-bit dual-channel DAC
+// 1Ã— 12-bit single-channel DAC (in SRD domain)
+// 1Ã— 12-bit dual-channel DAC
 bool DacIO::Initialize(CLR_INT32 dac_channel_number)
 {
     (void)dac_channel_number;
@@ -1469,7 +1474,12 @@ bool SerialIO::SetBaudRate(CLR_INT32 usartDeviceNumber, CLR_INT32 baudRate)
     UNUSED(baudRate);
     return true;
 }
-bool SerialIO::SetConfig(CLR_INT32 usartDeviceNumber, CLR_INT32 stopBits, CLR_INT32 dataBits, CLR_INT32 RequestedParity)
+bool SerialIO::SetConfig(
+    CLR_INT32 usartDeviceNumber,
+    SerialMode serialMode,
+    CLR_INT32 stopBits,
+    CLR_INT32 dataBits,
+    CLR_INT32 RequestedParity)
 {
     UNUSED(usartDeviceNumber);
     UNUSED(stopBits);

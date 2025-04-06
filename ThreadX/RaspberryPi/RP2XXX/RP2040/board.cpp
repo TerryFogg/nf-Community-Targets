@@ -13,37 +13,37 @@
 #include "File_Drivers.h"
 #endif
 
-Device::DevicePin mcuPins[] = {
-    {GP0, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP1, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP2, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP3, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP4, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP5, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP6, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP7, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP8, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP9, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP10, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP11, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP12, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP13, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP14, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP15, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP16, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP17, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP18, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP19, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP20, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP21, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP22, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP23, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP24, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP25, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP26, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP27, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP28, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
-    {GP29, false, NULL, NULL, PinMode::PinMode_Input, Device::DevicePinFunction::NONE, 0},
+Device::DeviceGpioPin mcuPins[] = {
+    {GP0, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP1, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP2, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP3, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP4, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP5, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP6, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP7, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP8, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP9, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP10, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP11, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP12, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP13, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP14, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP15, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP16, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP17, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP18, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP19, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP20, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP21, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP22, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP23, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP24, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP25, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP26, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP27, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP28, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
+    {GP29, false, NULL, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER},
 };
 
 // 1 Analog Digital controller
@@ -60,7 +60,6 @@ Device::AdcPin BoardADCChannels[] = {
     {&AdcControllerReference, 1, 2},
     {&AdcControllerReference, 1, 3},
     {&AdcControllerReference, 1, 4}};
-Device::I2cPin BoardI2CChannels[] = {{i2c0, 1, 1}, {i2c1, 2, 1}};
 
 // PWM controllers are slice id's
 static int PWMSlice1 = 1;
@@ -107,18 +106,6 @@ void Initialize_Board()
     Initialize64BitMicrosecondTimer();
     InitializeDevicePins();
 }
-void ResetPinList()
-{
-    for (int i = 0; i < sizeof(mcuPins) / sizeof(Device::DevicePin); i++)
-    {
-        mcuPins[i].Reserved = false;
-        mcuPins[i].next = NULL;
-        mcuPins[i].GpioParameterData = NULL;
-        mcuPins[i].Mode = PinMode::PinMode_Input;
-        mcuPins[i].CurrentFunction = Device::DevicePinFunction::NONE;
-        mcuPins[i].DeviceFunctionChannelNumber = 0;
-    }
-}
 void Initialize_Board_LEDS()
 {
     gpio_init(LED_PIN);
@@ -157,8 +144,11 @@ void InitializeDevicePins()
 {
     Device::CreatePinList(&mcuPins[0], ARRAY_LEN(mcuPins));
     Device::CreateADCChannelList(BoardADCChannels, ARRAY_LEN(BoardADCChannels));
-    Device::CreateI2CChannelList(BoardI2CChannels, ARRAY_LEN(BoardI2CChannels));
     Device::CreatePWMChannelList(BoardPWMChannels, ARRAY_LEN(BoardPWMChannels));
     Device::CreateSPIChannelList(BoardSPIChannels, ARRAY_LEN(BoardSPIChannels));
     Device::CreateSerialChannelList(BoardSerialChannels, ARRAY_LEN(BoardSerialChannels));
 };
+void ResetPinList()
+{
+    Device::CreatePinList(&mcuPins[0], ARRAY_LEN(mcuPins));
+}

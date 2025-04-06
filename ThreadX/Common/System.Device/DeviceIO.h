@@ -4,9 +4,8 @@
 // See LICENSE file in the project root for full license information.
 //
 #include "nanoCLR_Types.h"
-#include "Device.h"
 #include "board.h"
-
+#include "Device.h"
 #include "sys_dev_adc_native.h"
 #include "sys_dev_dac_native.h"
 #include "sys_dev_gpio_native.h"
@@ -18,12 +17,53 @@
 #include "sys_dev_spi_native.h"
 #include "sys_dev_usbstream_native.h"
 
+#ifdef STM32
 #define PORT_INDEX(pinNumber) (pinNumber / 16)
 #define PIN_INDEX(pinNumber)  pinNumber % 16
-
-#ifndef UNUSED
-#define UNUSED(x) ((void)(x))
 #endif
+
+enum I2C_CONTROL_TYPE
+{
+    MASTER,
+    SLAVE
+};
+struct ADC_Properties
+{
+    bool ADC_Initialized;
+    int channel;
+    PinNameValue adc;
+};
+struct I2C_Properties
+{
+    bool I2C_Initialized;
+    void *i2c_instance;
+    PinNameValue sda;
+    PinNameValue scl;
+};
+struct PWM_Properties
+{
+    bool PWM_Initialized;
+    CLR_INT32 sliceNumber;
+    PinNameValue channelA;
+    PinNameValue channelB;
+};
+struct SPI_Properties
+{
+    bool SPI_Initialized;
+    void *SPI_instance;
+    PinNameValue tx;
+    PinNameValue rx;
+    PinNameValue sck;
+    PinNameValue csn;
+};
+struct USART_Properties
+{
+    bool USART_Initialized;
+    void *USART_instance;
+    PinNameValue tx;
+    PinNameValue rx;
+};
+
 
 inline void Callback_EVENT_GPIO(GPIO_PIN pinNumber, bool pinValue)
 {
@@ -34,13 +74,12 @@ class GpioIO
 {
   private:
   public:
-    static bool Initialize();
+    GpioIO();
     static bool InitializePin(PinNameValue pinNumber);
     static bool Dispose(PinNameValue pinNumber);
     static bool Read(PinNameValue pinNumber);
     static bool Write(PinNameValue pinNumber, bool pinState);
     static bool Toggle(PinNameValue pinNumber);
-    static bool SetFunction(Device::DevicePin);
     static bool SetLowPower(PinNameValue pinNumber);
     static bool SetMode(PinNameValue pinNumber, PinMode pinMode);
     static bool InterruptEnable(PinNameValue pinNumber, GPIO_INT_EDGE events, void *interruptRoutine = NULL);
@@ -75,12 +114,11 @@ class AdcIO
     static int ChannelCount();
 
     static bool Initialize();
-    static bool Dispose(CLR_INT32 adc_channel_number);
     static bool Open(CLR_INT32 adc_channel_number);
+    static bool Dispose(CLR_INT32 adc_channel_number);
     static CLR_UINT16 Read(CLR_INT32 adc_channel_number);
-    static PinNameValue ChannelToPin(CLR_INT32 adc_channel_number);
     static CLR_UINT16 IsModeSupported(AdcChannelMode requestedMode);
-    static CLR_UINT16 DifferentialModeSupport(CLR_INT32 adc_channel_number);
+    static void SetupAdcList(ADC_Properties *mcuAdc);
 };
 
 class DacIO
@@ -90,7 +128,7 @@ class DacIO
     static int Resolution();
     static int ChannelCount();
     static bool Initialize(CLR_INT32 dac_channel_number);
-    static bool Open(CLR_INT32 controllerId, CLR_INT32 dac_channel_number);
+    static bool Open(CLR_INT32 dac_channel_number);
     static char *DeviceSelector(int controllerId);
     static void Write(CLR_INT32 dac_channel_number, CLR_INT32 value);
     static PinNameValue ChannelToPin(CLR_INT32 dac_channel_number);
@@ -101,41 +139,29 @@ class I2cIO
 {
   private:
   public:
-    static bool Initialize(CLR_INT32 I2C_deviceId, I2cBusSpeed I2C_speed);
+    static const CLR_INT32 TimeoutMaximum = 10000;
+    static const CLR_INT32 Timeout = 100;
+
+    static bool Initialize(
+        CLR_INT32 I2C_deviceId,
+        I2cBusSpeed I2C_speed,
+        I2C_CONTROL_TYPE I2C_control_type,
+        CLR_INT32 deviceAddress=0);
+
     static bool Dispose(CLR_INT32 I2C_deviceId);
     static I2cTransferStatus Write(
         CLR_INT32 I2C_deviceId,
         CLR_INT32 slaveAddress,
         CLR_UINT8 *writeBuffer,
-        CLR_INT32 writeSize);
+        CLR_INT32 writeSize,
+        I2C_CONTROL_TYPE busType);
 
     static I2cTransferStatus Read(
         CLR_INT32 I2C_deviceId,
         CLR_INT32 slaveAddress,
         CLR_UINT8 *readBuffer,
         CLR_INT32 readSize);
-};
-
-class I2cIO_Slave
-{
-  private:
-  public:
-    static CLR_INT32 TimeoutMaximum();
-    static CLR_INT32 Timeout();
-    static bool Initialize(CLR_INT32 I2C_deviceId, CLR_INT32 deviceAddress);
-    static bool Dispose(CLR_INT32 I2C_deviceId);
-    static I2cTransferStatus Write(
-        CLR_INT32 I2C_deviceId,
-        CLR_UINT8 *writeBuffer,
-        CLR_INT32 writeSize,
-        CLR_INT32 timeoutMilliseconds,
-        CLR_INT32 *readCount);
-    static I2cTransferStatus Read(
-        CLR_INT32 I2C_deviceId,
-        CLR_UINT8 *readBuffer,
-        CLR_INT32 readSize,
-        CLR_INT32 timeoutMilliseconds,
-        CLR_INT32 *readCount);
+    static void SetupI2CList(I2C_Properties *mcuI2C);
 };
 
 class PwmIO
@@ -156,6 +182,7 @@ class PwmIO
     static CLR_UINT32 Stop(CLR_INT32 pinNumber, CLR_INT32 timerId);
     static CLR_UINT32 DesiredFrequency(CLR_INT32 timerId, CLR_INT32 desiredFrequency);
     static CLR_UINT32 GetChannel(CLR_INT32 timerId, CLR_INT32 pin_number);
+    static void SetupPwmList(PWM_Properties *boardPWMDefinitions);
 };
 
 class SerialIO
@@ -163,6 +190,7 @@ class SerialIO
   private:
   public:
     static bool Initialize(CLR_INT32 usartDeviceNumber, CLR_INT32 baudrate);
+    static void SetupUsartList(USART_Properties *mcuUSART);
     static bool Dispose(CLR_INT32 usartDeviceNumber);
     static CLR_INT32 BytesAvailable(CLR_INT32 usartDeviceNumber);
     static bool ReadBytes(CLR_INT32 usartDeviceNumber, CLR_UINT8 *data, CLR_INT32 length);
@@ -177,6 +205,7 @@ class SerialIO
     static bool SetBaudRate(CLR_INT32 usartDeviceNumber, CLR_INT32 baudRate);
     static bool SetConfig(
         CLR_INT32 usartDeviceNumber,
+        SerialMode serialMode,
         CLR_INT32 stopBits,
         CLR_INT32 dataBits,
         CLR_INT32 RequestedParity);
@@ -193,6 +222,7 @@ class SpiIO
     static CLR_INT32 MinimumClockFrequency(CLR_INT32 controllerID);
 
     static bool Initialize();
+    static void SetupSpiList(SPI_Properties *mcuSPI);
     static bool Dispose(CLR_INT32 deviceId);
     static bool WriteRead(
         CLR_INT32 deviceId,

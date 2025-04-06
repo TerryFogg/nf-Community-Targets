@@ -10,33 +10,36 @@
 TouchInterface g_TouchInterface;
 
 static CLR_UINT8 I2C_READ_BUFFER[32];
+static int m_TouchI2cBus;
+static int m_TouchI2cSlaveAddress;
 
-bool TouchInterface::Initialize()
+bool TouchInterface::Initialize(int TouchI2cBus, int TouchI2cSlaveAddress)
 {
-    PinNameValue i2c_sda = (PinNameValue)TOUCH_INTERFACE_I2C_SDA;
-    PinNameValue i2c_scl = (PinNameValue)TOUCH_INTERFACE_I2C_SCL;
-
-    // Reserve the pins
-    Device::ReservePin(i2c_sda, Device::DevicePinFunction::I2C, TOUCH_INTERFACE_BUS);
-    Device::ReservePin(i2c_scl, Device::DevicePinFunction::I2C, TOUCH_INTERFACE_BUS);
-
-    // Setup the Pins
-    GpioIO::SetFunction(Device::GetPin(i2c_sda));
-    GpioIO::SetFunction(Device::GetPin(i2c_scl));
-
-    I2cIO::Initialize(TOUCH_INTERFACE_BUS, I2cBusSpeed::I2cBusSpeed_StandardMode);
+    m_TouchI2cBus = TouchI2cBus;
+    m_TouchI2cSlaveAddress = TouchI2cSlaveAddress;
+    I2cIO::Initialize(TouchI2cBus, I2cBusSpeed_StandardMode, I2C_CONTROL_TYPE::MASTER, TouchI2cSlaveAddress);
     return true;
 }
-
-static CLR_UINT8 readbuffer[12];
 CLR_UINT8 *TouchInterface::Write_Read(CLR_UINT8 *writeBuffer, CLR_UINT16 writeSize, CLR_UINT16 readSize)
 {
-    I2cTransferStatus writeStatus = I2cIO::Write(TOUCH_INTERFACE_BUS, TOUCH_INTERFACE_SLAVE_ADDRESS, writeBuffer, writeSize);
+    I2cTransferStatus writeStatus = I2cTransferStatus_UnknownError;
+    I2cTransferStatus readStatus = I2cTransferStatus_UnknownError;
 
+    writeStatus = I2cIO::Write(m_TouchI2cBus, m_TouchI2cSlaveAddress, writeBuffer, writeSize, I2C_CONTROL_TYPE::MASTER);
+    if (writeStatus != I2cTransferStatus_FullTransfer)
+    {
+        return NULL;
+    }
     if (readSize > 0)
     {
-        I2cTransferStatus readStatus =
-            I2cIO::Read(TOUCH_INTERFACE_BUS, TOUCH_INTERFACE_SLAVE_ADDRESS, I2C_READ_BUFFER, readSize);
+        I2cIO::Read(m_TouchI2cBus, m_TouchI2cSlaveAddress, I2C_READ_BUFFER, readSize);
     }
-    return I2C_READ_BUFFER;
+    if (readStatus != I2cTransferStatus_FullTransfer)
+    {
+        return I2C_READ_BUFFER;
+    }
+    else
+    {
+        return NULL;
+    }
 }

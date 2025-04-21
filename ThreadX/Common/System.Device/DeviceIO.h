@@ -17,10 +17,6 @@
 #include "sys_dev_spi_native.h"
 #include "sys_dev_usbstream_native.h"
 
-#ifdef STM32
-#define PORT_INDEX(pinNumber) (pinNumber / 16)
-#define PIN_INDEX(pinNumber)  pinNumber % 16
-#endif
 
 enum I2C_CONTROL_TYPE
 {
@@ -39,6 +35,25 @@ struct I2C_Properties
     void *i2c_instance;
     PinNameValue sda;
     PinNameValue scl;
+    uint32_t ByteTime;
+};
+struct I2c_Transaction
+{
+    bool InProgress;
+    uint8_t deviceId;
+    int slaveAddress;
+    int writeOffset;
+    int writeSize;
+    int readOffset;
+    int readSize;
+    int64_t estimatedTransactionTimeMilliseconds;
+    bool IsWrite;
+    bool IsRead;
+    bool longRunningTransaction;
+    uint8_t *writeBuffer;
+    uint8_t *readBuffer;
+    uint32_t bytesTransferred;
+    uint32_t status;
 };
 struct PWM_Properties
 {
@@ -63,8 +78,6 @@ struct USART_Properties
     PinNameValue tx;
     PinNameValue rx;
 };
-
-
 inline void Callback_EVENT_GPIO(GPIO_PIN pinNumber, bool pinValue)
 {
     PostManagedEvent(EVENT_GPIO, 0, (uint16_t)pinNumber, pinValue);
@@ -162,6 +175,7 @@ class I2cIO
         CLR_UINT8 *readBuffer,
         CLR_INT32 readSize);
     static void SetupI2CList(I2C_Properties *mcuI2C);
+    static uint32_t GetByteTime(uint32_t I2C_deviceId);
 };
 
 class PwmIO
@@ -218,8 +232,8 @@ class SpiIO
 {
   private:
   public:
-    static CLR_INT32 MaximumClockFrequency(CLR_INT32 requestClockFrequence);
-    static CLR_INT32 MinimumClockFrequency(CLR_INT32 controllerID);
+    static CLR_INT32 MaximumClockFrequencyHz(CLR_INT32 requestClockFrequence);
+    static CLR_INT32 MinimumClockFrequencyHz(CLR_INT32 controllerID);
 
     static bool Initialize();
     static void SetupSpiList(SPI_Properties *mcuSPI);

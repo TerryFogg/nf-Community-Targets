@@ -4,7 +4,6 @@
 // See LICENSE file in the project root for full license information.
 //
 #include <nanoCLR_Types.h>
-#include "sys_dev_i2c_native.h"
 #include "TX_API.h"
 #ifdef FILEX
 #include "File_Drivers.h"
@@ -21,12 +20,12 @@ enum DevicePinFunction
 {
     LOW_POWER,
     GPIO,
-    ADC0,
-    ADC1,
-    ADC2,
-    ADC3,
-    ADC4,
-    ADC5,
+    ADC_0,
+    ADC_1,
+    ADC_2,
+    ADC_3,
+    ADC_4,
+    ADC_5,
     DAC,
     SPI,
     PWM,

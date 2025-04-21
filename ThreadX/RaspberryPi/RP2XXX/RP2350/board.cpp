@@ -36,8 +36,8 @@ void SetupPinList()
     mcuPins[10] = {GP11, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
     mcuPins[11] = {GP12, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
     mcuPins[12] = {GP13, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
-    mcuPins[13] = {GP14, false, NULL, PinMode::PinMode_Input, DevicePinFunction::I2C0_SDA};
-    mcuPins[14] = {GP15, false, NULL, PinMode::PinMode_Input, DevicePinFunction::I2C0_SCL};
+    mcuPins[13] = {GP14, false, NULL, PinMode::PinMode_Input, DevicePinFunction::I2C1_SDA};
+    mcuPins[14] = {GP15, false, NULL, PinMode::PinMode_Input, DevicePinFunction::I2C1_SCL};
     mcuPins[15] = {GP16, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
     mcuPins[16] = {GP17, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
     mcuPins[17] = {GP18, false, NULL, PinMode::PinMode_Input, DevicePinFunction::LOW_POWER};
@@ -48,9 +48,9 @@ void SetupPinList()
     mcuPins[22] = {GP23, false, NULL, PinMode::PinMode_Input, DevicePinFunction::WIFI_INTERFACE};
     mcuPins[23] = {GP24, false, NULL, PinMode::PinMode_Input, DevicePinFunction::WIFI_INTERFACE};
     mcuPins[24] = {GP25, false, NULL, PinMode::PinMode_Input, DevicePinFunction::WIFI_INTERFACE};
-    mcuPins[25] = {GP26, false, NULL, PinMode::PinMode_Input, DevicePinFunction::ADC0};
-    mcuPins[26] = {GP27, false, NULL, PinMode::PinMode_Input, DevicePinFunction::ADC1};
-    mcuPins[27] = {GP28, false, NULL, PinMode::PinMode_Input, DevicePinFunction::ADC2};
+    mcuPins[25] = {GP26, false, NULL, PinMode::PinMode_Input, DevicePinFunction::ADC_0};
+    mcuPins[26] = {GP27, false, NULL, PinMode::PinMode_Input, DevicePinFunction::ADC_1};
+    mcuPins[27] = {GP28, false, NULL, PinMode::PinMode_Input, DevicePinFunction::ADC_2};
     mcuPins[28] = {GP29, false, NULL, PinMode::PinMode_Input, DevicePinFunction::WIFI_INTERFACE};
 
     Device::CreatePinList(&mcuPins[0], ARRAY_LEN(mcuPins));

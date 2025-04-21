@@ -66,7 +66,6 @@ enum ILI9341_CMD : CLR_UINT8
     Enable_3G = 0xF2,
     Pump_Ratio_Control = 0xF7
 };
-
 enum ILI9341_Orientation : CLR_UINT8
 {
     MADCTL_MH = 0x04, // sets the Horizontal Refresh, 0=Left-Right and 1=Right-Left
@@ -231,10 +230,7 @@ void DisplayDriver::PowerSave(PowerSaveState powerState)
 }
 void DisplayDriver::Clear()
 {
-    // Clear the ST7789 controller frame
     SetWindow(0, 0, Attributes.Width - 1, Attributes.Height - 1);
-
-    // Clear the transfer buffer
     memset(Attributes.TransferBuffer, 0, Attributes.TransferBufferSize);
 
     int totalBytesToClear = Attributes.Width * Attributes.Height * 2;
@@ -302,7 +298,6 @@ bool DisplayDriver::SetWindow(CLR_INT16 x1, CLR_INT16 y1, CLR_INT16 x2, CLR_INT1
 
     return true;
 }
-
 void DisplayDriver::BitBlt(int x, int y, int width, int height, int stride, int screenX, int screenY, CLR_UINT32 data[])
 {
     // 16 bit colour  RRRRRGGGGGGBBBBB mode 565

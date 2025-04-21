@@ -291,7 +291,10 @@ void I2cIO::SetupI2CList(I2C_Properties *boardMcuI2C)
 {
     mcuI2C = boardMcuI2C;
 }
-
+uint32_t I2cIO::GetByteTime(uint32_t I2C_deviceId)
+{
+    return mcuI2C[I2C_deviceId].ByteTime;
+}
 // The handler is called from the I2C ISR, so it must complete quickly.
 static void i2c_slave_handler(i2c_inst_t *i2c, i2c_slave_event_t event)
 {
@@ -320,6 +323,7 @@ static void i2c_slave_handler(i2c_inst_t *i2c, i2c_slave_event_t event)
             break;
     }
 }
+
 bool I2cIO::Initialize(
     CLR_INT32 I2C_deviceId,
     I2cBusSpeed I2C_speed,
@@ -333,12 +337,14 @@ bool I2cIO::Initialize(
         {
             case I2cBusSpeed::I2cBusSpeed_StandardMode:
                 baud = 100000;
-                break;
+                mcuI2C[I2C_deviceId].ByteTime = 0.1;
             case I2cBusSpeed::I2cBusSpeed_FastMode:
                 baud = 400000;
+                mcuI2C[I2C_deviceId].ByteTime = 0.02;
                 break;
             case I2cBusSpeed::I2cBusSpeed_FastModePlus:
                 baud = 1000000;
+                mcuI2C[I2C_deviceId].ByteTime = 0.009;
                 break;
         }
 
@@ -386,33 +392,54 @@ I2cTransferStatus I2cIO::Write(
         is_master); // true to keep master control of bus
 
     if (returnValue == PICO_ERROR_TIMEOUT)
+    {
         return_status = I2cTransferStatus_ClockStretchTimeout;
-    if (returnValue == PICO_ERROR_GENERIC)
+    }
+    else if (returnValue == PICO_ERROR_GENERIC)
+    {
         return_status = I2cTransferStatus_UnknownError;
-
-    if (returnValue != writeSize)
-        return_status = I2cTransferStatus_PartialTransfer;
-    if (returnValue = writeSize)
-        return_status = I2cTransferStatus_FullTransfer;
+    }
+    else
+    {
+        if (returnValue != writeSize)
+        {
+            return_status = I2cTransferStatus_PartialTransfer;
+        }
+        else if (returnValue = writeSize)
+        {
+            return_status = I2cTransferStatus_FullTransfer;
+        }
+    }
     return return_status;
 }
 I2cTransferStatus I2cIO::Read(CLR_INT32 I2C_deviceId, CLR_INT32 slaveAddress, CLR_UINT8 *readBuffer, CLR_INT32 readSize)
 {
     I2cTransferStatus return_status = I2cTransferStatus_UnknownError;
-    int returnValue =
+    int numberBytesRead =
         i2c_read_blocking((i2c_inst *)(mcuI2C[I2C_deviceId].i2c_instance), slaveAddress, readBuffer, readSize, false);
 
-    if (returnValue == PICO_ERROR_TIMEOUT)
+    if (numberBytesRead == PICO_ERROR_TIMEOUT)
+    {
         return_status = I2cTransferStatus_ClockStretchTimeout;
-    if (returnValue == PICO_ERROR_GENERIC)
+    }
+    else if (numberBytesRead == PICO_ERROR_GENERIC)
+    {
         return_status = I2cTransferStatus_UnknownError;
-
-    if (returnValue != readSize)
-        return_status = I2cTransferStatus_PartialTransfer;
-    if (returnValue = readSize)
-        return_status = I2cTransferStatus_FullTransfer;
+    }
+    else
+    {
+        if (numberBytesRead != readSize)
+        {
+            return_status = I2cTransferStatus_PartialTransfer;
+        }
+        else if (numberBytesRead = readSize)
+        {
+            return_status = I2cTransferStatus_FullTransfer;
+        }
+    }
     return return_status;
 }
+
 #pragma endregion
 
 #pragma region System.Device.Pwm
@@ -653,20 +680,25 @@ void SpiIO::SetupSpiList(SPI_Properties *boardMcuSPI)
 {
     mcuSPI = boardMcuSPI;
 }
-CLR_INT32 SpiIO::MaximumClockFrequency(CLR_INT32 controllerID)
+CLR_INT32 SpiIO::MaximumClockFrequencyHz(CLR_INT32 controllerID)
 {
-    return 1;
+#if PICO_RP2040
+    return 62500000;
+#elif PICO_RP2350
+    return 75000000;
+#endif
 }
-CLR_INT32 SpiIO::MinimumClockFrequency(CLR_INT32 controllerID)
+CLR_INT32 SpiIO::MinimumClockFrequencyHz(CLR_INT32 controllerID)
 {
-    return 1;
+    return 100;
 }
 bool SpiIO::Initialize()
 {
-    return true;
+    // Nothing to do,leave initialization until "Open"
 }
-bool SpiIO::Dispose(CLR_INT32 deviceId)
+bool SpiIO::Dispose(CLR_INT32 spi_deviceID)
 {
+    spi_deinit((spi_inst_t *)mcuSPI[spi_deviceID].SPI_instance);
     return true;
 }
 bool SpiIO::WriteRead(
@@ -681,7 +713,20 @@ bool SpiIO::WriteRead(
 }
 bool SpiIO::Open(SPI_DEVICE_CONFIGURATION spiConfig, CLR_UINT32 handle)
 {
-    return false;
+    if (spiConfig.Clock_RateHz >= SpiIO::MinimumClockFrequencyHz(spiConfig.BusConfiguration) &&
+        spiConfig.Clock_RateHz <= SpiIO::MaximumClockFrequencyHz(spiConfig.BusConfiguration))
+    {
+        spi_init((spi_inst_t *)mcuSPI[spiConfig.BusConfiguration].SPI_instance, spiConfig.Clock_RateHz);
+        gpio_set_function(mcuSPI[spiConfig.BusConfiguration].sck, GPIO_FUNC_SPI);
+        gpio_set_function(mcuSPI[spiConfig.BusConfiguration].tx, GPIO_FUNC_SPI);
+        gpio_set_function(mcuSPI[spiConfig.BusConfiguration].rx, GPIO_FUNC_SPI);
+    }
+    else
+    {
+        return false;
+    }
+    return true;
+
 }
 CLR_INT32 SpiIO::ByteTime()
 {

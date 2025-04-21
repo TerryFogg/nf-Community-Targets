@@ -16,6 +16,8 @@
 #define NUMBER_OF_LINES 2
 #define SPI_MAX_TRANSFER_SIZE 960
 
+
+
 #if PICO_RP2040
 #define MAX_SPI_BAUD_RATE 62500000
 #elif PICO_RP2350
@@ -51,6 +53,7 @@ void DisplayInterface::Initialize(DisplayInterfaceConfig &config)
             break;
     }
 
+    
     spi_init(spi_port, MAX_SPI_BAUD_RATE);
     gpio_set_function(SPI_CLK, GPIO_FUNC_SPI);
     gpio_set_function(SPI_TX, GPIO_FUNC_SPI);

@@ -31,7 +31,7 @@ HRESULT Library_sys_dev_spi_native_System_Device_Spi_SpiBusInfo::NativeMaxClockF
             stack.This()[Library_sys_dev_spi_native_System_Device_Spi_SpiBusInfo::FIELD___controllerId]
                 .NumericByRef()
                 .s4;
-        maxClockFrequency = SpiIO::MaximumClockFrequency(controllerID);
+        maxClockFrequency = SpiIO::MaximumClockFrequencyHz(controllerID);
         stack.SetResult_I4(maxClockFrequency);
     }
     NANOCLR_NOCLEANUP();
@@ -45,7 +45,7 @@ HRESULT Library_sys_dev_spi_native_System_Device_Spi_SpiBusInfo::NativeMinClockF
             stack.This()[Library_sys_dev_spi_native_System_Device_Spi_SpiBusInfo::FIELD___controllerId]
                 .NumericByRef()
                 .s4;
-        CLR_INT32 minClockFrequency = SpiIO::MinimumClockFrequency(controllerID);
+        CLR_INT32 minClockFrequency = SpiIO::MinimumClockFrequencyHz(controllerID);
         stack.SetResult_I4(minClockFrequency);
     }
     NANOCLR_NOCLEANUP();

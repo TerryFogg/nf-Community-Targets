@@ -41,7 +41,7 @@ extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_System_Device_Spi;
 #ifdef FILE_SUPPORT
     extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_System_IO_FileSystem;
 #endif
-#ifdef GRAPHICS_SUPPORT 
+#ifdef NANOCLR_GRAPHICS 
     extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_Graphics;
 #endif
 #ifdef NETWORK_SUPPORT
@@ -96,7 +96,7 @@ const CLR_RT_NativeAssemblyData *g_CLR_InteropAssembliesNativeData[] = {
 #ifdef FILE_SUPPORT
     &g_CLR_AssemblyNative_System_IO_FileSystem,
 #endif
-#ifdef GRAPHICS_SUPPORT
+#if (NANOCLR_GRAPHICS == TRUE)
     &g_CLR_AssemblyNative_nanoFramework_Graphics,
 #endif
 #ifdef NETWORK_SUPPORT

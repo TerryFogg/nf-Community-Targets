@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 //
 // Copyright (c) .NET Foundation and Contributors
@@ -6,7 +6,13 @@
 //
 
 // Declaration of RTOS thread
-void ReceiverThread(void const * argument);
+void ReceiverThread(void const *argument);
 
-void InitWireProtocolCommunications();
-
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+    void InitWireProtocolCommunications();
+#ifdef __cplusplus
+}
+#endif

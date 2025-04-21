@@ -35,11 +35,6 @@
 #define LED_STATE_OFF 0
 #define LED_STATE_ON  1
 
-// byte pool configuration and definitions
-#define DEFAULT_BYTE_POOL_SIZE     10000
-#define CLR_THREAD_STACK_SIZE      3000
-#define RECEIVER_THREAD_STACK_SIZE 5000
-
 #ifdef __cplusplus
 extern "C"
 {

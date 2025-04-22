@@ -383,11 +383,11 @@
 
                 "TOUCH_INTERFACE_CONTROLLER": "FT6X06.cpp",
                 "TOUCH_INTERFACE_DRIVER": "I2C_To_TouchPanel.cpp",
-                "TOUCH_INTERFACE_BUS": "4",                       // I2C4 
-                "TOUCH_INTERFACE_SLAVE_ADDRESS": "112",           // 0x70
+                "TOUCH_INTERFACE_BUS": "4", // I2C4 
+                "TOUCH_INTERFACE_SLAVE_ADDRESS": "112", // 0x70
                 "TOUCH_INTERFACE_I2C_SDA": "61",
                 "TOUCH_INTERFACE_I2C_SCL": "60",
-                "TOUCH_INTERFACE_INTERRUPT": "115",               // PH2
+                "TOUCH_INTERFACE_INTERRUPT": "115", // PH2
                 "TOUCH_INTERFACE_WIDTH": "472",
                 "TOUCH_INTERFACE_HEIGHT": "280",
                 "TOUCH_INVERT_X": true,
@@ -443,6 +443,19 @@
                 "SPI_TX": "19",
                 "SPI_CLK": "18",
                 "SPI_CS": "17"
+            }
+        },
+        {
+            "name": "OLED_SSD1306",
+            "description": "https://core-electronics.com.au/piicodev-oled-display-module-128x64-ssd1306.html",
+            "hidden": true,
+            "cacheVariables": {
+                "GRAPHICS_SUPPORT": true,
+                "TOUCH_DISPLAY_SUPPORT": false,
+                "GRAPHICS_LCD": "SSD1306",
+                "INTERFACE_TYPE": "I2C",
+                "LCD_WIDTH": "128",
+                "LCD_HEIGHT": "64"
             }
         },
         //
@@ -542,6 +555,16 @@
                 "W25Q128JV",
                 "APS6404L",
                 "Waveshare-LCD-1.14",
+                "DEBUG"
+            ]
+        },
+        {
+            "name": "RP2350 + OLED_SSD1306",
+            "description": "Pico2 board with 2.8 inch LCD and capacitive touch",
+            "hidden": false,
+            "inherits": [
+                "RP2350",
+                "OLED_SSD1306",
                 "DEBUG"
             ]
         },

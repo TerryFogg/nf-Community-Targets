@@ -452,7 +452,7 @@
             "cacheVariables": {
                 "GRAPHICS_SUPPORT": true,
                 "TOUCH_DISPLAY_SUPPORT": false,
-                "GRAPHICS_LCD": "SSD1306",
+                "GRAPHICS_LCD": "SSD1306.cpp",
                 "INTERFACE_TYPE": "I2C",
                 "LCD_WIDTH": "128",
                 "LCD_HEIGHT": "64"

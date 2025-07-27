@@ -64,7 +64,7 @@ enum DevicePinFunction
     WIFI_INTERFACE,
     USB,
     CAMERA
-} ;
+};
 
 typedef struct GpioCallbackParameter
 {

@@ -116,7 +116,6 @@ void nanoHAL_Initialize()
 void nanoHAL_Uninitialize(bool isPoweringDown)
 {
     (void)isPoweringDown;
-    SOCKETS_CloseConnections();
     BlockStorageList_UnInitializeDevices();
     Events_Uninitialize();
     HAL_CONTINUATION::Uninitialize();

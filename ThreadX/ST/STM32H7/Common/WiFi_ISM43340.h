@@ -1,11 +1,11 @@
-#pragma once
+﻿#pragma once
 //
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
 #include "board.h"
-#include "DeviceIO.h"
-#include "Device.h"
+#include "System.Device.IO.h"
+#include "System.Device.h"
 #include "wifi.h"
 
 

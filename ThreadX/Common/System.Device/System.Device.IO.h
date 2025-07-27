@@ -5,7 +5,7 @@
 //
 #include "nanoCLR_Types.h"
 #include "board.h"
-#include "Device.h"
+#include "System.Device.h"
 #include "sys_dev_adc_native.h"
 #include "sys_dev_dac_native.h"
 #include "sys_dev_gpio_native.h"
@@ -15,7 +15,6 @@
 #include "sys_dev_pwm_native.h"
 #include "sys_io_ser_native.h"
 #include "sys_dev_spi_native.h"
-#include "sys_dev_usbstream_native.h"
 
 
 enum I2C_CONTROL_TYPE

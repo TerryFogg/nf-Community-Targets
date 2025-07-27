@@ -1,27 +1,34 @@
 ﻿{
     "version": 4,
     "configurePresets": [
+        // --------------------
+        // Build Paths
+        // --------------------
         {
             "name": "THREADX_AND_COMPONENT_PATHS",
             "description": "Configuration for setting up locations where external source repositories have been copied to local disk",
             "hidden": true,
             "cacheVariables": {
+                "INFOSTRING": "Built with ThreadX 6.1.12_rel",
+                "BUILD_VERSION": "1.0.0.0",
+                "COMMUNITY_TARGET": "ThreadX",
                 "THREADX_PATH": "C:/nftools/ThreadX",
                 "FILEX_PATH": "C:/nftools/FileX",
+                "LEVELX_PATH": "C:/nftools/levelx",
                 "USBX_PATH": "C:/nftools/UsbX",
-                "NETXDUO_PATH": "C:/nftools/netxduo",
-                "LEVELX_PATH": "C:/nftools/levelx"
+                "NETXDUO_PATH": "C:/nftools/netxduo"
+                //"LWIP_PATH": "C:/nftools/lwip",
+                //"MBEDTLS_PATH": "C:/nftools/mbedtls"
             }
         },
         {
             "name": "GCC_ARM_COMMON_BUILD",
             "inherits": "general-preset",
-            "description": "Configuration common to all arm series processors",
+            "description": "Configuration common to all STM32 arm series processors",
             "hidden": true,
             "generator": "Ninja",
             "cacheVariables": {
                 "RTOS": "ThreadX",
-                "COMMUNITY_TARGET": "ThreadX",
                 "CMAKE_SYSTEM_NAME": "Generic",
 
                 "CMAKE_AR": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-ar.exe",
@@ -49,78 +56,9 @@
                 "CMAKE_SIZE_UTIL": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1/bin/arm-none-eabi-size.exe"
             }
         },
-        {
-            "name": "LIGHT_MATHEMATICS",
-            "description": "Configuration for setting up what hardware/software support for mathematics",
-            "hidden": true,
-            "cacheVariables": {
-                "NF_FEATURE_LIGHT_MATH": true,
-                "DP_FLOATINGPOINT": false
-            }
-        },
-        {
-            "name": "FULL_MATHEMATICS",
-            "description": "Configuration for setting up what hardware/software support for mathematics",
-            "hidden": true,
-            "cacheVariables": {
-                "NF_FEATURE_LIGHT_MATH": false,
-                "DP_FLOATINGPOINT": true
-            }
-        },
-        {
-            "name": "STM32H7",
-            "description": "Common to all STM32H7 series",
-            "hidden": true,
-            "inherits": [
-                "FULL_MATHEMATICS",
-                "THREADX_AND_COMPONENT_PATHS",
-                "GCC_ARM_COMMON_BUILD"
-            ],
-            "cacheVariables": {
-                "TARGET_VENDOR": "ST",
-                "TARGET_FAMILY": "STM32H7",
-                "ARM_PROCESSOR": "cortex-m7",
-                "TARGET_GIT_REPOSITORY": "https://github.com/STMicroelectronics/STM32CubeH7.git",
-                "TARGET_GIT_TAG": "v1.11.1",
-                "TARGET_GIT_LOCAL_PATH": "C:/nftools/STM32CubeH7",
-                "BUILD_VERSION": "1.0.0.0",
-                "INFOSTRING": "Built with ThreadX 6.1.12"
-            }
-        },
-        {
-            "name": "STM32U5",
-            "description": "Common to all STM32U5 series",
-            "hidden": true,
-            "inherits": [
-                "FULL_MATHEMATICS",
-                "THREADX_AND_COMPONENT_PATHS",
-                "GCC_ARM_COMMON_BUILD"
-            ],
-            "cacheVariables": {
-                "TARGET_VENDOR": "ST",
-                "TARGET_FAMILY": "STM32U5",
-                "ARM_PROCESSOR": "cortex-m33",
-                "TARGET_GIT_REPOSITORY": "https://github.com/STMicroelectronics/STM32CubeU5.git",
-                "TARGET_GIT_TAG": "v1.11.1",
-                "TARGET_GIT_LOCAL_PATH": "C:/nftools/STM32CubeU5",
-                "BUILD_VERSION": "1.0.0.0",
-                "INFOSTRING": "Built with ThreadX 6.1.12"
-            }
-        },
-        {
-            "name": "PICO_SDK",
-            "description": "Pico sdk support variables",
-            "hidden": true,
-            "cacheVariables": {
-                "PICO_TOOLCHAIN_PATH": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1",
-                "picotool_DIR": "C:/nftools/picotool",
-                "PICO_TOOLS_DIR": "C:/nftools/pico-sdk/tools",
-                "PICOTOOL_EXECUTABLE": "C:/nftools/picotool/build/picotool.exe",
-                "PICO_ARM": "1",
-                "PICO_SDK_PATH": "C:/nftools/pico-sdk",
-                "PICO_NO_PICOTOOL": true
-            }
-        },
+        // --------------------
+        // Build Options
+        // --------------------
         {
             "name": "DEBUG",
             "description": "This is non-optimized and contains all the debug symbols",
@@ -138,9 +76,103 @@
             }
         },
         {
+            "name": "ADVANCED_PROFILING",
+            "description": "Configuration for setting up what hardware/software support for mathematics",
+            "hidden": true,
+            "cacheVariables": {
+                "ADVANCED_PROFILING": true
+            }
+        },
+        {
+            "name": "LIGHT_MATHEMATICS",
+            "description": "Configuration for setting up what hardware/software support for mathematics",
+            "hidden": true,
+            "cacheVariables": {
+                "FEATURE_LIGHT_MATHEMATICS": true,
+                "FLOATING_POINT_MATHEMATICS": false
+            }
+        },
+        {
+            "name": "DOUBLE_PRECISION_MATHEMATICS",
+            "description": "Configuration for setting up what hardware/software support for mathematics",
+            "hidden": true,
+            "cacheVariables": {
+                "FEATURE_LIGHT_MATHEMATICS": false,
+                "FLOATING_POINT_MATHEMATICS": true
+            }
+        },
+        {
+            "name": "FULL_FRAMEWORK",
+            "description": "Include all of the features",
+            "hidden": true,
+            "cacheVariables": {
+                "NANOCLR_SYSTEM_COLLECTIONS": true,
+                "NANOCLR_REFLECTION": true
+            }
+        },
+        // --------------------
+        // Device Families
+        // --------------------
+        {
+            "name": "STM32H7",
+            "description": "Common to all STM32H7 series",
+            "hidden": true,
+            "inherits": [
+                "DOUBLE_PRECISION_MATHEMATICS",
+                "THREADX_AND_COMPONENT_PATHS",
+                "GCC_ARM_COMMON_BUILD"
+            ],
+            "cacheVariables": {
+                "TARGET_VENDOR": "ST",
+                "TARGET_FAMILY": "STM32H7",
+                "ARM_PROCESSOR": "cortex-m7",
+                "TARGET_GIT_REPOSITORY": "https://github.com/STMicroelectronics/STM32CubeH7.git",
+                "TARGET_GIT_TAG": "v1.11.1",
+                "TARGET_GIT_LOCAL_PATH": "C:/nftools/STM32CubeH7"
+            }
+        },
+        {
+            "name": "STM32U5",
+            "description": "Common to all STM32U5 series",
+            "hidden": true,
+            "inherits": [
+                "DOUBLE_PRECISION_MATHEMATICS",
+                "THREADX_AND_COMPONENT_PATHS",
+                "GCC_ARM_COMMON_BUILD"
+            ],
+            "cacheVariables": {
+                "TARGET_VENDOR": "ST",
+                "TARGET_FAMILY": "STM32U5",
+                "ARM_PROCESSOR": "cortex-m33",
+                "TARGET_GIT_REPOSITORY": "https://github.com/STMicroelectronics/STM32CubeU5.git",
+                "TARGET_GIT_TAG": "v1.11.1",
+                "TARGET_GIT_LOCAL_PATH": "C:/nftools/STM32CubeU5"
+            }
+        },
+        {
+            "name": "PICO_SDK",
+            "description": "Pico sdk support variables",
+            "hidden": true,
+            "cacheVariables": {
+                "TARGET_GIT_REPOSITORY": "https://github.com/raspberrypi/pico-sdk.git",
+                "TARGET_GIT_TAG": "2.0.0",
+                "TARGET_GIT_LOCAL_PATH": "C:/nftools/pico-sdk",
+                "PICO_TOOLCHAIN_PATH": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1",
+                "picotool_DIR": "C:/nftools/picotool",
+                "PICO_TOOLS_DIR": "C:/nftools/pico-sdk/tools",
+                "PICOTOOL_EXECUTABLE": "C:/nftools/picotool/build/picotool.exe",
+                "PICO_ARM": "1",
+                "PICO_SDK_PATH": "C:/nftools/pico-sdk",
+                "PICO_NO_PICOTOOL": true
+            }
+        },
+        // --------------------
+        // Base Devices
+        // --------------------
+        {
             "name": "STM32H735G_DK",
             "description": "Configuration for the STM32H735G_DK (Cortex M-7) discovery board from STMicroelectronics",
-            "hidden": false,
+            "hidden": true,
             "inherits": [
                 "STM32H7"
             ],
@@ -149,27 +181,14 @@
                 "TARGET_SERIES": "STM32H735xx",
                 "HAS_CONFIG_BLOCK": false,
                 "RANDOM_NUMBER_GENERATOR": true,
-                "NANOCLR_SYSTEM_COLLECTIONS": true,
-                "NANOCLR_REFLECTION": true,
                 "REALTIME_CLOCK": false,
-                "WATCHDOG": false,
-                "ADVANCED_PROFILING": false,
-                "NETWORKING": false,
-                "FILEX_SYSTEM_SD": false,
-                "FILEX_SYSTEM_NAND": false,
-                "FILEX_SYSTEM_NOR": false,
-                "FILEX_SYSTEM_RAM": false,
-                "USB_DEVICE": false,
-                "USB_HOST": false,
-                "USB_HOST_CONTROLLER": false,
-                "USB_NETWORK": false,
-                "USB_PICTBRIDGE": false
+                "WATCHDOG": false
             }
         },
         {
             "name": "STM32H7B3I_DK",
             "description": "Configuration for the STM32H7B3I_DK (Cortex M-7) discovery board from STMicroelectronics",
-            "hidden": false,
+            "hidden": true,
             "inherits": [
                 "STM32H7"
             ],
@@ -179,27 +198,14 @@
                 "TARGET_SERIES": "STM32H7B3xxQ",
                 "HAS_CONFIG_BLOCK": false,
                 "RANDOM_NUMBER_GENERATOR": true,
-                "NANOCLR_SYSTEM_COLLECTIONS": true,
-                "NANOCLR_REFLECTION": true,
                 "REALTIME_CLOCK": false,
-                "WATCHDOG": false,
-                "ADVANCED_PROFILING": false,
-                "NETWORKING": false,
-                "FILEX_SYSTEM_SD": false,
-                "FILEX_SYSTEM_NAND": false,
-                "FILEX_SYSTEM_NOR": false,
-                "FILEX_SYSTEM_RAM": false,
-                "USB_DEVICE": false,
-                "USB_HOST": false,
-                "USB_HOST_CONTROLLER": false,
-                "USB_NETWORK": false,
-                "USB_PICTBRIDGE": false
+                "WATCHDOG": false
             }
         },
         {
             "name": "NUCLEO_H743ZI2",
             "description": "Configuration for the NUCLEO-H743ZI2 (Cortex M-7) nucleo board from STMicroelectronics",
-            "hidden": false,
+            "hidden": true,
             "inherits": [
                 "STM32H7"
             ],
@@ -208,27 +214,14 @@
                 "TARGET_SERIES": "STM32H743xx",
                 "HAS_CONFIG_BLOCK": false,
                 "RANDOM_NUMBER_GENERATOR": true,
-                "NANOCLR_SYSTEM_COLLECTIONS": true,
-                "NANOCLR_REFLECTION": true,
                 "REALTIME_CLOCK": false,
-                "WATCHDOG": false,
-                "ADVANCED_PROFILING": false,
-                "NETWORKING": false,
-                "FILEX_SYSTEM_SD": false,
-                "FILEX_SYSTEM_NAND": false,
-                "FILEX_SYSTEM_NOR": false,
-                "FILEX_SYSTEM_RAM": false,
-                "USB_DEVICE": false,
-                "USB_HOST": false,
-                "USB_HOST_CONTROLLER": false,
-                "USB_NETWORK": false,
-                "USB_PICTBRIDGE": false
+                "WATCHDOG": false
             }
         },
         {
             "name": "STM32U5A9J_DK",
             "description": "Configuration for the STM32U5A9J_DK (Cortex-M33) from STMicroelectronics",
-            "hidden": false,
+            "hidden": true,
             "inherits": [
                 "STM32U5"
             ],
@@ -238,21 +231,8 @@
                 "SECURE_CODE": false,
                 "HAS_CONFIG_BLOCK": false,
                 "RANDOM_NUMBER_GENERATOR": true,
-                "NANOCLR_SYSTEM_COLLECTIONS": true,
-                "NANOCLR_REFLECTION": true,
                 "REALTIME_CLOCK": false,
-                "WATCHDOG": false,
-                "ADVANCED_PROFILING": false,
-                "NETWORKING": false,
-                "FILEX_SYSTEM_SD": false,
-                "FILEX_SYSTEM_NAND": false,
-                "FILEX_SYSTEM_NOR": false,
-                "FILEX_SYSTEM_RAM": false,
-                "USB_DEVICE": false,
-                "USB_HOST": false,
-                "USB_HOST_CONTROLLER": false,
-                "USB_NETWORK": false,
-                "USB_PICTBRIDGE": false
+                "WATCHDOG": false
             }
         },
         {
@@ -262,7 +242,7 @@
             "inherits": [
                 "THREADX_AND_COMPONENT_PATHS",
                 "GCC_ARM_COMMON_BUILD",
-                "FULL_MATHEMATICS",
+                "DOUBLE_PRECISION_MATHEMATICS",
                 "PICO_SDK"
             ],
             "cacheVariables": {
@@ -274,37 +254,18 @@
                 "ARM_PROCESSOR": "cortex-m0plus",
                 "PICO_BOARD": "pico",
                 "PICO_RP2040": "1",
-                "TARGET_GIT_REPOSITORY": "https://github.com/raspberrypi/pico-sdk.git",
-                "TARGET_GIT_TAG": "2.0.0",
-                "TARGET_GIT_LOCAL_PATH": "C:/nftools/pico-sdk",
-
-                "BUILD_VERSION": "1.0.0.0",
-                "INFOSTRING": "Built with ThreadX 6.1.12",
                 "HAS_CONFIG_BLOCK": false,
                 "RANDOM_NUMBER_GENERATOR": true,
-                "NANOCLR_SYSTEM_COLLECTIONS": true,
-                "NANOCLR_REFLECTION": true,
                 "REALTIME_CLOCK": false,
                 "WATCHDOG": false,
-                "ADVANCED_PROFILING": false,
-
-                "GRAPHICS_SUPPORT": true,
-                "TOUCH_DISPLAY_SUPPORT": false,
-
-                "FILEX_SYSTEM_SD": false,
-                "FILEX_SYSTEM_NAND": false,
-                "FILEX_SYSTEM_NOR": false,
-                "FILEX_SYSTEM_RAM": false,
-
-                "USB_DEVICE": false,
-                "USB_HOST": false,
-                "USB_HOST_CONTROLLER": false,
-                "USB_NETWORK": false,
-                "USB_PICTBRIDGE": false,
-                "NETWORKING": false,
-
                 "HARD_FAULT_DEBUG_HANDLER": true,
-                "CFG_USB_USE_DTR": false
+                "GRAPHICS_HEAP_FAST": false,
+                "CFG_USB_USE_DTR": false,
+                "CAN_SUPPORT": false,
+                "ONE_WIRE": false,
+                "IO_HASHING": false,
+                "CRYPTOGRAPHY": false,
+                "BLUETOOTH": false
             }
         },
         {
@@ -314,7 +275,7 @@
             "inherits": [
                 "THREADX_AND_COMPONENT_PATHS",
                 "GCC_ARM_COMMON_BUILD",
-                "FULL_MATHEMATICS",
+                "DOUBLE_PRECISION_MATHEMATICS",
                 "PICO_SDK"
             ],
             "cacheVariables": {
@@ -326,41 +287,78 @@
                 "ARM_PROCESSOR": "cortex-m33",
                 "PICO_BOARD": "pico2",
                 "PICO_RP2350": "1",
-                "TARGET_GIT_REPOSITORY": "https://github.com/raspberrypi/pico-sdk.git",
-                "TARGET_GIT_TAG": "2.0.0",
-                "TARGET_GIT_LOCAL_PATH": "C:/nftools/pico-sdk",
                 "SECURE_CODE": false,
-
-                "BUILD_VERSION": "1.0.0.0",
-                "INFOSTRING": "Built with ThreadX 6.1.12",
                 "HAS_CONFIG_BLOCK": false,
                 "RANDOM_NUMBER_GENERATOR": true,
-                "NANOCLR_SYSTEM_COLLECTIONS": true,
-                "NANOCLR_REFLECTION": true,
-
                 "REALTIME_CLOCK": false,
                 "WATCHDOG": false,
-
-                "ADVANCED_PROFILING": false,
                 "HARD_FAULT_DEBUG_HANDLER": true,
-
-                "NETWORKING": false,
                 "GRAPHICS_HEAP_FAST": false,
                 "CFG_USB_USE_DTR": false,
                 "CAN_SUPPORT": false,
                 "ONE_WIRE": false,
                 "IO_HASHING": false,
                 "CRYPTOGRAPHY": false,
-                "WIFI": false,
                 "BLUETOOTH": false
             }
         },
-        //
+        // --------------------
+        // Network Support  
+        // --------------------
+        {
+            "name": "NETWORKING",
+            "description": "Support for network",
+            "hidden": true,
+            "cacheVariables": {
+                "NETWORKING_SUPPORT": true,
+                "LWIP_VERSION": "STABLE-2_2_1_RELEASE",
+                "MBEDTLS_VERSION": "mbedtls-3.6.3"
+            }
+        },
+        {
+            "name": "WiFI_CYW43",
+            "description": "Support for wifi network",
+            "hidden": true,
+            "cacheVariables": {
+                "WIFI_SUPPORT": true,
+                "WIFI_MODULE": "CYW43"
+            }
+        },
+        // --------------------
+        // File Support
+        // --------------------
+        {
+            "name": "FILE_SYSTEM",
+            "description": "Support for network",
+            "hidden": true,
+            "cacheVariables": {
+                "FILE_SYSTEM_SUPPORT": true,
+                "FILEX_SYSTEM_SD": true,
+                "FILEX_SYSTEM_NAND": true,
+                "FILEX_SYSTEM_NOR": false,
+                "FILEX_SYSTEM_RAM": false
+            }
+        },
+        // --------------------
+        // Usb Support
+        // --------------------
+        {
+            "name": "USB_SUPPORT",
+            "description": "Support for network",
+            "hidden": true,
+            "cacheVariables": {
+                "USB_SUPPORT": true,
+                "USB_DEVICE": true,
+                "USB_HOST": false,
+                "USB_HOST_CONTROLLER": false
+            }
+        },
+        // --------------------
         // Displays
-        //
+        // --------------------
         {
             "name": "MB1315A(ST)",
-            "description": "https://www.st.com/resource/en/schematic_pack/mb1315-default-a02_schematic.pdf",
+            "description": "Daughter card of ST Development board - https://www.st.com/resource/en/schematic_pack/mb1315-default-a02_schematic.pdf",
             "hidden": true,
             "cacheVariables": {
                 "GRAPHICS_SUPPORT": true,
@@ -396,7 +394,7 @@
         },
         {
             "name": "Waveshare-LCD-1.14",
-            "description": "https://www.waveshare.com/SPI-LCD-1.14.htm",
+            "description": "Designed for Pico series format - https://www.waveshare.com/SPI-LCD-1.14.htm",
             "hidden": true,
             "cacheVariables": {
                 "GRAPHICS_SUPPORT": true,
@@ -404,25 +402,21 @@
                 "TOUCH_DISPLAY_SUPPORT": false,
                 "GRAPHICS_LCD": "SPI-LCD-1.14V2-ST7789VW.cpp",
                 "LCD_WIDTH": "240",
-                "LCD_HEIGHT": "135",
-                "LCD_BACKLIGHT": "13",
-                "LCD_RESET": "12",
-                "LDC_DC": "8",
-                "SPI_BUS": "1",
-                "SPI_TX": "11",
-                "SPI_CLK": "10",
-                "SPI_CS": "9"
+                "LCD_HEIGHT": "135"
             }
         },
         {
             "name": "BUYDISPLAY-ER-TFTM028",
-            "description": "https://www.buydisplay.com/2-8-inch-tft-touch-shield-for-arduino-w-capacitive-touch-screen-module",
+            "description": "Pico https://www.buydisplay.com/2-8-inch-tft-touch-shield-for-arduino-w-capacitive-touch-screen-module",
             "hidden": true,
             "cacheVariables": {
                 "GRAPHICS_SUPPORT": true,
-                "TOUCH_DISPLAY_SUPPORT": true,
                 "GRAPHICS_LCD": "SPI-LCD-ER-TFTM028-4.cpp",
                 "INTERFACE_TYPE": "SPI",
+                "LCD_WIDTH": "240",
+                "LCD_HEIGHT": "320",
+
+                "TOUCH_DISPLAY_SUPPORT": true,
                 "TOUCH_INTERFACE_CONTROLLER": "FT6X06.cpp",
                 "TOUCH_INTERFACE_DRIVER": "I2C_To_TouchPanel.cpp",
                 "TOUCH_INTERFACE_BUS": "1",
@@ -431,43 +425,43 @@
                 "TOUCH_INTERFACE_WIDTH": "240",
                 "TOUCH_INTERFACE_HEIGHT": "320",
                 "TOUCH_INVERT_X": true,
-                "TOUCH_INVERT_Y": true,
-
-                "LCD_WIDTH": "240",
-                "LCD_HEIGHT": "320",
-                "LCD_BACKLIGHT": "26",
-                "LCD_RESET": "27",
-                "LDC_DC": "16",
-
+                "TOUCH_INVERT_Y": true
+            }
+        },
+        // --------------------
+        // Interfaces
+        // --------------------
+        {
+            "name": "RP2XXX_TFT_SPI0",
+            "description": "SPI Interface for RP2040 and RP2350",
+            "hidden": true,
+            "cacheVariables": {
                 "SPI_BUS": "0",
                 "SPI_TX": "19",
                 "SPI_CLK": "18",
-                "SPI_CS": "17"
+                "SPI_CS": "17",
+                "LCD_BACKLIGHT": "26",
+                "LCD_RESET": "27",
+                "LDC_DC": "16"
             }
         },
         {
-            "name": "OLED_SSD1306",
-            "description": "https://core-electronics.com.au/piicodev-oled-display-module-128x64-ssd1306.html",
+            "name": "RP2XXX_TFT_SPI1",
+            "description": "SPI Interface for RP2040 and RP2350",
             "hidden": true,
             "cacheVariables": {
-                "GRAPHICS_SUPPORT": true,
-                "TOUCH_DISPLAY_SUPPORT": false,
-                "GRAPHICS_LCD": "SSD1306.cpp",
-                "INTERFACE_TYPE": "I2C",
-                "LCD_WIDTH": "128",
-                "LCD_HEIGHT": "64"
+                "SPI_BUS": "1",
+                "SPI_TX": "11",
+                "SPI_CLK": "10",
+                "SPI_CS": "9",
+                "LCD_BACKLIGHT": "13",
+                "LCD_RESET": "12",
+                "LDC_DC": "8"
             }
         },
-        //
-        // Flash configurations
-        //
-        // W25Qxxxx Series
-        // Program 1 to 256 bytes per programmable page,
-        // Pages can be erased in
-        // Groups of 16  (4KB sector erase)
-        // Groups of 128 (32KB block erase)
-        // *Groups of 256 (64KB block erase)
-        // Or the entire chip (chip erase)
+        // --------------------
+        // Flash chips
+        // --------------------
         {
             "name": "W25Q16JV",
             "description": "2MB Flash chip as used by Pico",
@@ -507,11 +501,9 @@
                 "PICO_FLASH_SIZE_BYTES": "16777216"
             }
         },
-        //
-        // PSRAM Configurations
-        //
-        // APSxx04L - Frequencies up to 133MHz
-        // Seamless self-managed refresh mechanism,does not require the support of DRAM refresh
+        // --------------------
+        // Psram chips
+        // --------------------
         {
             "name": "APS6404L",
             "description": "8MB PSRAM chip",
@@ -523,85 +515,120 @@
             }
         },
         //
-        // Configurations to build
+        // Board Configurations
         //
         {
-            "name": "RP2040 + Waveshare LCD-1.14",
+            "name": "cfg-RP2040 + Waveshare LCD-1.14",
             "description": "Pico2 board with 1.14 inch LCD",
             "hidden": false,
             "inherits": [
                 "RP2040",
+                "FULL_FRAMEWORK",
                 "Waveshare-LCD-1.14",
                 "DEBUG"
             ]
         },
         {
-            "name": "RP2350 + Waveshare LCD-1.14",
+            "name": "cfg-RP2350 + Waveshare LCD-1.14",
             "description": "Pico2 board with 1.14 inch LCD",
             "hidden": false,
             "inherits": [
                 "RP2350",
+                "RP2XXX_TFT_SPI0",
+                "FULL_FRAMEWORK",
                 "W25Q32RV",
                 "Waveshare-LCD-1.14",
                 "DEBUG"
             ]
         },
         {
-            "name": "RP2350(16MB,8MB) + Waveshare LCD-1.14",
+            "name": "cfg-RP2350(16MB,8MB) + Waveshare LCD-1.14",
             "description": "Pico2 board with 1.14 inch LCD",
             "hidden": false,
             "inherits": [
                 "RP2350",
+                "RP2XXX_TFT_SPI0",
+                "FULL_FRAMEWORK",
                 "W25Q128JV",
                 "APS6404L",
                 "Waveshare-LCD-1.14",
-                "DEBUG"
+                "NETWORKING"
             ]
         },
         {
-            "name": "RP2350 + OLED_SSD1306",
+            "name": "cfg-RP2350 + BuyDisplay-ER-TFTM028",
             "description": "Pico2 board with 2.8 inch LCD and capacitive touch",
             "hidden": false,
             "inherits": [
                 "RP2350",
-                "OLED_SSD1306",
-                "DEBUG"
-            ]
-        },
-        {
-            "name": "RP2350 + BuyDisplay-ER-TFTM028",
-            "description": "Pico2 board with 2.8 inch LCD and capacitive touch",
-            "hidden": false,
-            "inherits": [
-                "RP2350",
+                "RP2XXX_TFT_SPI1",
+                "FULL_FRAMEWORK",
+                "W25Q32RV",
                 "BUYDISPLAY-ER-TFTM028",
+                "NETWORKING",
                 "DEBUG"
             ]
         },
         {
-            "name": "RP2350(16MB,8MB) + BuyDisplay-ER-TFTM028",
-            "description": "Pico2 board with 2.8 inch LCD and capacitive touch",
+            "name": "cfg-RP2350(16MB)(8MB)(W)(BuyDisplay-ER-TFTM028)",
+            "description": "Pico2 board with 16MB flash and 8 MB PSRAM, 2.8 inch LCD and capacitive touch",
             "hidden": false,
             "inherits": [
                 "RP2350",
+                "RP2XXX_TFT_SPI1",
+                "FULL_FRAMEWORK",
                 "W25Q128JV",
                 "APS6404L",
                 "BUYDISPLAY-ER-TFTM028",
-                "DEBUG"
+                "NETWORKING",
+                "WiFI_CYW43"
             ]
         },
         {
-            "name": "STM32H7B3I + MB1315A(ST)",
+            "name": "cfg-STM32H7B3I + MB1315A(ST)",
             "description": "STM32H7B3I with Display",
             "hidden": false,
             "inherits": [
                 "STM32H7B3I_DK",
-                "MB1315A(ST)",
-                "DEBUG"
+                "FULL_FRAMEWORK",
+                "MB1315A(ST)"
             ]
         }
 
     ],
+    // buildPresets OVERRIDE display of ' "hidden": false ' configurePresets
     "buildPresets": [
+        {
+            "name": "debug",
+            "configurePreset": "DEBUG"
+        },
+        {
+            "name": "release",
+            "configurePreset": "RELEASE"
+        },
+        {
+            "name": "advanced_profiling",
+            "configurePreset": "ADVANCED_PROFILING"
+        },
+        {
+            "name": "RP2350(16MB)(8MB)(W)(BuyDisplay-ER-TFTM028)-Debug",
+            "configurePreset": "cfg-RP2350(16MB)(8MB)(W)(BuyDisplay-ER-TFTM028)",
+            "inherits": "debug"
+        },
+        {
+            "name": "RP2350(16MB)(8MB)(W)(BuyDisplay-ER-TFTM028)",
+            "configurePreset": "cfg-RP2350(16MB)(8MB)(W)(BuyDisplay-ER-TFTM028)",
+            "inherits": "release"
+        },
+        {
+            "name": "STM32H7B3I + MB1315A(ST)-Debug",
+            "configurePreset": "cfg-STM32H7B3I + MB1315A(ST)",
+            "inherits": "debug"
+        },
+        {
+            "name": "STM32H7B3I + MB1315A(ST)",
+            "configurePreset": "cfg-STM32H7B3I + MB1315A(ST)",
+            "inherits": "release"
+        }
     ]
 }

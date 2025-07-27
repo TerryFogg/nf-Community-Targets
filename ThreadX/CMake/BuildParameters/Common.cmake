@@ -26,6 +26,8 @@
     target_compile_definitions(nanoCLR PUBLIC -DPLATFORMNAMESTRING=\"${TARGET_FAMILY}\")
     target_compile_definitions(nanoCLR PUBLIC -DOEMSYSTEMINFOSTRING=\"${OEM}\")
 
+
+
 # Setup the type of build to customise elements of the CLR
     if(CMAKE_BUILD_TYPE STREQUAL "Debug") 
         target_compile_definitions(nanoCLR PUBLIC -DNANOCLR_ENABLE_SOURCELEVELDEBUGGING)
@@ -46,16 +48,23 @@
     else()
         target_compile_definitions(nanoCLR PUBLIC -DNANOCLR_SYSTEM_COLLECTIONS=0)
     endif()
-    if(NF_FEATURE_LIGHT_MATH)
+
+    if (FEATURE_LIGHT_MATHEMATICS AND FLOATING_POINT_MATHEMATICS)
+         message(FATAL_ERROR "Cannot have both LIGHT MATHEMATICS AND FLOATING POINT MATHEMATICS")
+         return()
+    endif()
+
+    if(FEATURE_LIGHT_MATHEMATICS)
         target_compile_definitions(nanoCLR PUBLIC -DNANOCLR_LIGHT_MATH=1)
     else()
         target_compile_definitions(nanoCLR PUBLIC -DNANOCLR_LIGHT_MATH=0)
     endif()
-        if(DP_FLOATINGPOINT)
+    if(FLOATING_POINT_MATHEMATICS)
         target_compile_definitions(nanoCLR PUBLIC -DP_FLOATINGPOINT=1)
     else()
         target_compile_definitions(nanoCLR PUBLIC -DP_FLOATINGPOINT=0)
     endif()
+
    if(HAS_CONFIG_BLOCK)
         target_compile_definitions(nanoCLR PUBLIC -DHAS_CONFIG_BLOCK=1)
     else()
@@ -93,6 +102,19 @@
               target_compile_definitions(nanoCLR PUBLIC -DFILEX_SYSTEM_RAM=TRUE)
         endif()
     endif()
+
+# Common Networking definitions
+    if(NETWORKING_SUPPORT)
+            target_compile_definitions(nanoCLR PUBLIC -DNETWORKING=TRUE)
+            target_compile_definitions(nanoCLR PUBLIC -DNX_ENABLE_INTERFACE_CAPABILITY=TRUE)
+            
+    endif()
+ # Common Networking definitions
+    if(WIFI_SUPPORT)
+            target_compile_definitions(nanoCLR PUBLIC -DWIFI=TRUE)
+            target_compile_definitions(nanoCLR PUBLIC -DWIFI_DEVICE={WIFI_MODULE})
+    endif()
+
 
 # Common use button defintion
     if(HAS_A_USER_BUTTON)
@@ -137,7 +159,7 @@
           target_compile_definitions(nanoCLR PUBLIC -DVIDEO_VERTICAL_FRONT_PORCH=${VIDEO_VERTICAL_FRONT_PORCH})
 
           target_compile_definitions(nanoCLR PUBLIC -DGRAPHICS_HEAP_FAST=${GRAPHICS_HEAP_FAST})
-else()
+    else()
           target_compile_definitions(nanoCLR PUBLIC -DNANOCLR_GRAPHICS=FALSE)
     endif()
 

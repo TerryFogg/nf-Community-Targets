@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
@@ -71,7 +71,6 @@ void nanoHAL_Initialize()
 void nanoHAL_Uninitialize(bool isPoweringDown)
 {
     (void)isPoweringDown;
-    SOCKETS_CloseConnections();
     BlockStorageList_UnInitializeDevices();
     CPU_GPIO_Uninitialize();
     Events_Uninitialize();

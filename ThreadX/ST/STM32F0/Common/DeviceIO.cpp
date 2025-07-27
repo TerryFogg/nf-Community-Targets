@@ -2,7 +2,7 @@
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
-#include "DeviceIO.h"
+#include "System.Device.IO.h"
 #include "board.h"
 
 #pragma region STM32 definitions

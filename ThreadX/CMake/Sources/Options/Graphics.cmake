@@ -1,4 +1,4 @@
-#
+﻿#
 # Copyright (c) .NET Foundation and Contributors
 # See LICENSE file in the project root for full license information.
 #
@@ -9,6 +9,7 @@
              ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Displays
              ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Native
  )
+
  list(APPEND GRAPHICS_SOURCES
              ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Core/Graphics.cpp
              ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Core/GraphicsDriver.cpp
@@ -79,3 +80,36 @@
              ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_Font.cpp
              ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/Graphics_Memory.cpp
  )
+
+ # Touch Display
+if(TOUCH_DISPLAY_SUPPORT)
+     list(APPEND TOUCH_INCLUDES
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics
+                ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/TouchPanel/Core
+                ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/TouchPanel/Devices
+     )
+    list(APPEND TOUCH_SOURCES
+                ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_TouchEventProcessor.cpp
+                ${CMAKE_SOURCE_DIR}/src/nanoFramework.Graphics/TouchPanel/Core/TouchPanel.cpp
+
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/${TOUCH_INTERFACE_CONTROLLER}
+                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/${TOUCH_INTERFACE_DRIVER}
+    )
+endif()
+
+if(GRAPHICS_SUPPORT AND NOT TOUCH_DISPLAY_SUPPORT)
+    # If the Graphics option is selected there are included references to touch that have to be satisfied, although they are not required.
+    list(APPEND GRAPHICS_SOURCES ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/TouchStubs.cpp )
+endif()
+
+
+ list(APPEND OPTIONAL_INCLUDES
+     ${GRAPHICS_INCLUDES}
+     ${TOUCH_INCLUDES}
+)
+
+list(APPEND OPTIONAL_SOURCES
+     ${GRAPHICS_SOURCES}
+     ${TOUCH_SOURCES}
+)
+

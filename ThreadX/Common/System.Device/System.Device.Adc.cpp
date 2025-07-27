@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
@@ -6,8 +6,8 @@
 #include "sys_dev_adc_native.h"
 #include <tx_api.h>
 #include <tx_port.h>
-#include "DeviceIO.h"
-#include "Device.h"
+#include "System.Device.IO.h"
+#include "System.Device.h"
 
 HRESULT Library_sys_dev_adc_native_System_Device_Adc_AdcController::NativeInit___VOID(CLR_RT_StackFrame &stack)
 {

@@ -5,6 +5,10 @@
 // See LICENSE file in the project root for full license information.
 //
 
+
+#include <nanoCLR_Interop.h>
+
+
 // Declaration of RTOS thread
 void ReceiverThread(void const *argument);
 

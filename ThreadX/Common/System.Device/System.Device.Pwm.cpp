@@ -5,8 +5,8 @@
 
 #include "nanoCLR_Types.h"
 #include "sys_dev_pwm_native.h"
-#include "DeviceIO.h"
-#include "Device.h"
+#include "System.Device.IO.h"
+#include "System.Device.h"
 
 HRESULT Library_sys_dev_pwm_native_System_Device_Pwm_PwmChannel::NativeInit___VOID(CLR_RT_StackFrame &stack)
 {

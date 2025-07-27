@@ -3,8 +3,8 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include "Device.h"
-#include "DeviceIO.h"
+#include "System.Device.h"
+#include "System.Device.IO.h"
 
 #define NOT_FOUND -1
 
@@ -131,3 +131,13 @@ void Device::CreateSDChannelList(SDPin *BoardSDChannels, int BoardnumberOfSDChan
     NumberOfSDChannels = BoardnumberOfSDChannels;
 }
 #endif
+#ifdef INCLUDE
+static Device::SDPin *SDChannels;
+static int NumberOfSDChannels;
+void Device::CreateSDChannelList(SDPin *BoardSDChannels, int BoardnumberOfSDChannels)
+{
+    SDChannels = BoardSDChannels;
+    NumberOfSDChannels = BoardnumberOfSDChannels;
+}
+#endif
+

@@ -4,20 +4,11 @@
 #
 
 # NOT USED
- #    ${CMAKE_SOURCE_DIR}/src/PAL/Lwip
- #    ${CMAKE_SOURCE_DIR}/src/PAL/COM/sockets/ssl/mbedTLS
- #    ${CMAKE_SOURCE_DIR}/src/PAL/COM/sockets/ssl
- #    ${CMAKE_SOURCE_DIR}/src/PAL/COM/sockets
  #    ${CMAKE_SOURCE_DIR}/src/CLR/nanoRingBuffer/nanoRingBuffer.c
 
 # NOT USED (Yet)
  #    ${CMAKE_SOURCE_DIR}/src/nanoFramework.Device.Can/nf_device_can_native.cpp
  #    ${CMAKE_SOURCE_DIR}/src/nanoFramework.Device.OneWire/nf_dev_onewire.cpp
- #    ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.IO.Hashing/nf_sys_io_hashing.cpp
-
- #    ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.Security.Cryptography/nf_sys_sec_cryptography.cpp
- #    ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.Security.Cryptography/nf_sys_sec_cryptography_System_Security_Cryptography_HMACSHA256.cpp
-
 
  #    ${CMAKE_SOURCE_DIR}/src/System.IO.Ports/sys_io_ser_native_System_IO_Ports_SerialPort__.cpp
 
@@ -42,8 +33,14 @@
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.ResourceManager
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.Runtime.Native
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.Collections
+                    ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.IO.Hashing
+                   # ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.Security.Cryptography
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.Text
                     ${CMAKE_SOURCE_DIR}/src/PAL/Include
+                    ${CMAKE_SOURCE_DIR}/src/PAL/COM/sockets
+                    ${CMAKE_SOURCE_DIR}/src/PAL/COM/sockets/ssl
+                    ${CMAKE_SOURCE_DIR}/src/PAL/COM/sockets/ssl/mbedTLS
+                    ${CMAKE_SOURCE_DIR}/src/PAL/Lwip
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.Runtime.Events
                     ${CMAKE_SOURCE_DIR}/src/System.Device.Adc
                     ${CMAKE_SOURCE_DIR}/src/System.Device.Dac
@@ -53,7 +50,7 @@
                     ${CMAKE_SOURCE_DIR}/src/System.Device.I2s
                     ${CMAKE_SOURCE_DIR}/src/System.Device.Pwm
                     ${CMAKE_SOURCE_DIR}/src/System.Device.Spi
-                    ${CMAKE_SOURCE_DIR}/src/System.Device.UsbStream
+                    ${CMAKE_SOURCE_DIR}/src/System.Device.Usb
                     ${CMAKE_SOURCE_DIR}/src/System.IO.Ports
                     ${CMAKE_SOURCE_DIR}/src/System.IO.FileSystem
                     ${CMAKE_SOURCE_DIR}/src/System.Net
@@ -184,7 +181,7 @@
 #                    ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Boot.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Capabilites.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_ConfigurationManager.c
-                    ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_ConfigurationManager_stubs.c
+                    #${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_ConfigurationManager_stubs.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_SystemEvents.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_SystemInformation.cpp
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Time.cpp
@@ -208,12 +205,16 @@
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.Collections/nf_system_collections_System_Collections_Hashtable__HashtableEnumerator.cpp
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.Collections/nf_system_collections_System_Collections_Queue.cpp
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.Collections/nf_system_collections_System_Collections_Stack.cpp
+                    ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.IO.Hashing/nf_sys_io_hashing.cpp
+                   # ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.Security.Cryptography/nf_sys_sec_cryptography.cpp
+                   # ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.Security.Cryptography/nf_sys_sec_cryptography_System_Security_Cryptography_Aes.cpp
+                   # ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.Security.Cryptography/nf_sys_sec_cryptography_System_Security_Cryptography_HMACSHA256.cpp
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.Text/nf_system_text.cpp
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.Text/nf_system_text_System_Text_UTF8Decoder.cpp
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.Text/nf_system_text_System_Text_UTF8Encoding.cpp
                     ${CMAKE_SOURCE_DIR}/src/PAL/AsyncProcCall/AsyncCompletions.cpp
                     ${CMAKE_SOURCE_DIR}/src/PAL/AsyncProcCall/AsyncContinuations.cpp
-                    ${CMAKE_SOURCE_DIR}/src/PAL/AsyncProcCall/Async_stubs.cpp
+                    #${CMAKE_SOURCE_DIR}/src/PAL/AsyncProcCall/Async_stubs.cpp
                     ${CMAKE_SOURCE_DIR}/src/PAL/BlockStorage/nanoPAL_BlockStorage.c
                     ${CMAKE_SOURCE_DIR}/src/PAL/COM/COM_stubs.c
                     ${CMAKE_SOURCE_DIR}/src/PAL/COM/GenericPort_stdio.c
@@ -221,8 +222,11 @@
                     ${CMAKE_SOURCE_DIR}/src/PAL/Events/nanoPAL_Events.cpp
                     ${CMAKE_SOURCE_DIR}/src/PAL/Events/nanoPAL_Events_driver.cpp
                     ${CMAKE_SOURCE_DIR}/src/PAL/Events/nanoPAL_Events_functions.cpp
-                    ${CMAKE_SOURCE_DIR}/src/PAL/nanoPAL_Network_stubs.cpp
-                    ${CMAKE_SOURCE_DIR}/src/PAL/Profiler/nanoPAL_PerformanceCounters_stubs.cpp
+                    ${CMAKE_SOURCE_DIR}/src/PAL/FileSystem/nanoPAL_FileSystem.cpp
+#                    ${CMAKE_SOURCE_DIR}/src/PAL/Lwip/lwIP_Sockets_functions.cpp
+#                    ${CMAKE_SOURCE_DIR}/src/PAL/Lwip/lwIP_Sockets.cpp
+                    #${CMAKE_SOURCE_DIR}/src/PAL/Profiler/nanoPAL_PerformanceCounters_stubs.cpp
+              #     ${CMAKE_SOURCE_DIR}/src/PAL/nanoPAL_Network_stubs.cpp
                     ${CMAKE_SOURCE_DIR}/src/System.Device.Adc/sys_dev_adc_native.cpp
                     ${CMAKE_SOURCE_DIR}/src/System.Device.Dac/sys_dev_dac_native.cpp
                     ${CMAKE_SOURCE_DIR}/src/System.Device.Gpio/sys_dev_gpio_native.cpp
@@ -236,17 +240,16 @@
                     #${CMAKE_SOURCE_DIR}/src/System.Device.Spi/nanoHAL_Spi.cpp
                     #${CMAKE_SOURCE_DIR}/src/System.Device.Spi/sys_dev_spi_native_System_Device_Spi_SpiBusInfo.cpp
                     #${CMAKE_SOURCE_DIR}/src/System.Device.Spi/sys_dev_spi_native_System_Device_Spi_SpiDevice.cpp
-
                     ${CMAKE_SOURCE_DIR}/src/System.IO.Ports/sys_io_ser_native.cpp
                     ${CMAKE_SOURCE_DIR}/src/System.Runtime.Serialization/nf_system_runtime_serialization.cpp
                     ${CMAKE_SOURCE_DIR}/src/System.Runtime.Serialization/nf_system_runtime_serialization_System_Runtime_Serialization_Formatters_Binary_BinaryFormatter.cpp
-
         )
 
 # Targets
         list(APPEND NF_INTERPRETER_INCLUDES 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/${TARGET_BOARD}
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Cryptography
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics																																																																																																																																																																																							
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other																																																																																																																																																																																							
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/RequiredNotUsed
@@ -254,10 +257,10 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/DeviceIO
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/WireProtocol
         )
         list(APPEND NF_INTERPRETER_SOURCES 
@@ -268,8 +271,7 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/nanoHAL_Boot.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/sys_calls.c
 
-                    # These device I/O are typical and have not been made optional
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/Device.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Adc.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Dac.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Gpio.cpp
@@ -284,20 +286,30 @@
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.Ports/System.IO.Ports.cpp
 
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads/ManagedThreadSupport.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Memory.cpp
+                    
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetHAL_Rtos.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetHAL_Time.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetPAL_Events.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetPAL_Time.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Thread_Creation.cpp
+
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads/CLRThread.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads/DeviceIOThreads.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads/ReceiverThread.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads/Thread_Creation.cpp
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/WireProtocol_MonitorCommands.c
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/WireProtocol_Receiver.cpp
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/DeviceIO.cpp																																																																																																																																																																																							
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/Delays.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/targetHAL.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/DeviceIO.cpp																																																																																																																																																																																							
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/DeviceWifi.Cyw43.cpp																																																																																																																																																																																							
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/driver_pico_w.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/FlashDriver.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/nanoSupport_CRC32.c
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/NetworkIO.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/targetHAL.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/WireProtocol_HAL_Interface.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/wp_Communications.c
         )  

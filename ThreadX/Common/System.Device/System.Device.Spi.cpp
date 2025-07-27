@@ -6,8 +6,8 @@
 #include "nanoCLR_Types.h"
 #include "CPU_SPI_DEcl.h"
 #include "board.h"
-#include "DeviceIO.h"
-#include "Device.h"
+#include "System.Device.IO.h"
+#include "System.Device.h"
 #include "sys_dev_spi_native.h"
 #include <string.h>
 #include <targetPAL.h>

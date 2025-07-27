@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 //
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
@@ -26,8 +26,6 @@ typedef enum
     FILE_WRITE_MULTIPLE_BLOCK = 8,
     FILE_DMA = 16
 } File_Read_Type;
-
-
 
 typedef enum
 {

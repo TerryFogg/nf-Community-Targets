@@ -1,35 +1,69 @@
-//
-// Copyright (c) .NET Foundation and Contributors
-// See LICENSE file in the project root for full license information.
-//
+﻿/***************************************************************************
+ * Copyright (c) 2024 Microsoft Corporation
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
+ *
+ * SPDX-License-Identifier: MIT
+ **************************************************************************/
 
-// clang-format off
+/**************************************************************************/
+/**************************************************************************/
+/**                                                                       */
+/** NetX Component                                                        */
+/**                                                                       */
+/**   User Specific                                                       */
+/**                                                                       */
+/**************************************************************************/
+/**************************************************************************/
 
 /**************************************************************************/
 /*                                                                        */
-/*       Copyright (c) Microsoft Corporation. All rights reserved.        */
+/*  PORT SPECIFIC C INFORMATION                            RELEASE        */
 /*                                                                        */
-/*       This software is licensed under the Microsoft Software License   */
-/*       Terms for Microsoft Azure RTOS. Full text of the license can be  */
-/*       found in the LICENSE file at https://aka.ms/AzureRTOS_EULA       */
-/*       and in the root directory of this software.                      */
+/*    nx_user.h                                           PORTABLE C      */
+/*                                                           6.3.0        */
+/*                                                                        */
+/*  AUTHOR                                                                */
+/*                                                                        */
+/*    Yuxin Zhou, Microsoft Corporation                                   */
+/*                                                                        */
+/*  DESCRIPTION                                                           */
+/*                                                                        */
+/*    This file contains user defines for configuring NetX in specific    */
+/*    ways. This file will have an effect only if the application and     */
+/*    NetX library are built with NX_INCLUDE_USER_DEFINE_FILE defined.    */
+/*    Note that all the defines in this file may also be made on the      */
+/*    command line when building NetX library and application objects.    */
+/*                                                                        */
+/*  RELEASE HISTORY                                                       */
+/*                                                                        */
+/*    DATE              NAME                      DESCRIPTION             */
+/*                                                                        */
+/*  05-19-2020     Yuxin Zhou               Initial Version 6.0           */
+/*  09-30-2020     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1    */
+/*  08-02-2021     Yuxin Zhou               Modified comment(s), and      */
+/*                                            supported TCP/IP offload,   */
+/*                                            resulting in version 6.1.8  */
+/*  04-25-2022     Yuxin Zhou               Modified comment(s),          */
+/*                                            resulting in version 6.1.11 */
+/*  10-31-2023     Tiejun Zhou              Modified comment(s),          */
+/*                                            supported random IP id,     */
+/*                                            resulting in version 6.3.0  */
 /*                                                                        */
 /**************************************************************************/
-
-// based in nx_user.h  Azure RTOS v6.1.8
 
 #ifndef NX_USER_H
 #define NX_USER_H
-
 
 /* Define various build options for the NetX Duo port.  The application should either make changes
    here by commenting or un-commenting the conditional compilation defined OR supply the defines
    though the compiler's equivalent of the -D option.  */
 
-
 /* Override various options with default values already assigned in nx_api.h or nx_port.h. Please
    also refer to nx_port.h for descriptions on each of these options.  */
-
 
 /* Configuration options for Interface */
 
@@ -49,7 +83,9 @@
 */
 
 /* If defined, the link driver is able to specify extra capability, such as checksum offloading features. */
+/*
 #define NX_ENABLE_INTERFACE_CAPABILITY
+*/
 
 /* Configuration options for IP */
 
@@ -65,7 +101,9 @@
 
 /* Defined, NX_ENABLE_IP_RAW_PACKET_FILTER allows an application to install a filter
    for incoming raw packets. This feature is disabled by default. */
+/*
 #define NX_ENABLE_IP_RAW_PACKET_FILTER
+*/
 
 /* This define specifies the maximum number of RAW packets can be queued for receive.  The default
    value is 20.  */
@@ -84,12 +122,16 @@
 #define NX_IP_ROUTING_TABLE_SIZE 8
 */
 
+/* Defined, this option enables random IP id. By default IP id is increased by one for each packet. */
+/*
+#define NX_ENABLE_IP_ID_RANDOMIZATION
+*/
+
 /* This define specifies the maximum number of multicast groups that can be joined.
    The default value is 7.  */
 /*
 #define NX_MAX_MULTICAST_GROUPS     7
 */
-
 
 /* Configuration options for IPv6 */
 
@@ -190,7 +232,6 @@
 #define NX_PATH_MTU_INCREASE_WAIT_INTERVAL               600
 */
 
-
 /* Configuration options for Neighbor Discovery.  */
 /* Define values used for Neighbor Discovery protocol.
    The default values are suggested by RFC2461, chapter 10. */
@@ -253,7 +294,6 @@
 #define NX_IPV6_PREFIX_LIST_TABLE_SIZE  8
 */
 
-
 /* Configuration options for IPSEC */
 
 /* This define enables IPSEC in NetX Duo.  */
@@ -261,14 +301,12 @@
 #define NX_IPSEC_ENABLE
 */
 
-
 /* Configuration options for NAT */
 
 /* This define enables NAT process in NetX Duo.  */
 /*
 #define NX_NAT_ENABLE
 */
-
 
 /* Configuration options for IGMP */
 
@@ -279,7 +317,6 @@
 #define NX_DISABLE_IGMPV2
 */
 
-
 /* Configuration options for ARP */
 
 /* When defines, ARP reply is sent when address conflict occurs. */
@@ -287,7 +324,7 @@
 #define NX_ARP_DEFEND_BY_REPLY
 */
 
-/* To use the ARP collision hander to check for invalid ARP messages
+/* To use the ARP collision handler to check for invalid ARP messages
    matching existing entries in the table (man in the middle attack),
    enable this feature.  */
 /*
@@ -328,7 +365,6 @@
 #define NX_ARP_DEFEND_INTERVAL  10
 */
 
-
 /* Configuration options for TCP */
 
 /* This define specifies how the number of system ticks (NX_IP_PERIODIC_RATE) is divided to calculate the
@@ -364,7 +400,9 @@
 */
 
 /* This define specifies the maximum packets that are out of order. The default value is 8.  */
+/*
 #define NX_TCP_MAX_OUT_OF_ORDER_PACKETS 8
+*/
 
 /* This define specifies the maximum number of TCP server listen requests. The default value is 10.  */
 /*
@@ -490,14 +528,14 @@
 
 /* Configuration options for checksum */
 
-/* Defiend, this option disables checksum logic on received ICMPv4 packets.
+/* Defined, this option disables checksum logic on received ICMPv4 packets.
    Note that if NX_DISABLE_ICMP_RX_CHECKSUM is defined, this option is
    automatically defined. By default this option is not defined.*/
 /*
 #define NX_DISABLE_ICMPV4_RX_CHECKSUM
 */
 
-/* Defiend, this option disables checksum logic on received ICMPv6 packets.
+/* Defined, this option disables checksum logic on received ICMPv6 packets.
    Note that if NX_DISABLE_ICMP_RX_CHECKSUM is defined, this option is
    automatically defined. By default this option is not defined.*/
 /*
@@ -511,14 +549,14 @@
 #define NX_DISABLE_ICMP_RX_CHECKSUM
 */
 
-/* Defiend, this option disables checksum logic on transmitted ICMPv4 packets.
+/* Defined, this option disables checksum logic on transmitted ICMPv4 packets.
    Note that if NX_DISABLE_ICMP_TX_CHECKSUM is defined, this option is
    automatically defined. By default this option is not defined.*/
 /*
 #define NX_DISABLE_ICMPV4_TX_CHECKSUM
 */
 
-/* Defiend, this option disables checksum logic on transmitted ICMPv6 packets.
+/* Defined, this option disables checksum logic on transmitted ICMPv6 packets.
    Note that if NX_DISABLE_ICMP_TX_CHECKSUM is defined, this option is
    automatically defined. By default this option is not defined.*/
 /*
@@ -567,7 +605,6 @@
 #define NX_DISABLE_UDP_TX_CHECKSUM
 */
 
-
 /* Configuration options for statistics.  */
 
 /* Defined, ARP information gathering is disabled.  */
@@ -609,7 +646,6 @@
 /*
 #define NX_DISABLE_UDP_INFO
 */
-
 
 /* Configuration options for Packet Pool */
 
@@ -680,7 +716,9 @@
    to NetX Duo API for notifying the application of socket events, such as TCP connection and disconnect
    completion.  These extended notify functions are mainly used by the BSD wrapper. The default is this
    feature is disabled.  */
+/*
 #define NX_ENABLE_EXTENDED_NOTIFY_SUPPORT
+*/
 
 /* Defined, ASSERT is disabled. The default is enabled. */
 /*
@@ -711,22 +749,16 @@
 
 /* Defined, the TCP/IP offload feature is enabled.
    NX_ENABLE_INTERFACE_CAPABILITY must be defined to enable this feature.  */
+/*
 #define NX_ENABLE_TCPIP_OFFLOAD
+*/
 
-// #define NX_SECURE_ENABLE
-#define NX_SNTP_CLIENT_MIN_SERVER_STRATUM 3
-
-#define NX_DNS_CLIENT_USER_CREATE_PACKET_POOL
-#define NX_DNS_CLIENT_CLEAR_QUEUE
-
-#define NX_BSD_ENABLE_DNS
-#define NX_BSD_TCP_WINDOW     2920
-#define NX_BSD_MAX_SOCKETS    16
-#define NX_BSD_IPV4_ADDR_MAX_NUM 2
-#define NX_BSD_IPV6_ADDR_MAX_NUM 2
-#define NX_BSD_IPV4_ADDR_PER_HOST 2
-#define NX_BSD_IPV6_ADDR_PER_HOST 2
+/* Defined, the VLAN feature is enabled.
+   Note: Require driver support to use APIs from this file.
+         A quick check in driver is to search for
+         NX_LINK_RAW_PACKET_SEND. VLAN APIs are not supported if not found. */
+/*
+#define NX_ENABLE_VLAN
+*/
 
 #endif
-
-// clang-format on

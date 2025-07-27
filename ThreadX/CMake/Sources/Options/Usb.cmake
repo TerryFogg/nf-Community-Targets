@@ -998,3 +998,25 @@
 	        ${USBX_PATH}/common/usbx_pictbridge/src/ux_pictbridge_xml_function_root_xml.c
         )
      endif()
+
+list(APPEND USB_INCLUDES
+     ${CMAKE_SOURCE_DIR}/src/System.Device.UsbStream
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device
+)
+list(APPEND USB_SOURCES
+      ${CMAKE_SOURCE_DIR}/src/System.Device.UsbStream/sys_dev_usbstream_native.cpp
+     #${CMAKE_SOURCE_DIR}/src/System.Device.UsbStream/sys_dev_usbstream_native_System_Device_Usb_UsbStream_stubs.cpp
+      ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.UsbStream.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads/UsbXThread.cpp
+)
+
+
+list(APPEND OPTIONAL_INCLUDES
+     ${USBX_INCLUDES}
+     ${USB_INCLUDES}
+)
+
+list(APPEND OPTIONAL_SOURCES
+     ${USBX_SOURCES}
+     ${USB_SOURCES}
+)

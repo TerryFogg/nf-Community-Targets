@@ -78,6 +78,7 @@ pico_sdk_init()
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/hardware_watchdog/include
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/hardware_xosc/include
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_bootrom/include
+          ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_arch/include
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_double/include
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_float/include
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_int64_ops/include
@@ -96,6 +97,9 @@ pico_sdk_init()
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_time_adapter/include
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_unique_id/include
           
+          ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver
+          ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src
+          ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/firmware
 
           ${TARGET_GIT_LOCAL_PATH}/src/common/pico_usb_reset_interface_headers/include
 
@@ -125,6 +129,15 @@ pico_sdk_init()
                ${TARGET_GIT_LOCAL_PATH}/src/rp2350/pico_platform/include
           )
      endif()
+
+     # Using NetxDuo, so we only need the base other code has lwip embedded
+     # Add the base wireless sources - uses SDIO by default
+     list(APPEND RP2XXX_SOURCES
+         ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src/cyw43_ctrl.c
+         ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src/cyw43_ll.c
+         ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src/cyw43_sdio.c
+         ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src/cyw43_sdio.c
+     )
 
      # Add the TinyUsb sources
      list(APPEND RP2XXX_SOURCES

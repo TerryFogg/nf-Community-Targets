@@ -9,8 +9,8 @@
 
 #include "TouchDevice.h"
 #include "TouchInterface.h"
-#include <Device.h>
-#include <DeviceIO.h>
+#include "System.Device.h"
+#include "System.Device.IO.h"
 
 enum FT6X06_CMD : CLR_UINT8
 {

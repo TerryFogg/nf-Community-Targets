@@ -2,15 +2,14 @@
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
-
 #include "nanoCLR_Types.h"
 #include "sys_dev_i2c_native.h"
-#include "DeviceIO.h"
-#include "Device.h"
+#include "System.Device.IO.h"
+#include "System.Device.h"
+#include "ManagedThreadSupport.h"
 
 void CreateI2CWorkerThread();
-void I2CWorkingThread_entry(uint32_t parameter);
-void RelinquishToOtherManagedThreads(CLR_RT_StackFrame &stack, int64_t estimatedTransactionTimeMilliseconds);
+void I2CWorkerThread_Entry(ULONG parameter);
 
 extern TX_EVENT_FLAGS_GROUP eventsI2CWorkerThread;
 static bool WorkerThreadCreated = false;
@@ -31,7 +30,6 @@ HRESULT Library_sys_dev_i2c_native_System_Device_I2c_I2cDevice::NativeInit___VOI
             CreateI2CWorkerThread();
             WorkerThreadCreated = true;
         }
-
         CLR_RT_HeapBlock *connectionSettings = stack.This()[FIELD___connectionSettings].Dereference();
         CLR_INT32 I2Cbus = connectionSettings[I2cConnectionSettings::FIELD___busId].NumericByRef().s4;
         I2cBusSpeed I2cSpeed =
@@ -67,7 +65,10 @@ HRESULT Library_sys_dev_i2c_native_System_Device_I2c_I2cDevice::
         if (I2CTransaction.InProgress)
         {
             // Wait for previous thread to finished
-            RelinquishToOtherManagedThreads(stack, I2CTransaction.estimatedTransactionTimeMilliseconds);
+            RelinquishToOtherManagedThreads(
+                stack,
+                I2CTransaction.estimatedTransactionTimeMilliseconds,
+                Event_I2cMaster);
         }
 
         bool eventResult = true;
@@ -87,8 +88,7 @@ HRESULT Library_sys_dev_i2c_native_System_Device_I2c_I2cDevice::
             connectionSettings[I2cConnectionSettings::FIELD___deviceAddress].NumericByRef().s4;
         CLR_RT_HeapBlock_Array *readData = readSpanByte[SpanByte::FIELD___array].DereferenceArray();
         CLR_RT_HeapBlock_Array *writeData = writeSpanByte[SpanByte::FIELD___array].DereferenceArray();
-        I2CTransaction.writeOffset =
-            (writeSpanByte == NULL) ? 0 : writeSpanByte[SpanByte::FIELD___start].NumericByRef().s4;
+        I2CTransaction.writeOffset = (writeSpanByte == NULL) ? 0 : writeSpanByte[SpanByte::FIELD___start].NumericByRef().s4;
         I2CTransaction.writeSize =
             (writeSpanByte == NULL) ? 0 : writeSpanByte[SpanByte::FIELD___length].NumericByRef().s4;
         I2CTransaction.readOffset =
@@ -131,7 +131,10 @@ HRESULT Library_sys_dev_i2c_native_System_Device_I2c_I2cDevice::
         }
         if (I2CTransaction.longRunningTransaction)
         {
-            RelinquishToOtherManagedThreads(stack, I2CTransaction.estimatedTransactionTimeMilliseconds);
+            RelinquishToOtherManagedThreads(
+                stack,
+                I2CTransaction.estimatedTransactionTimeMilliseconds,
+                Event_I2cMaster);
         }
         else
         {
@@ -167,24 +170,8 @@ HRESULT Library_sys_dev_i2c_native_System_Device_I2c_I2cDevice::
     }
     NANOCLR_NOCLEANUP();
 }
-void RelinquishToOtherManagedThreads(CLR_RT_StackFrame &stack,int64_t timeoutMilliseconds)
-{
-    CLR_INT64 *timeout;
-    bool eventResult = true;
 
-    CLR_RT_HeapBlock hbTimeout;
-    hbTimeout.SetInteger(timeoutMilliseconds * TIME_CONVERSION__TO_MILLISECONDS);
-    stack.SetupTimeoutFromTicks(hbTimeout, timeout);
-
-    // Wait here until native work completes and reliquish cpu to other c# threads
-    while (eventResult)
-    {
-        g_CLR_RT_ExecutionEngine.WaitEvents(stack.m_owningThread, *timeout, Event_I2cMaster, eventResult);
-    }
-    // Pop timeout heap block from stack
-    stack.PopValue();
-}
-void I2CWorkingThread_entry(ULONG parameter)
+void I2CWorkerThread_Entry(ULONG parameter)
 {
     ULONG actual_flags;
     // Loop continually, process is resumed when a write is required by setting the flag

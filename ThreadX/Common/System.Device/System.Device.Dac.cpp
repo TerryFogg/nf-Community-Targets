@@ -4,7 +4,7 @@
 //
 
 #include "sys_dev_dac_native.h"
-#include "DeviceIO.h"
+#include "System.Device.IO.h"
 
 HRESULT
 Library_sys_dev_dac_native_System_Device_Dac_DacController::NativeInit___VOID(CLR_RT_StackFrame &stack)

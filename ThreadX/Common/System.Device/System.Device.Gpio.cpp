@@ -3,13 +3,12 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include "sys_dev_gpio_native_target.h"
 #include "sys_dev_gpio_native.h"
 #include <targetPAL.h>
 #include <corlib_native.h>
 #include "nf_rt_events_native.h"
-#include "DeviceIO.h"
-#include "Device.h"
+#include "System.Device.IO.h"
+#include "System.Device.h"
 #include "tx_api.h"
 
 typedef Library_sys_dev_gpio_native_System_Device_Gpio_PinValue PinValue;

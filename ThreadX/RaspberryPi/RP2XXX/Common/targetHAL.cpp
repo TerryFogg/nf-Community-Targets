@@ -63,6 +63,13 @@ void nanoHAL_Initialize()
     g_TouchPanel.Initialize();
 #endif
 
+
+
+ #if (NETWORKING)
+    ConfigurationManager_Initialize();
+ #endif
+
+
     HAL_CONTINUATION::InitializeList();
     HAL_COMPLETION::InitializeList();
 
@@ -80,7 +87,6 @@ void nanoHAL_Initialize()
 void nanoHAL_Uninitialize(bool isPoweringDown)
 {
     (void)isPoweringDown;
-    SOCKETS_CloseConnections();
     BlockStorageList_UnInitializeDevices();
 
     Events_Uninitialize();

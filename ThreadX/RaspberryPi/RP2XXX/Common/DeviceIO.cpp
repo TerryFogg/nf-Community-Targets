@@ -2,7 +2,7 @@
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
-#include "DeviceIO.h"
+#include "System.Device.IO.h"
 
 #pragma region System.Device.Gpio
 GpioIO::GpioIO()
@@ -695,6 +695,7 @@ CLR_INT32 SpiIO::MinimumClockFrequencyHz(CLR_INT32 controllerID)
 bool SpiIO::Initialize()
 {
     // Nothing to do,leave initialization until "Open"
+    return true;
 }
 bool SpiIO::Dispose(CLR_INT32 spi_deviceID)
 {

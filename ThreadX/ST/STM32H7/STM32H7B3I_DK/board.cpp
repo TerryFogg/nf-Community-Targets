@@ -4,8 +4,8 @@
 // See LICENSE file in the project root for full license information.
 //
 #include "PinNames.h"
-#include "DeviceIO.h"
-#include "Device.h"
+#include "System.Device.IO.h"
+#include "System.Device.h"
 #include "board.h"
 #include "SD_DoubleBufferedDMA.h"
 

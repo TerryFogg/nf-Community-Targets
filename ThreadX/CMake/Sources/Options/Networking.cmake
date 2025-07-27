@@ -36,6 +36,8 @@
         list(APPEND NETXDUO_INCLUDES 
                     ${NETXDUO_PATH}/common/inc
                     ${NETXDUO_PATH}/crypto_libraries/inc
+                    ${NETXDUO_PATH}/addons/BSD
+                    ${NETXDUO_PATH}/addons/dns
         )
         list(APPEND NETXDUO_SOURCES
 	        ${NETXDUO_PATH}/common/src/nx_arp_announce_send.c
@@ -615,6 +617,7 @@
         list(APPEND NETXDUO_INCLUDES 
                     ${NETXDUO_PATH}/nx_secure/inc
                     ${NETXDUO_PATH}/nx_secure/ports
+                    ${NETXDUO_PATH}/addons/dhcp
         )
         list(APPEND NETXDUO_SOURCES
 	        ${NETXDUO_PATH}/nx_secure/src/nx_secure_crypto_method_self_test_3des.c
@@ -923,3 +926,29 @@
 	        ${NETXDUO_PATH}/nx_secure/src/nxe_secure_x509_extension_find.c
 	        ${NETXDUO_PATH}/nx_secure/src/nxe_secure_x509_key_usage_extension_parse.c
         )
+
+# Locals
+ list(APPEND NETWORK_INCLUDES
+    ${CMAKE_SOURCE_DIR}/src/System.Device.Wifi
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Network
+)
+ list(APPEND NETWORK_SOURCES
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Network/System.Device.Network.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Network/System.Device.Network.Thread.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Network/System.Device.Network.Configuration.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Network/System.Device.Wifi.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads/NetworkThread.cpp
+)
+
+list(APPEND OPTIONAL_INCLUDES
+    ${NETXDUO_INCLUDES}
+    ${NETWORK_INCLUDES}
+)
+
+list(APPEND OPTIONAL_SOURCES
+    ${NETXDUO_SOURCES}
+    ${NETWORK_SOURCES}
+)
+
+set(NX_USER_FILE ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/target_nx_user.h CACHE STRING "Enable NX user configuration")
+

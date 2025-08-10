@@ -54,7 +54,11 @@
 #define AF_INET6  3 // IPv6 socket (UDP, TCP, etc)
 #define AF_PACKET 4 // Raw Packet type (Link Layer packets)
 
-
+class NetworkIO
+{
+  public:
+    static void Entry(NX_IP_DRIVER *driver_req_ptr);
+};
 
 #define NX_DRIVER_PHYSICAL_HEADER_REMOVE(p)                                                                            \
     do                                                                                                                 \

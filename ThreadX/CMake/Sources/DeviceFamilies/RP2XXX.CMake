@@ -40,16 +40,20 @@ pico_sdk_init()
           ${TARGET_GIT_LOCAL_PATH}/src/common/boot_picoboot_headers/include
           ${TARGET_GIT_LOCAL_PATH}/src/common/hardware_claim/include
           ${TARGET_GIT_LOCAL_PATH}/src/common/pico_base_headers/include
-          ${TARGET_GIT_LOCAL_PATH}/src/common/pico_standard_binary_info
           ${TARGET_GIT_LOCAL_PATH}/src/common/pico_bit_ops/include
           ${TARGET_GIT_LOCAL_PATH}/src/common/pico_binary_info/include
+          ${TARGET_GIT_LOCAL_PATH}/src/common/pico_standard_binary_info
           ${TARGET_GIT_LOCAL_PATH}/src/common/pico_stdlib/include
           ${TARGET_GIT_LOCAL_PATH}/src/common/pico_stdlib_headers/include
           ${TARGET_GIT_LOCAL_PATH}/src/common/pico_sync/include
           ${TARGET_GIT_LOCAL_PATH}/src/common/pico_time/include
-          ${TARGET_GIT_LOCAL_PATH}/src/common/pico_usb_reset_interface/include
           ${TARGET_GIT_LOCAL_PATH}/src/common/pico_util/include
+
+          ${TARGET_GIT_LOCAL_PATH}/src/common/pico_usb_reset_interface/include
+          ${TARGET_GIT_LOCAL_PATH}/src/common/pico_usb_reset_interface_headers/include
+
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/cmsis/include
+
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/hardware_adc/include
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/hardware_base/include
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/hardware_boot_lock/include
@@ -71,12 +75,14 @@ pico_sdk_init()
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/hardware_spi/include
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/hardware_sync_spin_lock/include
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/hardware_sync/include
-          ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/hardware_ticks/include   # check for rp2350 specific
+          ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/hardware_ticks/include                    # check for rp2350 specific
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/hardware_timer/include
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/hardware_uart/include
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/hardware_vreg/include
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/hardware_watchdog/include
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/hardware_xosc/include
+
+          ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_async_context/include
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_bootrom/include
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_arch/include
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_double/include
@@ -96,22 +102,19 @@ pico_sdk_init()
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_stdio_uart/include
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_time_adapter/include
           ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_unique_id/include
-          
           ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver
           ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src
           ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/firmware
 
-          ${TARGET_GIT_LOCAL_PATH}/src/common/pico_usb_reset_interface_headers/include
-
-          ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/include   
           ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src
           ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src/class/cdc
           ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src/common
           ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src/device
-
           ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src/portable/raspberrypi/rp2040
-     
+
           ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/DeviceIO/UsbDevice
+
+          ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/include   
      )
 
      if( "${TARGET_SERIES}" STREQUAL "RP2040")

@@ -15,7 +15,6 @@
     if (disposedState != 0)                                                                                            \
     NANOCLR_SET_AND_LEAVE(CLR_E_OBJECT_DISPOSED)
 
-
 enum DevicePinFunction
 {
     LOW_POWER,

@@ -12,6 +12,7 @@
  target_compile_definitions(nanoCLR PUBLIC -DFLASH_ERASE_SIZE=${FLASH_ERASE_SIZE})
  target_compile_definitions(nanoCLR PUBLIC -DPICO_FLASH_SIZE_BYTES=${PICO_FLASH_SIZE_BYTES})
 
+
  if(${PSRAM})
     target_compile_definitions(nanoCLR PUBLIC -DPSRAM) 
     target_compile_definitions(nanoCLR PUBLIC -DPSRAM_SIZE=${PSRAM_SIZE}) 
@@ -39,6 +40,9 @@ target_compile_definitions(nanoCLR PUBLIC -DCFG_TUSB_MCU=OPT_MCU_RP2040 -DDEBUG)
 if(CFG_USB_USE_DTR)
  target_compile_definitions(nanoCLR PUBLIC -DCFG_USB_USE_DTR) 
 endif() 
+
+# Network support using NetXDuo not LWIP
+ target_compile_definitions(nanoCLR PUBLIC -DPICO_CYW43_ARCH_HEADER=Network_Custom_Architecture.h) 
 
 #  Some options
 target_link_options(nanoCLR PUBLIC "-Wl,--print-memory-usage")

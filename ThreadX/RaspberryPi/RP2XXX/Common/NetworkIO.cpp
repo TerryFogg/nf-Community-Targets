@@ -3,9 +3,9 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include "NetworkIO.h"
+#include "System.Device.Network.h"
 
-static VOID NetworkIO::Entry(NX_IP_DRIVER *driver_req_ptr)
+NetworkIO::Entry(NX_IP_DRIVER *driver_req_ptr)
 {
 
     /* Default to successful return.  */

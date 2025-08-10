@@ -1,21 +1,14 @@
 ﻿
-#define NX_DRIVER_SOURCE
-
 #include "pico/cyw43_arch.h"
-#include "nx_driver_pico_w.h"
+#include "System.Device.Network.h"
 #include "nx_api.h"
 
-#ifdef NX_DRIVER_CONFIG
-#include NX_DRIVER_CONFIG
-#endif
-
-#include "nx_driver_framework.c"
+const char *WIFI_SSID = "198.0.0.1";
+const char *WIFI_PASSWORD = "password";
 
 #define WIFI_CONNECT_TIMEOUT 10000 /* tmieout in ms */
 #define NX_DRIVER_STACK_SIZE 1024
-
-// Interval to receive packets when there is no packet.
-// The default value is 10 ticks which is 100ms.
+#define WIFI_AUTH_TYPE       CYW43_AUTH_WPA_TKIP_PSK
 #define NX_DRIVER_THREAD_INTERVAL (NX_IP_PERIODIC_RATE / 10)
 
 void nx_driver_pico_w(NX_IP_DRIVER *driver_req_ptr);
@@ -29,7 +22,6 @@ static uint32_t pico_w_packet_send(NX_PACKET *packet_ptr);
 static TX_THREAD nx_driver_pico_w_thread;
 static UCHAR nx_driver_pico_w_thread_stack[NX_DRIVER_STACK_SIZE];
 static UCHAR nx_driver_pico_w_link_up;
-
 static UCHAR buffer[1514];
 
 void nx_driver_pico_w(NX_IP_DRIVER *driver_req_ptr)
@@ -47,18 +39,16 @@ void nx_driver_pico_w(NX_IP_DRIVER *driver_req_ptr)
 
     Network_Request_Processing(driver_req_ptr);
 }
-
 struct pbuf;
-uint32_t16_t pbuf_copy_partial(const struct pbuf *p, void *dataptr, uint32_t16_t len, uint32_t16_t offset)
+uint32_t pbuf_copy_partial(const struct pbuf *p, void *dataptr, uint32_t len, uint32_t offset)
 {
     (void)p;
     (void)dataptr;
     (void)len;
-    (void)offset
+    (void)offset;
         /* Stub function as it will never hit. */
         return 0;
 }
-
 static void pico_w_thread_entry(ULONG thread_input)
 {
     NX_IP *ip_ptr = nx_driver_information.nx_driver_information_ip_ptr;
@@ -80,7 +70,6 @@ static void pico_w_thread_entry(ULONG thread_input)
         tx_thread_sleep(NX_DRIVER_THREAD_INTERVAL);
     }
 }
-
 int cyw43_tcpip_link_status(cyw43_t *self, int itf)
 {
     if (nx_driver_pico_w_link_up)
@@ -88,7 +77,6 @@ int cyw43_tcpip_link_status(cyw43_t *self, int itf)
     else
         return cyw43_wifi_link_status(self, itf);
 }
-
 void cyw43_cb_tcpip_init(cyw43_t *self, int itf)
 {
     if (!nx_driver_pico_w_link_up)
@@ -115,7 +103,7 @@ void cyw43_cb_tcpip_set_link_down(cyw43_t *self, int itf)
 {
     nx_driver_pico_w_link_up = NX_FALSE;
 }
-void cyw43_cb_process_ethernet(void *cb_data, int itf, size_t len, const uint32_t8_t *buf)
+void cyw43_cb_process_ethernet(void *cb_data, int itf, size_t len, const uint32_t *buf)
 {
     NX_PACKET *packet_ptr;
     if (!nx_driver_pico_w_link_up)
@@ -153,7 +141,6 @@ void cyw43_cb_process_ethernet(void *cb_data, int itf, size_t len, const uint32_
     // Everything is OK, transfer the packet to NetX.
     nx_driver_transfer_to_netx(nx_driver_information.nx_driver_information_ip_ptr, packet_ptr);
 }
-
 uint32_t pico_w_initialize(NX_IP_DRIVER *driver_req_ptr)
 {
     UCHAR mac[6];
@@ -185,7 +172,6 @@ uint32_t pico_w_initialize(NX_IP_DRIVER *driver_req_ptr)
 
     return NX_SUCCESS;
 }
-
 uint32_t pico_w_enable(NX_IP_DRIVER *driver_req_ptr)
 {
     printf("Connecting to Wi-Fi...\n");
@@ -198,14 +184,12 @@ uint32_t pico_w_enable(NX_IP_DRIVER *driver_req_ptr)
     tx_thread_resume(&nx_driver_pico_w_thread);
     return NX_SUCCESS;
 }
-
 uint32_t pico_w_disable(NX_IP_DRIVER *driver_req_ptr)
 {
     tx_thread_suspend(&nx_driver_pico_w_thread);
     tx_thread_terminate(&nx_driver_pico_w_thread);
     return NX_SUCCESS;
 }
-
 uint32_t pico_w_packet_send(NX_PACKET *packet_ptr)
 {
     int ret;

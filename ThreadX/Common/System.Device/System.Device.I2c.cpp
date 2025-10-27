@@ -8,8 +8,7 @@
 #include "System.Device.h"
 #include "ManagedThreadSupport.h"
 
-void CreateI2CWorkerThread();
-void I2CWorkerThread_Entry(ULONG parameter);
+void I2CThread_Entry(ULONG parameter);
 
 extern TX_EVENT_FLAGS_GROUP eventsI2CWorkerThread;
 static bool WorkerThreadCreated = false;
@@ -25,11 +24,6 @@ HRESULT Library_sys_dev_i2c_native_System_Device_I2c_I2cDevice::NativeInit___VOI
     {
         FAULT_ON_NULL(stack.This());
 
-        if (!WorkerThreadCreated)
-        {
-            CreateI2CWorkerThread();
-            WorkerThreadCreated = true;
-        }
         CLR_RT_HeapBlock *connectionSettings = stack.This()[FIELD___connectionSettings].Dereference();
         CLR_INT32 I2Cbus = connectionSettings[I2cConnectionSettings::FIELD___busId].NumericByRef().s4;
         I2cBusSpeed I2cSpeed =
@@ -171,7 +165,7 @@ HRESULT Library_sys_dev_i2c_native_System_Device_I2c_I2cDevice::
     NANOCLR_NOCLEANUP();
 }
 
-void I2CWorkerThread_Entry(ULONG parameter)
+void I2CThread_Entry(ULONG parameter)
 {
     ULONG actual_flags;
     // Loop continually, process is resumed when a write is required by setting the flag

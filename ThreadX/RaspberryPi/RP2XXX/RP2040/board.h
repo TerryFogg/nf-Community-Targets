@@ -11,7 +11,11 @@
 #include "tx_api.h"
 #include "target_platform.h"
 
+#ifdef NETWORKING
+#include "boards/pico_w.h"
+#elif
 #include "boards/pico.h"
+#endif
 
 #include "hardware/adc.h"
 #include "hardware/gpio.h"
@@ -49,7 +53,6 @@
 extern "C"
 {
 #endif
-    void Startup_Rtos(bool debuggerRequested);
     void Initialize_Board();
     void ResetPinList();
     void Initialize64BitMicrosecondTimer();

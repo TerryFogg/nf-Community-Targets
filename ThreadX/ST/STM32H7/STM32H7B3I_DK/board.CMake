@@ -11,7 +11,6 @@
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H7/STM32H7B3I_DK/Device_BlockStorage.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H7/STM32H7B3I_DK/board.cpp
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H7/STM32H7B3I_DK/Clock_configuration.c
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H7/STM32H7B3I_DK/CLR_RT_InteropAssembliesTable.cpp
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H7/STM32H7B3I_DK/MPU_Config.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H7/STM32H7B3I_DK/power.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H7/STM32H7B3I_DK/STM32_FMC_SDRAM.c

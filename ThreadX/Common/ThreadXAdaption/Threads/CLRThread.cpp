@@ -4,6 +4,7 @@
 #include <tx_api.h>
 #include "board.h"
 #include <nanoCLR_Application.h>
+#include "CLRNativeThreads.h"
 
 #define CLR_THREAD_PRIORITY   5
 #define CLR_THREAD_STACK_SIZE 3000
@@ -52,6 +53,6 @@ void CLRStartupThread(uint32_t parameter)
     clrSettings.EnterDebuggerLoopAfterExit = true;
     clrSettings.WaitForDebugger = userRequestedWaitForDebugger;
 
-    nanoHAL_Initialize_C();
+    nanoHAL_Initialize();
     ClrStartup(clrSettings);
 }

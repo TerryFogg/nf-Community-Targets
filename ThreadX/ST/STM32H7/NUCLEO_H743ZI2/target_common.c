@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
 
@@ -18,7 +18,3 @@ HAL_SYSTEM_CONFIG HalSystemConfig = {
 
 HAL_TARGET_CONFIGURATION g_TargetConfiguration;
 
-bool Target_CanChangeMacAddress()
-{
-    return false;
-}

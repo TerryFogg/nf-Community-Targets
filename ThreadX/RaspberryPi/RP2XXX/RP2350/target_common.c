@@ -3,9 +3,10 @@
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
 
 #include <nanoHAL_v2.h>
-#include "target_common.h"
-#include <platform_target_capabilities.h>
 #include <stdbool.h>
+
+extern uint32_t NATIVE_RAM;
+
 
 #define RAM1_MEMORY_StartAddress   ((uint32_t)0x20000000)
 #define RAM1_MEMORY_Size           ((uint32_t)0x00082000)
@@ -21,6 +22,5 @@ HAL_SYSTEM_CONFIG HalSystemConfig = {
 	{RAM1_MEMORY_StartAddress, RAM1_MEMORY_Size},
 	{FLASH1_MEMORY_StartAddress, FLASH1_MEMORY_Size} };
 
-HAL_TARGET_CONFIGURATION g_TargetConfiguration;
 
-bool Target_CanChangeMacAddress() { return false; }
+HAL_TARGET_CONFIGURATION g_TargetConfiguration;

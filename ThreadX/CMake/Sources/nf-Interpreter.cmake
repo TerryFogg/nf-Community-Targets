@@ -178,9 +178,9 @@
                     ${CMAKE_SOURCE_DIR}/src/CLR/WireProtocol/WireProtocol_HAL_Interface.c
                     ${CMAKE_SOURCE_DIR}/src/CLR/WireProtocol/WireProtocol_Message.c
                     ${CMAKE_SOURCE_DIR}/src/CLR/WireProtocol/WireProtocol_MonitorCommands.c
-#                    ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Boot.c
+#                   ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Boot.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Capabilites.c
-                    ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_ConfigurationManager.c
+                    #${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_ConfigurationManager.c
                     #${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_ConfigurationManager_stubs.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_SystemEvents.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_SystemInformation.cpp
@@ -247,7 +247,7 @@
 
 # Targets
         list(APPEND NF_INTERPRETER_INCLUDES 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/${TARGET_BOARD}
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Cryptography
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics																																																																																																																																																																																							
@@ -265,11 +265,12 @@
         )
         list(APPEND NF_INTERPRETER_SOURCES 
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/CortexM_HardFaultHandler.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/CircularBuffer.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/CortexM_HardFaultHandler.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/nanoCRT.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/nanoHAL_Boot.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/sys_calls.c
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/targetHAL_ConfigurationManager.cpp
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Adc.cpp
@@ -295,7 +296,7 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetPAL_Time.cpp
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads/CLRThread.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads/DeviceIOThreads.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads/I2CThread.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads/ReceiverThread.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads/Thread_Creation.cpp
 
@@ -304,14 +305,13 @@
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/Delays.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/DeviceIO.cpp																																																																																																																																																																																							
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/DeviceWifi.Cyw43.cpp																																																																																																																																																																																							
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/driver_pico_w.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/DeviceWifi.Cyw43.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/FlashDriver.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/nanoSupport_CRC32.c
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/NetworkIO.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/targetHAL.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/WireProtocol_HAL_Interface.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/wp_Communications.c
+                    
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/mock_sdio.c
         )  
 
 # Overide compile flags on selected files

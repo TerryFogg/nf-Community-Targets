@@ -3,17 +3,15 @@
 // See LICENSE file in the project root for full license information.
 //
 #include "board.h"
-typedef unsigned char CLR_UINT8;
 
 #if defined(DEBUG)
-bool debuggerRequested = true;
+bool g_waitForDebuggerRequested = true;
 #else
-bool debuggerRequested = false;
+bool g_waitForDebuggerRequested = false;
 #endif
 
 int main(void)
 {
-    debuggerRequested = true;
     Initialize_Board();
-    Startup_Rtos(debuggerRequested);
+    tx_kernel_enter();
 }

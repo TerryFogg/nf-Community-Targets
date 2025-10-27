@@ -16,7 +16,7 @@
  if(${PSRAM})
     target_compile_definitions(nanoCLR PUBLIC -DPSRAM) 
     target_compile_definitions(nanoCLR PUBLIC -DPSRAM_SIZE=${PSRAM_SIZE}) 
-    target_compile_definitions(nanoCLR PUBLIC -DPSRAM_CHIP =${PSRAM_CHIP}) 
+    target_compile_definitions(nanoCLR PUBLIC -DPSRAM_CHIP=${PSRAM_CHIP}) 
  endif()
 
  if( "${TARGET_SERIES}" STREQUAL "RP2350")
@@ -42,7 +42,7 @@ if(CFG_USB_USE_DTR)
 endif() 
 
 # Network support using NetXDuo not LWIP
- target_compile_definitions(nanoCLR PUBLIC -DPICO_CYW43_ARCH_HEADER=Network_Custom_Architecture.h) 
+## target_compile_definitions(nanoCLR PUBLIC -DPICO_CYW43_ARCH_HEADER=Network_Custom_Architecture.h) 
 
 #  Some options
 target_link_options(nanoCLR PUBLIC "-Wl,--print-memory-usage")

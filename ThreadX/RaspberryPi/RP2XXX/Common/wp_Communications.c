@@ -48,10 +48,12 @@ int wp_ReadBytes(uint8_t **ptr, uint32_t *size, uint32_t wait_time)
     uint32_t requestedSize = *size;
     tx_event_flags_get(&wpReceivedEvent, 0x1, TX_OR_CLEAR, &actual_flags, wait_time);
 
-    while (!UsbConnected)
-    {
-        tud_task();
-    }
+    //while (!UsbConnected)
+    //{
+    //    volatile bool xx = tud_mounted();
+    //    volatile bool yy = tud_suspended();
+    //    tud_task();
+    //}
     // Connected, loop until bytes have arrived try to read what was requested
     while (!tud_cdc_n_available(0))
     {

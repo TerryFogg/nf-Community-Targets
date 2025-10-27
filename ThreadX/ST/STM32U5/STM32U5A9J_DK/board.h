@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 //
 // Copyright (c) .NET Foundation and Contributors
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
@@ -199,7 +199,7 @@
 #pragma region Flash SOC parameters and onboard external flash parameters
 
 // FLASH_CR_PSIZE is a bit field in the FLASH_CR1 register of STM32 microcontrollers.
-// It is used to configure the parallelism size of the flash memory interface �
+// It is used to configure the parallelism size of the flash memory interface ¹
 // The value of FLASH_CR_PSIZE determines the number of bytes to be programmed
 // each time a write operation occurs to the flash memory
 //  However,it is important to note that the existence of FLASH_CR_PSIZE bits in FLASH_CR1 register
@@ -263,7 +263,6 @@ void Initialize_OCTOSPI2_Hyperam();
 void Initialize_OPSPI_Flash();
 void Initialize_RTC();
 void MPU_Config(void);
-void Startup_Rtos(bool debuggerRequested);
 void USBD_Clock_Config(void);
 void Initialize_64bit_timer();
 

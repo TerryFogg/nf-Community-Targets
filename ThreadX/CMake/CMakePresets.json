@@ -17,14 +17,12 @@
                 "LEVELX_PATH": "C:/nftools/levelx",
                 "USBX_PATH": "C:/nftools/UsbX",
                 "NETXDUO_PATH": "C:/nftools/netxduo"
-                //"LWIP_PATH": "C:/nftools/lwip",
-                //"MBEDTLS_PATH": "C:/nftools/mbedtls"
             }
         },
         {
             "name": "GCC_ARM_COMMON_BUILD",
             "inherits": "general-preset",
-            "description": "Configuration common to all STM32 arm series processors",
+            "description": "Configuration common to all GCC builds",
             "hidden": true,
             "generator": "Ninja",
             "cacheVariables": {
@@ -64,7 +62,8 @@
             "description": "This is non-optimized and contains all the debug symbols",
             "hidden": true,
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
+                "CMAKE_BUILD_TYPE": "Debug",
+                "GRAPHICS_PATH": "targets-community"
             }
         },
         {
@@ -77,7 +76,7 @@
         },
         {
             "name": "ADVANCED_PROFILING",
-            "description": "Configuration for setting up what hardware/software support for mathematics",
+            "description": "Configuration for setting up code profiling",
             "hidden": true,
             "cacheVariables": {
                 "ADVANCED_PROFILING": true
@@ -155,7 +154,7 @@
             "hidden": true,
             "cacheVariables": {
                 "TARGET_GIT_REPOSITORY": "https://github.com/raspberrypi/pico-sdk.git",
-                "TARGET_GIT_TAG": "2.0.0",
+                "TARGET_GIT_TAG": "2.2.0",
                 "TARGET_GIT_LOCAL_PATH": "C:/nftools/pico-sdk",
                 "PICO_TOOLCHAIN_PATH": "C:/nftools/GNU_Tools_ARM_Embedded/13.2.rel1",
                 "picotool_DIR": "C:/nftools/picotool",
@@ -236,8 +235,8 @@
             }
         },
         {
-            "name": "RP2040",
-            "description": "Configuration for the Raspberry Pi Pico",
+            "name": "RP2XXX",
+            "description": "Configuration for the Raspberry Pi Pico series 1 and 2",
             "hidden": true,
             "inherits": [
                 "THREADX_AND_COMPONENT_PATHS",
@@ -247,8 +246,25 @@
             ],
             "cacheVariables": {
                 "TARGET_VENDOR": "RaspberryPi",
-                "TARGET_BOARD": "RP2040",
                 "TARGET_FAMILY": "RP2XXX",
+                "PICO_BOARD": "pico",
+                "PICO_RP2040": "1",
+                "HAS_CONFIG_BLOCK": false,
+                "RANDOM_NUMBER_GENERATOR": true,
+                "REALTIME_CLOCK": false,
+                "WATCHDOG": false,
+                "HARD_FAULT_DEBUG_HANDLER": true,
+                "CFG_USB_USE_DTR": false
+            }
+        },
+        {
+            "name": "RP2040",
+            "description": "Configuration for the Raspberry Pi Pico 1",
+            "hidden": true,
+            "inherits": [
+                "RP2XXX"
+            ],
+            "cacheVariables": {
                 "TARGET_SERIES": "RP2040",
                 "TARGET_TYPE": "PICO_RP2040",
                 "ARM_PROCESSOR": "cortex-m0plus",
@@ -258,9 +274,7 @@
                 "RANDOM_NUMBER_GENERATOR": true,
                 "REALTIME_CLOCK": false,
                 "WATCHDOG": false,
-                "HARD_FAULT_DEBUG_HANDLER": true,
                 "GRAPHICS_HEAP_FAST": false,
-                "CFG_USB_USE_DTR": false,
                 "CAN_SUPPORT": false,
                 "ONE_WIRE": false,
                 "IO_HASHING": false,
@@ -270,18 +284,12 @@
         },
         {
             "name": "RP2350",
-            "description": "Configuration for the Raspberry Pi Pico",
+            "description": "Configuration for the Raspberry Pi Pico 2",
             "hidden": true,
             "inherits": [
-                "THREADX_AND_COMPONENT_PATHS",
-                "GCC_ARM_COMMON_BUILD",
-                "DOUBLE_PRECISION_MATHEMATICS",
-                "PICO_SDK"
+                "RP2XXX"
             ],
             "cacheVariables": {
-                "TARGET_VENDOR": "RaspberryPi",
-                "TARGET_BOARD": "RP2350",
-                "TARGET_FAMILY": "RP2XXX",
                 "TARGET_SERIES": "RP2350",
                 "TARGET_TYPE": "PICO_RP2350",
                 "ARM_PROCESSOR": "cortex-m33",
@@ -292,9 +300,7 @@
                 "RANDOM_NUMBER_GENERATOR": true,
                 "REALTIME_CLOCK": false,
                 "WATCHDOG": false,
-                "HARD_FAULT_DEBUG_HANDLER": true,
                 "GRAPHICS_HEAP_FAST": false,
-                "CFG_USB_USE_DTR": false,
                 "CAN_SUPPORT": false,
                 "ONE_WIRE": false,
                 "IO_HASHING": false,
@@ -302,31 +308,25 @@
                 "BLUETOOTH": false
             }
         },
-        // --------------------
-        // Network Support  
-        // --------------------
-        {
-            "name": "NETWORKING",
-            "description": "Support for network",
-            "hidden": true,
-            "cacheVariables": {
-                "NETWORKING_SUPPORT": true,
-                "LWIP_VERSION": "STABLE-2_2_1_RELEASE",
-                "MBEDTLS_VERSION": "mbedtls-3.6.3"
-            }
-        },
+        // ------------
+        // WiFI devices  
+        // ------------
         {
             "name": "WiFI_CYW43",
             "description": "Support for wifi network",
             "hidden": true,
             "cacheVariables": {
+                "NETWORKING_SUPPORT": true,
+                "TARGET_NETWORK_DRIVER": "wifi_cyw43_driver",
+                "WIFI_MODULE": "CYW43",
                 "WIFI_SUPPORT": true,
-                "WIFI_MODULE": "CYW43"
+                "WIFI_SSID": "WifiPico",
+                "WIFI_PASSWORD": "raspberry"
             }
         },
-        // --------------------
+        // ------------
         // File Support
-        // --------------------
+        // ------------
         {
             "name": "FILE_SYSTEM",
             "description": "Support for network",
@@ -339,9 +339,9 @@
                 "FILEX_SYSTEM_RAM": false
             }
         },
-        // --------------------
+        // -----------
         // Usb Support
-        // --------------------
+        // -----------
         {
             "name": "USB_SUPPORT",
             "description": "Support for network",
@@ -353,17 +353,17 @@
                 "USB_HOST_CONTROLLER": false
             }
         },
-        // --------------------
+        // --------
         // Displays
-        // --------------------
+        // --------
         {
-            "name": "MB1315A(ST)",
+            "name": "MB1315A",
             "description": "Daughter card of ST Development board - https://www.st.com/resource/en/schematic_pack/mb1315-default-a02_schematic.pdf",
             "hidden": true,
             "cacheVariables": {
                 "GRAPHICS_SUPPORT": true,
                 "TOUCH_DISPLAY_SUPPORT": true,
-                "GRAPHICS_LCD": "LTDC_PARALLEL_DMA2D_To_Video.cpp",
+                "DISPLAY_DRIVER": "LTDC_PARALLEL_DMA2D_To_Video.cpp",
                 "INTERFACE_TYPE": "VIDEO",
                 "LCD_WIDTH": "480",
                 "LCD_HEIGHT": "272",
@@ -393,28 +393,81 @@
             }
         },
         {
-            "name": "Waveshare-LCD-1.14",
+            "name": "Waveshare_LCD_1_14",
             "description": "Designed for Pico series format - https://www.waveshare.com/SPI-LCD-1.14.htm",
             "hidden": true,
             "cacheVariables": {
                 "GRAPHICS_SUPPORT": true,
                 "INTERFACE_TYPE": "SPI",
                 "TOUCH_DISPLAY_SUPPORT": false,
-                "GRAPHICS_LCD": "SPI-LCD-1.14V2-ST7789VW.cpp",
+                "DISPLAY_DRIVER": "DisplayDriver_Waveshare_LCD_1_14.cpp",
+                "DISPLAY_INTERFACE": "DisplayInterface_spi_pico.cpp",
                 "LCD_WIDTH": "240",
-                "LCD_HEIGHT": "135"
+                "LCD_HEIGHT": "135",
+                "SPI_BUS": "0",
+                "SPI_TX": "19",
+                "SPI_CLK": "18",
+                "SPI_CS": "17",
+                "LCD_BACKLIGHT": "26",
+                "LCD_RESET": "27",
+                "LDC_DC": "16"
             }
         },
         {
-            "name": "BUYDISPLAY-ER-TFTM028",
-            "description": "Pico https://www.buydisplay.com/2-8-inch-tft-touch-shield-for-arduino-w-capacitive-touch-screen-module",
+            "name": "RoundDisplay",
+            "description": "Pico + Round Display",
             "hidden": true,
             "cacheVariables": {
                 "GRAPHICS_SUPPORT": true,
-                "GRAPHICS_LCD": "SPI-LCD-ER-TFTM028-4.cpp",
+                "INTERFACE_TYPE": "SPI",
+                "TOUCH_DISPLAY_SUPPORT": false,
+                "DISPLAY_DRIVER": "DisplayDriver_Waveshare_LCD_1_14.cpp",
+                "DISPLAY_INTERFACE": "DisplayInterface_spi_pico.cpp",
+                "LCD_WIDTH": "240",
+                "LCD_HEIGHT": "240",
+                "SPI_BUS": "1",
+                "SPI_TX": "11",
+                "SPI_CLK": "10",
+                "SPI_CS": "9",
+                "LCD_BACKLIGHT": "25",
+                "LCD_RESET": "12",
+                "LDC_DC": "8"
+            }
+        },
+        {
+            "name": "Waveshare_pico_dvi_lcd",
+            "description": "Designed for Pico series format - https://www.waveshare.com/pico-dvi.htm",
+            "hidden": true,
+            "cacheVariables": {
+                "GRAPHICS_SUPPORT": true,
+                "TOUCH_DISPLAY_SUPPORT": false,
+                "DISPLAY_DRIVER": "DisplayDriver_DVI_PicoSeries.cpp",
+                "DISPLAY_INTERFACE": "DisplayInterface_DVI_PicoSeries.cpp",
+                "INTERFACE_TYPE": "DVI",
+                "LCD_WIDTH": "640",
+                "LCD_HEIGHT": "480"
+            }
+        },
+        {
+            "name": "BUYDISPLAY_ER_TFTM028",
+            "description": "https://www.buydisplay.com/2-8-inch-tft-touch-shield-for-arduino-w-capacitive-touch-screen-module",
+            "hidden": true,
+            "cacheVariables": {
+                "GRAPHICS_SUPPORT": true,
+                "DISPLAY_DRIVER": "DisplayDriver-ER-TFTM028-4.cpp",
+                "DISPLAY_INTERFACE": "DisplayInterface_spi_pico.cpp",
                 "INTERFACE_TYPE": "SPI",
                 "LCD_WIDTH": "240",
                 "LCD_HEIGHT": "320",
+
+                "SPI_BUS": "0",
+                "SPI_TX": "19",
+                "SPI_CLK": "18",
+                "SPI_CS": "17",
+
+                "LCD_BACKLIGHT": "26",
+                "LCD_RESET": "27",
+                "LDC_DC": "16",
 
                 "TOUCH_DISPLAY_SUPPORT": true,
                 "TOUCH_INTERFACE_CONTROLLER": "FT6X06.cpp",
@@ -428,40 +481,9 @@
                 "TOUCH_INVERT_Y": true
             }
         },
-        // --------------------
-        // Interfaces
-        // --------------------
-        {
-            "name": "RP2XXX_TFT_SPI0",
-            "description": "SPI Interface for RP2040 and RP2350",
-            "hidden": true,
-            "cacheVariables": {
-                "SPI_BUS": "0",
-                "SPI_TX": "19",
-                "SPI_CLK": "18",
-                "SPI_CS": "17",
-                "LCD_BACKLIGHT": "26",
-                "LCD_RESET": "27",
-                "LDC_DC": "16"
-            }
-        },
-        {
-            "name": "RP2XXX_TFT_SPI1",
-            "description": "SPI Interface for RP2040 and RP2350",
-            "hidden": true,
-            "cacheVariables": {
-                "SPI_BUS": "1",
-                "SPI_TX": "11",
-                "SPI_CLK": "10",
-                "SPI_CS": "9",
-                "LCD_BACKLIGHT": "13",
-                "LCD_RESET": "12",
-                "LDC_DC": "8"
-            }
-        },
-        // --------------------
+        // -----------
         // Flash chips
-        // --------------------
+        // -----------
         {
             "name": "W25Q16JV",
             "description": "2MB Flash chip as used by Pico",
@@ -501,9 +523,9 @@
                 "PICO_FLASH_SIZE_BYTES": "16777216"
             }
         },
-        // --------------------
+        // -----------
         // Psram chips
-        // --------------------
+        // -----------
         {
             "name": "APS6404L",
             "description": "8MB PSRAM chip",
@@ -514,84 +536,77 @@
                 "PSRAM_CHIP": "APS6404L"
             }
         },
-        //
+        // --------------------
         // Board Configurations
-        //
+        // --------------------
         {
-            "name": "cfg-RP2040 + Waveshare LCD-1.14",
+            "name": "cfg_RP2040_LCD_1_14",
             "description": "Pico2 board with 1.14 inch LCD",
             "hidden": false,
             "inherits": [
                 "RP2040",
                 "FULL_FRAMEWORK",
-                "Waveshare-LCD-1.14",
+                "Waveshare_LCD_1_14",
                 "DEBUG"
             ]
         },
         {
-            "name": "cfg-RP2350 + Waveshare LCD-1.14",
-            "description": "Pico2 board with 1.14 inch LCD",
+            "name": "cfg_RP2350_LCD_1_14",
+            "description": "Pico2 board with 4MB Flash and 1.14 inch LCD",
             "hidden": false,
             "inherits": [
                 "RP2350",
-                "RP2XXX_TFT_SPI0",
                 "FULL_FRAMEWORK",
                 "W25Q32RV",
-                "Waveshare-LCD-1.14",
+                "Waveshare_LCD_1_14",
                 "DEBUG"
             ]
         },
         {
-            "name": "cfg-RP2350(16MB,8MB) + Waveshare LCD-1.14",
-            "description": "Pico2 board with 1.14 inch LCD",
+            "name": "cfg_RP2350_16MB_8MB_LCD_1_14",
+            "description": "Pico2 board 16MB Flash, 8MB PSRAM with 1.14 inch LCD",
             "hidden": false,
             "inherits": [
                 "RP2350",
-                "RP2XXX_TFT_SPI0",
                 "FULL_FRAMEWORK",
                 "W25Q128JV",
                 "APS6404L",
-                "Waveshare-LCD-1.14",
-                "NETWORKING"
+                "Waveshare_LCD_1_14"
             ]
         },
         {
-            "name": "cfg-RP2350 + BuyDisplay-ER-TFTM028",
+            "name": "cfg_RP2350_BuyDisplay_ER_TFTM028",
             "description": "Pico2 board with 2.8 inch LCD and capacitive touch",
             "hidden": false,
             "inherits": [
                 "RP2350",
-                "RP2XXX_TFT_SPI1",
                 "FULL_FRAMEWORK",
                 "W25Q32RV",
-                "BUYDISPLAY-ER-TFTM028",
-                "NETWORKING",
+                "BUYDISPLAY_ER_TFTM028",
                 "DEBUG"
             ]
         },
         {
-            "name": "cfg-RP2350(16MB)(8MB)(W)(BuyDisplay-ER-TFTM028)",
-            "description": "Pico2 board with 16MB flash and 8 MB PSRAM, 2.8 inch LCD and capacitive touch",
+            "name": "RP2350_Pimoroni2W_ER_TFTM028",
+            "description": "Pimoroni Pico2 board with 16MB flash and 8 MB PSRAM, 2.8 inch LCD and capacitive touch",
             "hidden": false,
             "inherits": [
                 "RP2350",
-                "RP2XXX_TFT_SPI1",
                 "FULL_FRAMEWORK",
                 "W25Q128JV",
                 "APS6404L",
-                "BUYDISPLAY-ER-TFTM028",
-                "NETWORKING",
+                "BUYDISPLAY_ER_TFTM028",
                 "WiFI_CYW43"
             ]
         },
         {
-            "name": "cfg-STM32H7B3I + MB1315A(ST)",
+            "name": "cfg_STM32H7B3I_MB1315A",
             "description": "STM32H7B3I with Display",
             "hidden": false,
             "inherits": [
                 "STM32H7B3I_DK",
                 "FULL_FRAMEWORK",
-                "MB1315A(ST)"
+                "MB1315A"
             ]
         }
 
@@ -611,23 +626,18 @@
             "configurePreset": "ADVANCED_PROFILING"
         },
         {
-            "name": "RP2350(16MB)(8MB)(W)(BuyDisplay-ER-TFTM028)-Debug",
-            "configurePreset": "cfg-RP2350(16MB)(8MB)(W)(BuyDisplay-ER-TFTM028)",
-            "inherits": "debug"
-        },
-        {
-            "name": "RP2350(16MB)(8MB)(W)(BuyDisplay-ER-TFTM028)",
-            "configurePreset": "cfg-RP2350(16MB)(8MB)(W)(BuyDisplay-ER-TFTM028)",
+            "name": "RP2350_Pimoroni2W_ER_TFTM028",
+            "configurePreset": "RP2350_Pimoroni2W_ER_TFTM028",
             "inherits": "release"
         },
         {
-            "name": "STM32H7B3I + MB1315A(ST)-Debug",
-            "configurePreset": "cfg-STM32H7B3I + MB1315A(ST)",
+            "name": "STM32H7B3I_MB1315A_Debug",
+            "configurePreset": "cfg_STM32H7B3I_MB1315A",
             "inherits": "debug"
         },
         {
-            "name": "STM32H7B3I + MB1315A(ST)",
-            "configurePreset": "cfg-STM32H7B3I + MB1315A(ST)",
+            "name": "STM32H7B3I_MB1315A",
+            "configurePreset": "cfg_STM32H7B3I_MB1315A",
             "inherits": "release"
         }
     ]

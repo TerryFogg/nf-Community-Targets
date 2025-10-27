@@ -14,7 +14,7 @@ extern TX_BYTE_POOL byte_pool_0;
 
 TX_THREAD receiverThread;
 void wpReceiverThread_entry(uint32_t parameter);
-
+    
 void CreateReceiverThread()
 {
     void *pointer = TX_NULL;

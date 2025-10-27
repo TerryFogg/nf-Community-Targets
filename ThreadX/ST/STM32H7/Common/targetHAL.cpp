@@ -15,7 +15,6 @@
 #include "board.h"
 #include "SD_DoubleBufferedDMA.h"
 
-extern bool g_waitForDebuggerRequested;
 bool g_fDoNotUninitializeDebuggerPort = false;
 
 #if (TOUCH_DISPLAY_SUPPORT == TRUE)

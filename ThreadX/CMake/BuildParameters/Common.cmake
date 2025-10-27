@@ -36,6 +36,9 @@
         target_compile_definitions(nanoCLR PUBLIC -DBUILD_RTM)
     endif()
     
+    # Not using the configuration mechanism
+    target_compile_definitions(nanoCLR PUBLIC -DHAS_CONFIG_BLOCK=0)
+
     target_compile_definitions(nanoCLR PUBLIC -DPLATFORM_NO_CLR_TRACE=1)
 
     if(NANOCLR_REFLECTION)
@@ -63,12 +66,6 @@
         target_compile_definitions(nanoCLR PUBLIC -DP_FLOATINGPOINT=1)
     else()
         target_compile_definitions(nanoCLR PUBLIC -DP_FLOATINGPOINT=0)
-    endif()
-
-   if(HAS_CONFIG_BLOCK)
-        target_compile_definitions(nanoCLR PUBLIC -DHAS_CONFIG_BLOCK=1)
-    else()
-        target_compile_definitions(nanoCLR PUBLIC -DHAS_CONFIG_BLOCK=0)
     endif()
     if(REALTIME_CLOCK)
         target_compile_definitions(nanoCLR PUBLIC -DHAL_USE_RTC=1)
@@ -105,16 +102,15 @@
 
 # Common Networking definitions
     if(NETWORKING_SUPPORT)
-            target_compile_definitions(nanoCLR PUBLIC -DNETWORKING=TRUE)
+            target_compile_definitions(nanoCLR PUBLIC -DNETWORKING_SUPPORT=TRUE)
             target_compile_definitions(nanoCLR PUBLIC -DNX_ENABLE_INTERFACE_CAPABILITY=TRUE)
-            
+            target_compile_definitions(nanoCLR PUBLIC -DTARGET_NETWORK_DRIVER=${TARGET_NETWORK_DRIVER})
     endif()
  # Common Networking definitions
     if(WIFI_SUPPORT)
             target_compile_definitions(nanoCLR PUBLIC -DWIFI=TRUE)
             target_compile_definitions(nanoCLR PUBLIC -DWIFI_DEVICE={WIFI_MODULE})
     endif()
-
 
 # Common use button defintion
     if(HAS_A_USER_BUTTON)
@@ -131,33 +127,37 @@
           target_compile_definitions(nanoCLR PUBLIC -DLCD_BACKLIGHT=${LCD_BACKLIGHT})
           target_compile_definitions(nanoCLR PUBLIC -DLCD_RESET=${LCD_RESET})
 
+          # For SPI interface
           if( ${INTERFACE_TYPE} STREQUAL "SPI")
             target_compile_definitions(nanoCLR PUBLIC -DINTERFACE_SPI=TRUE)
+            target_compile_definitions(nanoCLR PUBLIC -DLCD_DC=${LDC_DC})
+            target_compile_definitions(nanoCLR PUBLIC -DSPI_BUS=${SPI_BUS})
+            target_compile_definitions(nanoCLR PUBLIC -DSPI_CLK=${SPI_CLK})
+            target_compile_definitions(nanoCLR PUBLIC -DSPI_TX=${SPI_TX})
+            target_compile_definitions(nanoCLR PUBLIC -DSPI_CS=${SPI_CS})
+          else()
+            target_compile_definitions(nanoCLR PUBLIC -DINTERFACE_SPI=FALSE)
+          endif()
+          if( ${INTERFACE_TYPE} STREQUAL "VIDEO")
+            target_compile_definitions(nanoCLR PUBLIC -DINTERFACE_VIDEO=TRUE)
+          # For Video Interface
+            target_compile_definitions(nanoCLR PUBLIC -DLCD_ENABLE=${LCD_ENABLE})
+            target_compile_definitions(nanoCLR PUBLIC -DLCD_CONTROL=${LCD_CONTROL})
+            target_compile_definitions(nanoCLR PUBLIC -DVIDEO_FREQUENCY_DIVIDER=${VIDEO_FREQUENCY_DIVIDER})
+            target_compile_definitions(nanoCLR PUBLIC -DVIDEO_HORIZONTAL_SYNC=${VIDEO_HORIZONTAL_SYNC})
+            target_compile_definitions(nanoCLR PUBLIC -DVIDEO_HORIZONTAL_BACK_PORCH=${VIDEO_HORIZONTAL_BACK_PORCH})
+            target_compile_definitions(nanoCLR PUBLIC -DVIDEO_HORIZONTAL_FRONT_PORCH=${VIDEO_HORIZONTAL_FRONT_PORCH})
+            target_compile_definitions(nanoCLR PUBLIC -DVIDEO_VERTICAL_SYNC=${VIDEO_VERTICAL_SYNC})
+            target_compile_definitions(nanoCLR PUBLIC -DVIDEO_VERTICAL_BACK_PORCH=${VIDEO_VERTICAL_BACK_PORCH})
+            target_compile_definitions(nanoCLR PUBLIC -DVIDEO_VERTICAL_FRONT_PORCH=${VIDEO_VERTICAL_FRONT_PORCH})
+          else()
             target_compile_definitions(nanoCLR PUBLIC -DINTERFACE_VIDEO=FALSE)
           endif()
-            if( ${INTERFACE_TYPE} STREQUAL "VIDEO")
-            target_compile_definitions(nanoCLR PUBLIC -DINTERFACE_SPI=FALSE)
-            target_compile_definitions(nanoCLR PUBLIC -DINTERFACE_VIDEO=TRUE)
+            if( ${INTERFACE_TYPE} STREQUAL "DVI")
+            target_compile_definitions(nanoCLR PUBLIC -DINTERFACE_DVI=TRUE)
+          else()
+            target_compile_definitions(nanoCLR PUBLIC -DINTERFACE_DVI=FALSE)
           endif()
-
-          # For SPI interface
-          target_compile_definitions(nanoCLR PUBLIC -DLCD_DC=${LDC_DC})
-          target_compile_definitions(nanoCLR PUBLIC -DSPI_BUS=${SPI_BUS})
-          target_compile_definitions(nanoCLR PUBLIC -DSPI_CLK=${SPI_CLK})
-          target_compile_definitions(nanoCLR PUBLIC -DSPI_TX=${SPI_TX})
-          target_compile_definitions(nanoCLR PUBLIC -DSPI_CS=${SPI_CS})
-
-          # For Video Interface
-          target_compile_definitions(nanoCLR PUBLIC -DLCD_ENABLE=${LCD_ENABLE})
-          target_compile_definitions(nanoCLR PUBLIC -DLCD_CONTROL=${LCD_CONTROL})
-          target_compile_definitions(nanoCLR PUBLIC -DVIDEO_FREQUENCY_DIVIDER=${VIDEO_FREQUENCY_DIVIDER})
-          target_compile_definitions(nanoCLR PUBLIC -DVIDEO_HORIZONTAL_SYNC=${VIDEO_HORIZONTAL_SYNC})
-          target_compile_definitions(nanoCLR PUBLIC -DVIDEO_HORIZONTAL_BACK_PORCH=${VIDEO_HORIZONTAL_BACK_PORCH})
-          target_compile_definitions(nanoCLR PUBLIC -DVIDEO_HORIZONTAL_FRONT_PORCH=${VIDEO_HORIZONTAL_FRONT_PORCH})
-          target_compile_definitions(nanoCLR PUBLIC -DVIDEO_VERTICAL_SYNC=${VIDEO_VERTICAL_SYNC})
-          target_compile_definitions(nanoCLR PUBLIC -DVIDEO_VERTICAL_BACK_PORCH=${VIDEO_VERTICAL_BACK_PORCH})
-          target_compile_definitions(nanoCLR PUBLIC -DVIDEO_VERTICAL_FRONT_PORCH=${VIDEO_VERTICAL_FRONT_PORCH})
-
           target_compile_definitions(nanoCLR PUBLIC -DGRAPHICS_HEAP_FAST=${GRAPHICS_HEAP_FAST})
     else()
           target_compile_definitions(nanoCLR PUBLIC -DNANOCLR_GRAPHICS=FALSE)

@@ -7,11 +7,16 @@
 #include <nanoHAL_v2.h>
 #include <nanoCLR_Headers.h>
 
-#include "tx_port.h"
-#include "tx_api.h"
 #include "target_platform.h"
 
+// For the pico-sdk
+#include "pico.h"
+
+#ifdef NETWORKING_SUPPORT
+#include "boards/pico2_w.h"
+#elif
 #include "boards/pico2.h"
+#endif
 
 #include "hardware/adc.h"
 #include <hardware/gpio.h>
@@ -39,7 +44,6 @@
 extern "C"
 {
 #endif
-    void Startup_Rtos(bool debuggerRequested);
     void Initialize_Board();
     void SetupPinList();
     void Initialize64BitMicrosecondTimer();

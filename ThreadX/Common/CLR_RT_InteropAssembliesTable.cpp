@@ -5,17 +5,18 @@
 #include <Core.h>
 
 extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_mscorlib;
+extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_ResourceManager;
+
 extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_Runtime_Events;
 extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_Runtime_Events_EventSink_DriverProcs;
 extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_Runtime_Native;
 
+extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_System_Collections;
+extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_System_Text;
+
 extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_System_IO_Ports;
 extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_System_Math;
 extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_System_Runtime_Serialization;
-
-extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_ResourceManager;
-extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_System_Collections;
-extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_System_Text;
 
 extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_System_Device_Adc;
 extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_System_Device_Dac;
@@ -44,16 +45,13 @@ extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_System_Device_Spi;
 #ifdef NANOCLR_GRAPHICS 
     extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_Graphics;
 #endif
-#ifdef NETWORK_SUPPORT
+#ifdef NETWORKING_SUPPORT
     extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_System_Net;
     extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_System_Device_Wifi;
-    extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_Networking_Sntp;
+  //  extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_Networking_Sntp;
 #endif
 #ifdef USB_SUPPORT
     extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_System_Device_UsbStream;
-#endif
-#ifdef NETWORK_THREAD_PROTOCOL
-    extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_Networking_Thread;
 #endif
 #ifdef BLUETOOTH
     extern const CLR_RT_NativeAssemblyData g_CLR_AssemblyNative_nanoFramework_Device_Bluetooth,
@@ -99,16 +97,13 @@ const CLR_RT_NativeAssemblyData *g_CLR_InteropAssembliesNativeData[] = {
 #if (NANOCLR_GRAPHICS == TRUE)
     &g_CLR_AssemblyNative_nanoFramework_Graphics,
 #endif
-#ifdef NETWORK_SUPPORT
+#ifdef NETWORKING_SUPPORT
     &g_CLR_AssemblyNative_System_Net,
     &g_CLR_AssemblyNative_System_Device_Wifi,
-    &g_CLR_AssemblyNative_nanoFramework_Networking_Sntp,
+  //  &g_CLR_AssemblyNative_nanoFramework_Networking_Sntp,
 #endif
 #ifdef USB_SUPPORT
     &g_CLR_AssemblyNative_System_Device_UsbStream,
-#endif
-#ifdef NETWORK_THREAD_PROTOCOL
-    &g_CLR_AssemblyNative_nanoFramework_Networking_Thread,
 #endif
 #ifdef BLUETOOTH
         &g_CLR_AssemblyNative_nanoFramework_Device_Bluetooth,

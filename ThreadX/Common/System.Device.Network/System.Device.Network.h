@@ -5,30 +5,23 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include <nx_api.h>
-#include "nx_user.h"
-#include "tx_api.h"
-#include "nxd_dhcp_client.h"
-#include "nx_udp.h"
-#include "nxd_dns.h"
-#include "nx_secure_tls_api.h"
-#include "nx_crypto_ec.h"
-#include <nanoHAL_ConfigurationManager.h>
+#include "nanoCLR_Types.h"
+#include "sys_net_native.h"
+
+#include "target_platform.h"
+#include "nanoHAL_ConfigurationManager.h"
 #include "nanoPAL_Sockets.h"
-#include <sys_net_native.h>
 
 #define DnsFromDHCP 1
 
 #define INTERFACE_WIFI     0
 #define INTERFACE_ETHERNET 1
 
-#define ACTIVE_INTERFACE_WIFI     1
-#define ACTIVE_INTERFACE_ETHERNET 0
-#define SERVER_PORT               443 // HTTPS default port
-#define CERTIFICATE_BUFFER_SIZE   2048
-#define PRIVATE_KEY_BUFFER_SIZE   2048
-#define DEMO_STACK_SIZE           2048
-#define PACKET_POOL_SIZE          ((sizeof(NX_PACKET) + 1536) * 4)
+#define SERVER_PORT             443 // HTTPS default port
+#define CERTIFICATE_BUFFER_SIZE 2048
+#define PRIVATE_KEY_BUFFER_SIZE 2048
+#define DEMO_STACK_SIZE         2048
+#define PACKET_POOL_SIZE        ((sizeof(NX_PACKET) + 1536) * 4)
 
 #define NX_DRIVER_MTU                 (1514)
 #define NX_DRIVER_PHYSICAL_FRAME_SIZE (14)
@@ -41,7 +34,7 @@
 #define NX_DRIVER_CAPABILITY              (0)
 #define NX_DRIVER_ERROR                   90
 
-/* Define generic constants and macros for all NetX Ethernet drivers.  */
+// Define generic constants and macros for all NetX Ethernet drivers.
 
 #define NX_DRIVER_ETHERNET_IP   0x0800
 #define NX_DRIVER_ETHERNET_IPV6 0x86dd
@@ -91,6 +84,7 @@ typedef struct NX_DRIVER_INFORMATION_STRUCT
 
 } NX_DRIVER_INFORMATION;
 
+
 typedef enum
 {
     SOCKET_TYPE_TCP,
@@ -106,7 +100,9 @@ typedef struct socket_entry_t
     };
 } socket_entry_t;
 
-static VOID Network_Request_Processing(NX_IP_DRIVER *driver_req_ptr);
+
+static void NetworkThread_Entry(uint32_t parameter);
+VOID _nx_ram_network_driver(NX_IP_DRIVER *driver_req_ptr);
 
 ////////////////
 
@@ -231,3 +227,25 @@ static unsigned char test_device_cert_key_der[] = {
     0x73, 0xf0, 0xe8, 0x38, 0x8d, 0xe8, 0xd0, 0x7e, 0x2c, 0x0c, 0xdc, 0x21, 0xfa, 0xc1};
 
 static unsigned int test_device_cert_key_der_len = 1192;
+
+#define SOCK_SUCCESS 0 // Successful operation
+
+#define SOCK_EPERM  1  // Operation not permitted
+#define SOCK_ENOENT 2  // No such file or directory
+#define SOCK_EIO    5  // I/O error
+#define SOCK_EAGAIN 11 // Try again
+#define SOCK_ENOMEM 12 // Out of memory
+#define SOCK_EEXIST 17 // File exists
+#define SOCK_ENODEV 19 // No such device
+#define SOCK_ENOSYS 38 // Function not implemented
+#define EOPNOTSUPP  95 // Operation not supported on transport endpoint
+
+#define Rdm       4
+#define Seqpacket 5
+
+HRESULT GetSocketEntry(CLR_RT_StackFrame &stack, socket_entry_t *socket_entry);
+int TranslateNXErrorToSocketError(CLR_RT_StackFrame &stack, int error);
+void SetReturnStatus(CLR_RT_StackFrame &stack, CLR_INT32 errorCode);
+void tcp_data_callback(NX_TCP_SOCKET *socket_ptr);
+void tcp_server_listen_callback(NX_TCP_SOCKET *socket_ptr, UINT port);
+

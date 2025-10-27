@@ -41,7 +41,7 @@ if(${ARM_PROCESSOR} STREQUAL "cortex-m0plus" OR ${ARM_PROCESSOR} STREQUAL "corte
         )
 endif()
 
-# Common
+# Common Includes
         list(APPEND FILEX_INCLUDES 
             ${FILEX_PATH}/common/inc
         )
@@ -260,7 +260,7 @@ endif()
             ${FILEX_PATH}/common/src/fxe_unicode_short_name_get_extended.c
         )
 
-# Common
+# Common LevelX
         list(APPEND LEVELX_INCLUDES 
             ${LEVELX_PATH}/common/inc
             )
@@ -345,7 +345,6 @@ list(APPEND FILE_SOURCES
      ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/FileSystem.cpp
 
      ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads/FileThread.cpp
-
 )
 
 if(FILE_SYSTEM_SD)

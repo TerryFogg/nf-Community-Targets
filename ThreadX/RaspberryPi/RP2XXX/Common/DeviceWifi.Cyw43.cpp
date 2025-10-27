@@ -3,9 +3,15 @@
 // See LICENSE file in the project root for full license information.
 //
 #include "System.Device.Wifi.h"
-#include <cyw43_country.h>
-#include "cyw43.h"
-#include <cyw43_ll.h>
+
+extern "C"
+{
+    #include <cyw43_country.h>
+    #include "cyw43.h"
+    #include <cyw43_ll.h>
+}
+       
+WifiConnectionStatus connectionStatus;
 
 // Note: cyw43_state
 // Appears to be a global variable to maintain the current state
@@ -20,6 +26,8 @@ CLR_UINT32 itfAccessPointInterfaceMode = CYW43_ITF_AP;
 // Start the Wifi, default power management
 bool DeviceWifi::Initialize()
 {
+    connectionStatus = WifiConnectionStatus::WifiConnectionStatus_NetworkNotAvailable;
+
     // This can take 100-200ms minimum
     cyw43_init(&cyw43_state);
     int itf = CYW43_ITF_STA;
@@ -40,7 +48,47 @@ bool DeviceWifi::WifiUp()
     int result = cyw43_wifi_link_status(&cyw43_state, CYW43_ITF_STA);
     return (result == 1);
 }
-/// Support for 'Client interface STA mode' only
+bool DeviceWifi::GetAccessPointMaxStations()
+{
+    // At the time of writing this code
+    // The CYW43 wireless driver in the Pico SDK does not support multiple simultaneous access points.
+    return 1;
+}
+bool DeviceWifi::GetAccessPointMaxAssociations(int station)
+{
+    // At the time of writing this code
+    // The CYW43 wireless driver in the Pico SDK does not support multiple simultaneous access points.
+    // Ignore station number
+
+    // Get maximum number of associated clients
+    int num_stas;
+    cyw43_wifi_ap_get_max_stas(&cyw43_state, &num_stas);
+    return num_stas;
+}
+bool DeviceWifi::GetAccessPointInformation(
+    int station,
+    int number_associations,
+    access_point_connected_clients_t *apInfo)
+{
+    // At the time of writing this code
+    // The CYW43 wireless driver in the Pico SDK does not support multiple simultaneous access points.
+    // The CYW43 firmware and driver do not expose per-client RSSI metrics when the device is acting as an AP.
+
+    uint8_t *list_of_macs = (uint8_t *)platform_malloc(number_associations * sizeof(access_point_connected_clients_t));
+    int num_stas;
+    cyw43_wifi_ap_get_stas(&cyw43_state, &num_stas, list_of_macs);
+
+    for (int i = 0; i < number_associations; i++)
+    {
+        memcpy(apInfo->mac, list_of_macs, 6);
+        apInfo->phyModes = WIRELESS_PROTOCOL(-1);
+        apInfo->rssi = 0;
+        apInfo++;
+        list_of_macs += 6;
+    }
+    platform_free(list_of_macs);
+    return true;
+}
 void DeviceWifi::Connect(HAL_Configuration_Wireless80211 wifiConfig)
 {
     CLR_UINT32 AuthenticationType;
@@ -80,7 +128,6 @@ void DeviceWifi::Connect(HAL_Configuration_Wireless80211 wifiConfig)
 
     cyw43_wifi_join(&cyw43_state, ssid_len, ssid, key_len, key, AuthenticationType, NULL, channel);
     Events_Set(SYSTEM_EVENT_FLAG_WIFI_STATION);
-
 }
 void DeviceWifi::Disconnect(int index)
 {

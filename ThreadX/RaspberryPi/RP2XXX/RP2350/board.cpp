@@ -63,28 +63,21 @@ void SetupPinList()
 };
 void Initialize_Board()
 {
-    SetupPinList();
-    Initialize64BitMicrosecondTimer();
 #ifdef PSRAM
-    InitializePSRAM();
+    // Enable XIP ( execute in place)
+    // Forums](https://forums.raspberrypi.com/viewtopic.php?t=375109)
+    gpio_set_function(47, GPIO_FUNC_XIP_CS1);   // Set GPIO47 as CS for PSRAM
+    xip_ctrl_hw->ctrl |= XIP_CTRL_WRITABLE_M1_BITS;
 #endif
-}
-void Initialize64BitMicrosecondTimer()
-{
-    // hardware_timer_init(timer_hw, 1, 1);
-    // hardware_timer_set_hw_clock_ticks_per_us(timer_hw, 1);
-    // hardware_timer_enable(timer_hw);
-    return;
+
+#ifdef OVERCLOCK
+// Future up to 700Mhz? for RP2350
+// https://forums.raspberrypi.com/viewtopic.php?t=375975&start=25
+#endif
 }
 uint64_t ReadMicrosecondCounter()
 {
+    // The RP2040/RP2350 has a dedicated hardware timer peripheral that starts counting from zero at boot.
+    // This timer is clocked by the reference clock(clk_ref), typically running at 1 MHz giving 1 µs resolution
     return time_us_64();
-}
-void InitializePSRAM()
-{
-    gpio_set_function(47, GPIO_FUNC_XIP_CS1); // Set GPIO47 as CS for PSRAM
-    xip_ctrl_hw->ctrl |= XIP_CTRL_WRITABLE_M1_BITS;
-
-    // Enable writable memory[_{{{CITATION{{{_1{RP2350: How to enable XIP PSRAM? - // Raspberry Pi
-    // Forums](https://forums.raspberrypi.com/viewtopic.php?t=375109)
 }

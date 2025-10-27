@@ -351,7 +351,6 @@ extern "C"
 #pragma region Prototypes
 
 #define INVALIDATE_DCACHE SCB_CleanInvalidateDCache()
-    void Startup_Rtos(bool debuggerRequested);
     void Initialize_Board();
     void InitializeBoardPeripherals();
     void InitializeDevicePins();

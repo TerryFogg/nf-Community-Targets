@@ -7,7 +7,6 @@
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H7/STM32H735G_DK/Device_BlockStorage.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H7/STM32H735G_DK/board.cpp
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H7/STM32H735G_DK/Clock_configuration.c
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H7/STM32H735G_DK/CLR_RT_InteropAssembliesTable.cpp
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H7/STM32H735G_DK/MicroSD.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H7/STM32H735G_DK/OSPI_memory.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H7/STM32H735G_DK/Power.c

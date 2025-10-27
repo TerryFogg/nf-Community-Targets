@@ -6,7 +6,6 @@
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H5/STM32U5A9J_DK/Device_BlockStorage.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H5/STM32U5A9J_DK/board.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H5/STM32U5A9J_DK/clock_configuration.c
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H5/STM32U5A9J_DK/CLR_RT_InteropAssembliesTable.cpp
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H5/STM32U5A9J_DK/power.c
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H5/STM32U5A9J_DK/startup_stm32u5a9njhxq.s
                 ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ST/STM32H5/STM32U5A9J_DK/target_common.c

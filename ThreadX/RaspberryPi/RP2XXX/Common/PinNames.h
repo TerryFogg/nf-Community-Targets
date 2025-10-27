@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 //
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
@@ -38,4 +38,22 @@ typedef enum PinNameValues
     GP28 = 28,
     GP29 = 29,
     GP30 = 30,
+    GP31 = 31,
+    GP32 = 32,
+    GP33 = 33,
+    GP34 = 34,
+    GP35 = 35,
+    GP36 = 36,
+    GP37 = 37,
+    GP38 = 38,
+    GP39 = 39,
+    GP40 = 40,
+    GP41 = 41,
+    GP42 = 42,
+    GP43 = 43,
+    GP44 = 44,
+    GP45 = 45,
+    GP46 = 46,
+    GP47 = 47,
+    GP48 = 48,
 } PinNameValue;

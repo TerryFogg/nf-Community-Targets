@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 //
 // Copyright (c) .NET Foundation and Contributors
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
@@ -292,7 +292,6 @@ static inline bool OSPI2_WaitUntilState(uint32_t Flag, FlagStatus State)
 
 #define INVALIDATE_DCACHE SCB_CleanInvalidateDCache()
 
-void Startup_Rtos(bool debuggerRequested);
 void Initialize_Board();
 void InitializeBoardPeripherals();
 void Initialize_Board_LEDS();

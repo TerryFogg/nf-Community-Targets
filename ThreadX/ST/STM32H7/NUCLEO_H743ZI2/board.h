@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 //
 // Copyright (c) .NET Foundation and Contributors
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
@@ -131,7 +131,7 @@ enum ArduinoPin : int
 #pragma region Flash SOC parameters and onboard external flash parameters
 
 // FLASH_CR_PSIZE is a bit field in the FLASH_CR1 register of STM32 microcontrollers.
-// It is used to configure the parallelism size of the flash memory interface �
+// It is used to configure the parallelism size of the flash memory interface ¹
 // The value of FLASH_CR_PSIZE determines the number of bytes to be programmed
 // each time a write operation occurs to the flash memory
 //  However,it is important to note that the existence of FLASH_CR_PSIZE bits in FLASH_CR1 register
@@ -172,7 +172,6 @@ static inline uint32_t Get_SYSTICK()
 #define INVALIDATE_DCACHE SCB_CleanInvalidateDCache()
 
 
-void Startup_Rtos(bool debuggerRequested);
 void Initialize_Board();
 void Initialize_DWT_Counter();
 void Initialize_Board_LEDS_And_Buttons();

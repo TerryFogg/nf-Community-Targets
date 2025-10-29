@@ -42,7 +42,6 @@
     
     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Network/ssl_ISM43362.cpp
     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Network/dummy.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads/NetworkThread.cpp
 )
 
  list(APPEND NETWORK_SOURCES

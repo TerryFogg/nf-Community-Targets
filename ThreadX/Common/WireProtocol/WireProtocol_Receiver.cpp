@@ -6,12 +6,11 @@
 #include <WireProtocol.h>
 #include <WireProtocol_Message.h>
 
-void wpReceiverThread_entry(uint32_t parameter)
+void ReceiverThread_entry(uint32_t parameter)
 {
     (void)parameter;
     extern WP_Message inboundMessage;
 
-    // NOTE: Don't call scheduler type calls in this module
     InitWireProtocolCommunications();
     tx_thread_sleep(50);
 

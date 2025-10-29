@@ -257,7 +257,6 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common
@@ -287,7 +286,7 @@
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.Ports/System.IO.Ports.cpp
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads/ManagedThreadSupport.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/ManagedThreadSupport.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Memory.cpp
                     
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetHAL_Rtos.c
@@ -295,10 +294,8 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetPAL_Events.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetPAL_Time.cpp
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads/CLRThread.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads/I2CThread.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads/ReceiverThread.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads/Thread_Creation.cpp
+                    # Core RTOS ThreadX threads
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/RTOS_Thread_Creation.cpp
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/WireProtocol_MonitorCommands.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/WireProtocol_Receiver.cpp

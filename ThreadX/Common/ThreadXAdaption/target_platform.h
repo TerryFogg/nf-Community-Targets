@@ -5,7 +5,6 @@
 //
 #include "tx_port.h"
 #include "tx_api.h"
-#include "tx_api.h"
 #include "nx_api.h"
 #include "nx_user.h"
 #include "nxd_dhcp_client.h"

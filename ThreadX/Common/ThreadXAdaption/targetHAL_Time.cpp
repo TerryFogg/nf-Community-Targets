@@ -9,7 +9,6 @@
 #include <nanoHAL_Time.h>
 #include <target_platform.h>
 
-#include <tx_api.h>
 
 // Returns the current date time from the RTC
 uint64_t HAL_Time_CurrentDateTime(bool datePartOnly)

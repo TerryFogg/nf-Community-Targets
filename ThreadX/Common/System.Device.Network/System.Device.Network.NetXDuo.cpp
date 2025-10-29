@@ -28,15 +28,15 @@
 #include "sys_net_native.h"
 #include "System.Device.Network.h"
 #include "System.Device.Wifi.h"
+#include "CLRNativeThreads.h"
 #include "nx_secure_tls_api.h"
 #include <nx_api.h>
 #include "tx_api.h"
 
 #define QUEUE_SIZE          10
 extern TX_EVENT_FLAGS_GROUP eventsNetworkWorkerThread;
-
-
 extern NX_PACKET_POOL nx_packet_pool_0;
+
 NX_IP ip_0;
 ULONG ip_thread_stack[2 * 1024 / sizeof(ULONG)];
 ULONG arp_space_area[512 / sizeof(ULONG)];
@@ -49,6 +49,8 @@ void *first_unused_memory;
 
 void NetworkThread_Entry(uint32_t parameter)
 {
+    (void)parameter;
+
     TX_EVENT_FLAGS_GROUP wpReceivedEvent;
     ULONG actual_flags;
 
@@ -95,9 +97,6 @@ void NetworkThread_Entry(uint32_t parameter)
         {
             // Wait for the process network event to be set by the hardware or class library request
             tx_event_flags_get(&eventsNetworkWorkerThread, 0x1, TX_OR_CLEAR, &actual_flags, NX_WAIT_FOREVER);
-
-           volatile int  xx = actual_flags;
-
         }
     }
     NANOCLR_CLEANUP();

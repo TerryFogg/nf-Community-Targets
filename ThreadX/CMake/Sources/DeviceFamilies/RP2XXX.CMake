@@ -26,8 +26,6 @@ set(PICO_NO_CMSE true)
 Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/RP2XXX.ld")
 configure_file(  ${LINKER_SCRIPT_FILE} "${CMAKE_BINARY_DIR}/configured_linker_Script.ld" @ONLY)
 set_target_properties(nanoCLR PROPERTIES LINK_DEPENDS "${CMAKE_BINARY_DIR}/configured_linker_Script.ld")
-
-
 set_target_properties(nanoCLR PROPERTIES PICO_TARGET_LINKER_SCRIPT ${CMAKE_BINARY_DIR}/configured_linker_Script.ld)
 
 include(${PICO_SDK_PATH}/pico_sdk_init.cmake)
@@ -239,60 +237,3 @@ if( "${TARGET_SERIES}" STREQUAL "RP2350")
                          pico_sha256
    )
 endif()
-
-
-# ┌────────────────────────────┐
-# │ Your App Code              │
-# │ ────────────────────────── │
-# │ cyw43_arch_wifi_connect()  │
-# │ cyw43_arch_enable_sta_mode() │
-# │ cyw43_arch_init()          │
-# └────────────┬───────────────┘
-#              │
-#              ▼
-# ┌────────────────────────────┐
-# │ Architecture Layer         │
-# │ ────────────────────────── │
-# │ cyw43_arch_lwip.c          │
-# │ - Initializes LwIP stack   │
-# │ - Starts polling loop      │
-# │ - Calls cyw43_ctrl_init()  │
-# └────────────┬───────────────┘
-#              │
-#              ▼
-# ┌────────────────────────────┐
-# │ Control Layer              │
-# │ ────────────────────────── │
-# │ cyw43_ctrl.c               │
-# │ - Manages Wi-Fi state      │
-# │ - Handles events, timers   │
-# │ - Calls cyw43_ll_xxx()     │
-# └────────────┬───────────────┘
-#              │
-#              ▼
-# ┌────────────────────────────┐
-# │ Low-Level Layer            │
-# │ ────────────────────────── │
-# │ cyw43_ll_spi.c             │
-# │ - Implements SPI protocol  │
-# │ - Handles mailbox framing  │
-# │ - Calls spi_transfer()     │
-# └────────────┬───────────────┘
-#              │
-#              ▼
-# ┌────────────────────────────┐
-# │ RP2040 SPI Peripheral      │
-# │ ────────────────────────── │
-# │ - Transfers bytes to/from  │
-# │   CYW43439 over SPI        │
-# │ - Uses GPIO for IRQ, CS    │
-# └────────────┬───────────────┘
-#              │
-#              ▼
-# ┌────────────────────────────┐
-# │ CYW43439 Wi-Fi/Bluetooth   │
-# │ ────────────────────────── │
-# │ - Responds to SPI commands │
-# │ - Sends events via IRQ     │
-# │ - Handles firmware, TCP/IP │
-# └────────────────────────────┘

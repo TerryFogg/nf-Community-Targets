@@ -40,7 +40,7 @@ void InitWireProtocolCommunications()
     irq_add_shared_handler(USBCTRL_IRQ, shared_interrupt, PICO_SHARED_IRQ_HANDLER_HIGHEST_ORDER_PRIORITY - 3);
 
     // Create event based data synchronization
-    tx_event_flags_create(&wpReceivedEvent, "wpReceiveDataEvent");
+    tx_event_flags_create(&wpReceivedEvent, (CHAR *)"wpReceiveDataEvent");
 }
 int wp_ReadBytes(uint8_t **ptr, uint32_t *size, uint32_t wait_time)
 {

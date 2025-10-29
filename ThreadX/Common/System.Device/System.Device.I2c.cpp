@@ -4,11 +4,10 @@
 //
 #include "nanoCLR_Types.h"
 #include "sys_dev_i2c_native.h"
+#include "CLRNativeThreads.h"
 #include "System.Device.IO.h"
 #include "System.Device.h"
 #include "ManagedThreadSupport.h"
-
-void I2CThread_Entry(ULONG parameter);
 
 extern TX_EVENT_FLAGS_GROUP eventsI2CWorkerThread;
 static bool WorkerThreadCreated = false;
@@ -82,7 +81,8 @@ HRESULT Library_sys_dev_i2c_native_System_Device_I2c_I2cDevice::
             connectionSettings[I2cConnectionSettings::FIELD___deviceAddress].NumericByRef().s4;
         CLR_RT_HeapBlock_Array *readData = readSpanByte[SpanByte::FIELD___array].DereferenceArray();
         CLR_RT_HeapBlock_Array *writeData = writeSpanByte[SpanByte::FIELD___array].DereferenceArray();
-        I2CTransaction.writeOffset = (writeSpanByte == NULL) ? 0 : writeSpanByte[SpanByte::FIELD___start].NumericByRef().s4;
+        I2CTransaction.writeOffset =
+            (writeSpanByte == NULL) ? 0 : writeSpanByte[SpanByte::FIELD___start].NumericByRef().s4;
         I2CTransaction.writeSize =
             (writeSpanByte == NULL) ? 0 : writeSpanByte[SpanByte::FIELD___length].NumericByRef().s4;
         I2CTransaction.readOffset =
@@ -167,6 +167,9 @@ HRESULT Library_sys_dev_i2c_native_System_Device_I2c_I2cDevice::
 
 void I2CThread_Entry(ULONG parameter)
 {
+
+    tx_event_flags_create(&eventsI2CWorkerThread, (CHAR *)"eventsI2CWorkerThread");
+
     ULONG actual_flags;
     // Loop continually, process is resumed when a write is required by setting the flag
     do

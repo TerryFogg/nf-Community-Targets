@@ -101,8 +101,6 @@ typedef struct socket_entry_t
 } socket_entry_t;
 
 
-static void NetworkThread_Entry(uint32_t parameter);
-VOID _nx_ram_network_driver(NX_IP_DRIVER *driver_req_ptr);
 
 ////////////////
 

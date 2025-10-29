@@ -2,9 +2,7 @@
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
-
 #include <tx_api.h>
-
 #include <nanoPAL.h>
 #include <target_platform.h>
 #include <targetPAL_Time.h>
@@ -16,7 +14,6 @@ void *nextEventCallbackDummyArg = NULL;
 static void NextEventTimer_Callback(uint32_t id)
 {
     (void)id;
-
     // this call also schedules the next one, if there is one
     HAL_COMPLETION::DequeueAndExec();
 }
@@ -35,14 +32,12 @@ HRESULT Time_Initialize()
     {
         return S_OK;
     }
-
     return S_FALSE;
 }
 
 HRESULT Time_Uninitialize()
 {
     tx_timer_delete(&nextEventTimer);
-
     return S_OK;
 }
 

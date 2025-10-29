@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
@@ -30,6 +30,7 @@ void CombinePathAndName(char *outpath, char *path1, char *path2)
     }
     strcat(outpath, path2);
 }
+
 int FileXToClrResultCode(int error)
 {
     int nanoCLR_File_Error;

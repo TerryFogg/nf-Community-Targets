@@ -8,32 +8,12 @@
 #include "ManagedThreadSupport.h"
 #include "System.Device.Wifi.h"
 
-
 static bool socket_data_available = false;
 
-HRESULT GetSocketEntry(CLR_RT_StackFrame &stack, socket_entry_t *socket_entry)
-{
-    NANOCLR_HEADER();
-    {
-        CLR_RT_HeapBlock *socket_info = stack.Arg0().Dereference();
-        if (socket_info != NULL)
-        {
-            socket_entry =
-                (socket_entry_t *)socket_info[Library_sys_net_native_System_Net_Sockets_NativeSocket::FIELD__m_Handle]
-                    .NumericByRef()
-                    .s4;
-        }
-        if ((int)socket_entry == Library_sys_net_native_System_Net_Sockets_NativeSocket::DISPOSED_HANDLE)
-        {
-            NANOCLR_SET_AND_LEAVE(CLR_E_PROCESS_EXCEPTION);
-        }
-    }
-    NANOCLR_NOCLEANUP();
-}
-int TranslateNXErrorToSocketError(CLR_RT_StackFrame &stack, int error)
+int TranslateNXErrorToSocketError(int NetXDuoError)
 {
     int translated_socket_error;
-    switch (error)
+    switch (NetXDuoError)
     {
         case NX_NO_PACKET:
             translated_socket_error = SOCK_EMFILE;

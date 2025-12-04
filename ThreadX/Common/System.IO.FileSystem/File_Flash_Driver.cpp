@@ -1,9 +1,9 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
 
-#include "File_Drivers.h"
+#include "System.IO.FileSystem.h"
 #include "board.h"
 #include "lx_api.h"
 
@@ -22,6 +22,16 @@ ULONG fx_lx_nand_driver_buffer
     [(7 * TOTAL_BLOCKS + 4 + 2 * (BYTES_PER_PHYSICAL_PAGE + SPARE_BYTES_PER_PAGE)) / sizeof(ULONG)];
 
 static const int num_drivers = sizeof(fx_lx_nand_drivers) / sizeof(fx_lx_nand_drivers[0]);
+
+static bool is_initialized = false;
+
+bool File_System_FLASH_Initialize()
+{
+    is_initialized = true;
+
+    return is_initialized;
+}
+
 static uint32_t find_driver_id(UINT driver_id)
 {
     int i = 0;
@@ -33,7 +43,7 @@ static uint32_t find_driver_id(UINT driver_id)
 
     return UNKNOWN_DRIVER_ID;
 }
-FileStatus Nand_Driver(FX_MEDIA *media_ptr)
+void File_Flash_Driver(FX_MEDIA *media_ptr)
 {
     int i;
     int status;
@@ -60,6 +70,7 @@ FileStatus Nand_Driver(FX_MEDIA *media_ptr)
     {
         current_driver = &fx_lx_nand_drivers[i];
     }
+
     switch (media_ptr->fx_media_driver_request)
     {
         case FX_DRIVER_INIT:
@@ -107,14 +118,7 @@ FileStatus Nand_Driver(FX_MEDIA *media_ptr)
         case FX_DRIVER_UNINIT:
         {
             status = lx_nand_flash_close(&current_driver->flash_instance);
-            if (status == LX_SUCCESS)
-            {
-                media_ptr->fx_media_driver_status = FX_SUCCESS;
-            }
-            else
-            {
-                media_ptr->fx_media_driver_status = FX_IO_ERROR;
-            }
+            media_ptr->fx_media_driver_status = (status == LX_SUCCESS) ? FX_SUCCESS : FX_IO_ERROR;
             break;
         }
         case FX_DRIVER_READ:
@@ -137,10 +141,10 @@ FileStatus Nand_Driver(FX_MEDIA *media_ptr)
         }
         case FX_DRIVER_BOOT_READ:
         {
-            // Read the boot record and return to the caller.  */
-            // Setup the destination buffer.  */
+            // Read the boot record and return to the caller.
+            // Setup the destination buffer.
             destination_buffer = (UCHAR *)media_ptr->fx_media_driver_buffer;
-            // Read boot sector from NAND flash.  */
+            // Read boot sector from NAND flash.
             status = lx_nand_flash_sector_read(&current_driver->flash_instance, 0, destination_buffer);
             if (status != LX_SUCCESS)
             {
@@ -155,7 +159,7 @@ FileStatus Nand_Driver(FX_MEDIA *media_ptr)
             logical_sector = media_ptr->fx_media_driver_logical_sector;
             source_buffer = (uint8_t *)media_ptr->fx_media_driver_buffer;
 
-            // Loop to write sectors to flash.  */
+            // Loop to write sectors to flash.
             for (i = 0; i < media_ptr->fx_media_driver_sectors; i++)
             {
                 status = lx_nand_flash_sector_write(&current_driver->flash_instance, logical_sector, source_buffer);
@@ -172,8 +176,8 @@ FileStatus Nand_Driver(FX_MEDIA *media_ptr)
         }
         case FX_DRIVER_BOOT_WRITE:
         {
-            // Write the boot record and return to the caller.  */
-            // Setup the source buffer.  */
+            // Write the boot record and return to the caller.
+            // Setup the source buffer.
             source_buffer = (UCHAR *)media_ptr->fx_media_driver_buffer;
             status = lx_nand_flash_sector_write(&current_driver->flash_instance, 0, source_buffer);
             if (status != LX_SUCCESS)
@@ -188,7 +192,7 @@ FileStatus Nand_Driver(FX_MEDIA *media_ptr)
         {
             logical_sector = media_ptr->fx_media_driver_logical_sector;
 
-            // Release sectors.  */
+            // Release sectors.
             for (i = 0; i < media_ptr->fx_media_driver_sectors; i++)
             {
                 status = lx_nand_flash_sector_release(&current_driver->flash_instance, logical_sector);

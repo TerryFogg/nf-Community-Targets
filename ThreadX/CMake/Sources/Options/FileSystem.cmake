@@ -336,38 +336,34 @@ list(APPEND FILE_INCLUDES
 )
 list(APPEND FILE_SOURCES
      ${CMAKE_SOURCE_DIR}/src/System.IO.FileSystem/nf_sys_io_filesystem.cpp
-     
-     # Can't use the master copies as they have references to "ff.h"
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/nf_sys_io_filesystem_nanoFramework_System_IO_FileSystem_SDCard.cpp
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/nf_sys_io_filesystem_System_IO_Directory.cpp
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/nf_sys_io_filesystem_System_IO_File.cpp
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/nf_sys_io_filesystem_System_IO_FileStream.cpp
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/FileSystem.cpp
+    ### Not Used in the current system should be removed
+    # ${CMAKE_SOURCE_DIR}/src/System.IO.FileSystem/nf_sys_io_filesystem_System_IO_File.cpp
 
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Threads/FileThread.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/nf_sys_io_filesystem_System_IO_Directory.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/nf_sys_io_filesystem_System_IO_DriveInfo.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/nf_sys_io_filesystem_System_IO_NativeFileStream.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/nf_sys_io_filesystem_System_IO_NativeFindFile.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/nf_sys_io_filesystem_System_IO_NativeIO.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/nf_sys_io_filesystem_nanoFramework_System_IO_FileSystem_SDCard.cpp
+
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/System.IO.FileSystem.cpp
 )
 
 if(FILE_SYSTEM_SD)
     list(APPEND FILE_SOURCES
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/Sd_driver.c
+         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/File_SD_driver.cpp
     )
 endif()
 
-if(FILE_SYSTEM_NAND)
+if(FILE_SYSTEM_FLASH)
     list(APPEND FILE_SOURCES
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/Nand_driver.c
-    )
-endif()
-
-if(FILE_SYSTEM_NOR)
-    list(APPEND FILE_SOURCES
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/Nor_driver.c
+         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/File_Flash_driver.cpp
     )
 endif()
 
 if(FILE_SYSTEM_RAM)
     list(APPEND FILE_SOURCES
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/Ram_driver.c
+         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/File_Ram_driver.cpp
     )
 endif()
 

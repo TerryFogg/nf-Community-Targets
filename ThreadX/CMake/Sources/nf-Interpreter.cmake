@@ -222,7 +222,8 @@
                     ${CMAKE_SOURCE_DIR}/src/PAL/Events/nanoPAL_Events.cpp
                     ${CMAKE_SOURCE_DIR}/src/PAL/Events/nanoPAL_Events_driver.cpp
                     ${CMAKE_SOURCE_DIR}/src/PAL/Events/nanoPAL_Events_functions.cpp
-                    ${CMAKE_SOURCE_DIR}/src/PAL/FileSystem/nanoPAL_FileSystem.cpp
+#                    ${CMAKE_SOURCE_DIR}/src/PAL/FileSystem/nanoPAL_FileSystem.cpp
+#                    ${CMAKE_SOURCE_DIR}/src/PAL/FileSystem/nanoPAL_FileSystem_stubs.cpp
 #                    ${CMAKE_SOURCE_DIR}/src/PAL/Lwip/lwIP_Sockets_functions.cpp
 #                    ${CMAKE_SOURCE_DIR}/src/PAL/Lwip/lwIP_Sockets.cpp
                     #${CMAKE_SOURCE_DIR}/src/PAL/Profiler/nanoPAL_PerformanceCounters_stubs.cpp
@@ -280,6 +281,7 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.I2s.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Pwm.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Spi.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.IO.Asychronous.cpp
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware/nanoframework_Hardware.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware/nanoframework_Hardware_nanoframework_Hardware_NativeFunctions.cpp

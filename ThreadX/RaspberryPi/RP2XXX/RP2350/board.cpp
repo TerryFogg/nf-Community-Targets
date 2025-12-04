@@ -56,7 +56,7 @@ void SetupPinList()
     Device::CreatePinList(&mcuPins[0], ARRAY_LEN(mcuPins));
 
     AdcIO::SetupAdcList(mcuADC);
-    I2cIO::SetupI2CList(mcuI2C);
+    I2cIO::SetupI2CList(mcuI2C,NUMBER_I2C_BUSES);
     PwmIO::SetupPwmList(mcuPWM);
     SpiIO::SetupSpiList(mcuSPI);
     SerialIO::SetupUsartList(mcuUSART);

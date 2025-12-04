@@ -5,11 +5,10 @@
 //
 #include <nanoCLR_Types.h>
 #include "TX_API.h"
-#ifdef FILEX
-#include "File_Drivers.h"
-#endif
+#include "System.IO.FileSystem.h"
 
 #include "PinNames.h"
+
 #define NOT_SET -1
 #define FAULT_ON_OBJECT_DISPOSED(disposedState)                                                                        \
     if (disposedState != 0)                                                                                            \
@@ -75,20 +74,23 @@ typedef struct GpioCallbackParameter
     uint32_t debounceMs;
     bool waitingForDebounceToExpire;
 } GpioCallbackParameter;
+
 typedef struct DeviceGpioPin
 {
-    PinNameValue pinNameValue;
+    PinNameValues pinNameValue;
     bool Reserved;
     GpioCallbackParameter *GpioCallbackParameters;
     PinMode Mode;
     DevicePinFunction Function;
     void *FunctionCode;
 } DeviceGpioPin;
+
 typedef enum I2c_Bus_Type
 {
     Master,
     Slave
 } I2c_Bus_Type;
+
 typedef struct AdcPin
 {
     void *controllerId;
@@ -135,6 +137,7 @@ typedef struct SerialChannel
 extern "C"
 {
 #endif
+
     class Device
     {
       public:

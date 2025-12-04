@@ -47,11 +47,6 @@
 #define AF_INET6  3 // IPv6 socket (UDP, TCP, etc)
 #define AF_PACKET 4 // Raw Packet type (Link Layer packets)
 
-class NetworkIO
-{
-  public:
-    static void Entry(NX_IP_DRIVER *driver_req_ptr);
-};
 
 #define NX_DRIVER_PHYSICAL_HEADER_REMOVE(p)                                                                            \
     do                                                                                                                 \
@@ -241,8 +236,7 @@ static unsigned int test_device_cert_key_der_len = 1192;
 #define Rdm       4
 #define Seqpacket 5
 
-HRESULT GetSocketEntry(CLR_RT_StackFrame &stack, socket_entry_t *socket_entry);
-int TranslateNXErrorToSocketError(CLR_RT_StackFrame &stack, int error);
+int TranslateNXErrorToSocketError( int NetXDuoError);
 void SetReturnStatus(CLR_RT_StackFrame &stack, CLR_INT32 errorCode);
 void tcp_data_callback(NX_TCP_SOCKET *socket_ptr);
 void tcp_server_listen_callback(NX_TCP_SOCKET *socket_ptr, UINT port);

@@ -16,12 +16,30 @@
 #include "sys_io_ser_native.h"
 #include "sys_dev_spi_native.h"
 
+#define CLEAR_FLAG(FLAG, BIT) ((FLAG) &= ~(BIT))
+
+extern TX_EVENT_FLAGS_GROUP asynchronous_io_flags;
+extern TX_QUEUE AsynchronousIOQueue;
+
+typedef enum
+{
+    REQUEST_I2C = 1,
+    REQUEST_NETWORK = 2,
+    REQUEST_USB = 4,
+    REQUEST_FILEX = 8,
+
+    I2C_REQUEST_COMPLETED = 32,
+    NETWORK_REQUEST_COMPLETED = 64,
+    USB_REQUEST_COMPLETED = 128,
+    FILEX_REQUEST_COMPLETED = 128
+} RequestType;
 
 enum I2C_CONTROL_TYPE
 {
     MASTER,
     SLAVE
 };
+
 struct ADC_Properties
 {
     bool ADC_Initialized;
@@ -38,17 +56,14 @@ struct I2C_Properties
 };
 struct I2c_Transaction
 {
-    bool InProgress;
-    uint8_t deviceId;
+    uint8_t busId;
     int slaveAddress;
     int writeOffset;
     int writeSize;
     int readOffset;
     int readSize;
-    int64_t estimatedTransactionTimeMilliseconds;
     bool IsWrite;
     bool IsRead;
-    bool longRunningTransaction;
     uint8_t *writeBuffer;
     uint8_t *readBuffer;
     uint32_t bytesTransferred;
@@ -77,6 +92,7 @@ struct USART_Properties
     PinNameValue tx;
     PinNameValue rx;
 };
+
 inline void Callback_EVENT_GPIO(GPIO_PIN pinNumber, bool pinValue)
 {
     PostManagedEvent(EVENT_GPIO, 0, (uint16_t)pinNumber, pinValue);
@@ -158,7 +174,7 @@ class I2cIO
         CLR_INT32 I2C_deviceId,
         I2cBusSpeed I2C_speed,
         I2C_CONTROL_TYPE I2C_control_type,
-        CLR_INT32 deviceAddress=0);
+        CLR_INT32 deviceAddress = 0);
 
     static bool Dispose(CLR_INT32 I2C_deviceId);
     static I2cTransferStatus Write(
@@ -173,7 +189,9 @@ class I2cIO
         CLR_INT32 slaveAddress,
         CLR_UINT8 *readBuffer,
         CLR_INT32 readSize);
-    static void SetupI2CList(I2C_Properties *mcuI2C);
+    static void Execute(I2c_Transaction *pI2CTransaction);
+
+    static void SetupI2CList(I2C_Properties *mcuI2C, int NumberI2CDevices);
     static uint32_t GetByteTime(uint32_t I2C_deviceId);
 };
 

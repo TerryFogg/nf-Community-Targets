@@ -31,3 +31,8 @@ extern uint32_t __nanoConfig_start__;
 extern uint32_t __nanoConfig_end__;
 extern uint32_t __deployment_start__;
 extern uint32_t __deployment_end__;
+
+extern const uint32_t ram_disk_start_address;
+extern const uint32_t ram_disk_size;
+extern const uint32_t flash_disk_start_address;
+extern const uint32_t flash_disk_size;

@@ -10,7 +10,6 @@
 #include "nxd_dhcp_client.h"
 #include "nx_udp.h"
 #include "nxd_dns.h"
-#include "nx_secure_tls_api.h"
 #include "nx_crypto_ec.h"
 
 #define GLOBAL_LOCK()   TX_INTERRUPT_SAVE_AREA TX_DISABLE

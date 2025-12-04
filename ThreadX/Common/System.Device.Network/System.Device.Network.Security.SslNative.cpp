@@ -3,387 +3,502 @@
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
 // See LICENSE file in the project root for full license information.
 //
-
 #include "System.Device.Network.h"
-#include "System.Device.Wifi.h"
+#include <nx_secure_tls.h>
+#include <nx_secure_tls_api.h>
+#include <nx_secure_x509.h>
 
-NX_TCP_SOCKET *socket_ptr;
-NX_SECURE_TLS_SESSION tls_session;
+NX_IP ServerIP;
+NX_TCP_SOCKET ServerSocket;
+NX_SECURE_TLS_SESSION TLSSession;
+NX_SECURE_TLS_CRYPTO cipher_table;
 NX_PACKET *send_packet;
 NX_PACKET *receive_packet;
+NX_SECURE_X509_CERT SecureX509CertificateLocal;
+NX_SECURE_X509_CERT SecureX509CertificateAuthority;
 
-static NX_SECURE_X509_CERT certificate;
+ULONG type_of_service;
+ULONG fragment;
+UINT time_to_live;
+ULONG window_size;
+void tcp_urgent_callback(NX_TCP_SOCKET *server_socket);
+void tcp_disconnect_callback(NX_TCP_SOCKET *server_socket);
 
+uint8_t working_buffer[2048];
+uint8_t tls_packet_buffer[2048];
 
-HRESULT Library_sys_net_native_System_Net_Security_CertificateManager::
-    AddCaCertificateBundle___STATIC__BOOLEAN__SZARRAY_U1(CLR_RT_StackFrame &stack)
+const UCHAR *private_key;
+USHORT priv_len;
+UINT private_key_type = NX_SECURE_X509_KEY_TYPE_RSA_PKCS1_DER; // Default ??????
+
+void tcp_urgent_callback(NX_TCP_SOCKET *server_socket)
 {
-    NANOCLR_HEADER();
-    {
-        uint32_t certificateSize;
-        uint32_t allocationSize;
-        HAL_Configuration_X509CaRootBundle *caBundle = NULL;
-
-        CLR_RT_HeapBlock_Array *arrayCA = stack.Arg0().DereferenceArray();
-
-        // check for empty array
-        FAULT_ON_NULL(arrayCA);
-
-        certificateSize = (int)arrayCA->m_numOfElements;
-
-        // build a HAL_Configuration_X509CaRootBundle
-        // because certificate length is variable need to compute required memory
-        // header
-        allocationSize = offsetof(HAL_Configuration_X509CaRootBundle, Certificate);
-        // certificate
-        allocationSize += certificateSize;
-
-        // allocate memory
-        caBundle = (HAL_Configuration_X509CaRootBundle *)platform_malloc(allocationSize);
-        // sanity check
-        FAULT_ON_NULL(caBundle);
-
-        // fill in struct
-        caBundle->CertificateSize = certificateSize;
-
-        // copy from get a pointer to the the binary data for the certificate
-        memcpy(caBundle->Certificate, arrayCA->GetFirstElement(), certificateSize);
-
-        if (g_TargetConfiguration.CertificateStore->Count == 0)
-        {
-            // not found, add the certificate bundle
-            // we only support one CA root bundle, so this is fixed to 0
-            // block size doesn't matter
-            // offset is 0 and done flag is true because this is being stored in a single chunk
-            if (ConfigurationManager_StoreConfigurationBlock(
-                    caBundle,
-                    DeviceConfigurationOption_X509CaRootBundle,
-                    0,
-                    certificateSize,
-                    0,
-                    true) != TRUE)
-            {
-                NANOCLR_SET_AND_LEAVE(CLR_E_FAIL);
-            }
-        }
-        else
-        {
-            // update the configuration block
-            // we only support one CA root bundle, so this is fixed to 0
-            if (ConfigurationManager_UpdateConfigurationBlock(
-                    caBundle,
-                    DeviceConfigurationOption_X509CaRootBundle,
-                    0) == UpdateConfigurationResult_Failed)
-            {
-                NANOCLR_SET_AND_LEAVE(CLR_E_FAIL);
-            }
-        }
-
-        // reach here, we should be OK
-        stack.SetResult_Boolean(TRUE);
-
-        if (caBundle != NULL)
-        {
-            platform_free(caBundle);
-        }
-    }
-    NANOCLR_NOCLEANUP();
+    // Placeholder for urgent data handling
 }
+void tcp_disconnect_callback(NX_TCP_SOCKET *server_socket)
+{
+    // Placeholder for disconnect handling
+}
+void thread_connect_received(NX_TCP_SOCKET *server_socket, UINT port)
+{
+    // Placeholder for connection received handling
+}
+
+// NetX Secure expects the private key in plain DER/PEM format
+// If you need password protection, implement a decryption routine after reading with
+// FileX or internal storage then pass the decrypted buffer to a routine to extract the
+// private key.
+
+// NOTE:
+// First implementation, no password support
 HRESULT Library_sys_net_native_System_Net_Security_SslNative::
     SecureServerInit___STATIC__I4__I4__I4__SystemSecurityCryptographyX509CertificatesX509Certificate__SystemSecurityCryptographyX509CertificatesX509Certificate__BOOLEAN(
         CLR_RT_StackFrame &stack)
 {
     NANOCLR_HEADER();
     {
-
+        // SslProtocols ( one, Tls, Tls11,Tls12,Tls13)
+        // SslVerification ( noVerification,VerifyPeer,certRequired,verifyClientOnce)
+        CLR_INT32 sslProtocol = stack.Arg0().NumericByRef().s4;
+        CLR_INT32 sslVerification = stack.Arg1().NumericByRef().s4;
+        uint8_t *PrivateKey;
+        CLR_UINT32 PrivateKeyLength;
+        const char *Password = NULL;
+        int PasswordLength = 0;
+        ULONG actual_status;
+        UINT status;
+        CLR_RT_HeapBlock *hbCertificate = stack.Arg2().Dereference();
+        CLR_RT_HeapBlock *hbCertificateAuthority = stack.Arg3().Dereference();
+        CLR_RT_HeapBlock_Array *Certificate = NULL;
+        CLR_RT_HeapBlock_Array *CertificateAuthority = NULL;
         CLR_RT_TypeDef_Index x509Certificate2TypeDef;
+        CLR_UINT8 *sslCertificateAuthority;
+        CLR_UINT8 *sslLocalCertificate;
+        CLR_RT_HeapBlock &res = stack.m_owningThread->m_currentException;
 
-        CLR_INT32 sslContext = -1;
-        CLR_INT32 sslMode = stack.Arg0().NumericByRef().s4;
-        CLR_INT32 sslVerify = stack.Arg1().NumericByRef().s4;
-        CLR_RT_HeapBlock *hbCert = stack.Arg2().Dereference();
-        CLR_RT_HeapBlock *caCert = stack.Arg3().Dereference();
+        NX_SECURE_X509_CERT *remote_certificate;
+        unsigned char remote_cert_buffer[10];
+        NX_SECURE_X509_CERT *remote_issuer;
+        unsigned char remote_issuer_buffer[10];
+
         bool useDeviceCertificate = (bool)stack.Arg4().NumericByRef().u1;
-        CLR_RT_HeapBlock_Array *arrCert = NULL;
-        CLR_RT_HeapBlock_Array *privateKey = NULL;
-        CLR_UINT8 *sslCert = NULL;
-        volatile int result;
-        uint8_t *pk = NULL;
-        const char *pkPassword = NULL;
-        CLR_UINT32 pkPasswordLength = 0;
+        bool typeFound = g_CLR_RT_TypeSystem.FindTypeDef(
+            "X509Certificate2",
+            "System.Security.Cryptography.X509Certificates",
+            x509Certificate2TypeDef);
 
-        if (hbCert != NULL)
+        // Create SocketException in case of failure
+        Library_corlib_native_System_Exception::CreateInstance(
+            res,
+            g_CLR_RT_WellKnownTypes.m_SocketException,
+            CLR_E_FAIL,
+            &stack);
+
+        FAULT_ON_NULL(hbCertificate);
         {
-            g_CLR_RT_TypeSystem.FindTypeDef(
-                "X509Certificate2",
-                "System.Security.Cryptography.X509Certificates",
-                x509Certificate2TypeDef);
-
-            arrCert = hbCert[X509Certificate::FIELD___certificate].DereferenceArray();
-            arrCert->Pin();
-
-            // there is a client certificate, find if it's a X509Certificate2
-            if (hbCert->ObjectCls().Type() == x509Certificate2TypeDef.Type())
+            FAULT_ON_NULL(hbCertificateAuthority);
             {
-                // get private key
-                privateKey = hbCert[X509Certificate2::FIELD___privateKey].DereferenceArray();
+                CertificateAuthority = hbCertificateAuthority[X509Certificate::FIELD___certificate].DereferenceArray();
+                Certificate = hbCertificate[X509Certificate::FIELD___certificate].DereferenceArray();
 
-                // grab the first element, if there is a private key
-                if (privateKey)
+                FAULT_ON_NULL_ARG(CertificateAuthority);
                 {
-                    pk = privateKey->GetFirstElement();
-
-                    // get password field
-                    CLR_RT_HeapBlock *passwordHb = hbCert[X509Certificate2::FIELD___password].Dereference();
-
-                    // get password length, if there is a password
-                    if (passwordHb)
+                    sslCertificateAuthority = CertificateAuthority->GetFirstElement();
+                    FAULT_ON_NULL_ARG(Certificate);
                     {
-                        pkPassword = passwordHb->StringText();
-                        pkPasswordLength = hal_strlen_s(pkPassword);
+                        Certificate->Pin();
+                        sslLocalCertificate = Certificate->GetFirstElement();
+
+                        bool IsX509Certificate2 = (hbCertificate->ObjectCls().Type() == x509Certificate2TypeDef.Type());
+                        if (IsX509Certificate2)
+                        {
+                            CLR_RT_HeapBlock_Array *hbaPrivateKey;
+                            if (hbaPrivateKey = Certificate[X509Certificate2::FIELD___privateKey].DereferenceArray())
+                                PrivateKey = hbaPrivateKey->GetFirstElement();
+                            CLR_RT_HeapBlock *hbPassword =
+                                hbCertificate[X509Certificate2::FIELD___password].Dereference();
+                            if (hbPassword)
+                            {
+                                Password = (const char *)hbPassword->StringText();
+                                PasswordLength = hal_strlen_s(Password);
+                            }
+                        }
+
+                        // Ensure the IP instance has been initialized.
+                        status =
+                            nx_ip_status_check(&ServerIP, NX_IP_INITIALIZE_DONE, &actual_status, NX_IP_PERIODIC_RATE);
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+
+                        status = nx_tcp_socket_create(
+                            &ServerIP,
+                            &ServerSocket,
+                            (char *)"Server Socket",
+                            NX_IP_NORMAL,
+                            NX_FRAGMENT_OKAY /*NX_DONT_FRAGMENT*/,
+                            NX_IP_TIME_TO_LIVE,
+                            8192,
+                            NX_NULL,
+                            NX_NULL);
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+
+                        status = nx_secure_tls_session_create(
+                            &TLSSession,
+                            &cipher_table,
+                            working_buffer,
+                            sizeof(working_buffer));
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+
+                        status = nx_secure_tls_session_packet_buffer_set(
+                            &TLSSession,
+                            tls_packet_buffer,
+                            sizeof(tls_packet_buffer));
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+
+                        status = nx_secure_tls_remote_certificate_allocate(
+                            &TLSSession,
+                            remote_certificate,
+                            remote_cert_buffer,
+                            sizeof(remote_cert_buffer));
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+
+                        status = nx_secure_tls_remote_certificate_allocate(
+                            &TLSSession,
+                            remote_issuer,
+                            remote_issuer_buffer,
+                            sizeof(remote_issuer_buffer));
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+
+                        status = nx_secure_x509_certificate_initialize(
+                            &SecureX509CertificateLocal,
+                            sslCertificateAuthority,
+                            sizeof(sslCertificateAuthority),
+                            working_buffer,
+                            sizeof(working_buffer),
+                            private_key,
+                            priv_len,
+                            private_key_type);
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+
+                        status = nx_secure_tls_local_certificate_add(&TLSSession, &SecureX509CertificateLocal);
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+
+                        status = nx_secure_x509_certificate_initialize(
+                            &SecureX509CertificateAuthority,
+                            sslLocalCertificate,
+                            sizeof(sslLocalCertificate),
+                            working_buffer,
+                            sizeof(working_buffer),
+                            private_key,
+                            priv_len,
+                            private_key_type);
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+
+                        status = nx_secure_tls_trusted_certificate_add(&TLSSession, &SecureX509CertificateAuthority);
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+
+                        status =
+                            nx_tcp_server_socket_listen(&ServerIP, 12, &ServerSocket, 5, thread_connect_received);
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+                    }
+                ReturnError:
+                    if (status != NX_SUCCESS)
+                    {
+                        int sslContext = -1; // Dummy context for now
+                        CLR_RT_HeapBlock &res = stack.m_owningThread->m_currentException;
+
+                        int translated_socket_error = TranslateNXErrorToSocketError(status);
+                        stack.SetResult_I4(sslContext);
+
+                        if ((Library_corlib_native_System_Exception::CreateInstance(
+                                res,
+                                g_CLR_RT_WellKnownTypes.m_SocketException,
+                                CLR_E_FAIL,
+                                &stack)) == S_OK)
+                        {
+                            res.Dereference()
+                                [Library_sys_net_native_System_Net_Sockets_SocketException::FIELD___errorCode]
+                                    .SetInteger(translated_socket_error);
+                            NANOCLR_SET_AND_LEAVE(CLR_E_PROCESS_EXCEPTION);
+                        }
                     }
                 }
             }
-
-            // get certificate
-            sslCert = arrCert->GetFirstElement();
         }
-
-        //result =
-        //    (SSL_ServerInit(
-        //         sslMode,
-        //         sslVerify,
-        //         (const char *)sslCert,
-        //         sslCert == NULL ? 0 : arrCert->m_numOfElements,
-        //         pk,
-        //         pk == NULL ? 0 : privateKey->m_numOfElements,
-        //         pkPassword,
-        //         pkPasswordLength,
-        //         sslContext,
-        //         useDeviceCertificate)
-        //         ? 0
-        //         : -1);
-
-        NANOCLR_CHECK_HRESULT(ThrowOnError(stack, result));
-
-        if (caCert != NULL)
-        {
-            arrCert = caCert[X509Certificate::FIELD___certificate].DereferenceArray();
-
-            // If arrCert == NULL then the certificate is an X509Certificate2 which uses a certificate handle
-            if (arrCert == NULL)
-            {
-                arrCert = caCert[X509Certificate::FIELD___handle].DereferenceArray();
-                FAULT_ON_NULL(arrCert);
-
-                sslCert = arrCert->GetFirstElement();
-
-                // pass the certificate handle as the data parameter
-                result =
-                    (SSL_AddCertificateAuthority(sslContext, (const char *)sslCert, arrCert->m_numOfElements) ? 0 : -1);
-
-                NANOCLR_CHECK_HRESULT(ThrowOnError(stack, result));
-            }
-            else
-            {
-
-                arrCert->Pin();
-
-                sslCert = arrCert->GetFirstElement();
-
-                result =
-                    (SSL_AddCertificateAuthority(sslContext, (const char *)sslCert, arrCert->m_numOfElements) ? 0 : -1);
-
-                NANOCLR_CHECK_HRESULT(ThrowOnError(stack, result));
-            }
-        }
-
-        stack.SetResult_I4(sslContext);
-
-        if (FAILED(hr) && (sslContext != -1))
-        {
-            SSL_ExitContext(sslContext);
-        }
+        NANOCLR_NOCLEANUP();
     }
-    NANOCLR_NOCLEANUP();
 }
+
+// internal static extern int SecureClientInit(
+// int sslProtocols,                             -- SslProtocols
+// int sslCertVerify,                            -- int
+// X509Certificate certificate,                  -- X509Certificate
+// X509Certificate ca,                           -- X509Certificate
+// bool useDeviceCertificate                     -- bool  false
+// private int _sslContext;
+// private bool _isServer;
+
 HRESULT Library_sys_net_native_System_Net_Security_SslNative::
     SecureClientInit___STATIC__I4__I4__I4__SystemSecurityCryptographyX509CertificatesX509Certificate__SystemSecurityCryptographyX509CertificatesX509Certificate__BOOLEAN(
         CLR_RT_StackFrame &stack)
 {
     NANOCLR_HEADER();
     {
-
+        // SslProtocols ( one, Tls, Tls11,Tls12,Tls13)
+        // SslVerification ( noVerification,VerifyPeer,certRequired,verifyClientOnce)
+        CLR_INT32 sslProtocol = stack.Arg0().NumericByRef().s4;
+        CLR_INT32 sslVerification = stack.Arg1().NumericByRef().s4;
+        uint8_t *PrivateKey;
+        CLR_UINT32 PrivateKeyLength;
+        const char *Password = NULL;
+        int PasswordLength = 0;
+        ULONG actual_status;
+        UINT status;
+        CLR_RT_HeapBlock *hbCertificate = stack.Arg2().Dereference();
+        CLR_RT_HeapBlock *hbCertificateAuthority = stack.Arg3().Dereference();
+        CLR_RT_HeapBlock_Array *Certificate = NULL;
+        CLR_RT_HeapBlock_Array *CertificateAuthority = NULL;
         CLR_RT_TypeDef_Index x509Certificate2TypeDef;
+        CLR_UINT8 *sslCertificateAuthority;
+        CLR_UINT8 *sslLocalCertificate;
+        CLR_RT_HeapBlock &res = stack.m_owningThread->m_currentException;
 
-        CLR_INT32 sslContext = -1;
-        CLR_INT32 sslMode = stack.Arg0().NumericByRef().s4;
-        CLR_INT32 sslVerify = stack.Arg1().NumericByRef().s4;
-        CLR_RT_HeapBlock *hbCert = stack.Arg2().Dereference();
-        CLR_RT_HeapBlock *caCert = stack.Arg3().Dereference();
+        NX_SECURE_X509_CERT *remote_certificate;
+        unsigned char remote_cert_buffer[10];
+        NX_SECURE_X509_CERT *remote_issuer;
+        unsigned char remote_issuer_buffer[10];
+
         bool useDeviceCertificate = (bool)stack.Arg4().NumericByRef().u1;
-        CLR_RT_HeapBlock_Array *arrCert = NULL;
-        CLR_RT_HeapBlock_Array *privateKey = NULL;
-        CLR_UINT8 *sslCert = NULL;
-        volatile int result;
-        uint8_t *pk = NULL;
-        const char *pkPassword = NULL;
-        CLR_UINT32 pkPasswordLength = 0;
+        bool typeFound = g_CLR_RT_TypeSystem.FindTypeDef(
+            "X509Certificate2",
+            "System.Security.Cryptography.X509Certificates",
+            x509Certificate2TypeDef);
 
-        if (hbCert != NULL)
+        // Create SocketException in case of failure
+        Library_corlib_native_System_Exception::CreateInstance(
+            res,
+            g_CLR_RT_WellKnownTypes.m_SocketException,
+            CLR_E_FAIL,
+            &stack);
+
+        FAULT_ON_NULL(hbCertificate);
         {
-            g_CLR_RT_TypeSystem.FindTypeDef(
-                "X509Certificate2",
-                "System.Security.Cryptography.X509Certificates",
-                x509Certificate2TypeDef);
-
-            arrCert = hbCert[X509Certificate::FIELD___certificate].DereferenceArray();
-            arrCert->Pin();
-
-            // there is a client certificate, find if it's a X509Certificate2
-            if (hbCert->ObjectCls().Type() == x509Certificate2TypeDef.Type())
+            FAULT_ON_NULL(hbCertificateAuthority);
             {
-                // get private key
-                privateKey = hbCert[X509Certificate2::FIELD___privateKey].DereferenceArray();
+                CertificateAuthority = hbCertificateAuthority[X509Certificate::FIELD___certificate].DereferenceArray();
+                Certificate = hbCertificate[X509Certificate::FIELD___certificate].DereferenceArray();
 
-                // grab the first element, if there is a private key
-                if (privateKey)
+                FAULT_ON_NULL_ARG(CertificateAuthority);
                 {
-                    pk = privateKey->GetFirstElement();
-
-                    // get password field
-                    CLR_RT_HeapBlock *passwordHb = hbCert[X509Certificate2::FIELD___password].Dereference();
-
-                    // get password length, if there is a password
-                    if (passwordHb)
+                    sslCertificateAuthority = CertificateAuthority->GetFirstElement();
+                    FAULT_ON_NULL_ARG(Certificate);
                     {
-                        pkPassword = passwordHb->StringText();
-                        pkPasswordLength = hal_strlen_s(pkPassword);
+                        Certificate->Pin();
+                        sslLocalCertificate = Certificate->GetFirstElement();
+
+                        bool IsX509Certificate2 = (hbCertificate->ObjectCls().Type() == x509Certificate2TypeDef.Type());
+                        if (IsX509Certificate2)
+                        {
+                            CLR_RT_HeapBlock_Array *hbaPrivateKey;
+                            if (hbaPrivateKey = Certificate[X509Certificate2::FIELD___privateKey].DereferenceArray())
+                                PrivateKey = hbaPrivateKey->GetFirstElement();
+                            CLR_RT_HeapBlock *hbPassword =
+                                hbCertificate[X509Certificate2::FIELD___password].Dereference();
+                            if (hbPassword)
+                            {
+                                Password = (const char *)hbPassword->StringText();
+                                PasswordLength = hal_strlen_s(Password);
+                            }
+                        }
+
+                        // Ensure the IP instance has been initialized.
+                        status =
+                            nx_ip_status_check(&ServerIP, NX_IP_INITIALIZE_DONE, &actual_status, NX_IP_PERIODIC_RATE);
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+
+                        status = nx_tcp_socket_create(
+                            &ServerIP,
+                            &ServerSocket,
+                            (char *)"Server Socket",
+                            NX_IP_NORMAL,
+                            NX_FRAGMENT_OKAY /*NX_DONT_FRAGMENT*/,
+                            NX_IP_TIME_TO_LIVE,
+                            8192,
+                            NX_NULL,
+                            NX_NULL);
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+
+                        status = nx_secure_tls_session_create(
+                            &TLSSession,
+                            &cipher_table,
+                            working_buffer,
+                            sizeof(working_buffer));
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+
+                        status = nx_secure_tls_session_packet_buffer_set(
+                            &TLSSession,
+                            tls_packet_buffer,
+                            sizeof(tls_packet_buffer));
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+
+                        status = nx_secure_tls_remote_certificate_allocate(
+                            &TLSSession,
+                            remote_certificate,
+                            remote_cert_buffer,
+                            sizeof(remote_cert_buffer));
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+
+                        status = nx_secure_tls_remote_certificate_allocate(
+                            &TLSSession,
+                            remote_issuer,
+                            remote_issuer_buffer,
+                            sizeof(remote_issuer_buffer));
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+
+                        status = nx_secure_x509_certificate_initialize(
+                            &SecureX509CertificateLocal,
+                            sslCertificateAuthority,
+                            sizeof(sslCertificateAuthority),
+                            working_buffer,
+                            sizeof(working_buffer),
+                            private_key,
+                            priv_len,
+                            private_key_type);
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+
+                        status = nx_secure_tls_local_certificate_add(&TLSSession, &SecureX509CertificateLocal);
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+
+                        status = nx_secure_x509_certificate_initialize(
+                            &SecureX509CertificateAuthority,
+                            sslLocalCertificate,
+                            sizeof(sslLocalCertificate),
+                            working_buffer,
+                            sizeof(working_buffer),
+                            private_key,
+                            priv_len,
+                            private_key_type);
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+
+                        status = nx_secure_tls_trusted_certificate_add(&TLSSession, &SecureX509CertificateAuthority);
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+
+                        status =
+                            nx_tcp_server_socket_listen(&ServerIP, 12, &ServerSocket, 5, thread_connect_received);
+                        if (status != NX_SUCCESS)
+                            goto ReturnError;
+                    }
+                ReturnError:
+                    if (status != NX_SUCCESS)
+                    {
+                        int sslContext = -1; // Dummy context for now
+                        CLR_RT_HeapBlock &res = stack.m_owningThread->m_currentException;
+
+                        int translated_socket_error = TranslateNXErrorToSocketError(status);
+                        stack.SetResult_I4(sslContext);
+
+                        if ((Library_corlib_native_System_Exception::CreateInstance(
+                                res,
+                                g_CLR_RT_WellKnownTypes.m_SocketException,
+                                CLR_E_FAIL,
+                                &stack)) == S_OK)
+                        {
+                            res.Dereference()
+                                [Library_sys_net_native_System_Net_Sockets_SocketException::FIELD___errorCode]
+                                    .SetInteger(translated_socket_error);
+                            NANOCLR_SET_AND_LEAVE(CLR_E_PROCESS_EXCEPTION);
+                        }
                     }
                 }
             }
-
-            // get certificate
-            sslCert = arrCert->GetFirstElement();
         }
-
-        result =
-            (SSL_ClientInit(
-                 sslMode,
-                 sslVerify,
-                 (const char *)sslCert,
-                 sslCert == NULL ? 0 : arrCert->m_numOfElements,
-                 pk,
-                 pk == NULL ? 0 : privateKey->m_numOfElements,
-                 pkPassword,
-                 pkPasswordLength,
-                 sslContext,
-                 useDeviceCertificate)
-                 ? 0
-                 : -1);
-
-        NANOCLR_CHECK_HRESULT(ThrowOnError(stack, result));
-
-        if (caCert != NULL)
-        {
-            arrCert = caCert[X509Certificate::FIELD___certificate].DereferenceArray();
-
-            // If arrCert == NULL then the certificate is an X509Certificate2 which uses a certificate handle
-            if (arrCert == NULL)
-            {
-                arrCert = caCert[X509Certificate::FIELD___handle].DereferenceArray();
-                FAULT_ON_NULL(arrCert);
-
-                sslCert = arrCert->GetFirstElement();
-
-                // pass the certificate handle as the data parameter
-                result =
-                    (SSL_AddCertificateAuthority(sslContext, (const char *)sslCert, arrCert->m_numOfElements) ? 0 : -1);
-
-                NANOCLR_CHECK_HRESULT(ThrowOnError(stack, result));
-            }
-            else
-            {
-
-                arrCert->Pin();
-
-                sslCert = arrCert->GetFirstElement();
-
-                result =
-                    (SSL_AddCertificateAuthority(sslContext, (const char *)sslCert, arrCert->m_numOfElements) ? 0 : -1);
-
-                NANOCLR_CHECK_HRESULT(ThrowOnError(stack, result));
-            }
-        }
-
-        stack.SetResult_I4(sslContext);
-
-        if (FAILED(hr) && (sslContext != -1))
-        {
-            SSL_ExitContext(sslContext);
-        }
+        NANOCLR_NOCLEANUP();
     }
-    NANOCLR_NOCLEANUP();
 }
-HRESULT Library_sys_net_native_System_Net_Security_SslNative::SecureAccept___STATIC__VOID__I4__OBJECT(
-    CLR_RT_StackFrame &stack)
+
+HRESULT
+Library_sys_net_native_System_Net_Security_SslNative::SecureAccept___STATIC__VOID__I4__OBJECT(CLR_RT_StackFrame &stack)
 {
     NANOCLR_HEADER();
     {
-
         int result = 0;
         bool fRes = true;
         CLR_INT64 *timeout;
         CLR_RT_HeapBlock hbTimeout;
 
         CLR_INT32 sslContext = stack.Arg0().NumericByRef().s4;
-        CLR_INT32 timeout_ms = -1; // wait forever
+        CLR_INT32 timeout_ms = -1;
 
         CLR_RT_HeapBlock *socket_info = stack.Arg0().Dereference();
         FAULT_ON_NULL(socket_info);
-        socket_entry_t *socket_entry =
-            (socket_entry_t *)socket_info[Library_sys_net_native_System_Net_Sockets_NativeSocket::FIELD__m_Handle]
-                .NumericByRef()
-                .s4;
-        FAULT_ON_NULL(socket_entry);
-
-        // Because we could have been a rescheduled call due to a prior call that would have blocked, we need to see
-        // if our handle has been shutdown before continuing.
-        if ((int)socket_entry == Library_sys_net_native_System_Net_Sockets_NativeSocket::DISPOSED_HANDLE)
         {
-            ThrowError(stack, CLR_E_OBJECT_DISPOSED);
-            NANOCLR_SET_AND_LEAVE(CLR_E_PROCESS_EXCEPTION);
-        }
+            socket_entry_t *socket_entry =
+                (socket_entry_t *)socket_info[Library_sys_net_native_System_Net_Sockets_NativeSocket::FIELD__m_Handle]
+                    .NumericByRef()
+                    .s4;
+            FAULT_ON_NULL_ARG(socket_entry);
 
-        // !! need to cast to CLR_INT64 otherwise it wont setup a proper timeout infinite
-        hbTimeout.SetInteger((CLR_INT64)timeout_ms * TIME_CONVERSION__TO_MILLISECONDS);
-
-        NANOCLR_CHECK_HRESULT(stack.SetupTimeoutFromTicks(hbTimeout, timeout));
-
-        // first make sure we have data to read or ability to write
-        while (true)
-        {
-            nx_tcp_server_socket_accept(socket_ptr, NX_WAIT_FOREVER);
-            if (result == SOCK_EWOULDBLOCK || result == SOCK_TRY_AGAIN)
+            // Because we could have been a rescheduled call due to a prior call that would have
+            // blocked, we need to see if our handle has been shutdown before continuing.
+            if ((int)socket_entry == Library_sys_net_native_System_Net_Sockets_NativeSocket::DISPOSED_HANDLE)
             {
-                // non-blocking - allow other threads to run while we wait for socket activity
-                NANOCLR_CHECK_HRESULT(
-                    g_CLR_RT_ExecutionEngine.WaitEvents(stack.m_owningThread, *timeout, Event_Socket, fRes));
+                ThrowError(stack, CLR_E_OBJECT_DISPOSED);
+                NANOCLR_SET_AND_LEAVE(CLR_E_PROCESS_EXCEPTION);
             }
-            else
+
+            // !! need to cast to CLR_INT64 otherwise it wont setup a proper timeout infinite
+            hbTimeout.SetInteger((CLR_INT64)timeout_ms * TIME_CONVERSION__TO_MILLISECONDS);
+
+            NANOCLR_CHECK_HRESULT(stack.SetupTimeoutFromTicks(hbTimeout, timeout));
+
+            // first make sure we have data to read or ability to write
+            while (true)
             {
-                break;
+
+                nx_tcp_server_socket_accept(socket_ptr, NX_WAIT_FOREVER);
+                nx_secure_tls_session_start(&tls_session, &server_socket, NX_WAIT_FOREVER);
+                if (result == SOCK_EWOULDBLOCK || result == SOCK_TRY_AGAIN)
+                {
+                    // non-blocking - allow other threads to run while we wait for socket activity
+                    NANOCLR_CHECK_HRESULT(
+                        g_CLR_RT_ExecutionEngine.WaitEvents(stack.m_owningThread, *timeout, Event_Socket, fRes));
+                }
+                else
+                {
+                    break;
+                }
             }
+
+            stack.PopValue(); // Timeout
+
+            NANOCLR_CHECK_HRESULT(ThrowOnError(stack, result));
         }
-
-        stack.PopValue(); // Timeout
-
-        NANOCLR_CHECK_HRESULT(ThrowOnError(stack, result));
     }
     NANOCLR_NOCLEANUP();
 }
 
-HRESULT Library_sys_net_native_System_Net_Security_SslNative::SecureConnect___STATIC__VOID__I4__STRING__OBJECT(
+HRESULT
+Library_sys_net_native_System_Net_Security_SslNative::SecureConnect___STATIC__VOID__I4__STRING__OBJECT(
     CLR_RT_StackFrame &stack)
 {
     NANOCLR_HEADER();
@@ -392,47 +507,57 @@ HRESULT Library_sys_net_native_System_Net_Security_SslNative::SecureConnect___ST
 
         bool fRes = true;
         CLR_INT64 *timeout;
-
-        socket_entry_t *socket_entry;
-        GetSocketEntry(stack, socket_entry);
-
-        CLR_RT_HeapBlock *hb = stack.Arg1().DereferenceString();
-        FAULT_ON_NULL_ARG(hb);
-
-        CLR_INT32 sslContext = stack.Arg0().NumericByRef().s4;
-        CLR_RT_HeapBlock hbTimeout;
-
-        const char *szName = hb->StringText();
-
-        // Infinite Timeout
-        hbTimeout.SetInteger((CLR_INT64)-1);
-
-        NANOCLR_CHECK_HRESULT(stack.SetupTimeoutFromTicks(hbTimeout, timeout));
-
-        while (true)
+        CLR_RT_HeapBlock *socket = stack.Arg0().Dereference();
+        FAULT_ON_NULL(socket);
         {
-            // result = SSL_Connect(handle, szName, sslContext);
-            //  Connect to the server
-            nx_tcp_client_socket_connect(socket_ptr, IP_ADDRESS(192, 168, 1, 100), SERVER_PORT, NX_WAIT_FOREVER);
+            CLR_INT32 handle =
+                socket[Library_sys_net_native_System_Net_Sockets_Socket::FIELD__m_Handle].NumericByRef().s4;
 
-            if (result == SOCK_EWOULDBLOCK || result == SOCK_TRY_AGAIN)
+            CLR_RT_HeapBlock *hb = stack.Arg1().DereferenceString();
+            FAULT_ON_NULL_ARG(hb);
             {
-                // non-blocking - allow other threads to run while we wait for socket activity
-                NANOCLR_CHECK_HRESULT(
-                    g_CLR_RT_ExecutionEngine.WaitEvents(stack.m_owningThread, *timeout, Event_Socket, fRes));
-                if (result < 0)
+
+                CLR_INT32 sslContext = stack.Arg0().NumericByRef().s4;
+                CLR_RT_HeapBlock hbTimeout;
+
+                const char *szName = hb->StringText();
+
+                // Infinite Timeout
+                hbTimeout.SetInteger((CLR_INT64)-1);
+
+                NANOCLR_CHECK_HRESULT(stack.SetupTimeoutFromTicks(hbTimeout, timeout));
+
+                while (true)
                 {
-                    break;
+                    // result = SSL_Connect(handle, szName, sslContext);
+                    //  Connect to the server
+                    nx_tcp_client_socket_connect(
+                        socket_ptr,
+                        IP_ADDRESS(192, 168, 1, 100),
+                        SERVER_PORT,
+                        NX_WAIT_FOREVER);
+
+                    if (result == SOCK_EWOULDBLOCK || result == SOCK_TRY_AGAIN)
+                    {
+                        // non-blocking - allow other threads to run while we wait for socket
+                        // activity
+                        NANOCLR_CHECK_HRESULT(
+                            g_CLR_RT_ExecutionEngine.WaitEvents(stack.m_owningThread, *timeout, Event_Socket, fRes));
+                        if (result < 0)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
-            }
-            else
-            {
-                break;
+                stack.PopValue(); // Timeout
+
+                NANOCLR_CHECK_HRESULT(ThrowOnError(stack, result));
             }
         }
-        stack.PopValue(); // Timeout
-
-        NANOCLR_CHECK_HRESULT(ThrowOnError(stack, result));
     }
     NANOCLR_NOCLEANUP();
 }
@@ -440,269 +565,275 @@ HRESULT
 Library_sys_net_native_System_Net_Security_SslNative::SecureRead___STATIC__I4__OBJECT__SZARRAY_U1__I4__I4__I4(
     CLR_RT_StackFrame &stack)
 {
-#define BUFFER_SIZE 1024
 
     CLR_INT32 handle;
 
     NANOCLR_HEADER();
     {
         CLR_RT_HeapBlock hbTimeout;
-        CLR_INT32 totReadWrite;
+        CLR_INT32 totalRead;
         bool fRes = true;
         CLR_INT64 *timeout;
         int result = 0;
         CLR_UINT8 *buffer;
+        CLR_RT_HeapBlock hbTimeout;
 
+        CLR_RT_HeapBlock *socket = stack.Arg0().Dereference();
         CLR_RT_HeapBlock_Array *arrData = stack.Arg1().DereferenceArray();
-        FAULT_ON_NULL(arrData);
-
         CLR_INT32 offset = stack.Arg2().NumericByRef().s4;
-        CLR_INT32 timeout_ms = stack.Arg4().NumericByRef().s4;
-
-        socket_entry_t *socket_entry;
-        GetSocketEntry(stack, socket_entry);
-
         CLR_INT32 count = stack.Arg3().NumericByRef().s4;
+        CLR_INT32 timeout_ms = stack.Arg4().NumericByRef().s4;
         if (count == 0)
         {
             stack.SetResult_I4(0);
             NANOCLR_SET_AND_LEAVE(S_OK);
         }
-
-        hbTimeout.SetInteger((CLR_INT64)timeout_ms * TIME_CONVERSION__TO_MILLISECONDS);
-        NANOCLR_CHECK_HRESULT(stack.SetupTimeoutFromTicks(hbTimeout, timeout));
-        //
-        // Push "totReadWrite" onto the eval stack.
-        //
-        if (stack.m_customState == 1)
+        CLR_INT32 handle = socket[Library_sys_net_native_System_Net_Sockets_Socket::FIELD__m_Handle].NumericByRef().s4;
+        if (handle == Library_sys_net_native_System_Net_Sockets_NativeSocket::DISPOSED_HANDLE)
         {
-            stack.PushValueI4(0);
-
-            stack.m_customState = 2;
+            ThrowError(stack, CLR_E_OBJECT_DISPOSED);
+            NANOCLR_SET_AND_LEAVE(CLR_E_PROCESS_EXCEPTION);
         }
-        totReadWrite = stack.m_evalStack[1].NumericByRef().s4;
-        buffer = arrData->GetElement(offset + totReadWrite);
-        count -= totReadWrite;
-        if ((offset + count + totReadWrite) > (int)arrData->m_numOfElements)
+
+        FAULT_ON_NULL(arrData);
         {
-            NANOCLR_SET_AND_LEAVE(CLR_E_INDEX_OUT_OF_RANGE);
-        }
-        while (count > 0)
-        {
-            // first make sure we have data to read or ability to write
-            //while (fRes)
-            //{
-            //    // check SSL_DataAvailable() in case SSL has already read and buffered socket data
-            //    result = SSL_DataAvailable(handle);
-
-            //    if ((result > 0) || ((result < 0) && (SOCK_getlasterror() != SOCK_EWOULDBLOCK)))
-            //    {
-            //        break;
-            //    }
-
-            //    result = Library_sys_net_native_System_Net_Sockets_NativeSocket::Helper__SelectSocket(handle, 0);
-
-            //    if ((result > 0) || ((result < 0) && (SOCK_getlasterror() != SOCK_EWOULDBLOCK)))
-            //    {
-            //        break;
-            //    }
-
-            //    // non-blocking - allow other threads to run while we wait for socket activity
-            //    NANOCLR_CHECK_HRESULT(
-            //        g_CLR_RT_ExecutionEngine.WaitEvents(stack.m_owningThread, *timeout, Event_Socket, fRes));
-
-            //    // timeout expired
-            //    if (!fRes)
-            //    {
-            //        result = SOCK_SOCKET_ERROR;
-
-            //        ThrowError(stack, SOCK_ETIMEDOUT);
-
-            //        NANOCLR_SET_AND_LEAVE(CLR_E_PROCESS_EXCEPTION);
-            //    }
-            //}
-
-            // socket is in the excepted state, so let's bail out
-            //if (SOCK_SOCKET_ERROR == result)
-            //{
-            //    break;
-            //}
-
-            UINT status = nx_secure_tls_session_receive(&tls_session, &receive_packet, NX_WAIT_FOREVER);
-            if (status == NX_SUCCESS)
+            FAULT_ON_NULL(socket);
             {
+                if (count == 0)
+                {
+                    stack.SetResult_I4(0);
+                    NANOCLR_SET_AND_LEAVE(S_OK);
+                }
+                hbTimeout.SetInteger((CLR_INT64)timeout_ms * TIME_CONVERSION__TO_MILLISECONDS);
+                NANOCLR_CHECK_HRESULT(stack.SetupTimeoutFromTicks(hbTimeout, timeout));
+                //
+                // Push "totReadWrite" onto the eval stack.
+                //
+                if (stack.m_customState == 1)
+                {
+                    stack.PushValueI4(0);
+
+                    stack.m_customState = 2;
+                }
+                totalRead = stack.m_evalStack[1].NumericByRef().s4;
+                buffer = arrData->GetElement(offset + totalRead);
+                count -= totalRead;
+                if ((offset + count + totalRead) > (int)arrData->m_numOfElements)
+                {
+                    NANOCLR_SET_AND_LEAVE(CLR_E_INDEX_OUT_OF_RANGE);
+                }
+                while (count > 0)
+                {
+                    // first make sure we have data to read or ability to write
+                    while (fRes)
+                    {
+                        nx_secure_tls_session_receive(&tls_session, buffer, buffer_size, &actual_size, NX_WAIT_FOREVER);
+
+                        // check SSL_DataAvailable() in case SSL has already read and buffered
+                        // socket data
+                        result = SSL_DataAvailable(handle);
+
+                        if ((result > 0) || ((result < 0) && (SOCK_getlasterror() != SOCK_EWOULDBLOCK)))
+                        {
+                            break;
+                        }
+
+                        result =
+                            Library_sys_net_native_System_Net_Sockets_NativeSocket::Helper__SelectSocket(handle, 0);
+
+                        if ((result > 0) || ((result < 0) && (SOCK_getlasterror() != SOCK_EWOULDBLOCK)))
+                        {
+                            break;
+                        }
+
+                        // non-blocking - allow other threads to run while we wait for socket
+                        // activity
+                        NANOCLR_CHECK_HRESULT(
+                            g_CLR_RT_ExecutionEngine.WaitEvents(stack.m_owningThread, *timeout, Event_Socket, fRes));
+
+                        // timeout expired
+                        if (!fRes)
+                        {
+                            result = SOCK_SOCKET_ERROR;
+                            ThrowError(stack, SOCK_ETIMEDOUT);
+                            NANOCLR_SET_AND_LEAVE(CLR_E_PROCESS_EXCEPTION);
+                        }
+                    }
+
+                    // socket is in the excepted state, so let's bail out
+                    if (SOCK_SOCKET_ERROR == result)
+                    {
+                        break;
+                    }
+
+                    result = SSL_Read(handle, (char *)buffer, count);
+
+                    if (result == SSL_RESULT__WOULD_BLOCK)
+                    {
+                        continue;
+                    }
+
+                    // ThrowOnError expects anything other than 0 to be a failure - so return 0 if
+                    // we don't have an error
+                    if (result <= 0)
+                    {
+                        break;
+                    }
+                    buffer += result;
+                    totalRead += result;
+                    count -= result;
+
+                    // read is non-blocking if we have any data
+                    if (totalRead > 0)
+                    {
+                        break;
+                    }
+
+                    stack.m_evalStack[1].NumericByRef().s4 = totalRead;
+                }
+
+                stack.PopValue(); // totReadWrite
+                stack.PopValue(); // Timeout
+
+                if (result < 0)
+                {
+                    NANOCLR_CHECK_HRESULT(ThrowOnError(stack, result));
+                }
+
+                stack.SetResult_I4(totalRead);
             }
-
-            //    result = SSL_Read(handle, (char *)buffer, count);
-
-            // if (result == SSL_RESULT__WOULD_BLOCK)
-            //{
-            //     continue;
-            // }
-
-            // ThrowOnError expects anything other than 0 to be a failure - so return 0 if we don't have an error
-            if (result <= 0)
-            {
-                break;
-            }
-
-            buffer += result;
-            totReadWrite += result;
-            count -= result;
-
-            // read is non-blocking if we have any data
-            if (totReadWrite > 0)
-            {
-                break;
-            }
-
-            stack.m_evalStack[1].NumericByRef().s4 = totReadWrite;
         }
-
-        stack.PopValue(); // totReadWrite
-        stack.PopValue(); // Timeout
-
-        if (result < 0)
-        {
-            NANOCLR_CHECK_HRESULT(ThrowOnError(stack, result));
-        }
-
-        stack.SetResult_I4(totReadWrite);
     }
     NANOCLR_NOCLEANUP();
+
 }
 HRESULT
 Library_sys_net_native_System_Net_Security_SslNative::SecureWrite___STATIC__I4__OBJECT__SZARRAY_U1__I4__I4__I4(
     CLR_RT_StackFrame &stack)
 {
+
     CLR_INT32 handle;
-    NX_PACKET send_packet;
 
     NANOCLR_HEADER();
     {
-        NX_PACKET **packet_ptr_ptr;
-
         CLR_RT_HeapBlock hbTimeout;
-        CLR_INT32 totReadWrite;
+        CLR_INT32 totalWritten;
         bool fRes = true;
         CLR_INT64 *timeout;
         int result = 0;
         CLR_UINT8 *buffer;
+        CLR_RT_HeapBlock hbTimeout;
 
-#define BUFFER_SIZE 1024
-
-        UCHAR receive_buffer[BUFFER_SIZE];
-        UINT bytes_received;
-        UINT status;
-
+        CLR_RT_HeapBlock *socket = stack.Arg0().Dereference();
         CLR_RT_HeapBlock_Array *arrData = stack.Arg1().DereferenceArray();
-        FAULT_ON_NULL(arrData);
-
         CLR_INT32 offset = stack.Arg2().NumericByRef().s4;
-        CLR_INT32 timeout_ms = stack.Arg4().NumericByRef().s4;
-        CLR_RT_HeapBlock *socket_info = stack.Arg0().Dereference();
-        FAULT_ON_NULL(socket_info);
-        socket_entry_t *socket_entry;
-        GetSocketEntry(stack, socket_entry);
-
         CLR_INT32 count = stack.Arg3().NumericByRef().s4;
+        CLR_INT32 timeout_ms = stack.Arg4().NumericByRef().s4;
         if (count == 0)
         {
             stack.SetResult_I4(0);
             NANOCLR_SET_AND_LEAVE(S_OK);
         }
-        hbTimeout.SetInteger((CLR_INT64)timeout_ms * TIME_CONVERSION__TO_MILLISECONDS);
-        NANOCLR_CHECK_HRESULT(stack.SetupTimeoutFromTicks(hbTimeout, timeout));
-        //
-        // Push "totReadWrite" onto the eval stack.
-        //
-        if (stack.m_customState == 1)
+        CLR_INT32 handle = socket[Library_sys_net_native_System_Net_Sockets_Socket::FIELD__m_Handle].NumericByRef().s4;
+        if (handle == Library_sys_net_native_System_Net_Sockets_NativeSocket::DISPOSED_HANDLE)
         {
-            stack.PushValueI4(0);
+            ThrowError(stack, CLR_E_OBJECT_DISPOSED);
+            NANOCLR_SET_AND_LEAVE(CLR_E_PROCESS_EXCEPTION);
+        }
 
-            stack.m_customState = 2;
-        }
-        totReadWrite = stack.m_evalStack[1].NumericByRef().s4;
-        buffer = arrData->GetElement(offset + totReadWrite);
-        count -= totReadWrite;
-        if ((offset + count + totReadWrite) > (int)arrData->m_numOfElements)
+        FAULT_ON_NULL(arrData);
         {
-            NANOCLR_SET_AND_LEAVE(CLR_E_INDEX_OUT_OF_RANGE);
-        }
-        while (count > 0)
-        {
-            // first make sure we have data to read or ability to write
-            while (fRes)
+            FAULT_ON_NULL(socket);
             {
-                // check SSL_DataAvailable() in case SSL has already read and buffered socket data
-                result = SSL_DataAvailable(handle);
-
-                if ((result > 0) || ((result < 0) && (SOCK_getlasterror() != SOCK_EWOULDBLOCK)))
+                if (count == 0)
                 {
-                    break;
+                    stack.SetResult_I4(0);
+                    NANOCLR_SET_AND_LEAVE(S_OK);
+                }
+                hbTimeout.SetInteger((CLR_INT64)timeout_ms * TIME_CONVERSION__TO_MILLISECONDS);
+                NANOCLR_CHECK_HRESULT(stack.SetupTimeoutFromTicks(hbTimeout, timeout));
+                //
+                // Push "totReadWrite" onto the eval stack.
+                //
+                if (stack.m_customState == 1)
+                {
+                    stack.PushValueI4(0);
+
+                    stack.m_customState = 2;
+                }
+                totalWritten = stack.m_evalStack[1].NumericByRef().s4;
+                buffer = arrData->GetElement(offset + totalWritten);
+                count -= totalWritten;
+                if ((offset + count + totalWritten) > (int)arrData->m_numOfElements)
+                {
+                    NANOCLR_SET_AND_LEAVE(CLR_E_INDEX_OUT_OF_RANGE);
+                }
+                while (count > 0)
+                {
+                    // first make sure we have data to read or ability to write
+                    while (fRes)
+                    {
+
+                        nx_secure_tls_session_send(&tls_session, data, length, NX_WAIT_FOREVER);
+                        result =
+                            Library_sys_net_native_System_Net_Sockets_NativeSocket::Helper__SelectSocket(handle, 0);
+
+                        if ((result > 0) || ((result < 0) && (SOCK_getlasterror() != SOCK_EWOULDBLOCK)))
+                        {
+                            break;
+                        }
+
+                        // non-blocking - allow other threads to run while we wait for socket
+                        // activity
+                        NANOCLR_CHECK_HRESULT(
+                            g_CLR_RT_ExecutionEngine.WaitEvents(stack.m_owningThread, *timeout, Event_Socket, fRes));
+
+                        // timeout expired
+                        if (!fRes)
+                        {
+                            result = SOCK_SOCKET_ERROR;
+                            ThrowError(stack, SOCK_ETIMEDOUT);
+                            NANOCLR_SET_AND_LEAVE(CLR_E_PROCESS_EXCEPTION);
+                        }
+                    }
+
+                    // socket is in the excepted state, so let's bail out
+                    if (SOCK_SOCKET_ERROR == result)
+                    {
+                        break;
+                    }
+                    result = SSL_Write(handle, (const char *)buffer, count);
+
+                    // ThrowOnError expects anything other than 0 to be a failure - so return 0 if
+                    // we don't have an error
+                    if (result <= 0)
+                    {
+                        break;
+                    }
+                    buffer += result;
+                    totalWritten += result;
+                    count -= result;
+
+                    stack.m_evalStack[1].NumericByRef().s4 = totalWritten;
                 }
 
-                result = Library_sys_net_native_System_Net_Sockets_NativeSocket::Helper__SelectSocket(handle, 1);
+                stack.PopValue(); // totReadWrite
+                stack.PopValue(); // Timeout
 
-                if ((result > 0) || ((result < 0) && (SOCK_getlasterror() != SOCK_EWOULDBLOCK)))
+                if (result < 0)
                 {
-                    break;
+                    NANOCLR_CHECK_HRESULT(ThrowOnError(stack, result));
                 }
 
-                // non-blocking - allow other threads to run while we wait for socket activity
-                NANOCLR_CHECK_HRESULT(
-                    g_CLR_RT_ExecutionEngine.WaitEvents(stack.m_owningThread, *timeout, Event_Socket, fRes));
-
-                // timeout expired
-                if (!fRes)
-                {
-                    result = SOCK_SOCKET_ERROR;
-
-                    ThrowError(stack, SOCK_ETIMEDOUT);
-
-                    NANOCLR_SET_AND_LEAVE(CLR_E_PROCESS_EXCEPTION);
-                }
+                stack.SetResult_I4(totalWritten);
             }
-
-            // socket is in the excepted state, so let's bail out
-            if (SOCK_SOCKET_ERROR == result)
-            {
-                break;
-            }
-
-            // Send data securely
-            UINT status = nx_secure_tls_session_send(&tls_session, &send_packet, NX_WAIT_FOREVER);
-            if (status == NX_SUCCESS)
-            {
-            }
-
-            // ThrowOnError expects anything other than 0 to be a failure - so return 0 if we don't have an error
-            if (result <= 0)
-            {
-                break;
-            }
-
-            buffer += result;
-            totReadWrite += result;
-            count -= result;
-
-            stack.m_evalStack[1].NumericByRef().s4 = totReadWrite;
         }
-
-        stack.PopValue(); // totReadWrite
-        stack.PopValue(); // Timeout
-
-        if (result < 0)
-        {
-            NANOCLR_CHECK_HRESULT(ThrowOnError(stack, result));
-        }
-
-        stack.SetResult_I4(totReadWrite);
     }
     NANOCLR_NOCLEANUP();
 }
-HRESULT Library_sys_net_native_System_Net_Security_SslNative::SecureCloseSocket___STATIC__I4__OBJECT(
-    CLR_RT_StackFrame &stack)
+
+HRESULT
+Library_sys_net_native_System_Net_Security_SslNative::SecureCloseSocket___STATIC__I4__OBJECT(CLR_RT_StackFrame &stack)
 {
     NANOCLR_HEADER();
     {
@@ -722,12 +853,19 @@ HRESULT Library_sys_net_native_System_Net_Security_SslNative::SecureCloseSocket_
         {
         }
 
+        try
+        {
+        }
+        catch ()
+        {
+        }
         // Disconnect the TCP socket
         status = nx_tcp_socket_disconnect(socket_ptr, NX_WAIT_FOREVER);
         if (status == NX_SUCCESS)
         {
 
             // Delete the TLS session
+            nx_secure_tls_session_end(&tls_session, NX_WAIT_FOREVER);
             nx_secure_tls_session_delete(&tls_session);
 
             stack.SetResult_I4(status);
@@ -735,6 +873,7 @@ HRESULT Library_sys_net_native_System_Net_Security_SslNative::SecureCloseSocket_
         NANOCLR_NOCLEANUP();
     }
 }
+
 HRESULT Library_sys_net_native_System_Net_Security_SslNative::ExitSecureContext___STATIC__I4__I4(
     CLR_RT_StackFrame &stack)
 {
@@ -753,6 +892,7 @@ HRESULT Library_sys_net_native_System_Net_Security_SslNative::ExitSecureContext_
     }
     NANOCLR_NOCLEANUP();
 }
+
 HRESULT Library_sys_net_native_System_Net_Security_SslNative::DataAvailable___STATIC__I4__OBJECT(
     CLR_RT_StackFrame &stack)
 {
@@ -787,6 +927,7 @@ HRESULT Library_sys_net_native_System_Net_Security_SslNative::DataAvailable___ST
     }
     NANOCLR_NOCLEANUP();
 }
+
 HRESULT Library_sys_net_native_System_Security_Cryptography_X509Certificates_X509Certificate::
     ParseCertificate___STATIC__VOID__SZARRAY_U1__BYREF_STRING__BYREF_STRING__BYREF_SystemDateTime__BYREF_SystemDateTime(
         CLR_RT_StackFrame &stack)
@@ -834,7 +975,8 @@ HRESULT Library_sys_net_native_System_Security_Cryptography_X509Certificates_X50
         ////NANOCLR_CHECK_HRESULT(hbIssuer.StoreToReference(stack.Arg1(), 0));
 
         ////NANOCLR_CHECK_HRESULT(
-        ////    CLR_RT_HeapBlock_String::CreateInstance(hbSubject, certificate.nx_secure_x509_subject_identifier));
+        ////    CLR_RT_HeapBlock_String::CreateInstance(hbSubject,
+        /// certificate.nx_secure_x509_subject_identifier));
         ////NANOCLR_CHECK_HRESULT(hbSubject.StoreToReference(stack.Arg2(), 0));
 
         const UCHAR *StartDate = certificate.nx_secure_x509_not_before;
@@ -906,37 +1048,5 @@ HRESULT Library_sys_net_native_System_Security_Cryptography_X509Certificates_X50
             NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_PARAMETER);
         }
     }
-    NANOCLR_NOCLEANUP();
-}
-
-
-void Library_sys_net_native_System_Net_Security_SslNative::ThrowError(CLR_RT_StackFrame &stack, int errorCode)
-{
-    NATIVE_PROFILE_CLR_NETWORK();
-    CLR_RT_HeapBlock &res = stack.m_owningThread->m_currentException;
-
-    if ((Library_corlib_native_System_Exception::CreateInstance(
-            res,
-            g_CLR_RT_WellKnownTypes.m_SocketException,
-            CLR_E_FAIL,
-            &stack)) == S_OK)
-    {
-        res.Dereference()[Library_sys_net_native_System_Net_Sockets_SocketException::FIELD___errorCode].SetInteger(
-            errorCode);
-    }
-}
-
-HRESULT Library_sys_net_native_System_Net_Security_SslNative::ThrowOnError(CLR_RT_StackFrame &stack, int res)
-{
-    NATIVE_PROFILE_CLR_NETWORK();
-    NANOCLR_HEADER();
-
-    if (res != 0)
-    {
-        ThrowError(stack, res);
-
-        NANOCLR_SET_AND_LEAVE(CLR_E_PROCESS_EXCEPTION);
-    }
-
     NANOCLR_NOCLEANUP();
 }

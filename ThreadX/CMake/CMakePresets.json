@@ -181,7 +181,8 @@
                 "HAS_CONFIG_BLOCK": false,
                 "RANDOM_NUMBER_GENERATOR": true,
                 "REALTIME_CLOCK": false,
-                "WATCHDOG": false
+                "WATCHDOG": false,
+                "NUMBER_I2C_BUSES": "2"
             }
         },
         {
@@ -198,7 +199,8 @@
                 "HAS_CONFIG_BLOCK": false,
                 "RANDOM_NUMBER_GENERATOR": true,
                 "REALTIME_CLOCK": false,
-                "WATCHDOG": false
+                "WATCHDOG": false,
+                "NUMBER_I2C_BUSES": "2"
             }
         },
         {
@@ -231,7 +233,8 @@
                 "HAS_CONFIG_BLOCK": false,
                 "RANDOM_NUMBER_GENERATOR": true,
                 "REALTIME_CLOCK": false,
-                "WATCHDOG": false
+                "WATCHDOG": false,
+                "NUMBER_I2C_BUSES": "2"
             }
         },
         {
@@ -279,7 +282,8 @@
                 "ONE_WIRE": false,
                 "IO_HASHING": false,
                 "CRYPTOGRAPHY": false,
-                "BLUETOOTH": false
+                "BLUETOOTH": false,
+                "NUMBER_I2C_BUSES": "2"
             }
         },
         {
@@ -305,38 +309,61 @@
                 "ONE_WIRE": false,
                 "IO_HASHING": false,
                 "CRYPTOGRAPHY": false,
-                "BLUETOOTH": false
+                "BLUETOOTH": false,
+                "NUMBER_I2C_BUSES": "2"
+
             }
         },
         // ------------
         // WiFI devices  
         // ------------
         {
-            "name": "WiFI_CYW43",
+            "name": "WiFi_Cyw43",
             "description": "Support for wifi network",
             "hidden": true,
             "cacheVariables": {
                 "NETWORKING_SUPPORT": true,
-                "TARGET_NETWORK_DRIVER": "wifi_cyw43_driver",
+                "TARGET_NETWORK_DRIVER": "WiFi_Cyw43_driver",
                 "WIFI_MODULE": "CYW43",
                 "WIFI_SUPPORT": true,
                 "WIFI_SSID": "WifiPico",
                 "WIFI_PASSWORD": "raspberry"
             }
         },
-        // ------------
-        // File Support
-        // ------------
+        // -------------------------
+        // File Support for Ram Disk
+        // -------------------------
         {
-            "name": "FILE_SYSTEM",
+            "name": "FILE_SYSTEM_RAM",
             "description": "Support for network",
             "hidden": true,
             "cacheVariables": {
                 "FILE_SYSTEM_SUPPORT": true,
-                "FILEX_SYSTEM_SD": true,
-                "FILEX_SYSTEM_NAND": true,
-                "FILEX_SYSTEM_NOR": false,
-                "FILEX_SYSTEM_RAM": false
+                "FILE_SYSTEM_RAM": true
+            }
+        },
+        // -------------------
+        // File Support for SD
+        // -------------------
+        {
+            "name": "FILE_SYSTEM_SD",
+            "description": "Support for network",
+            "hidden": true,
+            "cacheVariables": {
+                "FILE_SYSTEM_SUPPORT": true,
+                "FILE_SYSTEM_SD": true
+            }
+        },
+        // ----------------------
+        // File Support for FLASH
+        // ----------------------
+        {
+            "name": "FILE_SYSTEM_FLASH",
+            "description": "Support for network",
+            "hidden": true,
+            "cacheVariables": {
+                "FILE_SYSTEM_SUPPORT": true,
+                "FILE_SYSTEM_FLASH": true
             }
         },
         // -----------
@@ -350,6 +377,7 @@
                 "USB_SUPPORT": true,
                 "USB_DEVICE": true,
                 "USB_HOST": false,
+                "USB_STORAGE": true,
                 "USB_HOST_CONTROLLER": false
             }
         },
@@ -596,7 +624,8 @@
                 "W25Q128JV",
                 "APS6404L",
                 "BUYDISPLAY_ER_TFTM028",
-                "WiFI_CYW43"
+                "WiFi_Cyw43",
+                "FILE_SYSTEM_RAM"
             ]
         },
         {

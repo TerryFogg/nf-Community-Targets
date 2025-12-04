@@ -50,7 +50,18 @@ extern "C"
     void InitializeDevicePins();
     uint64_t ReadMicrosecondCounter();
     void SystemClock_Config();
-    void InitializePSRAM();
+
+#ifdef FILE_SYSTEM_RAM
+    bool File_System_RAM_Initialize();
+#endif
+
+#ifdef FILE_SYSTEM_FLASH
+    bool File_System_FLASH_Initialize();
+#endif
+
+#ifdef FILE_SYSTEM_SD
+    bool File_System_SD_Initialize();
+#endif
 
 #ifdef __cplusplus
 }

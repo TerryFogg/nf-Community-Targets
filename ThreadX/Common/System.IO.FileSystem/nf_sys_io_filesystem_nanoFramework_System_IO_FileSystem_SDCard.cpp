@@ -1,10 +1,9 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
 
 #include "nf_sys_io_filesystem.h"
-#include "FileSystem.h"
 
 HRESULT
 Library_nf_sys_io_filesystem_nanoFramework_System_IO_FileSystem_SDCard::InitNative___VOID(CLR_RT_StackFrame &stack)

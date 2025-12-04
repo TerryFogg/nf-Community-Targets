@@ -150,45 +150,46 @@ HRESULT Library_sys_net_native_System_Net_Sockets_NativeSocket::bind___STATIC__V
 {
     NANOCLR_HEADER();
     {
-        CLR_INT32 status;
-        CLR_INT32 returnStatus = SOCK_SUCCESS;
-        SOCK_sockaddr sock_addr;
-        UINT sock_addr_len;
-
-        socket_entry_t *socket_entry;
-        GetSocketEntry(stack, socket_entry);
-
-        NANOCLR_CHECK_HRESULT(MarshalSockAddress(&sock_addr, sock_addr_len, stack.Arg1()));
-
-        // sock_addr.sa_family = AF_INET;
-        // sock_addr.sa_data;
-
-        switch (socket_entry->type)
+        CLR_RT_HeapBlock *socket = stack.Arg0().Dereference();
+        FAULT_ON_NULL(socket);
         {
-            case SOCKET_TYPE_UDP:
-                // socket_entry->tcp_socket->nx_tcp_socket_connect_ip.nxd_ip_address.v4 =
-                //(ULONG)sock_addr.sa_data.ip_addr;
-                status = nx_udp_socket_bind(
-                    (NX_UDP_SOCKET *)socket_entry->tcp_socket,
-                    socket_entry->tcp_socket->nx_tcp_socket_port,
-                    2 * NX_IP_PERIODIC_RATE);
-                break;
-            case SOCKET_TYPE_TCP:
-                //
-                status = nx_tcp_client_socket_bind(
-                    (NX_TCP_SOCKET *)socket_entry->udp_socket,
-                    socket_entry->tcp_socket->nx_tcp_socket_port,
-                    2 * NX_IP_PERIODIC_RATE);
-                break;
-            default:
-                break;
+            CLR_INT32 handle = socket[FIELD__m_Handle].NumericByRef().s4;
+
+            CLR_INT32 status;
+            CLR_INT32 returnStatus = SOCK_SUCCESS;
+            SOCK_sockaddr addr;
+            CLR_UINT32 addrLen = sizeof(addr);
+
+            NANOCLR_CHECK_HRESULT(MarshalSockAddress(&addr, addrLen, stack.Arg1()));
+            socket_entry_t *socket_entry;
+
+            switch (socket_entry->type)
+            {
+                case SOCKET_TYPE_UDP:
+                    // socket_entry->tcp_socket->nx_tcp_socket_connect_ip.nxd_ip_address.v4 =
+                    //(ULONG)sock_addr.sa_data.ip_addr;
+                    status = nx_udp_socket_bind(
+                        (NX_UDP_SOCKET *)socket_entry->tcp_socket,
+                        socket_entry->tcp_socket->nx_tcp_socket_port,
+                        2 * NX_IP_PERIODIC_RATE);
+                    break;
+                case SOCKET_TYPE_TCP:
+                    //
+                    status = nx_tcp_client_socket_bind(
+                        (NX_TCP_SOCKET *)socket_entry->udp_socket,
+                        socket_entry->tcp_socket->nx_tcp_socket_port,
+                        2 * NX_IP_PERIODIC_RATE);
+                    break;
+                default:
+                    break;
+            }
+            if (status != NX_SUCCESS)
+            {
+                returnStatus = TranslateNXErrorToSocketError(stack, status);
+                NANOCLR_SET_AND_LEAVE(CLR_E_FAIL);
+            }
+            SetReturnStatus(stack, returnStatus);
         }
-        if (status != NX_SUCCESS)
-        {
-            returnStatus = TranslateNXErrorToSocketError(stack, status);
-            NANOCLR_SET_AND_LEAVE(CLR_E_FAIL);
-        }
-        SetReturnStatus(stack, returnStatus);
     }
     NANOCLR_NOCLEANUP();
 }

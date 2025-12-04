@@ -287,9 +287,11 @@ static struct
 } context;
 
 static I2C_Properties *mcuI2C;
-void I2cIO::SetupI2CList(I2C_Properties *boardMcuI2C)
+static int gNumberI2CDevices;
+void I2cIO::SetupI2CList(I2C_Properties *boardMcuI2C, int NumberI2CDevices)
 {
     mcuI2C = boardMcuI2C;
+    gNumberI2CDevices = NumberI2CDevices;
 }
 uint32_t I2cIO::GetByteTime(uint32_t I2C_deviceId)
 {
@@ -438,6 +440,29 @@ I2cTransferStatus I2cIO::Read(CLR_INT32 I2C_deviceId, CLR_INT32 slaveAddress, CL
         }
     }
     return return_status;
+}
+
+void I2cIO::Execute(I2c_Transaction *pI2CTransaction)
+{
+    pI2CTransaction->status = I2cTransferStatus::I2cTransferStatus_FullTransfer;
+
+    if (pI2CTransaction->IsWrite)
+    {
+        pI2CTransaction->status = Write(
+            pI2CTransaction->busId,
+            pI2CTransaction->slaveAddress,
+            pI2CTransaction->writeBuffer,
+            pI2CTransaction->writeSize,
+            I2C_CONTROL_TYPE::MASTER);
+    }
+    if (pI2CTransaction->IsRead && (pI2CTransaction->status == I2cTransferStatus::I2cTransferStatus_FullTransfer))
+    {
+        pI2CTransaction->status = Read(
+            pI2CTransaction->busId,
+            pI2CTransaction->slaveAddress,
+            pI2CTransaction->readBuffer,
+            pI2CTransaction->readSize);
+    }
 }
 
 #pragma endregion
@@ -727,7 +752,6 @@ bool SpiIO::Open(SPI_DEVICE_CONFIGURATION spiConfig, CLR_UINT32 handle)
         return false;
     }
     return true;
-
 }
 CLR_INT32 SpiIO::ByteTime()
 {

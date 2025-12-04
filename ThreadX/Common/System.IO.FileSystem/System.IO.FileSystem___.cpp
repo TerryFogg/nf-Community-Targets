@@ -2,7 +2,9 @@
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
-#include "FileSystem.h"
+
+#include "System.IO.FileSystem.h"
+#include "CLRNativeThreads.h"
 #include "File_Drivers.h"
 #include <fx_api.h>
 #include "nanoHAL.h"
@@ -13,13 +15,15 @@
 // FileX maintains a logical sector cache  for each opened media.
 //  The depth of the logical sector cache is determined by  the amount of memory supplied to FileX with the
 //  fx_media_open API  call.
-// FileX offers contiguous file support through  the API service fx_file_allocate to improve and make file access time
+// FileX offers contiguous file supportFread through  the API service fx_file_allocate to improve and make file access time
 // deterministic. This routine takes the amount of memory requested and looks  for a series of adjacent clusters to
 // satisfy the request.
 
-static int NumberOfLogicalDrivers = 0;
+static int NumberOfLogicalDrivers;
 
-void CombinePathAndName(char *outpath, char *path1, char *path2)
+FileIO g_FileIO;
+
+void FileIO::CombinePathAndName(char *outpath, char *path1, char *path2)
 {
     strcat(outpath, path1);
 
@@ -31,130 +35,12 @@ void CombinePathAndName(char *outpath, char *path1, char *path2)
     strcat(outpath, path2);
 }
 
-int FileXToClrResultCode(int error)
-{
-    int nanoCLR_File_Error;
-    switch (error)
-    {
-        case FX_SUCCESS:
-            nanoCLR_File_Error = 0;
-            break;
-        case FX_BOOT_ERROR:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_MEDIA_INVALID:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_FAT_READ_ERROR:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_NOT_FOUND:
-            nanoCLR_File_Error = CLR_E_FILE_NOT_FOUND;
-            break;
-        case FX_NOT_A_FILE:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_ACCESS_ERROR:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_NOT_OPEN:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_FILE_CORRUPT:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_END_OF_FILE:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_NO_MORE_SPACE:
-            nanoCLR_File_Error = CLR_E_OUT_OF_MEMORY;
-            break;
-        case FX_ALREADY_CREATED:
-            nanoCLR_File_Error = CLR_E_PATH_ALREADY_EXISTS;
-            break;
-        case FX_INVALID_NAME:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_INVALID_PATH:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_NOT_DIRECTORY:
-            nanoCLR_File_Error = CLR_E_DIRECTORY_NOT_FOUND;
-            break;
-        case FX_NO_MORE_ENTRIES:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_DIR_NOT_EMPTY:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_MEDIA_NOT_OPEN:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_INVALID_YEAR:
-        case FX_INVALID_MONTH:
-        case FX_INVALID_DAY:
-        case FX_INVALID_HOUR:
-        case FX_INVALID_MINUTE:
-        case FX_INVALID_SECOND:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_PTR_ERROR:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_INVALID_ATTR:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_CALLER_ERROR:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_BUFFER_ERROR:
-            nanoCLR_File_Error = CLR_E_BUFFER_TOO_SMALL;
-            break;
-        case FX_NOT_IMPLEMENTED:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_WRITE_PROTECT:
-            nanoCLR_File_Error = CLR_E_UNAUTHORIZED_ACCESS;
-            break;
-        case FX_INVALID_OPTION:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_SECTOR_INVALID:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_IO_ERROR:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_NOT_ENOUGH_MEMORY:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_ERROR_FIXED:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_ERROR_NOT_FIXED:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_NOT_AVAILABLE:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_INVALID_CHECKSUM:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_READ_CONTINUE:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-        case FX_INVALID_STATE:
-            nanoCLR_File_Error = CLR_E_FILE_IO;
-            break;
-    }
-    return nanoCLR_File_Error;
-}
 
 #pragma region Linked list
 struct Media_Device *nextMediaDevice = NULL;
 struct FileHandle *nextOpenFile = NULL;
 
-bool AddMediaDevice(char DeviceType, char DeviceUnit)
+bool FileIO::AddMediaDevice(char DeviceType, char DeviceUnit)
 {
     if (FindMediaDevice(DeviceType, DeviceUnit) == NULL)
     {
@@ -170,7 +56,7 @@ bool AddMediaDevice(char DeviceType, char DeviceUnit)
         return false;
     }
 }
-Media_Device *FindMediaDevice(char DeviceType, char DeviceUnit)
+Media_Device *FileIO::FindMediaDevice(char DeviceType, char DeviceUnit)
 {
     struct Media_Device *temp = nextMediaDevice;
     while (temp != NULL)
@@ -183,7 +69,7 @@ Media_Device *FindMediaDevice(char DeviceType, char DeviceUnit)
     }
     return NULL;
 }
-bool RemoveMediaDevice(char DeviceType, char DeviceUnit)
+bool FileIO::RemoveMediaDevice(char DeviceType, char DeviceUnit)
 {
     struct Media_Device *temp = nextMediaDevice;
     struct Media_Device *prev = NULL;
@@ -211,18 +97,18 @@ bool RemoveMediaDevice(char DeviceType, char DeviceUnit)
     platform_free(temp);
     return true;
 }
-Media_Device *FindMediaDeviceFromPath(char *DeviceDirectoryAndFileName)
+Media_Device *FileIO::FindMediaDeviceFromPath(char *DeviceDirectoryAndFileName)
 {
     char DeviceType = DeviceDirectoryAndFileName[0];
     char DeviceUnit = DeviceDirectoryAndFileName[1];
     return FindMediaDevice(DeviceType, DeviceUnit);
 }
-FX_FILE *CreateFileHandle()
+FX_FILE *FileIO::CreateFileHandle()
 {
     FX_FILE *newFileHandle = (FX_FILE *)platform_malloc(sizeof(FX_FILE));
     return newFileHandle;
 }
-bool AddOpenFileHandle(char *DeviceDirectoryAndFileName, FX_FILE *fileHandle)
+bool FileIO::AddOpenFileHandle(char *DeviceDirectoryAndFileName, FX_FILE *fileHandle)
 {
     Media_Device *sdm = FindMediaDeviceFromPath(DeviceDirectoryAndFileName);
     if (sdm != NULL)
@@ -238,7 +124,7 @@ bool AddOpenFileHandle(char *DeviceDirectoryAndFileName, FX_FILE *fileHandle)
         return false;
     }
 }
-bool RemoveFileHandle(char *DeviceDirectoryAndFileName, FX_FILE *fileHandle)
+bool FileIO::RemoveFileHandle(char *DeviceDirectoryAndFileName, FX_FILE *fileHandle)
 {
     Media_Device *sdm = FindMediaDeviceFromPath(DeviceDirectoryAndFileName);
     if (sdm != NULL)
@@ -277,18 +163,18 @@ bool RemoveFileHandle(char *DeviceDirectoryAndFileName, FX_FILE *fileHandle)
 #pragma region SD card
 __attribute__((aligned(32))) uint32_t sd_media_memory[FILE_DEFAULT_SECTOR_SIZE / sizeof(uint32_t)];
 
-VOID media_close_callback(FX_MEDIA *media_ptr)
+void FileIO::media_close_callback(FX_MEDIA *media_ptr)
 {
     (void)media_ptr;
     media_ptr->fx_media_driver_status = FX_NOT_OPEN;
 }
-void postManagedStorageEvent(bool pinState, uint32_t driveIndex)
+void FileIO::postManagedStorageEvent(bool pinState, uint32_t driveIndex)
 {
     StorageEventType eventType =
         pinState ? StorageEventType_RemovableDeviceRemoval : StorageEventType_RemovableDeviceInsertion;
     PostManagedEvent(EVENT_STORAGE, 0, eventType, driveIndex);
 }
-void cardDetect_interrupt(GPIO_PIN Pin, bool pinState, void *pArg)
+void FileIO::cardDetect_interrupt(GPIO_PIN Pin, bool pinState, void *pArg)
 {
     (void)Pin;
     postManagedStorageEvent(pinState, (uint32_t)pArg);
@@ -296,11 +182,11 @@ void cardDetect_interrupt(GPIO_PIN Pin, bool pinState, void *pArg)
 #pragma endregion
 
 #pragma region Logical Drives
-int GetNumberOfLogicalDrives()
+int FileIO::GetNumberOfLogicalDrives()
 {
     return NumberOfLogicalDrivers;
 }
-char *GetLogicalDrive(int iRequestedDrive)
+char *FileIO::GetLogicalDrive(int iRequestedDrive)
 {
     static char LogicalDriveName[3];
     struct Media_Device *current = nextMediaDevice;
@@ -321,25 +207,13 @@ char *GetLogicalDrive(int iRequestedDrive)
 #pragma endregion
 
 #pragma region Directories
-char *GetDirectoryAndFileName(char *DeviceDirectoryAndFileName)
-{
-    (void)DeviceDirectoryAndFileName;
-    static char DirectoryAndFileName[256];
-    return DirectoryAndFileName;
-}
-char *GetDirectoryPath(char *DeviceDirectory)
-{
-    (void)DeviceDirectory;
-    static char DirectoryPath[256];
-    return DirectoryPath;
-}
-bool DirectoryExists(char *DeviceAndDirectory)
+bool FileIO::DirectoryExists(char *DeviceAndDirectory)
 {
     Media_Device *sdm = FindMediaDeviceFromPath(DeviceAndDirectory);
     char *DirectoryPath = GetDirectoryPath(DeviceAndDirectory);
     return (fx_directory_next_entry_find(&sdm->media, DirectoryPath) == FX_SUCCESS);
 }
-bool MoveDirectory(char *DeviceAndDirectorySrc, char *DirectoryDst)
+bool FileIO::MoveDirectory(char *DeviceAndDirectorySrc, char *DirectoryDst)
 {
     bool status = false;
     Media_Device *sdm = FindMediaDeviceFromPath(DeviceAndDirectorySrc);
@@ -351,7 +225,7 @@ bool MoveDirectory(char *DeviceAndDirectorySrc, char *DirectoryDst)
     }
     return status;
 }
-bool DeleteDirectory(char *DeviceAndDirectory)
+bool FileIO::DeleteDirectory(char *DeviceAndDirectory)
 {
     bool status = false;
     Media_Device *sdm = FindMediaDeviceFromPath(DeviceAndDirectory);
@@ -362,7 +236,7 @@ bool DeleteDirectory(char *DeviceAndDirectory)
     }
     return status;
 }
-bool CreateDirectory(char *DeviceAndDirectory)
+bool FileIO::CreateDirectory(char *DeviceAndDirectory)
 {
     bool status = false;
     Media_Device *sdm = FindMediaDeviceFromPath(DeviceAndDirectory);
@@ -373,7 +247,7 @@ bool CreateDirectory(char *DeviceAndDirectory)
     }
     return status;
 }
-int GetDirectoryCount(char *DeviceAndDirectory)
+int FileIO::GetDirectoryCount(char *DeviceAndDirectory)
 {
     Media_Device *sdm = FindMediaDeviceFromPath(DeviceAndDirectory);
     char *DirectoryPath = GetDirectoryPath(DeviceAndDirectory);
@@ -389,7 +263,7 @@ int GetDirectoryCount(char *DeviceAndDirectory)
     }
     return directorycount;
 }
-char *GetDirectories(char *DeviceAndDirectoryPath, int DirectorySequenceNumber)
+char *FileIO::GetDirectories(char *DeviceAndDirectoryPath, int DirectorySequenceNumber)
 {
     // TODO - semaphore needed?
     // If using a non-local path, it is important to prevent (with a ThreadX semaphore, mutex, or priority level change)
@@ -416,10 +290,10 @@ char *GetDirectories(char *DeviceAndDirectoryPath, int DirectorySequenceNumber)
     }
     return NULL;
 }
-int GetFileCount(char *DeviceAndDirectory)
+int FileIO::GetFileCount(char *DeviceAndDirectory)
 {
-    Media_Device *sdm = FindMediaDeviceFromPath(DeviceAndDirectory);
-    char *DirectoryPath = GetDirectoryPath(DeviceAndDirectory);
+    Media_Device *sdm = FileIO::FindMediaDeviceFromPath(DeviceAndDirectory);
+    char *DirectoryPath = FileIO::GetDirectoryPath(DeviceAndDirectory);
     int directorycount = 0;
 
     if (fx_directory_first_entry_find(&sdm->media, DirectoryPath) == FX_SUCCESS)
@@ -432,7 +306,7 @@ int GetFileCount(char *DeviceAndDirectory)
     }
     return directorycount;
 }
-char *GetFiles(char *DirectoryAndFilePath, int fileSequenceNumber)
+char *FileIO::GetFiles(char *DirectoryAndFilePath, int fileSequenceNumber)
 {
     (void)DirectoryAndFilePath;
     (void)fileSequenceNumber;
@@ -440,7 +314,7 @@ char *GetFiles(char *DirectoryAndFilePath, int fileSequenceNumber)
     static char FileName[260];
     return &FileName[0];
 }
-int GetDirectoryWriteTime(SYSTEMTIME *directoryTime, char *directoryPath)
+int FileIO::GetDirectoryWriteTime(SYSTEMTIME *directoryTime, char *directoryPath)
 {
     UINT attributes;
     ULONG size;
@@ -478,7 +352,7 @@ int GetDirectoryWriteTime(SYSTEMTIME *directoryTime, char *directoryPath)
     }
     return nanoCLRCode;
 }
-bool GetDirectoryAttributes(char *DirectoryName, UINT *attributes)
+bool FileIO::GetDirectoryAttributes(char *DirectoryName, UINT *attributes)
 {
     Media_Device *sdm = FindMediaDeviceFromPath(DirectoryName);
     if (sdm != NULL)
@@ -494,13 +368,13 @@ bool GetDirectoryAttributes(char *DirectoryName, UINT *attributes)
 #pragma endregion
 
 #pragma region Files
-char *GetFileName(char *DeviceDirectoryAndFilename)
+char *FileIO::GetFileName(char *DeviceDirectoryAndFilename)
 {
     (void)DeviceDirectoryAndFilename;
     static char FileName[256];
     return FileName;
 }
-bool FileExists(char *DeviceDirectoryAndFileName)
+bool FileIO::FileExists(char *DeviceDirectoryAndFileName)
 {
     FX_FILE my_file;
     Media_Device *sdm = FindMediaDeviceFromPath(DeviceDirectoryAndFileName);
@@ -517,14 +391,14 @@ bool FileExists(char *DeviceDirectoryAndFileName)
     }
     return false;
 }
-int CreateFile(char *DeviceDirectoryAndFileName)
+int FileIO::CreateFile(char *DeviceDirectoryAndFileName)
 {
     Media_Device *sdm = FindMediaDeviceFromPath(DeviceDirectoryAndFileName);
     char *DirectoryAndFileName = GetDirectoryAndFileName(DeviceDirectoryAndFileName);
     int result = fx_file_create(&sdm->media, DirectoryAndFileName);
     return FileXToClrResultCode(result);
 }
-bool MoveFile(char *DeviceDirectoryAndFileNameSrc, char *DeviceDirectoryAndFileNameDst)
+bool FileIO::MoveFile(char *DeviceDirectoryAndFileNameSrc, char *DeviceDirectoryAndFileNameDst)
 {
     bool status = false;
     Media_Device *sdm = FindMediaDeviceFromPath(DeviceDirectoryAndFileNameSrc);
@@ -537,18 +411,10 @@ bool MoveFile(char *DeviceDirectoryAndFileNameSrc, char *DeviceDirectoryAndFileN
     }
     return status;
 }
-bool DeleteFile(char *DeviceDirectoryAndFileName)
+bool FileIO::DeleteFile(char *DeviceDirectoryAndFileName)
 {
-    bool status = false;
-    Media_Device *sdm = FindMediaDeviceFromPath(DeviceDirectoryAndFileName);
-    char *DirectoryAndFilename = GetDirectoryAndFileName(DeviceDirectoryAndFileName);
-    if (fx_directory_delete(&sdm->media, DirectoryAndFilename) == FX_SUCCESS)
-    {
-        status = true;
-    }
-    return status;
 }
-bool GetFileAttributes(char *DeviceDirectoryAndFileName, uint8_t *attributes)
+bool FileIO::GetFileAttributes(char *DeviceDirectoryAndFileName, uint8_t *attributes)
 {
     Media_Device *sdm = FindMediaDeviceFromPath(DeviceDirectoryAndFileName);
     char *DirectoryAndFilename = GetDirectoryAndFileName(DeviceDirectoryAndFileName);
@@ -561,7 +427,7 @@ bool GetFileAttributes(char *DeviceDirectoryAndFileName, uint8_t *attributes)
         return false;
     }
 }
-bool SetFileAttributes(char *DeviceDirectoryAndFileName, uint8_t attributes)
+bool FileIO::SetFileAttributes(char *DeviceDirectoryAndFileName, uint8_t attributes)
 {
     Media_Device *sdm = FindMediaDeviceFromPath(DeviceDirectoryAndFileName);
     char *DirectoryAndFilename = GetDirectoryAndFileName(DeviceDirectoryAndFileName);
@@ -574,7 +440,7 @@ bool SetFileAttributes(char *DeviceDirectoryAndFileName, uint8_t attributes)
         return false;
     }
 }
-int GetFileWriteTime(SYSTEMTIME *fileTime, char *DeviceDirectoryAndFileName)
+int FileIO::GetFileWriteTime(SYSTEMTIME *fileTime, char *DeviceDirectoryAndFileName)
 {
     UINT attributes;
     ULONG size;
@@ -613,7 +479,7 @@ int GetFileWriteTime(SYSTEMTIME *fileTime, char *DeviceDirectoryAndFileName)
     }
     return nanoCLRCode;
 }
-int GetDirectoryLength(char *DeviceDirectoryAndFileName, uint32_t *FileSize)
+int FileIO::GetDirectoryLength(char *DeviceDirectoryAndFileName, uint32_t *FileSize)
 {
     UINT attributes;
     ULONG size;
@@ -642,11 +508,12 @@ int GetDirectoryLength(char *DeviceDirectoryAndFileName, uint32_t *FileSize)
     nanoCLRCode == 0 ? *FileSize = size : 0;
     return nanoCLRCode;
 }
+
 #pragma endregion
 
 #pragma region File Stream
 
-int OpenFile(char *DeviceDirectoryAndFileName, FileMode mode)
+int FileIO::OpenFile(char *DeviceDirectoryAndFileName, FileMode mode)
 {
     FX_FILE openFile;
     Media_Device *sdm = FindMediaDeviceFromPath(DeviceDirectoryAndFileName);
@@ -679,7 +546,7 @@ int OpenFile(char *DeviceDirectoryAndFileName, FileMode mode)
 
     return FileXToClrResultCode(status);
 }
-int ReadFile(char *DeviceDirectoryAndFileName, uint8_t *buffer, int position, int length)
+int FileIO::ReadFile(char *DeviceDirectoryAndFileName, uint8_t *buffer, int position, int length)
 {
     (void)buffer;
     (void)position;
@@ -697,7 +564,7 @@ int ReadFile(char *DeviceDirectoryAndFileName, uint8_t *buffer, int position, in
     int result = fx_file_read(&file, localBuffer, requestedBytes, &actualBytes);
     return FileXToClrResultCode(result);
 }
-int WriteFile(char *DeviceDirectoryAndFileName, uint8_t *buffer, int position, int length)
+int FileIO::WriteFile(char *DeviceDirectoryAndFileName, uint8_t *buffer, int position, int length)
 {
     (void)buffer;
     (void)position;
@@ -712,9 +579,9 @@ int WriteFile(char *DeviceDirectoryAndFileName, uint8_t *buffer, int position, i
     char *DirectoryAndFileName = GetDirectoryAndFileName(DeviceDirectoryAndFileName);
     (void)DirectoryAndFileName;
     int result = fx_file_write(&file, localBuffer, sizeof(buffer));
-    return FileXToClrResultCode(result);
+    return FileIO::FileXToClrResultCode(result);
 }
-int GetFileLength(char *DeviceDirectoryAndFileName, uint32_t *size)
+int FileIO::GetFileLength(char *DeviceDirectoryAndFileName, uint32_t *size)
 {
     UINT attributes;
     ULONG fileSize;

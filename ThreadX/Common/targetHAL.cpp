@@ -12,6 +12,7 @@
 #include <nanoHAL_Graphics.h>
 #include <nanoHAL_v2.h>
 #include "board.h"
+#include "CLRNativeThreads.h"
 
 bool g_fDoNotUninitializeDebuggerPort = false;
 
@@ -57,6 +58,25 @@ void nanoHAL_Initialize()
     g_TouchPanel.Initialize();
 #endif
 
+#if (NETWORKING_SUPPORT == TRUE)
+    NetworkStartup();
+#endif
+
+#if (FILE_SYSTEM_SUPPORT == TRUE)
+    //FS_Initialize();
+    //FileSystemVolumeList::Initialize();
+    //FS_AddVolumes();
+    //FileSystemVolumeList::InitializeVolumes();
+#endif
+#if (FILE_SYSTEM_SD == TRUE)
+    File_System_SD_Initialize();
+#endif
+#if (FILE_SYSTEM_FLASH == TRUE)
+    File_System_FLASH_Initialize();
+#endif
+#if (FILE_SYSTEM_RAM == TRUE)
+    File_System_RAM_Initialize();
+#endif
 }
 
 void nanoHAL_Uninitialize(bool isPoweringDown)
@@ -80,7 +100,6 @@ bool Target_CanChangeMacAddress()
 {
     return false;
 }
-
 
 void ConfigurationManager_GetOemModelSku(char *model, size_t modelSkuSize)
 {

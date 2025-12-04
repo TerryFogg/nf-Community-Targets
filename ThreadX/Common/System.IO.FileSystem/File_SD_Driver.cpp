@@ -1,8 +1,8 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
-#include "File_Drivers.h"
+#include "System.IO.FileSystem.h"
 #include "board.h"
 #include <targetHAL_Time.h>
 
@@ -21,6 +21,15 @@ UINT _fx_partition_offset_calculate(
 
 #define FX_SD_DEFAULT_TIMEOUT (10 * TX_TIMER_TICKS_PER_SECOND)
 
+static bool is_initialized = false;
+
+bool File_System_SD_Initialize()
+{
+    is_initialized = true;
+
+    return is_initialized;
+}
+
 bool check_sd_status(CLR_INT32 SDBus_index)
 {
     CLR_INT32 start = HAL_Time_CurrentSysTicks();
@@ -35,7 +44,7 @@ bool check_sd_status(CLR_INT32 SDBus_index)
     return false;
 }
 
-void Sd_Driver(FX_MEDIA *media_ptr)
+void File_SD_Driver(FX_MEDIA *media_ptr)
 {
     ULONG partition_start;
     ULONG partition_size;
@@ -83,7 +92,7 @@ void Sd_Driver(FX_MEDIA *media_ptr)
             uint32_t numberOfBlocks = media_ptr->fx_media_driver_sectors;
             uint32_t total_blocks = media_ptr->fx_media_total_sectors;
             uint32_t card_type = media_ptr->fx_media_FAT_type;
-            if (WriteSD(SDBus_index, card_type, total_blocks, startBlock, numberOfBlocks))
+            if (FileIO::WriteSD(SDBus_index, card_type, total_blocks, startBlock, numberOfBlocks))
             {
                 media_ptr->fx_media_driver_status = FX_SUCCESS;
             }

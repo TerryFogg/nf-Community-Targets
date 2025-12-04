@@ -122,6 +122,7 @@ bool Device::RegisterPinFunction(PinNameValue pinNameValue,DevicePinFunction fun
     GPIOPins[pinIndex].Function = function;
     return true;
 }
+
 #ifdef FILEX
 static Device::SDPin *SDChannels;
 static int NumberOfSDChannels;
@@ -131,7 +132,8 @@ void Device::CreateSDChannelList(SDPin *BoardSDChannels, int BoardnumberOfSDChan
     NumberOfSDChannels = BoardnumberOfSDChannels;
 }
 #endif
-#ifdef INCLUDE
+
+#ifdef SD_CARD
 static Device::SDPin *SDChannels;
 static int NumberOfSDChannels;
 void Device::CreateSDChannelList(SDPin *BoardSDChannels, int BoardnumberOfSDChannels)

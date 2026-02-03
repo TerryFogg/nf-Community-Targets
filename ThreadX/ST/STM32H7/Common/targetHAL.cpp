@@ -12,7 +12,7 @@
 #include <nanoHAL_ConfigurationManager.h>
 #include <nanoHAL_Graphics.h>
 #include <nanoHAL_v2.h>
-#include "board.h"
+#include "target_board.h"
 #include "SD_DoubleBufferedDMA.h"
 
 bool g_fDoNotUninitializeDebuggerPort = false;

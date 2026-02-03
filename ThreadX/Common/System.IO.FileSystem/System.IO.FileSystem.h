@@ -21,6 +21,8 @@
         }                                                                                                              \
     } while (0)
 
+typedef void (*DriverFunc)(FX_MEDIA *media);
+
 typedef enum
 {
     FILE_NONE = 0,
@@ -107,13 +109,14 @@ extern "C"
     uint8_t *GetMediaAddress(char MediaName);
     int GetMediaCount();
 
-    void (*GetMediaDriver(char mediaName))(FX_MEDIA *media);
+    DriverFunc GetMediaDriver(char mediaName);
 
     UINT FxStatusToManagedStatus(UINT status);
 
     UINT FormatMedia(
         char mediaName,
-        uint8_t *MediaAddress,
+        uint8_t *media_address,
+        unsigned int media_address_size,
         unsigned int NumberOfFATs,
         unsigned int DirectoryEntries,
         unsigned int HiddenSectors,

@@ -5,12 +5,10 @@
 
 #include "nanoCLR_Types.h"
 #include "CPU_SPI_DEcl.h"
-#include "board.h"
+#include "target_board.h"
 #include "System.Device.IO.h"
 #include "System.Device.h"
 #include "sys_dev_spi_native.h"
-#include <string.h>
-#include <targetPAL.h>
 
 typedef Library_sys_dev_spi_native_System_Device_Spi_SpiConnectionSettings SpiConnectionSettings;
 typedef Library_corlib_native_System_SpanByte SpanByte;

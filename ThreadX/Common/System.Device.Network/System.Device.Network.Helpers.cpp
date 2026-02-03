@@ -5,12 +5,19 @@
 //
 
 #include "System.Device.Network.h"
-#include "ManagedThreadSupport.h"
-#include "System.Device.Wifi.h"
 
 static bool socket_data_available = false;
 
-int TranslateNXErrorToSocketError(int NetXDuoError)
+void SetReturnStatus(CLR_RT_StackFrame &stack, int errorCode, CLR_RT_TypeDef_Index messageType)
+{
+    CLR_RT_HeapBlock &res = stack.m_owningThread->m_currentException;
+    if ((Library_corlib_native_System_Exception::CreateInstance(res, messageType, CLR_E_FAIL, &stack)) == S_OK)
+    {
+        res.Dereference()[Library_sys_net_native_System_Net_Sockets_SocketException::FIELD___errorCode].SetInteger(
+            errorCode);
+    }
+}
+int TranslateNXStatusToBSDStatus(int NetXDuoError)
 {
     int translated_socket_error;
     switch (NetXDuoError)
@@ -198,21 +205,6 @@ int TranslateNXErrorToSocketError(int NetXDuoError)
             translated_socket_error = SOCK_EPERM;
     }
     return translated_socket_error;
-}
-void SetReturnStatus(CLR_RT_StackFrame &stack, CLR_INT32 errorCode)
-{
-    NATIVE_PROFILE_CLR_NETWORK();
-    CLR_RT_HeapBlock &res = stack.m_owningThread->m_currentException;
-
-    if ((Library_corlib_native_System_Exception::CreateInstance(
-            res,
-            g_CLR_RT_WellKnownTypes.m_SocketException,
-            CLR_E_FAIL,
-            &stack)) == S_OK)
-    {
-        res.Dereference()[Library_sys_net_native_System_Net_Sockets_SocketException::FIELD___errorCode].SetInteger(
-            errorCode);
-    }
 }
 void tcp_data_callback(NX_TCP_SOCKET *socket_ptr)
 {

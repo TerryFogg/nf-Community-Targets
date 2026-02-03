@@ -4,9 +4,7 @@
 //
 
 #include "sys_dev_gpio_native.h"
-#include <targetPAL.h>
 #include <corlib_native.h>
-#include "nf_rt_events_native.h"
 #include "System.Device.IO.h"
 #include "System.Device.h"
 #include "tx_api.h"

@@ -5,12 +5,12 @@
 #include <nanoCLR_Application.h>
 #include "CLRNativeThreads.h"
 #include <tx_api.h>
-#include "board.h"
 
-#define DEFAULT_BYTE_POOL_SIZE 10000
+#define DEFAULT_BYTE_POOL_SIZE 24000
 
 TX_BYTE_POOL byte_pool_0;
 uint8_t byte_pool_memory_area[DEFAULT_BYTE_POOL_SIZE];
+
 
 TX_THREAD CLRThread;
 TX_THREAD receiverThread;

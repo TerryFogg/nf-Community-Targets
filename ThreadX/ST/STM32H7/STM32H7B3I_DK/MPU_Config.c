@@ -1,9 +1,9 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // Portions Copyright (c) 2021 STMicroelectronics.  All rights reserved.
 // See LICENSE file in the project root for full license information.
 //
-#include "board.h"
+#include "target_board.h"
 
 void MPU_Config(uint32_t sdram_base_address, uint32_t sdram_region_size)
 {

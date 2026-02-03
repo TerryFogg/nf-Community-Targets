@@ -5,7 +5,6 @@
 //
 
 #include "System.Device.Network.h"
-#include "System.Device.Wifi.h"
 #include "nanoHAL_v2.h"
 #include "nanoCLR_Interop.h"
 

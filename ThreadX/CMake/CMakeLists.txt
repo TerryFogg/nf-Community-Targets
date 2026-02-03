@@ -36,7 +36,7 @@ add_executable(nanoCLR)
     target_sources(nanoCLR PUBLIC
                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/main.c
                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/common/CLR_RT_InteropAssembliesTable.cpp
-                   ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/targetHAL.cpp
+                   "../targetHAL.cpp"
                    ${NF_INTERPRETER_SOURCES}
                    ${THREADX_SOURCES}
                    ${${TARGET_FAMILY}_SOURCES}

@@ -11,13 +11,12 @@
 //     +FAT Sectors              Root Directory Start
 //     +Directory Sectors        Data Sector Start
 
-#include "board.h"
+#include "target_board.h"
 #include "memory.h"
 #include "System.IO.FileSystem.h"
 
 static bool is_initialized = false;
 
-#define UNKNOWN_DRIVER_ID 0xFFFFFFFF
 
 #define return_if_fail(p)                                                                                              \
     if (!(p))                                                                                                          \
@@ -40,13 +39,19 @@ bool File_System_RAM_Initialize()
         unsigned int HiddenSectors = 0;
         unsigned int SectorsPerTrack = 1;
         unsigned int BytesPerSector = 128;
-        unsigned int TotalSectors = ram_disk_size / BytesPerSector;
+        unsigned int TotalSectors = (uint32_t)&ram_disk_size / BytesPerSector;
         unsigned int Heads = 1;
         unsigned int SectorsPerCluster = 1;
+        unsigned int ram_size = (uint32_t)&ram_disk_size;
+        // Ram disk total sectors must be an integral
+        ASSERT(((uint32_t)&ram_disk_size % BytesPerSector) == 0);
+
+        uint8_t *ram_disk_memory = (uint8_t *)(uint32_t)&ram_disk_start_address;
 
         FormatMedia(
             'R',
-            (uint8_t *)&ram_disk_start_address,
+            ram_disk_memory,
+            ram_size,
             NumberOfFATs,
             DirectoryEntries,
             HiddenSectors,

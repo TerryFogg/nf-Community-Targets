@@ -6,8 +6,7 @@
 #include "PinNames.h"
 #include "System.Device.IO.h"
 #include "System.Device.h"
-#include "board.h"
-#include "Delays.h"
+#include "target_board.h"
 
 #ifdef FileX
 #include "File_Drivers.h"

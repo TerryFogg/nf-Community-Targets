@@ -16,4 +16,4 @@ void ReceiverThread_entry(uint32_t parameter);
 void CreateAsynchronousIOThread();
 void DeviceIOAsynchronousThread_Entry(uint32_t parameter);
 
-void NetworkStartup();
+bool NetworkStartup();

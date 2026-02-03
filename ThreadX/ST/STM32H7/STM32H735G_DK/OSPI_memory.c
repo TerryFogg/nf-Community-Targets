@@ -1,8 +1,8 @@
-
+﻿
 #include "stm32h7xx_ll_bus.h"
 #include "stm32h7xx_ll_gpio.h"
 #include "stm32h7xx_ll_rcc.h"
-#include "board.h"
+#include "target_board.h"
 
 #define OSPI_TIMEOUT_DEFAULT_VALUE         ((uint32_t)5000U)
 #define OSPI_FUNCTIONAL_MODE_MEMORY_MAPPED ((uint32_t)OCTOSPI_CR_FMODE)

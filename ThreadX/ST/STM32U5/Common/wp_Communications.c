@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
 // See LICENSE file in the project root for full license information.
@@ -21,7 +21,7 @@
 #include "CircularBuffer.h"
 #include <assert.h>
 #include <tx_api.h>
-#include "board.h"
+#include "target_board.h"
 
 // USART receive buffer for DMA - make sure it is in RAM accessible by the DMA controller used.
 // Also, check alignment

@@ -5,7 +5,6 @@
 //
 
 #include "System.Device.Network.h"
-#include "System.Device.Wifi.h"
 
 HAL_Configuration_NetworkInterface network_Interface;
 

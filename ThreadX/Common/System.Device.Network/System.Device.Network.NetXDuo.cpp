@@ -26,78 +26,100 @@
 //
 
 #include "sys_net_native.h"
-#include "System.Device.Network.h"
-#include "System.Device.Wifi.h"
 #include "CLRNativeThreads.h"
-#include "nx_secure_tls_api.h"
 #include <nx_api.h>
-#include "tx_api.h"
 
-#define QUEUE_SIZE          10
-extern TX_EVENT_FLAGS_GROUP eventsNetworkWorkerThread;
-extern NX_PACKET_POOL nx_packet_pool_0;
+#define NX_PACKET_SIZE      1536
+#define NX_PACKET_POOL_SIZE NX_PACKET_SIZE * 8
+#define NX_ARP_SPACE_SIZE  1024
 
-NX_IP ip_0;
-ULONG ip_thread_stack[2 * 1024 / sizeof(ULONG)];
-ULONG arp_space_area[512 / sizeof(ULONG)];
-ULONG error_counter;
-UINT status;
+#define NX_DHCP_SERVER_IP_ADDRESS_0 IP_ADDRESS(10, 0, 0, 1)
+#define START_IP_ADDRESS_LIST_0     IP_ADDRESS(10, 0, 0, 10)
+#define END_IP_ADDRESS_LIST_0       IP_ADDRESS(10, 0, 0, 19)
 
-static bool socket_data_available = false;
-TX_QUEUE Network_message_queue;
-void *first_unused_memory;
+#define NX_DHCP_SUBNET_MASK_0     IP_ADDRESS(255, 255, 255, 0)
+#define NX_DHCP_DEFAULT_GATEWAY_0 IP_ADDRESS(10, 0, 0, 1)
+#define NX_DHCP_DNS_SERVER_0      IP_ADDRESS(10, 0, 0, 1)
 
-void NetworkThread_Entry(uint32_t parameter)
+static NX_IP IP0;
+static NX_PACKET_POOL Network_packet_pool_0;
+NX_DHCP dhcp_client;
+uint8_t* pointer;
+uint8_t *pArp_space;
+
+bool NetworkStartup()
 {
-    (void)parameter;
-
-    TX_EVENT_FLAGS_GROUP wpReceivedEvent;
-    ULONG actual_flags;
+    UINT status;
 
     nx_system_initialize();
 
-    NANOCLR_HEADER();
+    pointer = (uint8_t *)platform_malloc(NX_PACKET_POOL_SIZE);
+    status = nx_packet_pool_create(&Network_packet_pool_0, (char *)"NetX Main Packet Pool", 1024, pointer, NX_PACKET_POOL_SIZE);
+    if (status != NX_SUCCESS)
     {
-        // Create an IP instance.
-        status = nx_ip_create(
-            &ip_0,
-            (char *)"NetX IP Instance 0",
-            IP_ADDRESS(192, 168, 1, 139),
-            0xFFFFFF00UL,
-            &nx_packet_pool_0,
-            _nx_ram_network_driver,
-            (UCHAR *)ip_thread_stack,
-            sizeof(ip_thread_stack),
-            1);
-        if (status)
-        {
-            NANOCLR_SET_AND_LEAVE(CLR_E_FAIL);
-        }
-
-        // Enable ARP and supply ARP cache memory for IP Instance 0.
-        status = nx_arp_enable(&ip_0, (void *)arp_space_area, sizeof(arp_space_area));
-
-        if (status)
-            error_counter++;
-
-        status = nx_tcp_enable(&ip_0);
-        if (status)
-            error_counter++;
-
-        status = nx_udp_enable(&ip_0);
-        if (status)
-            error_counter++;
-
-        status = nx_icmp_enable(&ip_0);
-        if (status)
-            error_counter++;
-
-        // Main loop for network operations
-        while (1)
-        {
-            // Wait for the process network event to be set by the hardware or class library request
-            tx_event_flags_get(&eventsNetworkWorkerThread, 0x1, TX_OR_CLEAR, &actual_flags, NX_WAIT_FOREVER);
-        }
+        return false;
     }
-    NANOCLR_CLEANUP();
+    status = nx_ip_create(
+        &IP0,
+        (char *)"NetX IP Instance 0",
+        IP_ADDRESS(192, 168, 1, 139),
+        0xFFFFFF00UL,
+        &Network_packet_pool_0,
+        _nx_ram_network_driver,
+        pointer,
+        2048,
+        1);
+    if (status != NX_SUCCESS)
+    {
+        return false;
+    }
+
+    pArp_space = (uint8_t *)platform_malloc(NX_ARP_SPACE_SIZE);
+    status = nx_arp_enable(&IP0, (void *)pArp_space, NX_ARP_SPACE_SIZE);
+    if (status != NX_SUCCESS)
+    {
+        return false;
+    }
+
+    status = nx_udp_enable(&IP0);
+    if (status != NX_SUCCESS)
+    {
+        return false;
+    }
+
+    status = nx_tcp_enable(&IP0);
+    if (status != NX_SUCCESS)
+    {
+        return false;
+    }
+
+    status = nx_icmp_enable(&IP0);
+    if (status != NX_SUCCESS)
+    {
+        return false;
+    }
+
+    return true;
 }
+
+//void NetworkThread_Entry(uint32_t parameter)
+//{
+//    (void)parameter;
+//
+//    TX_EVENT_FLAGS_GROUP wpReceivedEvent;
+//    ULONG actual_flags;
+//
+//    nx_system_initialize();
+//
+//    NANOCLR_HEADER();
+//    {
+//
+//        // Main loop for network operations
+//        while (1)
+//        {
+//            // Wait for the process network event to be set by the hardware or class library request
+//            tx_event_flags_get(&eventsNetworkWorkerThread, 0x1, TX_OR_CLEAR, &actual_flags, NX_WAIT_FOREVER);
+//        }
+//    }
+//    NANOCLR_CLEANUP();
+//}

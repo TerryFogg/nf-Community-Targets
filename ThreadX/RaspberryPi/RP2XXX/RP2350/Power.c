@@ -5,7 +5,7 @@
 
 #include <nanoHAL_Power.h>
 #include <nanoHAL_v2.h>
-#include "board.h"
+#include "target_board.h"
 #include "hardware/gpio.h"
 #include "hardware/powman.h"
 #include "Power.h"

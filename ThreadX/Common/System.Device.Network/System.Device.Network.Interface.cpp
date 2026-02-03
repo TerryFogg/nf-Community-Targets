@@ -9,6 +9,7 @@
 
 NX_IP *ip_ptr;
 NX_DHCP *dhcp_ptr;
+
 static HAL_Configuration_NetworkInterface network_Interface;
 static HAL_Configuration_NetworkInterface ethernetInterface;
 static HAL_Configuration_WirelessAP wifiAP;

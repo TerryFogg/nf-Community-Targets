@@ -4,7 +4,6 @@
 //
 #include <tx_api.h>
 #include <nanoPAL.h>
-#include <target_platform.h>
 #include <targetPAL_Time.h>
 
 // timer for next event

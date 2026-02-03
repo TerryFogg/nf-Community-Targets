@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 
 #include "stdbool.h"
-#include "board.h"
+#include "target_board.h"
 
 typedef unsigned char CLR_UINT8;
 typedef unsigned short CLR_UINT16;

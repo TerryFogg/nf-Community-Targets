@@ -25,12 +25,12 @@ extern const uint32_t deployment_block_end;
 extern const uint32_t config_block_start;
 extern const uint32_t config_block_end;
 
-extern uint32_t __nanoImage_start__;
-extern uint32_t __nanoImage_end__;
+//extern uint32_t __nanoImage_start__;
+//extern uint32_t __nanoImage_end__;
 extern uint32_t __nanoConfig_start__;
 extern uint32_t __nanoConfig_end__;
-extern uint32_t __deployment_start__;
-extern uint32_t __deployment_end__;
+//extern uint32_t __deployment_start__;
+//extern uint32_t __deployment_end__;
 
 extern const uint32_t ram_disk_start_address;
 extern const uint32_t ram_disk_size;

@@ -60,6 +60,9 @@ deployment_block_start = native_block_end + 1;
 deployment_block_end   = deployment_block_start + deployment_flash_blocks - 1;
 config_block_start = deployment_block_end + 1;
 config_block_end   = config_block_start + config_flash_blocks - 1;
+__nanoConfig_start__    = ORIGIN(CONFIG_FLASH);
+__nanoConfig_size__     = LENGTH(CONFIG_FLASH);
+__nanoConfig_end__      = __nanoConfig_start__ + __nanoConfig_size__;
 /*----------------------------------------------------------------------------*/
 
 /* -------------------------------------- */

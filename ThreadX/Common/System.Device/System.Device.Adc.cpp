@@ -4,8 +4,6 @@
 //
 
 #include "sys_dev_adc_native.h"
-#include <tx_api.h>
-#include <tx_port.h>
 #include "System.Device.IO.h"
 #include "System.Device.h"
 

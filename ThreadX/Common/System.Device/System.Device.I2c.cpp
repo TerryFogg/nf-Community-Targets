@@ -4,9 +4,7 @@
 //
 #include "nanoCLR_Types.h"
 #include "sys_dev_i2c_native.h"
-#include "CLRNativeThreads.h"
 #include "System.Device.IO.h"
-#include "System.Device.h"
 #include "ManagedThreadSupport.h"
 
 static bool WorkerThreadCreated = false;

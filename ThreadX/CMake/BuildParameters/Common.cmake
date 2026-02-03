@@ -36,8 +36,11 @@
         target_compile_definitions(nanoCLR PUBLIC -DBUILD_RTM)
     endif()
     
-    # Not using the configuration mechanism
-    target_compile_definitions(nanoCLR PUBLIC -DHAS_CONFIG_BLOCK=0)
+    if(HAS_CONFIG_BLOCK)
+        target_compile_definitions(nanoCLR PUBLIC -DHAS_CONFIG_BLOCK=1)
+    else()
+        target_compile_definitions(nanoCLR PUBLIC -DHAS_CONFIG_BLOCK=0)
+    endif()
 
     target_compile_definitions(nanoCLR PUBLIC -DPLATFORM_NO_CLR_TRACE=1)
 

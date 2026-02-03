@@ -4,7 +4,6 @@
 //
 
 #include <tx_api.h>
-#include "nanoHAL_Rtos.h"
 
 void RtosYield()
 {

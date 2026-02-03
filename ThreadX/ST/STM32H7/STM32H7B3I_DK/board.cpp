@@ -6,7 +6,7 @@
 #include "PinNames.h"
 #include "System.Device.IO.h"
 #include "System.Device.h"
-#include "board.h"
+#include "target_board.h"
 #include "SD_DoubleBufferedDMA.h"
 
 #ifdef FILEX

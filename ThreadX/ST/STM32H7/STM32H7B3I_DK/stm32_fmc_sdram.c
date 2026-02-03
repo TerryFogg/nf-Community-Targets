@@ -1,8 +1,8 @@
-
+﻿
 // Copyright(c).NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 
-#include "board.h"
+#include "target_board.h"
 #include "stm32h7xx_hal_mdma.h"
 #include "stm32h7xx_hal_sdram.h"
 

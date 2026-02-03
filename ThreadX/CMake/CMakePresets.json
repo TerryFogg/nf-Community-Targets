@@ -252,7 +252,6 @@
                 "TARGET_FAMILY": "RP2XXX",
                 "PICO_BOARD": "pico",
                 "PICO_RP2040": "1",
-                "HAS_CONFIG_BLOCK": false,
                 "RANDOM_NUMBER_GENERATOR": true,
                 "REALTIME_CLOCK": false,
                 "WATCHDOG": false,
@@ -300,7 +299,7 @@
                 "PICO_BOARD": "pico2",
                 "PICO_RP2350": "1",
                 "SECURE_CODE": false,
-                "HAS_CONFIG_BLOCK": false,
+                "HAS_CONFIG_BLOCK": true,
                 "RANDOM_NUMBER_GENERATOR": true,
                 "REALTIME_CLOCK": false,
                 "WATCHDOG": false,
@@ -625,7 +624,8 @@
                 "APS6404L",
                 "BUYDISPLAY_ER_TFTM028",
                 "WiFi_Cyw43",
-                "FILE_SYSTEM_RAM"
+                "FILE_SYSTEM_RAM",
+                "FILE_SYSTEM_FLASH"
             ]
         },
         {

@@ -76,11 +76,11 @@ HRESULT Library_nf_sys_io_filesystem_System_IO_DriveInfo::GetFileSystems___STATI
             CLR_RT_HeapBlock_Array::CreateInstance(ret, installedFileSystems, g_CLR_RT_WellKnownTypes.m_String));
 
 #ifdef FILE_SYSTEM_SD
-        NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance(fsNames, "S:"));
+        NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance(*fsNames, "S:"));
         fsNames++;
 #endif
 #ifdef FILE_SYSTEM_FLASH
-        NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance(fsNames, "F:"));
+        NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_String::CreateInstance(*fsNames, "F:"));
         fsNames++;
 #endif
 #ifdef FILE_SYSTEM_RAM

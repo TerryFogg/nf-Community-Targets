@@ -4,9 +4,6 @@
 //
 
 #include "sys_dev_i2s_native.h"
-#include <tx_api.h>
-#include <tx_port.h>
-#include "System.Device.IO.h"
 
 HRESULT Library_sys_dev_i2s_native_System_Device_I2s_I2sDevice::NativeInit___VOID(CLR_RT_StackFrame &stack)
 {

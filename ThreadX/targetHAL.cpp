@@ -4,24 +4,22 @@
 //
 
 #include <nanoPAL.h>
-#include <nanoHAL_Time.h>
-#include <nanoHAL_Types.h>
-#include <target_platform.h>
 #include <nanoPAL_Events.h>
 #include <nanoPAL_BlockStorage.h>
 #include <nanoHAL_Graphics.h>
 #include <nanoHAL_v2.h>
-#include "board.h"
+#include "target_board.h"
 #include "CLRNativeThreads.h"
+#include <fx_api.h>
 
 bool g_fDoNotUninitializeDebuggerPort = false;
 
 #if (TOUCH_DISPLAY_SUPPORT == TRUE)
-#include "TouchPanel.h"
-#include "TouchInterface.h"
-extern TouchPanel g_TouchPanel;
-extern TouchInterface g_TouchInterface;
-extern TouchDevice g_TouchDevice;
+    #include "TouchPanel.h"
+    #include "TouchInterface.h"
+    extern TouchPanel g_TouchPanel;
+    extern TouchInterface g_TouchInterface;
+    extern TouchDevice g_TouchDevice;
 #endif
 
 void nanoHAL_Initialize()
@@ -34,10 +32,15 @@ void nanoHAL_Initialize()
 
     HeapLocation(heapStart, heapSize);
     memset(heapStart, 0, heapSize);
+
     BlockStorageList_Initialize();
     BlockStorage_AddDevices();
     BlockStorageList_InitializeDevices();
+
+ //   ConfigurationManager_Initialize();
+
     Events_Initialize();
+
     SetupPinList();
 
 #if (NANOCLR_GRAPHICS == TRUE)
@@ -59,11 +62,11 @@ void nanoHAL_Initialize()
 #endif
 
 #if (NETWORKING_SUPPORT == TRUE)
-    NetworkStartup();
+ //   NetworkStartup();
 #endif
 
 #if (FILE_SYSTEM_SUPPORT == TRUE)
-    //FS_Initialize();
+   // fx_system_initialize();
     //FileSystemVolumeList::Initialize();
     //FS_AddVolumes();
     //FileSystemVolumeList::InitializeVolumes();
@@ -72,10 +75,10 @@ void nanoHAL_Initialize()
     File_System_SD_Initialize();
 #endif
 #if (FILE_SYSTEM_FLASH == TRUE)
-    File_System_FLASH_Initialize();
+   // File_System_FLASH_Initialize();
 #endif
 #if (FILE_SYSTEM_RAM == TRUE)
-    File_System_RAM_Initialize();
+  //  File_System_RAM_Initialize();
 #endif
 }
 
@@ -101,17 +104,3 @@ bool Target_CanChangeMacAddress()
     return false;
 }
 
-void ConfigurationManager_GetOemModelSku(char *model, size_t modelSkuSize)
-{
-    memset(model, 0, modelSkuSize);
-}
-
-void ConfigurationManager_GetModuleSerialNumber(char *serialNumber, size_t serialNumberSize)
-{
-    memset(serialNumber, 0, serialNumberSize);
-}
-
-void ConfigurationManager_GetSystemSerialNumber(char *serialNumber, size_t serialNumberSize)
-{
-    memset(serialNumber, 0, serialNumberSize);
-}

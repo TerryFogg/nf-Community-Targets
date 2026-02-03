@@ -7,12 +7,15 @@
 
 #include "nanoCLR_Types.h"
 #include "sys_net_native.h"
+#include "corlib_native.h"
 
 #include "target_platform.h"
 #include "nanoHAL_ConfigurationManager.h"
 #include "nanoPAL_Sockets.h"
+#include <nx_secure_tls.h>
 
-#define DnsFromDHCP 1
+#define NETWORK_INFINITE_TIMEOUT ((CLR_INT64) - 1)
+#define DnsFromDHCP              1
 
 #define INTERFACE_WIFI     0
 #define INTERFACE_ETHERNET 1
@@ -47,6 +50,15 @@
 #define AF_INET6  3 // IPv6 socket (UDP, TCP, etc)
 #define AF_PACKET 4 // Raw Packet type (Link Layer packets)
 
+#define FAULT_IF_NX_CALL_UNSUCCESSFUL(status, stack)                                                                   \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        if ((status) != NX_SUCCESS)                                                                                    \
+        {                                                                                                              \
+            SetReturnStatus((stack), SOCK_EINVAL, g_CLR_RT_WellKnownTypes.m_NetworkInterface);                         \
+            NANOCLR_SET_AND_LEAVE(CLR_E_FAIL);                                                                         \
+        }                                                                                                              \
+    } while (0)
 
 #define NX_DRIVER_PHYSICAL_HEADER_REMOVE(p)                                                                            \
     do                                                                                                                 \
@@ -79,25 +91,21 @@ typedef struct NX_DRIVER_INFORMATION_STRUCT
 
 } NX_DRIVER_INFORMATION;
 
-
-typedef enum
+enum socket_type
 {
     SOCKET_TYPE_TCP,
     SOCKET_TYPE_UDP
-} socket_type_t;
-
-typedef struct socket_entry_t
+};
+struct socket_entry_t
 {
-    socket_type_t type;
+    socket_type type;
     union {
         NX_TCP_SOCKET *tcp_socket;
         NX_UDP_SOCKET *udp_socket;
     };
-} socket_entry_t;
+    NX_SECURE_TLS_SESSION TLSSession;
+};
 
-
-
-////////////////
 
 static unsigned char test_device_cert_der[] = {
     0x30, 0x82, 0x03, 0xd2, 0x30, 0x82, 0x02, 0xba, 0xa0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x01, 0x01, 0x30, 0x0d, 0x06,
@@ -236,8 +244,7 @@ static unsigned int test_device_cert_key_der_len = 1192;
 #define Rdm       4
 #define Seqpacket 5
 
-int TranslateNXErrorToSocketError( int NetXDuoError);
-void SetReturnStatus(CLR_RT_StackFrame &stack, CLR_INT32 errorCode);
+int TranslateNXStatusToBSDStatus(int NetXDuoError);
+void SetReturnStatus(CLR_RT_StackFrame &stack, int errorCode, CLR_RT_TypeDef_Index messageType);
 void tcp_data_callback(NX_TCP_SOCKET *socket_ptr);
 void tcp_server_listen_callback(NX_TCP_SOCKET *socket_ptr, UINT port);
-

@@ -1,10 +1,9 @@
-//
+﻿//
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
 
 #include <nanoHAL_Boot.h>
-#include <nanoHAL_Capabilites.h>
 #include "nanoHAL_v2.h"
 
 inline bool RequestToLaunchProprietaryBootloader()

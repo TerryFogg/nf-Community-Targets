@@ -1,10 +1,10 @@
-//
+﻿//
 // Copyright (c) 2017 The nanoFramework project contributors
 // See LICENSE file in the project root for full license information.
 //
 
 #include "GraphicsMemoryHeap.h"
-#include "board.h"
+#include "target_board.h"
 #include <nanoCLR_Headers.h>
 #include <nanoHAL_Graphics.h>
 

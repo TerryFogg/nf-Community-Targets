@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include "DisplayInterface.h"
 #include <nanoCLR_Interop.h>
-#include "board.h"
+#include "target_board.h"
 
 #define LCD_COLOR_RGB565_BLACK 0x0000U
 #define LCD_COLOR_RGB565_WHITE 0x1010U

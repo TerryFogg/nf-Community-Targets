@@ -6,8 +6,6 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include <nanoHAL_v2.h>
-#include <nanoCLR_Interop.h>
 #include "nanoCLR_Types.h"
 #include "nanoCLR_Runtime.h"
 

@@ -217,6 +217,7 @@ HRESULT Library_nf_sys_io_filesystem_System_IO_NativeIO::Format___STATIC__VOID__
         CLR_RT_HeapBlock_String *pmediaName = stack.Arg0().DereferenceString();
         CLR_RT_HeapBlock_String *pFileSystemName = stack.Arg1().DereferenceString();
         uint32_t parameters = stack.Arg2().NumericByRef().u4;
+        unsigned int media_address_size;
 
         FAULT_ON_NULL(pmediaName);
         {
@@ -228,6 +229,7 @@ HRESULT Library_nf_sys_io_filesystem_System_IO_NativeIO::Format___STATIC__VOID__
                 UINT status = FormatMedia(
                     *media_ptr->fx_media_name,
                     MediaAddress,
+                    media_address_size,
                     media_ptr->fx_media_number_of_FATs,
                     media_ptr->fx_media_root_directory_entries,
                     media_ptr->fx_media_hidden_sectors,

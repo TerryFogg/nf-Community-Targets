@@ -19,7 +19,12 @@ void HeapLocation(unsigned char * & baseAddress, unsigned int& sizeInBytes)
 void *platform_malloc(size_t size)
 {
     uint8_t *pointer = (uint8_t *)TX_NULL;
-    tx_byte_allocate(&byte_pool_0, (VOID **)&pointer, size, TX_NO_WAIT);
+
+    //ULONG remaining_bytes;
+    //tx_byte_pool_info_get(&byte_pool_0, NULL, &remaining_bytes, NULL, NULL, NULL, NULL);
+
+
+    volatile UINT status = tx_byte_allocate(&byte_pool_0, (VOID **)&pointer, size, TX_NO_WAIT);
     return pointer;
 }
 

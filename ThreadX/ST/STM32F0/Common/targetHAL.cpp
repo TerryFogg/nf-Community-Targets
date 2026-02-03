@@ -11,7 +11,7 @@
 #include <nanoPAL_BlockStorage.h>
 #include <nanoHAL_ConfigurationManager.h>
 #include <nanoHAL_v2.h>
-#include "board.h"
+#include "target_board.h"
 
 bool g_fDoNotUninitializeDebuggerPort = false;
 

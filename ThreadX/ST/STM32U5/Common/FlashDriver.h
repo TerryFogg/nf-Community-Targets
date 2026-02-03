@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 //
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <nanoPAL_BlockStorage.h>
-#include "board.h"
+#include "target_board.h"
 
 #ifdef __cplusplus
 extern "C"

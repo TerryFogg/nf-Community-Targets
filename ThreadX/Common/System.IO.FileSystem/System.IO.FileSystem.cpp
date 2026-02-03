@@ -4,10 +4,8 @@
 //
 
 #include "System.IO.FileSystem.h"
-#include "CLRNativeThreads.h"
 #include <fx_api.h>
 #include "nanoHAL.h"
-#include "nf_errors_exceptions.h"
 #include "memory.h"
 
 // ThreadX integration: FileX uses ThreadX semaphores and timers.
@@ -33,12 +31,9 @@
 //     To access others, modify the driver to calculate offsets for additional partitions.
 //
 
-// "S" for SD card
-// "F" for Flash
-// "R" for RAM disk
-static FX_MEDIA SD_CARD_MEDIA;
-static FX_MEDIA FLASH_MEDIA;
-static FX_MEDIA RAM_MEDIA;
+static FX_MEDIA sd_card_media;
+static FX_MEDIA flash_media;
+static FX_MEDIA ram_disk_media;
 
 FX_MEDIA *GetMedia(char media_id)
 {
@@ -46,17 +41,17 @@ FX_MEDIA *GetMedia(char media_id)
     {
 #ifdef FILE_SYSTEM_SD
         case 'S':
-            return &SD_CARD_MEDIA;
+            return &sd_card_media;
             break;
 #endif
 #ifdef FILE_SYSTEM_FLASH
         case 'F':
-            return &FLASH_MEDIA;
+            return &flash_media;
             break;
 #endif
 #ifdef FILE_SYSTEM_RAM
         case 'R':
-            return &RAM_MEDIA;
+            return &ram_disk_media;
             break;
 #endif
         default:
@@ -82,14 +77,9 @@ uint8_t *GetMediaAddress(char mediaName)
 {
     switch (mediaName)
     {
-#ifdef FILE_SYSTEM_SD
-        case 'S':
-            return &File_SD_Driver;
-            break;
-#endif
 #ifdef FILE_SYSTEM_FLASH
         case 'F':
-            return &File_Flash_Driver;
+            return (uint8_t *)flash_disk_start_address;
             break;
 #endif
 #ifdef FILE_SYSTEM_RAM
@@ -102,7 +92,7 @@ uint8_t *GetMediaAddress(char mediaName)
     }
 }
 
-void (*GetMediaDriver(char mediaName))(FX_MEDIA *media)
+DriverFunc GetMediaDriver(char mediaName)
 {
     switch (mediaName)
     {
@@ -128,48 +118,53 @@ void (*GetMediaDriver(char mediaName))(FX_MEDIA *media)
 
 UINT FormatMedia(
     char mediaName,
-    uint8_t *MediaAddress,
-    unsigned int NumberOfFATs,
-    unsigned int DirectoryEntries,
-    unsigned int HiddenSectors,
-    unsigned int SectorsPerTrack,
-    unsigned int BytesPerSector,
-    unsigned int TotalSectors,
+    uint8_t *media_address,
+    unsigned int media_address_size,
+    unsigned int number_of_fats,
+    unsigned int directory_entries,
+    unsigned int hidden_sectors,
+    unsigned int sectors_per_track,
+    unsigned int bytes_per_sector,
+    unsigned int total_sectors,
     unsigned int Heads,
-    unsigned int SectorsPerCluster,
-    char *volumeName)
+    unsigned int sectors_per_cluster,
+    char *volume_name)
 {
     UINT status;
-    static uint8_t *ram_disk_memory = (uint8_t *)ram_disk_start_address;
+    VOID *driver_info_ptr = NULL;   //  Optional information pointer
 
-    FX_MEDIA *media_ptr = GetMedia(mediaName);
-
-    
-// After (preferred)
-    using fx_media_driver_t = void (*)(FX_MEDIA *);
-    fx_media_driver_t pDriver = GetMediaDriver(mediaName);
-
-    int cache_size = 128 * 128;
-
-    uint8_t *cache_buffer = (uint8_t *)platform_malloc(cache_size);
-    {
-        status = fx_media_format(
-            media_ptr,
-            pDriver,
-            MediaAddress,
-            cache_buffer,
-            cache_size,
-            volumeName,
-            NumberOfFATs,
-            DirectoryEntries,
-            HiddenSectors,
-            TotalSectors,
-            BytesPerSector,
-            SectorsPerCluster,
-            Heads,
-            SectorsPerTrack);
-    }
-    platform_free(cache_buffer);
+    DriverFunc media_driver = GetMediaDriver(mediaName);
+    FX_MEDIA *media = GetMedia('R');
+    status = fx_media_format(
+        media,
+        media_driver,
+        driver_info_ptr,
+        media_address,
+        media_address_size,
+        volume_name,
+        number_of_fats,
+        directory_entries,
+        hidden_sectors,
+        total_sectors,
+        bytes_per_sector,
+        sectors_per_cluster,
+        Heads,
+        sectors_per_track);
 
     return status;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

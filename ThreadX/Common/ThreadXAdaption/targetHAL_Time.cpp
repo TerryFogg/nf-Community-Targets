@@ -7,7 +7,6 @@
 #include <nanoHAL_Types.h>
 #include <nanoCLR_Types.h>
 #include <nanoHAL_Time.h>
-#include <target_platform.h>
 
 
 // Returns the current date time from the RTC

@@ -1,4 +1,4 @@
-
+﻿
 //
 // Copyright (c) .NET Foundation and Contributors
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
@@ -6,7 +6,6 @@
 //
 
 #include "CircularBuffer.h"
-#include "target_platform.h"
 
 bool wp_InitializeBuffer(CircularBuffer_t *circularBuffer, void *data, CLR_INT32 size)
 {

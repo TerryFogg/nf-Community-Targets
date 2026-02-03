@@ -4,7 +4,6 @@
 //
 
 #include "System.Device.h"
-#include "System.Device.IO.h"
 
 #define NOT_FOUND -1
 

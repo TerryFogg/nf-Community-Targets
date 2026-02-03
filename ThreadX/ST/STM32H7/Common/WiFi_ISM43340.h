@@ -3,7 +3,7 @@
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
-#include "board.h"
+#include "target_board.h"
 #include "System.Device.IO.h"
 #include "System.Device.h"
 #include "wifi.h"

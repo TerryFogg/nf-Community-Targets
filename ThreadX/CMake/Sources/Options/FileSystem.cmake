@@ -339,12 +339,12 @@ list(APPEND FILE_SOURCES
     ### Not Used in the current system should be removed
     # ${CMAKE_SOURCE_DIR}/src/System.IO.FileSystem/nf_sys_io_filesystem_System_IO_File.cpp
 
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/nf_sys_io_filesystem_System_IO_Directory.cpp
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/nf_sys_io_filesystem_System_IO_DriveInfo.cpp
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/nf_sys_io_filesystem_System_IO_NativeFileStream.cpp
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/nf_sys_io_filesystem_System_IO_NativeFindFile.cpp
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/nf_sys_io_filesystem_System_IO_NativeIO.cpp
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/nf_sys_io_filesystem_nanoFramework_System_IO_FileSystem_SDCard.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/FileSystem.Directory.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/FileSystem.DriveInfo.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/FileSystem.NativeFileStream.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/FileSystem.NativeFindFile.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/FileSystem.NativeIO.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/FileSystem.SDCard.cpp
 
      ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/FileSystem.cpp
 )

@@ -4,10 +4,8 @@
 #
 # Locals
  list(APPEND NETWORK_INCLUDES
-    ${CMAKE_SOURCE_DIR}/src/System.Device.Wifi
     ${CMAKE_SOURCE_DIR}/src/DeviceInterfaces/System.Net
     ${CMAKE_SOURCE_DIR}/src/boards/includes
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Network
     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RaspberryPi/RP2XXX/Common/nx_driver
     ${CMAKE_SOURCE_DIR}/src/PAL/COM/sockets/ssl
 )
@@ -30,23 +28,26 @@
 )
 
  list(APPEND NETWORK_SOURCES
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Network/System.Device.Network.Driver.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Network/System.Device.Network.Helpers.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Network/System.Device.Network.Information.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Network/System.Device.Network.Interface.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Network/System.Device.Network.NetXDuo.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Network/System.Device.Network.Security.SslNative.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Network/System.Device.Network.Sockets.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Network/System.Device.Network.WirelessAPConfiguration.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Network/System.Device.Network.Wireless80211Configuration.cpp
+
+    # Included by specific drivers
+        #${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/nx_driver_framework.c
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Network.Helpers.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Network.NetXDuo.cpp
+
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Network.Information.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Network.Interface.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Network.Security.SslNative.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Network.Sockets.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Network.WirelessAPConfiguration.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Network.Wireless80211Configuration.cpp
     
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Network/ssl_ISM43362.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Network/dummy.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/ssl_ISM43362.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/dummy.cpp
 )
 
  list(APPEND NETWORK_SOURCES
     ${CMAKE_SOURCE_DIR}/src/System.Device.Wifi/sys_dev_wifi_native.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Network/System.Device.Wifi.Adapter.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Wifi.Adapter.cpp
 )
 
 list(APPEND OPTIONAL_SOURCES

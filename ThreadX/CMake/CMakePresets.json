@@ -63,7 +63,7 @@
             "hidden": true,
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "GRAPHICS_PATH": "targets-community"
+                "GRAPHICS_PATH": "targets-community/ThreadX/Common"
             }
         },
         {
@@ -267,6 +267,7 @@
                 "RP2XXX"
             ],
             "cacheVariables": {
+                "TARGET_BOARD": "RP2040",
                 "TARGET_SERIES": "RP2040",
                 "TARGET_TYPE": "PICO_RP2040",
                 "ARM_PROCESSOR": "cortex-m0plus",
@@ -293,6 +294,7 @@
                 "RP2XXX"
             ],
             "cacheVariables": {
+                "TARGET_BOARD": "RP2350",
                 "TARGET_SERIES": "RP2350",
                 "TARGET_TYPE": "PICO_RP2350",
                 "ARM_PROCESSOR": "cortex-m33",
@@ -625,7 +627,24 @@
                 "BUYDISPLAY_ER_TFTM028",
                 "WiFi_Cyw43",
                 "FILE_SYSTEM_RAM",
-                "FILE_SYSTEM_FLASH"
+                "FILE_SYSTEM_FLASH",
+                "DEBUG"
+            ]
+        },
+        {
+            "name": "RP2350_Pimoroni2W_WaveShare_DVI",
+            "description": "Pimoroni Pico2 board with 16MB flash and 8 MB PSRAM, Waveshare DVI ",
+            "hidden": false,
+            "inherits": [
+                "RP2350",
+                "FULL_FRAMEWORK",
+                "W25Q128JV",
+                "APS6404L",
+                "Waveshare_pico_dvi_lcd",
+                "WiFi_Cyw43",
+                "FILE_SYSTEM_RAM",
+                "FILE_SYSTEM_FLASH",
+                "DEBUG"
             ]
         },
         {
@@ -657,7 +676,12 @@
         {
             "name": "RP2350_Pimoroni2W_ER_TFTM028",
             "configurePreset": "RP2350_Pimoroni2W_ER_TFTM028",
-            "inherits": "release"
+            "inherits": "debug"
+        },
+        {
+            "name": "RP2350_Pimoroni2W_WaveShare_DVI",
+            "configurePreset": "RP2350_Pimoroni2W_WaveShare_DVI",
+            "inherits": "debug"
         },
         {
             "name": "STM32H7B3I_MB1315A_Debug",

@@ -62,7 +62,8 @@ void nanoHAL_Initialize()
 #endif
 
 #if (NETWORKING_SUPPORT == TRUE)
- //   NetworkStartup();
+
+    NetworkStartup();
 #endif
 
 #if (FILE_SYSTEM_SUPPORT == TRUE)

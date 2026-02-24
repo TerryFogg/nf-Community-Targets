@@ -4,7 +4,7 @@
 //
 
 #include "nf_sys_io_filesystem.h"
-#include "System.IO.FileSystem.h"
+#include "FileSystem.h"
 #include "memory.h"
 
 HRESULT Library_nf_sys_io_filesystem_System_IO_NativeIO::Delete___STATIC__VOID__STRING__BOOLEAN(

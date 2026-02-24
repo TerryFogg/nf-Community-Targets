@@ -3,12 +3,21 @@
 // See LICENSE file in the project root for full license information.
 //
 #include "System.Device.Wifi.h"
+#include "sys_dev_wifi_native.h"
 
 extern "C"
 {
     #include <cyw43_country.h>
     #include "cyw43.h"
     #include <cyw43_ll.h>
+
+struct pbuf;
+    uint16_t pbuf_copy_partial(const struct pbuf *p, void *dataptr, uint16_t len, uint16_t offset)
+    {
+
+        /* Stub function as it will never hit. */
+        return 0;
+    }
 }
        
 WifiConnectionStatus connectionStatus;
@@ -183,3 +192,9 @@ int scan_results_callback(void *env, const cyw43_ev_scan_result_t *result)
     }
     return 0;
 }
+
+
+
+
+////////////
+

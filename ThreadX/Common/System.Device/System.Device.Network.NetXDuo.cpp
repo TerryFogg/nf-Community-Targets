@@ -27,6 +27,7 @@
 
 #include "sys_net_native.h"
 #include "CLRNativeThreads.h"
+#include "nx_driver_pico_w.h"
 #include <nx_api.h>
 
 #define NX_PACKET_SIZE      1536
@@ -43,9 +44,10 @@
 
 static NX_IP IP0;
 static NX_PACKET_POOL Network_packet_pool_0;
-NX_DHCP dhcp_client;
+//NX_DHCP dhcp_client;
 uint8_t* pointer;
 uint8_t *pArp_space;
+
 
 bool NetworkStartup()
 {
@@ -65,7 +67,7 @@ bool NetworkStartup()
         IP_ADDRESS(192, 168, 1, 139),
         0xFFFFFF00UL,
         &Network_packet_pool_0,
-        _nx_ram_network_driver,
+        nx_driver_pico_w,
         pointer,
         2048,
         1);

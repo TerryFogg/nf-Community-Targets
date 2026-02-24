@@ -11,17 +11,13 @@ static HAL_Configuration_Wireless80211 Wireless80211_DefaultConfig = {
     { 'W', '8', '2', '1' },
     // Id
     0,
-    // Authentication
     AuthenticationType_Open,
-    // Encryption
     EncryptionType_None,
-    // Radio
     RadioType__802_11n,
     // SSID
     { 0 },
     // Password
     { 0 },
-    // Options
     Wireless80211Configuration_ConfigurationOptions_None,
     // Rssi
 };

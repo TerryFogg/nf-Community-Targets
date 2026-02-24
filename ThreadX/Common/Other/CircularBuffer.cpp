@@ -6,6 +6,7 @@
 //
 
 #include "CircularBuffer.h"
+#include <nanoHAL_v2.h>
 
 bool wp_InitializeBuffer(CircularBuffer_t *circularBuffer, void *data, CLR_INT32 size)
 {
@@ -15,7 +16,7 @@ bool wp_InitializeBuffer(CircularBuffer_t *circularBuffer, void *data, CLR_INT32
     }
     memset((void *)circularBuffer, 0x00, sizeof(*circularBuffer));
     circularBuffer->size = size;
-    circularBuffer->buffer = (CLR_UINT8*)data;
+    circularBuffer->buffer = (CLR_UINT8 *)data;
 
     memset(data, 0x00, size);
     return true;
@@ -26,11 +27,19 @@ CLR_INT32 wp_WriteBuffer(CircularBuffer_t *buffer, const void *data, CLR_INT32 b
     CLR_INT32 free;
     CLR_INT32 size;
     const CLR_UINT8 *d = (CLR_UINT8 *)data;
+    uint8_t *pointer = (uint8_t*)data;
 
     if (data == NULL || btw == 0)
     {
         return 0;
     }
+
+    debug_printf("[W+]", pointer++);
+    for (int j = 0; j < btw; j++)
+    {
+        debug_printf("%0x", pointer++);
+    }
+    debug_printf("[W-]", pointer++);
 
     // Calculate maximum number of bytes available to write
     // Use temporary values in case they are changed during operations
@@ -82,11 +91,20 @@ CLR_INT32 wp_ReadBuffer(CircularBuffer_t *buffer, void *data, CLR_INT32 btr)
     CLR_INT32 tocopy;
     CLR_INT32 full;
     CLR_UINT8 *d = (CLR_UINT8 *)data;
+    uint8_t *pointer = (uint8_t *)data;
+
 
     if (data == NULL || btr == 0)
     {
         return 0;
     }
+        
+     debug_printf("[R+]", pointer++);
+    for (int j = 0; j < btr; j++)
+    {
+        debug_printf("%0x", pointer++);
+    }
+    debug_printf("[R-]", pointer++);
 
     // Calculate maximum number of bytes available to read
     full = wp_BufferBytesWaiting(buffer);
@@ -98,7 +116,7 @@ CLR_INT32 wp_ReadBuffer(CircularBuffer_t *buffer, void *data, CLR_INT32 btr)
 
     // Step 1: Read data from linear part of buffer
     tocopy = BUF_MIN(buffer->size - buffer->r, btr);
-    memcpy((void*)d, &buffer->buffer[buffer->r], tocopy);
+    memcpy((void *)d, &buffer->buffer[buffer->r], tocopy);
     buffer->r += tocopy;
     btr -= tocopy;
 

@@ -16,6 +16,7 @@
 #define CYW43_LWIP     (0) // Disable LWIP
 #define CYW43_USE_LWIP (0) // Disable LWIP stack integration for netXduo implementation
 
+
 #ifndef MIN
 #define MIN(a, b) ((a) <= (b) ? (a) : (b))
 #endif
@@ -34,9 +35,9 @@
 #define CYW43_COUNTRY_CODE "AU" // Uncomment and set if needed
 
 // Feature Toggles
-#define CYW43_USE_SPI  (0) // Set to 1 if using SPI instead of SDIO
+#define CYW43_USE_SPI  (1) // Set to 1 if using SPI instead of SDIO
 #define CYW43_USE_UART (0) // Set to 1 if using UART for debug or control
-#define CYW43_SPI_PIO  (0) // Set to 1 if using PIO
+#define CYW43_SPI_PIO  (1) // Set to 1 if using PIO
 
 // The following pins can be defined, depending on the configuration:
 #define CYW43_PIN_RFSW_SELECT (0) // RF-switch select

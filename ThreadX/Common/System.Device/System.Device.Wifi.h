@@ -5,15 +5,19 @@
 // See LICENSE file in the project root for full license information.
 //
 
- #include "sys_dev_wifi_native.h"
+#include <stdint.h>
+#include "nanoHAL_network.h"
 
-extern "C"
-{
-#include "System.Device.Wifi.h"
-}
 #define TheSingleWirelessAdapter 1
-
 #define ALL_ACCESS_POINT_STATIONS 0
+
+#define WIFI_AUTH_TYPE            CYW43_AUTH_WPA2_AES_PSK
+#define WIFI_CONNECT_TIMEOUT      10000 /* WIFI_CONNECT_TIMEOUT */
+#define WIFI_SSID                 "test"
+#define WIFI_PASSWORD             "test"
+#define NX_DRIVER_STACK_SIZE      1024
+#define NX_DRIVER_THREAD_INTERVAL (NX_IP_PERIODIC_RATE / 10)
+
 
 typedef enum
 {

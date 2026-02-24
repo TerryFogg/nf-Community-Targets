@@ -1006,8 +1006,8 @@ list(APPEND USB_INCLUDES
 list(APPEND USB_SOURCES
       ${CMAKE_SOURCE_DIR}/src/System.Device.UsbStream/sys_dev_usbstream_native.cpp
      #${CMAKE_SOURCE_DIR}/src/System.Device.UsbStream/sys_dev_usbstream_native_System_Device_Usb_UsbStream_stubs.cpp
-      ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Usb/System.Device.Usb.cpp
-      ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device.Usb/System.Device.UsbStream.cpp
+      ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Usb.cpp
+      ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.UsbStream.cpp
 )
 
 

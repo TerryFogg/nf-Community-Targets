@@ -30,6 +30,15 @@ HRESULT Library_sys_dev_wifi_native_System_Device_Wifi_WifiAdapter::DisposeNativ
     }
     NANOCLR_NOCLEANUP_NOLABEL();
 }
+HRESULT Library_sys_dev_wifi_native_System_Device_Wifi_WifiAdapter::NativeSetDeviceName___VOID__STRING(
+    CLR_RT_StackFrame &stack)
+{
+    NANOCLR_HEADER();
+    {
+        NANOCLR_SET_AND_LEAVE(CLR_E_NOTIMPL);
+    }
+    NANOCLR_NOCLEANUP();
+}
 HRESULT Library_sys_dev_wifi_native_System_Device_Wifi_WifiAdapter::NativeFindWirelessAdapters___STATIC__SZARRAY_U1(
     CLR_RT_StackFrame &stack)
 {

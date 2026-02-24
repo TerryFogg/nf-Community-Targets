@@ -50,11 +50,12 @@
                     ${CMAKE_SOURCE_DIR}/src/System.Device.I2s
                     ${CMAKE_SOURCE_DIR}/src/System.Device.Pwm
                     ${CMAKE_SOURCE_DIR}/src/System.Device.Spi
-                    ${CMAKE_SOURCE_DIR}/src/System.Device.Usb
-                    ${CMAKE_SOURCE_DIR}/src/System.IO.Ports
+                    ${CMAKE_SOURCE_DIR}/src/System.Device.UsbStream
+                    ${CMAKE_SOURCE_DIR}/src/System.Device.Wifi
                     ${CMAKE_SOURCE_DIR}/src/System.IO.FileSystem
-                    ${CMAKE_SOURCE_DIR}/src/System.Net
-                    ${CMAKE_SOURCE_DIR}/src/Windows.Storage
+                    ${CMAKE_SOURCE_DIR}/src/System.IO.Ports
+                    ${CMAKE_SOURCE_DIR}/src/System.IO.Ports
+                    ${CMAKE_SOURCE_DIR}/src/System.Runtime.Serialization
         )
         list(APPEND NF_INTERPRETER_SOURCES
                     ${CMAKE_SOURCE_DIR}/src/CLR/Core/Cache.cpp
@@ -97,7 +98,7 @@
                     ${CMAKE_SOURCE_DIR}/src/CLR/Core/StringTable.cpp
                     ${CMAKE_SOURCE_DIR}/src/CLR/Core/StringTableData.cpp
                     ${CMAKE_SOURCE_DIR}/src/CLR/Core/Thread.cpp
-                    ${CMAKE_SOURCE_DIR}/src/CLR/Core/TypeSystem.cpp
+# Use Copy          ${CMAKE_SOURCE_DIR}/src/CLR/Core/TypeSystem.cpp
                     ${CMAKE_SOURCE_DIR}/src/CLR/Core/TypeSystemLookup.cpp
                     ${CMAKE_SOURCE_DIR}/src/CLR/Core/Various.cpp
                     ${CMAKE_SOURCE_DIR}/src/CLR/Core/Hardware/Hardware.cpp
@@ -212,8 +213,11 @@
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.Text/nf_system_text.cpp
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.Text/nf_system_text_System_Text_UTF8Decoder.cpp
                     ${CMAKE_SOURCE_DIR}/src/nanoFramework.System.Text/nf_system_text_System_Text_UTF8Encoding.cpp
-                    ${CMAKE_SOURCE_DIR}/src/PAL/AsyncProcCall/AsyncCompletions.cpp
+# To be reintegrated into core later
+
+#  ${CMAKE_SOURCE_DIR}/src/PAL/AsyncProcCall/AsyncCompletions.cpp
                     ${CMAKE_SOURCE_DIR}/src/PAL/AsyncProcCall/AsyncContinuations.cpp
+
                     #${CMAKE_SOURCE_DIR}/src/PAL/AsyncProcCall/Async_stubs.cpp
                     ${CMAKE_SOURCE_DIR}/src/PAL/BlockStorage/nanoPAL_BlockStorage.c
                     ${CMAKE_SOURCE_DIR}/src/PAL/COM/COM_stubs.c
@@ -256,6 +260,7 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/RequiredNotUsed
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Startup																																																																																																																																																																																							
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadX.Headers
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol
@@ -272,21 +277,27 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/sys_calls.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/targetHAL_ConfigurationManager.cpp
 
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/TraceWireProtocol.c
+
+# To be reintegrated into core later
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/src/CLR/Core/TypeSystem.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/src/PAL/AsyncProcCall/AsyncCompletions.cpp
+
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Adc.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Dac.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Gpio.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.I2c.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.I2c.slave.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.I2s.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Pwm.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Spi.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Adc.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Dac.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Gpio.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/I2c.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/I2c.slave.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/I2s.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Pwm.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Spi.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.IO.Asychronous.cpp
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware/nanoframework_Hardware.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware/nanoframework_Hardware_nanoframework_Hardware_NativeFunctions.cpp
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.Ports/System.IO.Ports.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/IO.Ports_SerialPort.cpp
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/ManagedThreadSupport.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Memory.cpp
@@ -305,12 +316,12 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/Delays.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/DeviceIO.cpp																																																																																																																																																																																							
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/DeviceWifi.Cyw43.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/nx_driver_pico_w.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/FlashDriver.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/nanoSupport_CRC32.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/WireProtocol_HAL_Interface.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/wp_Communications.c
                     
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/mock_sdio.c
         )  
 
 # Overide compile flags on selected files

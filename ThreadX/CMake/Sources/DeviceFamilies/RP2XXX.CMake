@@ -28,7 +28,9 @@ configure_file(  ${LINKER_SCRIPT_FILE} "${CMAKE_BINARY_DIR}/configured_linker_Sc
 set_target_properties(nanoCLR PROPERTIES LINK_DEPENDS "${CMAKE_BINARY_DIR}/configured_linker_Script.ld")
 set_target_properties(nanoCLR PROPERTIES PICO_TARGET_LINKER_SCRIPT ${CMAKE_BINARY_DIR}/configured_linker_Script.ld)
 
+#set(${PIOASM_INSTALL_DIR} ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/tools)
 include(${PICO_SDK_PATH}/pico_sdk_init.cmake)
+
 project(nanoFramework VERSION ${BUILD_VERSION} LANGUAGES C CXX ASM)
 pico_sdk_init()
 
@@ -83,39 +85,39 @@ list(APPEND RP2XXX_INCLUDES
 
      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_async_context/include
      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_bootrom/include
-    # ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_arch/include
-      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_driver/include
-      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_double/include
-      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_float/include
-      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_int64_ops/include
-      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_i2c_slave/include
-      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_malloc/include
-      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_multicore/include
-      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_platform_compiler/include
-      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_platform_panic/include
-      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_platform_sections/include
-      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_printf/include
-      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_runtime/include
-      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_runtime_init/include
-      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_stdio
-      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_stdio/include
-      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_stdio_uart/include
-      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_time_adapter/include
-      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_unique_id/include
-      ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver
-      ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src
-      ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/firmware
+     ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_arch/include
+     ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_driver/include
+     ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_double/include
+     ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_float/include
+     ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_int64_ops/include
+     ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_i2c_slave/include
+     ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_malloc/include
+     ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_multicore/include
+     ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_platform_compiler/include
+     ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_platform_panic/include
+     ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_platform_sections/include
+     ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_printf/include
+     ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_runtime/include
+     ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_runtime_init/include
+     ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_stdio
+     ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_stdio/include
+     ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_stdio_uart/include
+     ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_time_adapter/include
+     ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_unique_id/include
+     ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver
+     ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src
+     ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/firmware
+     
+     ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src
+     ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src/class/cdc
+     ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src/common
+     ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src/device
+     ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src/portable/raspberrypi/rp2040
+     
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/${TARGET_SERIES}
       
-      ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src
-      ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src/class/cdc
-      ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src/common
-      ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src/device
-      ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src/portable/raspberrypi/rp2040
-      
-      ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common
-      ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/${TARGET_SERIES}
-      
-      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/include   
+     ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/include   
 )
 
 if( "${TARGET_SERIES}" STREQUAL "RP2040")
@@ -140,12 +142,19 @@ if(NETWORKING_SUPPORT)
    list(APPEND RP2XXX_SOURCES
         ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src/cyw43_ctrl.c
         ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src/cyw43_ll.c
-        ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src/cyw43_sdio.c
-        ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src/cyw43_spi.c
+       # ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src/cyw43_spi.c
         ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_driver/cyw43_driver.c
+        ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_async_context/async_context_base.c
+        ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_async_context/async_context_poll.c
 
+        ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_arch/cyw43_arch.c 
+        ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_arch/cyw43_arch_poll.c
+        
         ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_driver/cyw43_bus_pio_spi.c
-        ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_driver/cyw43_bus_pio_spi.pio
+       # ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_driver/cyw43_bus_pio_spi.pio
+
+        ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/demo_netx_tcp.cpp
+
    )
 endif()
 

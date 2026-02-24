@@ -4,7 +4,7 @@
 //
 
 #include "nf_sys_io_filesystem.h"
-#include "System.IO.FileSystem.h"
+#include "FileSystem.h"
 
 typedef Library_nf_sys_io_filesystem_System_IO_NativeFileInfo NativeFileInfo;
 

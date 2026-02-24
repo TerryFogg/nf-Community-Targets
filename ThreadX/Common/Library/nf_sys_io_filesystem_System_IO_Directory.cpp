@@ -4,7 +4,7 @@
 //
 
 #include "nf_sys_io_filesystem.h"
-#include "System.IO.FileSystem.h"
+#include "FileSystem.h"
 
 HRESULT Library_nf_sys_io_filesystem_System_IO_Directory::NativeGetChildren___STATIC__SZARRAY_STRING__STRING__BOOLEAN(
     CLR_RT_StackFrame &stack)

@@ -91,15 +91,15 @@ endif()
  # Display hardware
 if(GRAPHICS_SUPPORT)
     list(APPEND NF_INTERPRETER_SOURCES 
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/Driver/${DISPLAY_DRIVER}
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/Interface/${DISPLAY_INTERFACE}
+                ${CMAKE_SOURCE_DIR}/${GRAPHICS_PATH}/nanoFramework.Graphics/Driver/${DISPLAY_DRIVER}
+                ${CMAKE_SOURCE_DIR}/${GRAPHICS_PATH}/nanoFramework.Graphics/Interface/${DISPLAY_INTERFACE}
     )
 endif()
 
  # Touch Display
 if(TOUCH_DISPLAY_SUPPORT)
      list(APPEND TOUCH_INCLUDES
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/
+                ${CMAKE_SOURCE_DIR}/${GRAPHICS_PATH}/nanoFramework.Graphics/
                 ${CMAKE_SOURCE_DIR}/${GRAPHICS_PATH}/nanoFramework.Graphics/TouchPanel/Core
                 ${CMAKE_SOURCE_DIR}/${GRAPHICS_PATH}/nanoFramework.Graphics/TouchPanel/Devices
      )
@@ -107,8 +107,8 @@ if(TOUCH_DISPLAY_SUPPORT)
                 ${CMAKE_SOURCE_DIR}/${GRAPHICS_PATH}/nanoFramework.Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_TouchEventProcessor.cpp
                 ${CMAKE_SOURCE_DIR}/${GRAPHICS_PATH}/nanoFramework.Graphics/TouchPanel/Core/TouchPanel.cpp
 
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/TouchPanel/Devices/${TOUCH_INTERFACE_CONTROLLER}
-                ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/TouchPanel/Interface/${TOUCH_INTERFACE_DRIVER}
+                ${CMAKE_SOURCE_DIR}/${GRAPHICS_PATH}/nanoFramework.Graphics/TouchPanel/Devices/${TOUCH_INTERFACE_CONTROLLER}
+                ${CMAKE_SOURCE_DIR}/${GRAPHICS_PATH}/nanoFramework.Graphics/TouchPanel/Interface/${TOUCH_INTERFACE_DRIVER}
     )
 endif()
 

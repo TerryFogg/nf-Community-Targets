@@ -8,8 +8,6 @@
 #include <tx_api.h>
 WP_Message inboundMessage;
 
-uint8_t buffer[1000];
-static int buffer_point = 0;
 
 void WP_ReceiveBytes(uint8_t **ptr, uint32_t *size)
 {

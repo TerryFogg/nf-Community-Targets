@@ -5,13 +5,12 @@
 # Raspberry Pi Pico uses the Pico-Sdk for build parameters
 
 # nanoCLR requirement
- target_compile_definitions(nanoCLR PUBLIC -DPLATFORM_ARM)
 
+ target_compile_definitions(nanoCLR PUBLIC -DPLATFORM_ARM)
  target_compile_definitions(nanoCLR PUBLIC -DFLASH_SIZE=${FLASH_SIZE}) 
  target_compile_definitions(nanoCLR PUBLIC -DFLASH_CHIP=${FLASH_CHIP})
  target_compile_definitions(nanoCLR PUBLIC -DFLASH_ERASE_SIZE=${FLASH_ERASE_SIZE})
  target_compile_definitions(nanoCLR PUBLIC -DPICO_FLASH_SIZE_BYTES=${PICO_FLASH_SIZE_BYTES})
-
 
  if(${PSRAM})
     target_compile_definitions(nanoCLR PUBLIC -DPSRAM) 
@@ -23,7 +22,7 @@
        # Cortex-m33 can run non secure or secure, at boot the RP2350 is in secure mode.
        target_compile_definitions(nanoCLR PUBLIC -DTX_SINGLE_MODE_SECURE -DPICO_PLATFORM=rp2350)
  else()
-        target_compile_definitions(nanoCLR PUBLIC -DPICO_PLATFORM=rp2040)
+       target_compile_definitions(nanoCLR PUBLIC -DPICO_PLATFORM=rp2040)
  endif()
 
 # Redirect the pico-sdk handlers to the ThreadX handlers
@@ -42,7 +41,9 @@ if(CFG_USB_USE_DTR)
 endif() 
 
 # Network support using NetXDuo not LWIP
-## target_compile_definitions(nanoCLR PUBLIC -DPICO_CYW43_ARCH_HEADER=Network_Custom_Architecture.h) 
+if(${NETWORKING_SUPPORT})
+ target_compile_definitions(nanoCLR PUBLIC -DPICO_CYW43_ARCH_POLL=1)
+endif()
 
 #  Some options
 target_link_options(nanoCLR PUBLIC "-Wl,--print-memory-usage")
@@ -55,3 +56,4 @@ pico_add_extra_outputs(nanoCLR)
 add_custom_command(TARGET nanoCLR POST_BUILD
     COMMAND ${CMAKE_OBJDUMP} -d -EL -S $<TARGET_FILE:nanoCLR> > nanoCLR.lst
 )
+

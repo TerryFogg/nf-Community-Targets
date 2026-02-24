@@ -1,7 +1,6 @@
 ﻿# Copyright (c) .NET Foundation and Contributors
 # See LICENSE file in the project root for full license information.
 
-
 # The project command must come later for the RP2XXX series build system
 if( NOT ${TARGET_FAMILY} STREQUAL "RP2XXX")
   project(nanoFramework VERSION ${BUILD_VERSION} LANGUAGES C CXX ASM)
@@ -35,8 +34,8 @@ add_executable(nanoCLR)
 
     target_sources(nanoCLR PUBLIC
                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/main.c
-                   ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/common/CLR_RT_InteropAssembliesTable.cpp
-                   "../targetHAL.cpp"
+                   ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/CLR_RT_InteropAssembliesTable.cpp
+                   ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/targetHAL.cpp
                    ${NF_INTERPRETER_SOURCES}
                    ${THREADX_SOURCES}
                    ${${TARGET_FAMILY}_SOURCES}

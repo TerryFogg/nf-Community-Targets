@@ -7,8 +7,6 @@
 #include "System.Device.Network.h"
 #include "System.Device.Wifi.h"
 
-NX_IP *ip_ptr;
-NX_DHCP *dhcp_ptr;
 
 static HAL_Configuration_NetworkInterface network_Interface;
 static HAL_Configuration_NetworkInterface ethernetInterface;
@@ -19,9 +17,11 @@ HRESULT Library_sys_net_native_System_Net_NetworkInformation_NetworkInterface::
 {
     NANOCLR_HEADER();
     {
+        NX_DHCP *dhcp_ptr;
         HAL_Configuration_NetworkInterface config;
         CLR_RT_HeapBlock *pConfig = stack.Arg0().Dereference();
         FAULT_ON_NULL(pConfig);
+        NX_IP *ip_ptr;
 
         CLR_UINT32 interfaceIndex = pConfig[FIELD___interfaceIndex].NumericByRefConst().u4;
         HAL_Configuration_NetworkInterface *pLocalConfig;

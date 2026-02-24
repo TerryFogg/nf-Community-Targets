@@ -5,7 +5,7 @@
 //
 #include <nanoCLR_Types.h>
 #include "TX_API.h"
-#include "System.IO.FileSystem.h"
+#include "FileSystem.h"
 
 #include "PinNames.h"
 

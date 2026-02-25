@@ -3,27 +3,27 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include "System.Device.h"
+#include "DevicePin.h"
 
 #define NOT_FOUND -1
 
 static DeviceGpioPin *GPIOPins;
 static int NumberOfGPIOPins;
 
-void Device::CreatePinList(DeviceGpioPin *mcuGPIOPinList, int numberOfPins)
+void DevicePin::CreatePinList(DeviceGpioPin *mcuGPIOPinList, int numberOfPins)
 {
     GPIOPins = mcuGPIOPinList;
     NumberOfGPIOPins = numberOfPins;
 }
-bool Device::IsValidPin(PinNameValue pinNameValue)
+bool DevicePin::IsValidPin(PinNameValue pinNameValue)
 {
     return (FindPin(pinNameValue) != NOT_FOUND);
 }
-int Device::NumberOfPins()
+int DevicePin::NumberOfPins()
 {
     return NumberOfGPIOPins;
 }
-int Device::FindPin(PinNameValue pinNameValue)
+int DevicePin::FindPin(PinNameValue pinNameValue)
 {
     for (int pinIndex = 0; pinIndex < NumberOfGPIOPins; pinIndex++)
     {
@@ -34,7 +34,7 @@ int Device::FindPin(PinNameValue pinNameValue)
     }
     return NOT_FOUND;
 }
-bool Device::AddPinCallbackParameter(PinNameValue pinNameValue, void *newCallbackParameters)
+bool DevicePin::AddPinCallbackParameter(PinNameValue pinNameValue, void *newCallbackParameters)
 {
     bool status = false;
     int pin = FindPin(pinNameValue);
@@ -45,7 +45,7 @@ bool Device::AddPinCallbackParameter(PinNameValue pinNameValue, void *newCallbac
     }
     return status;
 }
-bool Device::RemovePinCallbackParameters(PinNameValue pinNameValue)
+bool DevicePin::RemovePinCallbackParameters(PinNameValue pinNameValue)
 {
     bool status = false;
     int pinIndex = FindPin(pinNameValue);
@@ -61,12 +61,12 @@ bool Device::RemovePinCallbackParameters(PinNameValue pinNameValue)
     }
     return status;
 }
-bool Device::IsPinReserved(PinNameValue pinNameValue)
+bool DevicePin::IsPinReserved(PinNameValue pinNameValue)
 {
     int pinIndex = FindPin(pinNameValue);
     return GPIOPins[pinIndex].Reserved;
 }
-bool Device::ReservePin(PinNameValue pinNameValue)
+bool DevicePin::ReservePin(PinNameValue pinNameValue)
 {
     int pinIndex = FindPin(pinNameValue);
     if (!IsPinReserved(pinNameValue))
@@ -76,12 +76,12 @@ bool Device::ReservePin(PinNameValue pinNameValue)
     }
     return false;
 }
-DeviceGpioPin Device::GetPin(PinNameValue pinNameValue)
+DeviceGpioPin DevicePin::GetPin(PinNameValue pinNameValue)
 {
     int pinIndex = FindPin(pinNameValue);
     return GPIOPins[pinIndex];
 }
-void Device::ReleasePin(PinNameValue pinNameValue)
+void DevicePin::ReleasePin(PinNameValue pinNameValue)
 {
     int pinIndex = FindPin(pinNameValue);
     if (IsPinReserved(pinNameValue))
@@ -90,32 +90,32 @@ void Device::ReleasePin(PinNameValue pinNameValue)
         GPIOPins[pinIndex].Function = DevicePinFunction::LOW_POWER;
     }
 }
-bool Device::IsValidOutputPin(PinNameValue pinNameValue)
+bool DevicePin::IsValidOutputPin(PinNameValue pinNameValue)
 {
     return IsValidOutputDriveMode(GPIOPins[FindPin(pinNameValue)].Mode);
 }
-bool Device::IsValidInputPin(PinNameValue pinNameValue)
+bool DevicePin::IsValidInputPin(PinNameValue pinNameValue)
 {
     return IsValidInputDriveMode(GPIOPins[FindPin(pinNameValue)].Mode);
 }
-bool Device::IsValidOutputDriveMode(PinMode driveMode)
+bool DevicePin::IsValidOutputDriveMode(PinMode driveMode)
 {
     return (
         driveMode == PinMode_Output || driveMode == PinMode_OutputOpenDrain ||
         driveMode == PinMode_OutputOpenDrainPullUp || driveMode == PinMode_OutputOpenSource ||
         driveMode == PinMode_OutputOpenSourcePullDown);
 }
-bool Device::IsValidInputDriveMode(PinMode driveMode)
+bool DevicePin::IsValidInputDriveMode(PinMode driveMode)
 {
     return (driveMode == PinMode_Input || driveMode == PinMode_InputPullDown || driveMode == PinMode_InputPullUp);
 }
-bool Device::RegisterPinMode(PinNameValue pinNameValue, PinMode pinMode)
+bool DevicePin::RegisterPinMode(PinNameValue pinNameValue, PinMode pinMode)
 {
     int pinIndex = FindPin(pinNameValue);
     GPIOPins[pinIndex].Mode = pinMode;
     return true;
 }
-bool Device::RegisterPinFunction(PinNameValue pinNameValue,DevicePinFunction function)
+bool DevicePin::RegisterPinFunction(PinNameValue pinNameValue,DevicePinFunction function)
 {
     int pinIndex = FindPin(pinNameValue);
     GPIOPins[pinIndex].Function = function;
@@ -123,9 +123,9 @@ bool Device::RegisterPinFunction(PinNameValue pinNameValue,DevicePinFunction fun
 }
 
 #ifdef FILEX
-static Device::SDPin *SDChannels;
+static DevicePin::SDPin *SDChannels;
 static int NumberOfSDChannels;
-void Device::CreateSDChannelList(SDPin *BoardSDChannels, int BoardnumberOfSDChannels)
+void DevicePin::CreateSDChannelList(SDPin *BoardSDChannels, int BoardnumberOfSDChannels)
 {
     SDChannels = BoardSDChannels;
     NumberOfSDChannels = BoardnumberOfSDChannels;
@@ -133,9 +133,9 @@ void Device::CreateSDChannelList(SDPin *BoardSDChannels, int BoardnumberOfSDChan
 #endif
 
 #ifdef SD_CARD
-static Device::SDPin *SDChannels;
+static DevicePin::SDPin *SDChannels;
 static int NumberOfSDChannels;
-void Device::CreateSDChannelList(SDPin *BoardSDChannels, int BoardnumberOfSDChannels)
+void DevicePin::CreateSDChannelList(SDPin *BoardSDChannels, int BoardnumberOfSDChannels)
 {
     SDChannels = BoardSDChannels;
     NumberOfSDChannels = BoardnumberOfSDChannels;

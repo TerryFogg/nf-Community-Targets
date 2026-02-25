@@ -3,7 +3,7 @@
 // Portions Copyright (c) Microsoft Corporation.  All rights reserved.
 // See LICENSE file in the project root for full license information.
 //
-#include "System.Device.Network.h"
+#include "Network.h"
 #include <nx_secure_tls.h>
 #include <nx_secure_tls_api.h>
 #include <nx_secure_x509.h>

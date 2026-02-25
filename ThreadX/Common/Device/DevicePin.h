@@ -138,7 +138,7 @@ extern "C"
 {
 #endif
 
-    class Device
+    class DevicePin
     {
       public:
         static void CreatePinList(DeviceGpioPin *GpioPins, int numberOfPins);

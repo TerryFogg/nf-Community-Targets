@@ -6,8 +6,8 @@
 #include "nanoCLR_Types.h"
 #include "CPU_SPI_DEcl.h"
 #include "target_board.h"
-#include "System.Device.IO.h"
-#include "System.Device.h"
+#include "Device.IO.h"
+#include "DevicePin.h"
 #include "sys_dev_spi_native.h"
 
 typedef Library_sys_dev_spi_native_System_Device_Spi_SpiConnectionSettings SpiConnectionSettings;

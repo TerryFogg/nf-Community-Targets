@@ -5,7 +5,7 @@
 
 #include <tx_api.h>
 #include <tx_port.h>
-#include "System.Device.IO.h"
+#include "Device.IO.h"
 
 TX_EVENT_FLAGS_GROUP asynchronous_io_events_group;
 TX_QUEUE AsynchronousIOQueue;

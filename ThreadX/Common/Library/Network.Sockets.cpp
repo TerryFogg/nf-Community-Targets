@@ -4,7 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include "System.Device.Network.h"
+#include "Network.h"
 
 static NX_IP IP0;
 

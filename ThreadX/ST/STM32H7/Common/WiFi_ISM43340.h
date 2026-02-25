@@ -4,8 +4,8 @@
 // See LICENSE file in the project root for full license information.
 //
 #include "target_board.h"
-#include "System.Device.IO.h"
-#include "System.Device.h"
+#include "Device.IO.h"
+#include "DevicePin.h"
 #include "wifi.h"
 
 

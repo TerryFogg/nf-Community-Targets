@@ -2,7 +2,7 @@
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
-#include "System.Device.IO.h"
+#include "Device.IO.h"
 
 #pragma region System.Device.Gpio
 GpioIO::GpioIO()

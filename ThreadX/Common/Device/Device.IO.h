@@ -5,7 +5,7 @@
 //
 #include "nanoCLR_Types.h"
 #include "target_board.h"
-#include "System.Device.h"
+#include "DevicePin.h"
 #include "sys_dev_adc_native.h"
 #include "sys_dev_dac_native.h"
 #include "sys_dev_gpio_native.h"

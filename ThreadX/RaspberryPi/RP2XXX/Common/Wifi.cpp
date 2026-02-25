@@ -2,7 +2,7 @@
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
-#include "System.Device.Wifi.h"
+#include "Wifi.h"
 #include "sys_dev_wifi_native.h"
 
 extern "C"
@@ -33,7 +33,7 @@ CLR_UINT32 itfClientInterfaceSTAMode = CYW43_ITF_STA;
 CLR_UINT32 itfAccessPointInterfaceMode = CYW43_ITF_AP;
 
 // Start the Wifi, default power management
-bool DeviceWifi::Initialize()
+bool Wifi::Initialize()
 {
     connectionStatus = WifiConnectionStatus::WifiConnectionStatus_NetworkNotAvailable;
 
@@ -45,25 +45,25 @@ bool DeviceWifi::Initialize()
     cyw43_wifi_set_up(&cyw43_state, itf, up, country);
     return true;
 }
-bool DeviceWifi::Dispose()
+bool Wifi::Dispose()
 {
     // Stops TCP/IP interfaces, power of the WLAN chip
     cyw43_deinit(&cyw43_state);
     return true;
 }
-bool DeviceWifi::WifiUp()
+bool Wifi::WifiUp()
 {
     // Only supports 'Client interface STA mode'             -
     int result = cyw43_wifi_link_status(&cyw43_state, CYW43_ITF_STA);
     return (result == 1);
 }
-bool DeviceWifi::GetAccessPointMaxStations()
+bool Wifi::GetAccessPointMaxStations()
 {
     // At the time of writing this code
     // The CYW43 wireless driver in the Pico SDK does not support multiple simultaneous access points.
     return 1;
 }
-bool DeviceWifi::GetAccessPointMaxAssociations(int station)
+bool Wifi::GetAccessPointMaxAssociations(int station)
 {
     // At the time of writing this code
     // The CYW43 wireless driver in the Pico SDK does not support multiple simultaneous access points.
@@ -74,7 +74,7 @@ bool DeviceWifi::GetAccessPointMaxAssociations(int station)
     cyw43_wifi_ap_get_max_stas(&cyw43_state, &num_stas);
     return num_stas;
 }
-bool DeviceWifi::GetAccessPointInformation(
+bool Wifi::GetAccessPointInformation(
     int station,
     int number_associations,
     access_point_connected_clients_t *apInfo)
@@ -98,7 +98,7 @@ bool DeviceWifi::GetAccessPointInformation(
     platform_free(list_of_macs);
     return true;
 }
-void DeviceWifi::Connect(HAL_Configuration_Wireless80211 wifiConfig)
+void Wifi::Connect(HAL_Configuration_Wireless80211 wifiConfig)
 {
     CLR_UINT32 AuthenticationType;
     switch (wifiConfig.Authentication)
@@ -138,25 +138,25 @@ void DeviceWifi::Connect(HAL_Configuration_Wireless80211 wifiConfig)
     cyw43_wifi_join(&cyw43_state, ssid_len, ssid, key_len, key, AuthenticationType, NULL, channel);
     Events_Set(SYSTEM_EVENT_FLAG_WIFI_STATION);
 }
-void DeviceWifi::Disconnect(int index)
+void Wifi::Disconnect(int index)
 {
     WifiConnectionStatus::WifiConnectionStatus_UnspecifiedFailure;
 }
-bool DeviceWifi::StartScan()
+bool Wifi::StartScan()
 {
     cyw43_wifi_scan_options_t scan_options = {0};
     int err = cyw43_wifi_scan(&cyw43_state, &scan_options, NULL, scan_results_callback);
     return (err == 1);
 }
-bool DeviceWifi::ScanActive()
+bool Wifi::ScanActive()
 {
     return cyw43_wifi_scan_active(&cyw43_state);
 }
-int DeviceWifi::NumberOfScanReportEntries()
+int Wifi::NumberOfScanReportEntries()
 {
     return 1;
 }
-bool DeviceWifi::GetScanReport(ScanReportRecordMatchesManagedCode *reportEntries)
+bool Wifi::GetScanReport(ScanReportRecordMatchesManagedCode *reportEntries)
 {
     const uint8_t unknown = 0;
     reportEntries = (ScanReportRecordMatchesManagedCode *)platform_malloc(

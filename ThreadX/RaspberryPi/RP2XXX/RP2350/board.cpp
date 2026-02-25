@@ -4,8 +4,8 @@
 // See LICENSE file in the project root for full license information.
 //
 #include "PinNames.h"
-#include "System.Device.IO.h"
-#include "System.Device.h"
+#include "Device.IO.h"
+#include "DevicePin.h"
 #include "target_board.h"
 
 #ifdef FileX
@@ -52,7 +52,7 @@ void SetupPinList()
     mcuPins[27] = {GP28, false, NULL, PinMode::PinMode_Input, DevicePinFunction::ADC_2};
     mcuPins[28] = {GP29, false, NULL, PinMode::PinMode_Input, DevicePinFunction::WIFI_INTERFACE};
 
-    Device::CreatePinList(&mcuPins[0], ARRAY_LEN(mcuPins));
+    DevicePin::CreatePinList(&mcuPins[0], ARRAY_LEN(mcuPins));
 
     AdcIO::SetupAdcList(mcuADC);
     I2cIO::SetupI2CList(mcuI2C,NUMBER_I2C_BUSES);

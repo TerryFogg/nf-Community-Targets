@@ -4,8 +4,8 @@
 //
 
 #include "sys_dev_adc_native.h"
-#include "System.Device.IO.h"
-#include "System.Device.h"
+#include "Device.IO.h"
+#include "DevicePin.h"
 
 HRESULT Library_sys_dev_adc_native_System_Device_Adc_AdcController::NativeInit___VOID(CLR_RT_StackFrame &stack)
 {

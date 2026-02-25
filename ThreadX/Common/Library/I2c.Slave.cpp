@@ -5,7 +5,7 @@
 
 #include "sys_dev_i2c_slave_native.h"
 
-#include "System.Device.IO.h"
+#include "Device.IO.h"
 #include <corlib_native.h>
 
 typedef Library_corlib_native_System_SpanByte SpanByte;

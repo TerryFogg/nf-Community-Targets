@@ -4,7 +4,7 @@
 //
 
 #include "TouchInterface.h"
-#include "System.Device.IO.h"
+#include "Device.IO.h"
 
 TouchInterface g_TouchInterface;
 

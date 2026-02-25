@@ -46,7 +46,7 @@ typedef struct ScanReportRecordMatchesManagedCode
     uint8_t cypherType;
 } ScanReportRecordMatchesManagedCode;
 
-class DeviceWifi
+class Wifi
 {
 
   public:

@@ -9,8 +9,8 @@
 
 #include "TouchDevice.h"
 #include "TouchInterface.h"
-#include "System.Device.h"
-#include "System.Device.IO.h"
+#include "DevicePin.h"
+#include "Device.IO.h"
 
 enum FT6X06_CMD : CLR_UINT8
 {
@@ -111,14 +111,14 @@ bool TouchDevice::Initialize(
     {
         return false;
     }
-    Device::ReservePin((PinNameValue)m_TouchInterruptPin);
+    DevicePin::ReservePin((PinNameValue)m_TouchInterruptPin);
     GpioIO::InitializePin((PinNameValue)m_TouchInterruptPin);
-    Device::RegisterPinMode((PinNameValue)m_TouchInterruptPin, PinMode_Input);
+    DevicePin::RegisterPinMode((PinNameValue)m_TouchInterruptPin, PinMode_Input);
     GpioIO::SetMode((PinNameValue)m_TouchInterruptPin, PinMode_Input);
 
     GpioCallbackParameter *newGpioParameter = (GpioCallbackParameter *)platform_malloc(sizeof(GpioCallbackParameter));
     memset(newGpioParameter, 0, sizeof(GpioCallbackParameter));
-    Device::AddPinCallbackParameter((PinNameValue)m_TouchInterruptPin, newGpioParameter);
+    DevicePin::AddPinCallbackParameter((PinNameValue)m_TouchInterruptPin, newGpioParameter);
     newGpioParameter->callBack = true;
     newGpioParameter->edgeTrigger = GPIO_INT_EDGE_HIGH;
 

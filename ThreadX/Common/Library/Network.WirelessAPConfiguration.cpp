@@ -4,7 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include "System.Device.Network.h"
+#include "Network.h"
 #include "nanoHAL_v2.h"
 #include "nanoCLR_Interop.h"
 

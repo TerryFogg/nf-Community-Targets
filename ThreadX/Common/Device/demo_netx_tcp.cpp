@@ -3,7 +3,7 @@
 #include "tx_api.h"
 #include "nx_api.h"
 #include "nxd_dhcp_client.h"
- #include "System.Device.Wifi.h"
+ #include "Wifi.h"
 /* Define the ThreadX and NetX object control blocks...  */
 #include "nx_driver_pico_w.h"
 
@@ -78,9 +78,9 @@ void tx_application_define(void *first_unused_memory)
 
 
     cyw43_arch_init();
-    DeviceWifi::Initialize();
+    Wifi::Initialize();
 
-    while (!DeviceWifi::WifiUp())
+    while (!Wifi::WifiUp())
     {
     }
 

@@ -30,9 +30,9 @@
  list(APPEND NETWORK_SOURCES
 
     # Included by specific drivers
-        #${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/nx_driver_framework.c
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Network.Helpers.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.Network.NetXDuo.cpp
+        #${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/nx_driver_framework.c
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/Network.Helpers.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/NetXDuo.cpp
 
     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Network.Information.cpp
     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Network.Interface.cpp
@@ -41,8 +41,6 @@
     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Network.WirelessAPConfiguration.cpp
     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Network.Wireless80211Configuration.cpp
     
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/ssl_ISM43362.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/dummy.cpp
 )
 
  list(APPEND NETWORK_SOURCES

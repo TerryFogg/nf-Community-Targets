@@ -4,7 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //
 #include <sys_dev_wifi_native.h>
-#include "System.Device.Wifi.h"
+#include "Wifi.h"
 
 extern "C"
 {
@@ -18,7 +18,7 @@ HRESULT Library_sys_dev_wifi_native_System_Device_Wifi_WifiAdapter::NativeInit__
 {
     NANOCLR_HEADER();
     {
-        DeviceWifi::Initialize();
+        Wifi::Initialize();
     }
     NANOCLR_NOCLEANUP_NOLABEL();
 }
@@ -26,7 +26,7 @@ HRESULT Library_sys_dev_wifi_native_System_Device_Wifi_WifiAdapter::DisposeNativ
 {
     NANOCLR_HEADER();
     {
-        DeviceWifi::Dispose();
+        Wifi::Dispose();
     }
     NANOCLR_NOCLEANUP_NOLABEL();
 }
@@ -140,7 +140,7 @@ HRESULT Library_sys_dev_wifi_native_System_Device_Wifi_WifiAdapter::
                     // The WaitEvents will return earlier than timeout value if
                     // 'Events_Set(SYSTEM_EVENT_FLAG_WIFI_STATION)' translated to wait for event 'Event_Wifi_Station'
                     stack.SetupTimeoutFromTicks(hbTimeout, timeout);
-                    DeviceWifi::Connect(wifiConfig);
+                    Wifi::Connect(wifiConfig);
                     if (connectionStatus == WifiConnectionStatus::WifiConnectionStatus_NetworkNotAvailable)
                     {
                         // Non-blocking wait allowing other threads to run while we wait for the wifi to connect
@@ -162,7 +162,7 @@ HRESULT Library_sys_dev_wifi_native_System_Device_Wifi_WifiAdapter::NativeDiscon
 {
     NANOCLR_HEADER();
     {
-        DeviceWifi::Disconnect(TheSingleWirelessAdapter);
+        Wifi::Disconnect(TheSingleWirelessAdapter);
     }
     NANOCLR_NOCLEANUP();
 }
@@ -176,7 +176,7 @@ HRESULT Library_sys_dev_wifi_native_System_Device_Wifi_WifiAdapter::NativeScanAs
 
         // This code base only supports 1 wireless adapter
         adapterIndex = TheSingleWirelessAdapter;
-        if (!DeviceWifi::StartScan())
+        if (!Wifi::StartScan())
         {
             NANOCLR_SET_AND_LEAVE(CLR_E_INVALID_OPERATION);
         }
@@ -202,7 +202,7 @@ HRESULT Library_sys_dev_wifi_native_System_Device_Wifi_WifiAdapter::GetNativeSca
         // Initiate a Scan then reliquish thread while waiting for completion with timeout.
         // The WaitEvents will return earlier than timeout value if
         // 'Events_Set(SYSTEM_EVENT_FLAG_WIFI_STATION)' translated to wait for event 'Event_Wifi_Station'
-        DeviceWifi::StartScan();
+        Wifi::StartScan();
         stack.SetupTimeoutFromTicks(hbTimeout, timeout);
         g_CLR_RT_ExecutionEngine.WaitEvents(stack.m_owningThread, *timeout, Event_Wifi_Station, eventResult);
         if (!eventResult)

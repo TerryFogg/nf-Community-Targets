@@ -28,7 +28,6 @@ configure_file(  ${LINKER_SCRIPT_FILE} "${CMAKE_BINARY_DIR}/configured_linker_Sc
 set_target_properties(nanoCLR PROPERTIES LINK_DEPENDS "${CMAKE_BINARY_DIR}/configured_linker_Script.ld")
 set_target_properties(nanoCLR PROPERTIES PICO_TARGET_LINKER_SCRIPT ${CMAKE_BINARY_DIR}/configured_linker_Script.ld)
 
-#set(${PIOASM_INSTALL_DIR} ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/tools)
 include(${PICO_SDK_PATH}/pico_sdk_init.cmake)
 
 project(nanoFramework VERSION ${BUILD_VERSION} LANGUAGES C CXX ASM)
@@ -142,23 +141,19 @@ if(NETWORKING_SUPPORT)
    list(APPEND RP2XXX_SOURCES
         ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src/cyw43_ctrl.c
         ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src/cyw43_ll.c
-       # ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src/cyw43_spi.c
-        ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_driver/cyw43_driver.c
         ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_async_context/async_context_base.c
         ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_async_context/async_context_poll.c
-
+        ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_driver/cyw43_driver.c
         ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_arch/cyw43_arch.c 
         ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_arch/cyw43_arch_poll.c
-        
         ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_driver/cyw43_bus_pio_spi.c
-       # ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_driver/cyw43_bus_pio_spi.pio
 
-        ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/demo_netx_tcp.cpp
+        ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/demo_netx_tcp.cpp
 
    )
 endif()
 
-# Add the TinyUsb sources
+# Add the TinyUsb sources - Note: RP2350 uses some RP2040 files
 list(APPEND RP2XXX_SOURCES
      ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src/tusb.c
      ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src/class/cdc/cdc_device.c
@@ -172,13 +167,6 @@ list(APPEND RP2XXX_SOURCES
      # Wire Protocol support
      ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RaspberryPi/RP2XXX/Common/tinyusb_cdc_descriptor.c
 )
-
-if( "${TARGET_SERIES}" STREQUAL "RP2040")
-   target_link_libraries(nanoCLR
-                         hardware_rtc
-   )
-endif()
-
 
 # Set properties on certain files to compile successfully
 set_source_files_properties(${TARGET_GIT_LOCAL_PATH}/src/common/pico_sync/sem.c COMPILE_FLAGS -std=gnu17)

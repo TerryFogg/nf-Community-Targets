@@ -4,7 +4,7 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include "System.Device.Network.h"
+#include "Network.h"
 
 HAL_Configuration_NetworkInterface network_Interface;
 
@@ -49,5 +49,3 @@ HRESULT Library_sys_net_native_System_Net_NetworkInformation_IPGlobalProperties:
     }
     NANOCLR_NOCLEANUP();
 }
-
-

@@ -346,24 +346,24 @@ list(APPEND FILE_SOURCES
      ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/FileSystem.NativeIO.cpp
      ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/FileSystem.SDCard.cpp
 
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/FileSystem.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/FileSystem.cpp
 )
 
 if(FILE_SYSTEM_SD)
     list(APPEND FILE_SOURCES
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem/System.Device.File_SD_driver.cpp
+         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/FileSystem_SdDriver.cpp
     )
 endif()
 
 if(FILE_SYSTEM_FLASH)
     list(APPEND FILE_SOURCES
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.File_Flash_driver.cpp
+         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/FileSystem_FlashDriver.cpp
     )
 endif()
 
 if(FILE_SYSTEM_RAM)
     list(APPEND FILE_SOURCES
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.File_Ram_driver.cpp
+         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/FileSystem_RamDriver.cpp
     )
 endif()
 

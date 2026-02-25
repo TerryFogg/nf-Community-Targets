@@ -4,8 +4,8 @@
 //
 #include "nanoCLR_Interop.h"
 #include "sys_io_ser_native.h"
-#include "System.Device.IO.h"
-#include "System.Device.h"
+#include "Device.IO.h"
+#include "DevicePin.h"
 
 // An Events_Get clears the event
 #define CLEAR_SERIAL_IN_EVENT Events_Get(SYSTEM_EVENT_FLAG_COM_IN)

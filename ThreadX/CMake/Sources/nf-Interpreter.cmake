@@ -253,15 +253,13 @@
 # Targets
         list(APPEND NF_INTERPRETER_INCLUDES 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Cryptography
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics																																																																																																																																																																																							
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other																																																																																																																																																																																							
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/RequiredNotUsed
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Startup																																																																																																																																																																																							
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadX.Headers
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol
 
@@ -280,10 +278,10 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/TraceWireProtocol.c
 
 # To be reintegrated into core later
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/src/CLR/Core/TypeSystem.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/src/PAL/AsyncProcCall/AsyncCompletions.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Temporary_src/CLR/Core/TypeSystem.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Temporary_src/PAL/AsyncProcCall/AsyncCompletions.cpp
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/DevicePin.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Adc.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Dac.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Gpio.cpp
@@ -292,12 +290,12 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/I2s.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Pwm.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Spi.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.Device/System.Device.IO.Asychronous.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/AsychronousIO.cpp
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware/nanoframework_Hardware.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware/nanoframework_Hardware_nanoframework_Hardware_NativeFunctions.cpp
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/IO.Ports_SerialPort.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/IO.Ports.SerialPort.cpp
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/ManagedThreadSupport.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Memory.cpp
@@ -314,8 +312,8 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/WireProtocol_Receiver.cpp
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/Delays.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/DeviceIO.cpp																																																																																																																																																																																							
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/DeviceWifi.Cyw43.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/Device.IO.cpp																																																																																																																																																																																							
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/Wifi.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/nx_driver_pico_w.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/FlashDriver.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/nanoSupport_CRC32.c

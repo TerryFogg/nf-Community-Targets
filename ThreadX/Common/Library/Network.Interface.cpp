@@ -4,9 +4,8 @@
 // See LICENSE file in the project root for full license information.
 //
 
-#include "System.Device.Network.h"
-#include "System.Device.Wifi.h"
-
+#include "Network.h"
+#include "Wifi.h"
 
 static HAL_Configuration_NetworkInterface network_Interface;
 static HAL_Configuration_NetworkInterface ethernetInterface;
@@ -26,13 +25,13 @@ HRESULT Library_sys_net_native_System_Net_NetworkInformation_NetworkInterface::
         CLR_UINT32 interfaceIndex = pConfig[FIELD___interfaceIndex].NumericByRefConst().u4;
         HAL_Configuration_NetworkInterface *pLocalConfig;
 
-        //if (!ConfigurationManager_GetConfigurationBlock(
-        //        (void *)&config,
-        //        DeviceConfigurationOption_Network,
-        //        interfaceIndex))
+        // if (!ConfigurationManager_GetConfigurationBlock(
+        //         (void *)&config,
+        //         DeviceConfigurationOption_Network,
+        //         interfaceIndex))
         //{
-        //    NANOCLR_SET_AND_LEAVE(CLR_E_FAIL);
-        //}
+        //     NANOCLR_SET_AND_LEAVE(CLR_E_FAIL);
+        // }
         //_ASSERTE(config.StartupAddressMode > 0);
 
         if (config.StartupAddressMode == AddressMode_DHCP)
@@ -80,10 +79,11 @@ HRESULT Library_sys_net_native_System_Net_NetworkInformation_NetworkInterface::
         pConfig[FIELD___specificConfigId].SetInteger((CLR_UINT32)pLocalConfig->SpecificConfigId);
         pConfig[FIELD___startupAddressMode].SetInteger((CLR_UINT32)pLocalConfig->StartupAddressMode);
 
-        NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_Array::CreateInstance(
-            pConfig[FIELD___macAddress],
-            NETIF_MAX_HWADDR_LEN,
-            g_CLR_RT_WellKnownTypes.m_UInt8));
+        NANOCLR_CHECK_HRESULT(
+            CLR_RT_HeapBlock_Array::CreateInstance(
+                pConfig[FIELD___macAddress],
+                NETIF_MAX_HWADDR_LEN,
+                g_CLR_RT_WellKnownTypes.m_UInt8));
         memcpy(
             pConfig[FIELD___macAddress].DereferenceArray()->GetFirstElement(),
             pLocalConfig->MacAddress,
@@ -183,7 +183,7 @@ Library_sys_net_native_System_Net_NetworkInformation_NetworkInterface::GetIsNetw
 
 // Check if wireless or ethernet network is available
 #ifdef WIFI
-        wifiIsAvailable = DeviceWifi::WifiUp();
+        wifiIsAvailable = Wifi::WifiUp();
 #endif
 
 #ifdef ETHERNET
@@ -243,10 +243,11 @@ HRESULT Library_sys_net_native_System_Net_NetworkInformation_NetworkInterface::
             pConfig = top.Dereference();
             FAULT_ON_NULL(pConfig);
 
-            NANOCLR_CHECK_HRESULT(CLR_RT_HeapBlock_Array::CreateInstance(
-                pConfig[FIELD___macAddress],
-                NETIF_MAX_HWADDR_LEN,
-                g_CLR_RT_WellKnownTypes.m_UInt8));
+            NANOCLR_CHECK_HRESULT(
+                CLR_RT_HeapBlock_Array::CreateInstance(
+                    pConfig[FIELD___macAddress],
+                    NETIF_MAX_HWADDR_LEN,
+                    g_CLR_RT_WellKnownTypes.m_UInt8));
             memcpy(
                 pConfig[FIELD___macAddress].DereferenceArray()->GetFirstElement(),
                 pLocalConfig->MacAddress,

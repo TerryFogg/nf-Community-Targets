@@ -4,8 +4,8 @@
 // See LICENSE file in the project root for full license information.
 //
 #include "PinNames.h"
-#include "System.Device.IO.h"
-#include "System.Device.h"
+#include "Device.IO.h"
+#include "DevicePin.h"
 #include "target_board.h"
 #include "Delays.h"
 

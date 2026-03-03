@@ -181,7 +181,7 @@
                     ${CMAKE_SOURCE_DIR}/src/CLR/WireProtocol/WireProtocol_MonitorCommands.c
 #                   ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Boot.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_Capabilites.c
-                    #${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_ConfigurationManager.c
+                    ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_ConfigurationManager.c
                     #${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_ConfigurationManager_stubs.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_SystemEvents.c
                     ${CMAKE_SOURCE_DIR}/src/HAL/nanoHAL_SystemInformation.cpp
@@ -252,7 +252,7 @@
 
 # Targets
         list(APPEND NF_INTERPRETER_INCLUDES 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics																																																																																																																																																																																							
@@ -263,8 +263,8 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/WireProtocol
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/Common
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/WireProtocol
         )
         list(APPEND NF_INTERPRETER_SOURCES 
 
@@ -292,6 +292,9 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Spi.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/AsychronousIO.cpp
 
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/nx_driver_framework.cpp
+
+
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware/nanoframework_Hardware.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware/nanoframework_Hardware_nanoframework_Hardware_NativeFunctions.cpp
 
@@ -311,14 +314,14 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/WireProtocol_MonitorCommands.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/WireProtocol_Receiver.cpp
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/Delays.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/Device.IO.cpp																																																																																																																																																																																							
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/Wifi.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/nx_driver_pico_w.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/FlashDriver.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/nanoSupport_CRC32.c
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/WireProtocol_HAL_Interface.c
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/wp_Communications.c
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/Delays.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/Device.IO.cpp																																																																																																																																																																																							
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/Wifi.cpp
+##                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/nx_driver_pico_w.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/FlashDriver.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/nanoSupport_CRC32.c
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/WireProtocol_HAL_Interface.c
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/wp_Communications.c
                     
         )  
 

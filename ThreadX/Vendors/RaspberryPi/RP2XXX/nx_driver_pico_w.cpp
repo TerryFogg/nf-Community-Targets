@@ -43,7 +43,7 @@ void nx_driver_pico_w(NX_IP_DRIVER *driver_req_ptr)
     static UCHAR start = NX_FALSE;
     if (!start)
     {
-        Wifi::Initialize();
+        DeviceWifi::Initialize();
 
         nx_driver_hardware_initialize = _nx_driver_hardware_initialize;
         nx_driver_hardware_enable = _nx_driver_hardware_enable;
@@ -66,11 +66,13 @@ static VOID _nx_driver_thread_entry(ULONG thread_input)
     {
         if (nx_driver_information.nx_driver_information_ip_ptr->nx_ip_driver_link_up)
         {
-            // Obtain the IP internal mutex before processing the IP event.
+            /* Obtain the IP internal mutex before processing the IP event.  */
             tx_mutex_get(&(ip_ptr->nx_ip_protection), TX_WAIT_FOREVER);
+
+            /* Poll WIFI events. */
             cyw43_arch_poll();
 
-            // Release the IP internal mutex before processing the IP event.
+            /* Release the IP internal mutex before processing the IP event.  */
             tx_mutex_put(&(ip_ptr->nx_ip_protection));
         }
 

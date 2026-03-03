@@ -12,7 +12,7 @@ add_executable(nanoCLR)
    include( ${CMAKE_CURRENT_SOURCE_DIR}/Sources/DeviceFamilies/${TARGET_FAMILY}.cmake)
    include( ${CMAKE_CURRENT_SOURCE_DIR}/Sources/nf-Interpreter.cmake)
    include( ${CMAKE_CURRENT_SOURCE_DIR}/Sources/ThreadX.cmake)
-   include(../${PARENT_DIRECTORY}/${TARGET_VENDOR}/${TARGET_FAMILY}/${TARGET_SERIES}/board.cmake)
+   include(../${PARENT_DIRECTORY}Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/${TARGET_SERIES}/board.cmake)
 
 # Optional Sources
     if(GRAPHICS_SUPPORT)
@@ -33,9 +33,9 @@ add_executable(nanoCLR)
     endif()
 
     target_sources(nanoCLR PUBLIC
-                   ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/main.c
-                   ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/CLR_RT_InteropAssembliesTable.cpp
-                   ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/targetHAL.cpp
+                   "../Common/Startup/main.c"
+                   "../Common/Startup/CLR_RT_InteropAssembliesTable.cpp"
+                   "../Common/Startup/targetHAL.cpp"
                    ${NF_INTERPRETER_SOURCES}
                    ${THREADX_SOURCES}
                    ${${TARGET_FAMILY}_SOURCES}

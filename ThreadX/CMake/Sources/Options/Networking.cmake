@@ -6,7 +6,6 @@
  list(APPEND NETWORK_INCLUDES
     ${CMAKE_SOURCE_DIR}/src/DeviceInterfaces/System.Net
     ${CMAKE_SOURCE_DIR}/src/boards/includes
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RaspberryPi/RP2XXX/Common/nx_driver
     ${CMAKE_SOURCE_DIR}/src/PAL/COM/sockets/ssl
 )
  list(APPEND NETWORK_SOURCES

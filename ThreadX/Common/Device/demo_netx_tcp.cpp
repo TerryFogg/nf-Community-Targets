@@ -76,15 +76,6 @@ void tx_application_define(void *first_unused_memory)
         (ULONG *)(((int)packet_pool_area + 15) & ~15),
         NX_PACKET_POOL_SIZE);
 
-
-    cyw43_arch_init();
-    Wifi::Initialize();
-
-    while (!Wifi::WifiUp())
-    {
-    }
-
-
     /* Check for pool creation error.  */
     if (status)
     {
@@ -97,7 +88,7 @@ void tx_application_define(void *first_unused_memory)
         IP_ADDRESS(0, 0, 0, 0),
         IP_ADDRESS(0, 0, 0, 0),
         &pool_0,
-        nx_driver_pico_w,
+        nx_driver_framework_entry_default,
         (UCHAR *)ip_thread_stack,
         sizeof(ip_thread_stack),
         1);

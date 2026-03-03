@@ -25,16 +25,16 @@ TX_THREAD AsynchronousIOThread;
 
 extern bool g_waitForDebuggerRequested;
 
-//void tx_application_define(void *first_unused_memory)
-//{
-//
-//    // Create a byte memory pool from which to allocate the thread stacks
-//    const char *str = "byte pool 0";
-//    tx_byte_pool_create(&byte_pool_0, (char *)str, byte_pool_memory_area, DEFAULT_BYTE_POOL_SIZE);
-//
-//    CreateReceiverThread();
-//    CreateCLRThread();
-//}
+void tx_application_define(void *first_unused_memory)
+{
+
+    // Create a byte memory pool from which to allocate the thread stacks
+    const char *str = "byte pool 0";
+    tx_byte_pool_create(&byte_pool_0, (char *)str, byte_pool_memory_area, DEFAULT_BYTE_POOL_SIZE);
+
+    CreateReceiverThread();
+    CreateCLRThread();
+}
 
 void CreateCLRThread()
 {

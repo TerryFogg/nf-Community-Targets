@@ -23,7 +23,7 @@ FetchContent_MakeAvailable(Repository)
 set(PICO_NO_CMSE true)
 
 # Configure the sizes in the linker script file based on CMakePresets.json variables
-Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/RP2XXX.ld")
+Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/RP2XXX.ld")
 configure_file(  ${LINKER_SCRIPT_FILE} "${CMAKE_BINARY_DIR}/configured_linker_Script.ld" @ONLY)
 set_target_properties(nanoCLR PROPERTIES LINK_DEPENDS "${CMAKE_BINARY_DIR}/configured_linker_Script.ld")
 set_target_properties(nanoCLR PROPERTIES PICO_TARGET_LINKER_SCRIPT ${CMAKE_BINARY_DIR}/configured_linker_Script.ld)
@@ -113,8 +113,8 @@ list(APPEND RP2XXX_INCLUDES
      ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src/device
      ${TARGET_GIT_LOCAL_PATH}/lib/tinyusb/src/portable/raspberrypi/rp2040
      
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/Common
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/${TARGET_VENDOR}/${TARGET_FAMILY}/${TARGET_SERIES}
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/${TARGET_SERIES}
       
      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/include   
 )
@@ -148,8 +148,6 @@ if(NETWORKING_SUPPORT)
         ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_arch/cyw43_arch_poll.c
         ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_driver/cyw43_bus_pio_spi.c
 
-        ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/demo_netx_tcp.cpp
-
    )
 endif()
 
@@ -165,7 +163,7 @@ list(APPEND RP2XXX_SOURCES
      ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_fix/rp2040_usb_device_enumeration/rp2040_usb_device_enumeration.c
 
      # Wire Protocol support
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/RaspberryPi/RP2XXX/Common/tinyusb_cdc_descriptor.c
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/RaspberryPi/RP2XXX/tinyusb_cdc_descriptor.c
 )
 
 # Set properties on certain files to compile successfully

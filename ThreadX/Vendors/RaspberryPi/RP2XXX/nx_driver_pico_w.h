@@ -8,7 +8,7 @@ extern "C"
 #include "pico/cyw43_arch.h"
 #include "nx_api.h"
 
-    void nx_driver_pico_w(NX_IP_DRIVER *driver_req_ptr);
+    void nx_driver_framework_entry_default(NX_IP_DRIVER *driver_req_ptr);
 
 #ifdef __cplusplus
 }

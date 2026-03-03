@@ -67,7 +67,7 @@ bool NetworkStartup()
         IP_ADDRESS(192, 168, 1, 139),
         0xFFFFFF00UL,
         &Network_packet_pool_0,
-        nx_driver_pico_w,
+        nx_driver_framework_entry_default,
         pointer,
         2048,
         1);

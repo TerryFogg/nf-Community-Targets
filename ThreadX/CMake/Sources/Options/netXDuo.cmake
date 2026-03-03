@@ -941,5 +941,5 @@ list(APPEND OPTIONAL_SOURCES
     ${NETXDUO_SOURCES}
 )
 
-set(NX_USER_FILE ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/target_nx_user.h CACHE STRING "Enable NX user configuration")
+set(NX_USER_FILE ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadX.Adaption/target_nx_user.h CACHE STRING "Enable NX user configuration")
 

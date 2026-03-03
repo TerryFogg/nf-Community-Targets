@@ -252,15 +252,15 @@
 
 # Targets
         list(APPEND NF_INTERPRETER_INCLUDES 
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Startup
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics																																																																																																																																																																																							
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other																																																																																																																																																																																							
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/RequiredNotUsed
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadX.Headers
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/RequiredNotUsed
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadX.Adaption
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/Common
@@ -300,16 +300,16 @@
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/IO.Ports.SerialPort.cpp
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/ManagedThreadSupport.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/Memory.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadX.Adaption/ManagedThreadSupport.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadX.Adaption/Memory.cpp
                     
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetHAL_Rtos.c
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetHAL_Time.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetPAL_Events.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/targetPAL_Time.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadX.Adaption/targetHAL_Rtos.c
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadX.Adaption/targetHAL_Time.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadX.Adaption/targetPAL_Events.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadX.Adaption/targetPAL_Time.cpp
 
                     # Core RTOS ThreadX threads
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadXAdaption/RTOS_Thread_Creation.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Startup/RTOS_Thread_Creation.cpp
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/WireProtocol_MonitorCommands.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/WireProtocol_Receiver.cpp

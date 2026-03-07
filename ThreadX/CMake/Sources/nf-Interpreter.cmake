@@ -292,7 +292,7 @@
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Spi.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/AsychronousIO.cpp
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/nx_driver_framework.cpp
+               ##     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/nx_driver_framework.cpp
 
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware/nanoframework_Hardware.cpp

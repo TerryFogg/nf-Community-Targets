@@ -6,10 +6,8 @@
 //
 
 #include <stdint.h>
-#include "pico.h"
 #include "hardware/gpio.h"
 #include "pico/time.h"
-#include "pico/async_context.h"
 #include "nanoHAL_v2.h"
 
 // We are not using lwIP
@@ -17,14 +15,6 @@
 #define CYW43_USE_LWIP (0) // Disable LWIP stack integration for netXduo implementation
 
 
-#ifndef MIN
-#define MIN(a, b) ((a) <= (b) ? (a) : (b))
-#endif
-#define STATIC static
-
-#ifndef static_assert
-#define static_assert(expr, msg) typedef int static_assert_##__LINE__[(expr) ? 1 : -1]
-#endif
 
 #define CYW43_RESOURCE_VERIFY_DOWNLOAD (1)
 #define CYW43_THREAD_ENTER             cyw43_thread_enter();
@@ -34,10 +24,9 @@
 // Helps with regulatory compliance and Wi-Fi channel selection
 #define CYW43_COUNTRY_CODE "AU" // Uncomment and set if needed
 
-// Feature Toggles
-#define CYW43_USE_SPI  (1) // Set to 1 if using SPI instead of SDIO
-#define CYW43_USE_UART (0) // Set to 1 if using UART for debug or control
-#define CYW43_SPI_PIO  (1) // Set to 1 if using PIO
+#define CYW43_USE_SPI 1 // We are using SPI as the bus
+#define CYW43_SPI_PIO 1 // That SPI is implemented using PIO
+
 
 // The following pins can be defined, depending on the configuration:
 #define CYW43_PIN_RFSW_SELECT (0) // RF-switch select

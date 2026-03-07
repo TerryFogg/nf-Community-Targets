@@ -17,7 +17,7 @@ else()
         GIT_REPOSITORY  ${TARGET_GIT_REPOSITORY}
         GIT_TAG ${TARGET_GIT_TAG}
     )
-endif()
+endif()                                
 FetchContent_MakeAvailable(Repository)
 
 set(PICO_NO_CMSE true)
@@ -141,8 +141,10 @@ if(NETWORKING_SUPPORT)
    list(APPEND RP2XXX_SOURCES
         ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src/cyw43_ctrl.c
         ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src/cyw43_ll.c
+
         ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_async_context/async_context_base.c
         ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_async_context/async_context_poll.c
+        
         ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_driver/cyw43_driver.c
         ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_arch/cyw43_arch.c 
         ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_arch/cyw43_arch_poll.c
@@ -171,6 +173,11 @@ set_source_files_properties(${TARGET_GIT_LOCAL_PATH}/src/common/pico_sync/sem.c 
 set_source_files_properties(${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_runtime_init/runtime_init.c COMPILE_FLAGS -std=gnu17)
 set_source_files_properties(${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_multicore/multicore.c COMPILE_FLAGS -std=gnu17)
 
+if(NETWORKING_SUPPORT)
+   target_link_libraries(nanoCLR
+                           
+                         )
+endif()
 # Pico SDK builds INTERFACE libraries
 target_link_libraries(nanoCLR
             hardware_adc

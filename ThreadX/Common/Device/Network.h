@@ -7,48 +7,24 @@
 
 #include "nanoCLR_Types.h"
 #include "sys_net_native.h"
-#include "corlib_native.h"
-
-#include "target_platform.h"
-#include "nanoHAL_ConfigurationManager.h"
 #include "nanoPAL_Sockets.h"
 #include <nx_secure_tls.h>
 
 #define NETWORK_INFINITE_TIMEOUT ((CLR_INT64) - 1)
-#define DnsFromDHCP              1
 
 #define INTERFACE_WIFI     0
 #define INTERFACE_ETHERNET 1
-
-#define SERVER_PORT             443 // HTTPS default port
-#define CERTIFICATE_BUFFER_SIZE 2048
-#define PRIVATE_KEY_BUFFER_SIZE 2048
-#define DEMO_STACK_SIZE         2048
-#define PACKET_POOL_SIZE        ((sizeof(NX_PACKET) + 1536) * 4)
-
-#define NX_DRIVER_MTU                 (1514)
-#define NX_DRIVER_PHYSICAL_FRAME_SIZE (14)
-#define NX_DRIVER_PACKET_SIZE         (1600) // (NX_DRIVER_MTU + 28 + 2) // To be reviewed with MX-CHIP and ST
-
-#define NX_DRIVER_STATE_NOT_INITIALIZED   1
-#define NX_DRIVER_STATE_INITIALIZE_FAILED 2
-#define NX_DRIVER_STATE_INITIALIZED       3
-#define NX_DRIVER_STATE_LINK_ENABLED      4
-#define NX_DRIVER_CAPABILITY              (0)
-#define NX_DRIVER_ERROR                   90
-
-// Define generic constants and macros for all NetX Ethernet drivers.
-
-#define NX_DRIVER_ETHERNET_IP   0x0800
-#define NX_DRIVER_ETHERNET_IPV6 0x86dd
-#define NX_DRIVER_ETHERNET_ARP  0x0806
-#define NX_DRIVER_ETHERNET_RARP 0x8035
 
 #define AF_UNSPEC 0 // Unspecified.
 #define AF_NS     1 // Local to host (pipes, portals).
 #define AF_INET   2 // IPv4 socket (UDP, TCP, etc)
 #define AF_INET6  3 // IPv6 socket (UDP, TCP, etc)
 #define AF_PACKET 4 // Raw Packet type (Link Layer packets)
+
+#define EVT_WIFI_RX        (1u << 0)
+#define EVT_WIFI_LINK_UP   (1u << 1)
+#define EVT_WIFI_LINK_DOWN (1u << 2)
+
 
 #define FAULT_IF_NX_CALL_UNSUCCESSFUL(status, stack)                                                                   \
     do                                                                                                                 \
@@ -71,25 +47,25 @@
 typedef Library_sys_net_native_System_Security_Cryptography_X509Certificates_X509Certificate X509Certificate;
 typedef Library_sys_net_native_System_Security_Cryptography_X509Certificates_X509Certificate2 X509Certificate2;
 
-typedef struct NX_DRIVER_INFORMATION_STRUCT
-{
-    /* NetX IP instance that this driver is attached to.  */
-    NX_IP *nx_driver_information_ip_ptr;
-
-    /* Driver's current state.  */
-    ULONG nx_driver_information_state;
-
-    /* Packet pool used for receiving packets. */
-    NX_PACKET_POOL *nx_driver_information_packet_pool_ptr;
-
-    /* Define the driver interface association.  */
-    NX_INTERFACE *nx_driver_information_interface;
-
-    /* Define the deferred event field. This will contain bits representing events
-       deferred from the ISR for processing in the thread context.  */
-    ULONG nx_driver_information_deferred_events;
-
-} NX_DRIVER_INFORMATION;
+//typedef struct NX_DRIVER_INFORMATION_STRUCT
+//{
+//    /* NetX IP instance that this driver is attached to.  */
+//    NX_IP *nx_driver_information_ip_ptr;
+//
+//    /* Driver's current state.  */
+//    ULONG nx_driver_information_state;
+//
+//    /* Packet pool used for receiving packets. */
+//    NX_PACKET_POOL *nx_driver_information_packet_pool_ptr;
+//
+//    /* Define the driver interface association.  */
+//    NX_INTERFACE *nx_driver_information_interface;
+//
+//    /* Define the deferred event field. This will contain bits representing events
+//       deferred from the ISR for processing in the thread context.  */
+//    ULONG nx_driver_information_deferred_events;
+//
+//} NX_DRIVER_INFORMATION;
 
 enum socket_type
 {
@@ -248,3 +224,4 @@ int TranslateNXStatusToBSDStatus(int NetXDuoError);
 void SetReturnStatus(CLR_RT_StackFrame &stack, int errorCode, CLR_RT_TypeDef_Index messageType);
 void tcp_data_callback(NX_TCP_SOCKET *socket_ptr);
 void tcp_server_listen_callback(NX_TCP_SOCKET *socket_ptr, UINT port);
+bool NetXDuoStartup();

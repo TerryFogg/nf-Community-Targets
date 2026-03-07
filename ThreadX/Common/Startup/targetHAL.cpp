@@ -61,10 +61,6 @@ void nanoHAL_Initialize()
     g_TouchPanel.Initialize();
 #endif
 
-#if (NETWORKING_SUPPORT == TRUE)
-
-    NetworkStartup();
-#endif
 
 #if (FILE_SYSTEM_SUPPORT == TRUE)
    // fx_system_initialize();

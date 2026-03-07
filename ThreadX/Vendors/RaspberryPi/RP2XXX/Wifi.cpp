@@ -2,6 +2,7 @@
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
+#include "network.h"
 #include "Wifi.h"
 #include "sys_dev_wifi_native.h"
 
@@ -33,7 +34,7 @@ CLR_UINT32 itfClientInterfaceSTAMode = CYW43_ITF_STA;
 CLR_UINT32 itfAccessPointInterfaceMode = CYW43_ITF_AP;
 
 // Start the Wifi, default power management
-bool Wifi::Initialize()
+bool Wifi::Initialize(uint8_t* mac)
 {
     connectionStatus = WifiConnectionStatus::WifiConnectionStatus_NetworkNotAvailable;
 
@@ -191,6 +192,28 @@ int scan_results_callback(void *env, const cyw43_ev_scan_result_t *result)
         Events_Set(SYSTEM_EVENT_FLAG_WIFI_STATION);
     }
     return 0;
+}
+
+
+/* Simple single-frame RX buffer (replace with queue/pool later) */
+#define RX_BUF_SIZE 1600
+static uint8_t rx_buf[RX_BUF_SIZE];
+static volatile size_t rx_len;
+extern TX_EVENT_FLAGS_GROUP wifi_events;
+
+void cyw43_cb_process_ethernet(void *cb_data, int itf, size_t len, const uint8_t *buf)
+{
+    (void)cb_data;
+    (void)itf;
+
+    if (len <= RX_BUF_SIZE)
+    {
+        memcpy(rx_buf, buf, len);
+        rx_len = len;
+
+        /* Signal RX available */
+        tx_event_flags_set(&wifi_events, EVT_WIFI_RX, TX_OR);
+    }
 }
 
 

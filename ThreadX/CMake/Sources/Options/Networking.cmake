@@ -26,12 +26,12 @@
     #    ${CMAKE_SOURCE_DIR}/src/DeviceInterfaces/System.Net/sys_net_native_System_Security_Cryptography_X509Certificates_X509Certificate2.cpp
 )
 
- list(APPEND NETWORK_SOURCES
+ list(APPEND NETWORK_SOURCES                        
 
     # Included by specific drivers
         #${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/nx_driver_framework.c
     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/Network.Helpers.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/NetXDuo.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/Network.cpp
 
     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Network.Information.cpp
     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Network.Interface.cpp

@@ -18,7 +18,7 @@ HRESULT Library_sys_dev_wifi_native_System_Device_Wifi_WifiAdapter::NativeInit__
 {
     NANOCLR_HEADER();
     {
-        Wifi::Initialize();
+        // Initialization is done at power up and located in the NetXDuo framework driver "switch" statement.
     }
     NANOCLR_NOCLEANUP_NOLABEL();
 }

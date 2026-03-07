@@ -320,9 +320,10 @@
         // ------------
         {
             "name": "WiFi_Cyw43",
-            "description": "Support for wifi network",
+            "description": "Support for wifi network on Rasbperry Pi Pico using the cyw43 wireless chip",
             "hidden": true,
             "cacheVariables": {
+                "BOARD": "pico-w",
                 "NETWORKING_SUPPORT": true,
                 "TARGET_NETWORK_DRIVER": "WiFi_Cyw43_driver",
                 "WIFI_MODULE": "CYW43",

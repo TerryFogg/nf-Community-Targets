@@ -50,7 +50,7 @@ class Wifi
 {
 
   public:
-    static bool Initialize();
+    static bool Initialize(uint8_t *mac);
     static bool Dispose();
     static void Connect(HAL_Configuration_Wireless80211 wifiConfig);
     static void Disconnect(int index);

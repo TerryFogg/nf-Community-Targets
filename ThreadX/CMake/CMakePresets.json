@@ -243,11 +243,11 @@
             "hidden": true,
             "inherits": [
                 "THREADX_AND_COMPONENT_PATHS",
-               // "GCC_ARM_COMMON_BUILD",
                 "DOUBLE_PRECISION_MATHEMATICS",
                 "PICO_SDK"
             ],
             "cacheVariables": {
+                "binaryDir": "${sourceDir}/build",
                 "TARGET_VENDOR": "RaspberryPi",
                 "TARGET_FAMILY": "RP2XXX",
                 "RANDOM_NUMBER_GENERATOR": true,

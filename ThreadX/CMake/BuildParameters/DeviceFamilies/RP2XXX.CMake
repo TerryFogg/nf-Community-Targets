@@ -18,12 +18,8 @@
     target_compile_definitions(nanoCLR PUBLIC -DPSRAM_CHIP=${PSRAM_CHIP}) 
  endif()
 
- if( "${TARGET_SERIES}" STREQUAL "RP2350")
-       # Cortex-m33 can run non secure or secure, at boot the RP2350 is in secure mode.
-       target_compile_definitions(nanoCLR PUBLIC -DTX_SINGLE_MODE_SECURE -DPICO_PLATFORM=rp2350)
- else()
-       target_compile_definitions(nanoCLR PUBLIC -DPICO_PLATFORM=rp2040)
- endif()
+target_compile_definitions(nanoCLR PUBLIC -DTX_SINGLE_MODE_SECURE -DPICO_PLATFORM=${PICO_PLATFORM})
+# target_compile_definitions(nanoCLR PUBLIC -DTX_SINGLE_MODE_SECURE -DPICO_BOARD=${PICO_BOARD})
 
 # Redirect the pico-sdk handlers to the ThreadX handlers
 target_compile_definitions(nanoCLR PUBLIC -DPendSV_Handler=isr_pendsv) 
@@ -40,10 +36,10 @@ if(CFG_USB_USE_DTR)
  target_compile_definitions(nanoCLR PUBLIC -DCFG_USB_USE_DTR) 
 endif() 
 
-# Network support using NetXDuo not LWIP
-if(${NETWORKING_SUPPORT})
- target_compile_definitions(nanoCLR PUBLIC -DPICO_CYW43_ARCH_POLL=1)
-endif()
+## Network support using NetXDuo not LWIP
+#if(${NETWORKING_SUPPORT})
+# target_compile_definitions(nanoCLR PUBLIC -DPICO_CYW43_ARCH_POLL=1)
+#endif()
 
 #  Some options
 target_link_options(nanoCLR PUBLIC "-Wl,--print-memory-usage")

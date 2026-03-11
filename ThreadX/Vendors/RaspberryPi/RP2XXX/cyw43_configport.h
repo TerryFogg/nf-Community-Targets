@@ -11,8 +11,8 @@
 #include "nanoHAL_v2.h"
 
 // We are not using lwIP
-#define CYW43_LWIP     (0) // Disable LWIP
-#define CYW43_USE_LWIP (0) // Disable LWIP stack integration for netXduo implementation
+//#define CYW43_LWIP     (0) // Disable LWIP
+//#define CYW43_USE_LWIP (0) // Disable LWIP stack integration for netXduo implementation
 
 
 

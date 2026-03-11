@@ -243,15 +243,13 @@
             "hidden": true,
             "inherits": [
                 "THREADX_AND_COMPONENT_PATHS",
-                "GCC_ARM_COMMON_BUILD",
+               // "GCC_ARM_COMMON_BUILD",
                 "DOUBLE_PRECISION_MATHEMATICS",
                 "PICO_SDK"
             ],
             "cacheVariables": {
                 "TARGET_VENDOR": "RaspberryPi",
                 "TARGET_FAMILY": "RP2XXX",
-                "PICO_BOARD": "pico",
-                "PICO_RP2040": "1",
                 "RANDOM_NUMBER_GENERATOR": true,
                 "REALTIME_CLOCK": false,
                 "WATCHDOG": false,
@@ -271,7 +269,7 @@
                 "TARGET_SERIES": "RP2040",
                 "TARGET_TYPE": "PICO_RP2040",
                 "ARM_PROCESSOR": "cortex-m0plus",
-                "PICO_BOARD": "pico",
+                "PICO_PLATFORM": "RP2040",
                 "PICO_RP2040": "1",
                 "HAS_CONFIG_BLOCK": false,
                 "RANDOM_NUMBER_GENERATOR": true,
@@ -298,7 +296,7 @@
                 "TARGET_SERIES": "RP2350",
                 "TARGET_TYPE": "PICO_RP2350",
                 "ARM_PROCESSOR": "cortex-m33",
-                "PICO_BOARD": "pico2",
+                "PICO_PLATFORM": "rp2350",
                 "PICO_RP2350": "1",
                 "SECURE_CODE": false,
                 "HAS_CONFIG_BLOCK": true,
@@ -315,6 +313,17 @@
 
             }
         },
+        {
+            "name": "PICO Pimoroni Plus 2 W",
+            "description": "Configuration for the Raspberry Pi Pico 2",
+            "hidden": true,
+            "inherits": [
+                "RP2350"
+            ],
+            "cacheVariables": {
+                "PICO_BOARD": "pimoroni_pico_plus2_w_rp2350"
+            }
+        },
         // ------------
         // WiFI devices  
         // ------------
@@ -323,7 +332,6 @@
             "description": "Support for wifi network on Rasbperry Pi Pico using the cyw43 wireless chip",
             "hidden": true,
             "cacheVariables": {
-                "BOARD": "pico-w",
                 "NETWORKING_SUPPORT": true,
                 "TARGET_NETWORK_DRIVER": "WiFi_Cyw43_driver",
                 "WIFI_MODULE": "CYW43",
@@ -605,28 +613,16 @@
             ]
         },
         {
-            "name": "cfg_RP2350_BuyDisplay_ER_TFTM028",
-            "description": "Pico2 board with 2.8 inch LCD and capacitive touch",
-            "hidden": false,
-            "inherits": [
-                "RP2350",
-                "FULL_FRAMEWORK",
-                "W25Q32RV",
-                "BUYDISPLAY_ER_TFTM028",
-                "DEBUG"
-            ]
-        },
-        {
             "name": "RP2350_Pimoroni2W_ER_TFTM028",
             "description": "Pimoroni Pico2 board with 16MB flash and 8 MB PSRAM, 2.8 inch LCD and capacitive touch",
             "hidden": false,
             "inherits": [
-                "RP2350",
+                "PICO Pimoroni Plus 2 W",
+                "WiFi_Cyw43",
                 "FULL_FRAMEWORK",
                 "W25Q128JV",
                 "APS6404L",
                 "BUYDISPLAY_ER_TFTM028",
-                "WiFi_Cyw43",
                 "FILE_SYSTEM_RAM",
                 "FILE_SYSTEM_FLASH",
                 "DEBUG"
@@ -638,11 +634,11 @@
             "hidden": false,
             "inherits": [
                 "RP2350",
+                "WiFi_Cyw43",
                 "FULL_FRAMEWORK",
                 "W25Q128JV",
                 "APS6404L",
                 "Waveshare_pico_dvi_lcd",
-                "WiFi_Cyw43",
                 "FILE_SYSTEM_RAM",
                 "FILE_SYSTEM_FLASH",
                 "DEBUG"

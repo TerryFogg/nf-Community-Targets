@@ -3,6 +3,7 @@
 # See LICENSE file in the project root for full license information.
 #
 # Check and find source repository
+
 include(FetchContent)
 if(IS_DIRECTORY ${TARGET_GIT_LOCAL_PATH})
     message(STATUS "Source code support is local folder ${TARGET_GIT_LOCAL_PATH}")
@@ -23,7 +24,7 @@ FetchContent_MakeAvailable(Repository)
 set(PICO_NO_CMSE true)
 
 # Configure the sizes in the linker script file based on CMakePresets.json variables
-Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/RP2XXX.ld")
+Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/RaspberryPi/RP2XXX/RP2XXX.ld")
 configure_file(  ${LINKER_SCRIPT_FILE} "${CMAKE_BINARY_DIR}/configured_linker_Script.ld" @ONLY)
 set_target_properties(nanoCLR PROPERTIES LINK_DEPENDS "${CMAKE_BINARY_DIR}/configured_linker_Script.ld")
 set_target_properties(nanoCLR PROPERTIES PICO_TARGET_LINKER_SCRIPT ${CMAKE_BINARY_DIR}/configured_linker_Script.ld)
@@ -31,6 +32,7 @@ set_target_properties(nanoCLR PROPERTIES PICO_TARGET_LINKER_SCRIPT ${CMAKE_BINAR
 include(${PICO_SDK_PATH}/pico_sdk_init.cmake)
 
 project(nanoFramework VERSION ${BUILD_VERSION} LANGUAGES C CXX ASM)
+
 pico_sdk_init()
 
 # Add these includes for local code references
@@ -137,21 +139,21 @@ endif()
 
 # Using NetxDuo so we only need the base code, other code has lwip embedded
 # The physical device driver is a special 
-if(NETWORKING_SUPPORT)
-   list(APPEND RP2XXX_SOURCES
-        ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src/cyw43_ctrl.c
-        ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src/cyw43_ll.c
-
-        ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_async_context/async_context_base.c
-        ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_async_context/async_context_poll.c
-        
-        ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_driver/cyw43_driver.c
-        ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_arch/cyw43_arch.c 
-        ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_arch/cyw43_arch_poll.c
-        ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_driver/cyw43_bus_pio_spi.c
-
-   )
-endif()
+#if(NETWORKING_SUPPORT)
+#   list(APPEND RP2XXX_SOURCES
+#        ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src/cyw43_ctrl.c
+#        ${TARGET_GIT_LOCAL_PATH}/lib/cyw43-driver/src/cyw43_ll.c
+#
+#        ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_async_context/async_context_base.c
+#        ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_async_context/async_context_poll.c
+#        
+#        ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_driver/cyw43_driver.c
+#        ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_arch/cyw43_arch.c 
+#        ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_arch/cyw43_arch_poll.c
+#        ${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_cyw43_driver/cyw43_bus_pio_spi.c
+#
+#   )
+#endif()
 
 # Add the TinyUsb sources - Note: RP2350 uses some RP2040 files
 list(APPEND RP2XXX_SOURCES
@@ -174,10 +176,10 @@ set_source_files_properties(${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_runtime
 set_source_files_properties(${TARGET_GIT_LOCAL_PATH}/src/rp2_common/pico_multicore/multicore.c COMPILE_FLAGS -std=gnu17)
 
 if(NETWORKING_SUPPORT)
-   target_link_libraries(nanoCLR
-                           
-                         )
+  #  target_link_libraries(nanoCLR cyw43_driver )
+    target_link_libraries(nanoCLR pico_cyw43_arch_none )
 endif()
+
 # Pico SDK builds INTERFACE libraries
 target_link_libraries(nanoCLR
             hardware_adc

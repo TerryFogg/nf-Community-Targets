@@ -4,6 +4,16 @@
 #
 # Check and find source repository
 
+set(PICO_NO_CMSE true)
+# Don't build pioasm use a prebuilt one
+set(PIOASM_EXE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/RaspberryPi/RP2XXX/pioasm.exe")
+
+# Define an imported executable target so pioasm is not built.
+add_executable(pioasm IMPORTED GLOBAL)
+set_target_properties(pioasm PROPERTIES IMPORTED_LOCATION "${PIOASM_EXE}"
+)
+
+
 include(FetchContent)
 if(IS_DIRECTORY ${TARGET_GIT_LOCAL_PATH})
     message(STATUS "Source code support is local folder ${TARGET_GIT_LOCAL_PATH}")
@@ -21,7 +31,6 @@ else()
 endif()                                
 FetchContent_MakeAvailable(Repository)
 
-set(PICO_NO_CMSE true)
 
 # Configure the sizes in the linker script file based on CMakePresets.json variables
 Set( LINKER_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/RaspberryPi/RP2XXX/RP2XXX.ld")

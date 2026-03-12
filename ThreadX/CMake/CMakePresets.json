@@ -242,12 +242,12 @@
             "description": "Configuration for the Raspberry Pi Pico series 1 and 2",
             "hidden": true,
             "inherits": [
+                "general-preset",
                 "THREADX_AND_COMPONENT_PATHS",
                 "DOUBLE_PRECISION_MATHEMATICS",
                 "PICO_SDK"
             ],
             "cacheVariables": {
-                "binaryDir": "${sourceDir}/build",
                 "TARGET_VENDOR": "RaspberryPi",
                 "TARGET_FAMILY": "RP2XXX",
                 "RANDOM_NUMBER_GENERATOR": true,

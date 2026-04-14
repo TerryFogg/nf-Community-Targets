@@ -6,14 +6,14 @@
 #include "nanoCLR_Types.h"
 
 void CreateCLRThread();
-void CLRThread_Entry(uint32_t parameter);
+void CLRThread(ULONG parameter);
 
 void CreateReceiverThread();
-void ReceiverThread_entry(uint32_t parameter);
+void ReceiverThread(ULONG parameter);
 
 void CreateNetworkThread();
-void NetworkThread_entry(uint32_t parameter);
+void NetworkThread(ULONG parameter);
 
 void CreateAsynchronousIOThread();
-void DeviceIOAsynchronousThread_Entry(uint32_t parameter);
+void AsynchronousIOThread(ULONG parameter);
 

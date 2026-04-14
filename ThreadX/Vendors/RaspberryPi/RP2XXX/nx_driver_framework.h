@@ -66,3 +66,4 @@ void nx_driver_transfer_to_netx(NX_IP *ip_ptr, NX_PACKET *packet_ptr);
 void nx_driver_update_hardware_address(UCHAR hardware_address[6]);
 void _nx_driver_thread_entry(ULONG thread_input);
 UINT _nx_driver_packet_send(NX_PACKET *packet_ptr);
+void nx_driver_framework_entry_default(NX_IP_DRIVER *driver_req_ptr);

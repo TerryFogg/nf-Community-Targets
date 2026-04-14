@@ -5,7 +5,7 @@
 //
 
 #include "Network.h"
-#include "Wifi.h"
+#include "NetworkInterfaceAdapter.h"
 
 static HAL_Configuration_NetworkInterface network_Interface;
 static HAL_Configuration_NetworkInterface ethernetInterface;

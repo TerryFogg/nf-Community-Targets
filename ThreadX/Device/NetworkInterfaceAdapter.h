@@ -7,17 +7,17 @@
 
 #include <stdint.h>
 #include "nanoHAL_network.h"
+#include <sys_dev_wifi_native.h>
 
 #define TheSingleWirelessAdapter 1
 #define ALL_ACCESS_POINT_STATIONS 0
 
 #define WIFI_AUTH_TYPE            CYW43_AUTH_WPA2_AES_PSK
 #define WIFI_CONNECT_TIMEOUT      10000 /* WIFI_CONNECT_TIMEOUT */
-#define WIFI_SSID                 "test"
-#define WIFI_PASSWORD             "test"
+#define WIFI_SSID                 "Telstra02A9D1"
+#define WIFI_PASSWORD             "2zcqqyr3se"
 #define NX_DRIVER_STACK_SIZE      1024
 #define NX_DRIVER_THREAD_INTERVAL (NX_IP_PERIODIC_RATE / 10)
-
 
 typedef enum
 {
@@ -53,7 +53,13 @@ class Wifi
     static bool Initialize(uint8_t *mac);
     static bool Dispose();
     static void Connect(HAL_Configuration_Wireless80211 wifiConfig);
-    static void Disconnect(int index);
+    static bool Enable();
+    static bool Send(uint8_t *buffer, int length);
+    static bool Receive();
+    static bool MultiCastJoin();
+    static bool MultiCastLeave();
+    static bool DriverStatus();
+    static bool Disconnect(HAL_Configuration_Wireless80211 wifiConfig);
     static bool StartScan();
     static bool ScanActive();
     static int NumberOfScanReportEntries();
@@ -65,4 +71,22 @@ class Wifi
         int station,
         int expected_number_associations,
         access_point_connected_clients_t *apConnectedClients);
+
 };
+
+#ifdef ETHERNET_INTERFACE
+class Ethernet
+{
+  public:
+    static bool Initialize(uint8_t *mac);
+    static bool Dispose();
+    static void Connect(HAL_Configuration_Wireless80211 wifiConfig);
+    static bool Enable();
+    static bool Send(uint8_t *buffer, int length);
+    static bool Receive();
+    static bool MultiCastJoin();
+    static bool MultiCastLeave();
+    static bool DriverStatus();
+    static void Disconnect(int adapterNumber);
+};
+#endif

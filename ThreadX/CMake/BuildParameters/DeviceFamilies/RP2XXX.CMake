@@ -37,9 +37,10 @@ if(CFG_USB_USE_DTR)
 endif() 
 
 ## Network support using NetXDuo not LWIP
-#if(${NETWORKING_SUPPORT})
-# target_compile_definitions(nanoCLR PUBLIC -DPICO_CYW43_ARCH_POLL=1)
-#endif()
+if(${NETWORKING_SUPPORT})
+ target_compile_definitions(nanoCLR PUBLIC -DCYW43_LWIP=0 -DPICO_CYW43_ARCH_POLL=1)
+ 
+endif()
 
 #  Some options
 target_link_options(nanoCLR PUBLIC "-Wl,--print-memory-usage")

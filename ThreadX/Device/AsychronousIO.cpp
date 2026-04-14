@@ -14,7 +14,7 @@ TX_EVENT_FLAGS_GROUP asynchronous_io_flags;
 uint8_t *RequestData;
 
 #define QUEUE_SIZE 10
-void DeviceIOAsynchronousThread_Entry(uint32_t parameter)
+void AsynchronousIOThread(ULONG parameter)
 {
     ULONG actual_flags;
     UINT status;

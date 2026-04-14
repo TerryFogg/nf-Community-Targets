@@ -3,7 +3,7 @@
 #include "tx_api.h"
 #include "nx_api.h"
 #include "nxd_dhcp_client.h"
- #include "Wifi.h"
+ #include "NetworkInterfaceAdapter.h"
 /* Define the ThreadX and NetX object control blocks...  */
 #include "nx_driver_pico_w.h"
 

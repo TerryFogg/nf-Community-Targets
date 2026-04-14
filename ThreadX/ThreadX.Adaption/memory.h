@@ -29,6 +29,8 @@ extern const uint32_t config_block_end;
 //extern uint32_t __nanoImage_end__;
 extern uint32_t __nanoConfig_start__;
 extern uint32_t __nanoConfig_end__;
+extern uint32_t __nanoConfig_size__;
+
 //extern uint32_t __deployment_start__;
 //extern uint32_t __deployment_end__;
 

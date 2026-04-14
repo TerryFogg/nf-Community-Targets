@@ -2,31 +2,36 @@
 // See LICENSE file in the project root for full license information.
 
 #include "targetHAL.h"
-#include <nanoCLR_Application.h>
+#include "nanoCLR_Application.h"
 #include "CLRNativeThreads.h"
 #include <tx_api.h>
-#include "network.h"
 
-#define RECEIVER_THREAD_STACK_SIZE 16000
-#define CLR_THREAD_STACK_SIZE      16000
-#define NETWORK_THREAD_STACK_SIZE  1000
-#define MALLOC_BYTES_AVAILABLE     8000
+#define RECEIVER_THREAD_STACK_SIZE 2048
+#define CLR_THREAD_STACK_SIZE      4096
+#define NETWORK_THREAD_STACK_SIZE  8000
+#define MALLOC_BYTES_AVAILABLE     90000
+
+// TODO  - Fix duplicate
+#define POLL_THREAD_STACK_SIZE 2000
 
 #define CLR_THREAD_PRIORITY      5
 #define RECEIVER_THREAD_PRIORITY 5
 #define NETWORK_THREAD_PRIORITY  5
 
-#define DEFAULT_BYTE_POOL_SIZE (CLR_THREAD_STACK_SIZE + RECEIVER_THREAD_STACK_SIZE + MALLOC_BYTES_AVAILABLE)
+#define DEFAULT_BYTE_POOL_SIZE                                                                                         \
+    (CLR_THREAD_STACK_SIZE + RECEIVER_THREAD_STACK_SIZE + NETWORK_THREAD_STACK_SIZE + POLL_THREAD_STACK_SIZE +         \
+     MALLOC_BYTES_AVAILABLE)
 
 TX_BYTE_POOL byte_pool_0;
 static uint8_t byte_pool_memory_area[DEFAULT_BYTE_POOL_SIZE];
 
-TX_THREAD CLRThread;
-TX_THREAD receiverThread;
-TX_THREAD AsynchronousIOThread;
-TX_THREAD networkThread;
+TX_THREAD TX_CLRThread;
+TX_THREAD TX_receiverThread;
+TX_THREAD TX_AsynchronousIOThread;
+TX_THREAD TX_networkThread;
 
 extern bool g_waitForDebuggerRequested;
+extern uint32_t g_networkThreadCountryCode;
 
 void tx_application_define(void *first_unused_memory)
 {
@@ -40,27 +45,25 @@ void tx_application_define(void *first_unused_memory)
     CreateNetworkThread();
 #endif
 }
-
-void CLRThread_Entry(uint32_t parameter)
+void CLRThread(ULONG parameter)
 {
-    bool userRequestedWaitForDebugger = (bool)parameter;
     CLR_SETTINGS clrSettings = {0};
+    bool userRequestedWaitForDebugger = (bool)parameter;
     clrSettings.MaxContextSwitches = 50;
     clrSettings.EnterDebuggerLoopAfterExit = true;
     clrSettings.WaitForDebugger = userRequestedWaitForDebugger;
     nanoHAL_Initialize();
     ClrStartup(clrSettings);
 }
-
 void CreateCLRThread()
 {
     void *pointer = TX_NULL;
     UINT status = tx_byte_allocate(&byte_pool_0, (VOID **)&pointer, CLR_THREAD_STACK_SIZE, TX_NO_WAIT);
 
     status = tx_thread_create(
-        &CLRThread,
+        &TX_CLRThread,
         (char *)"CLR_Thread",
-        CLRThread_Entry,
+        CLRThread,
         g_waitForDebuggerRequested,
         pointer,
         CLR_THREAD_STACK_SIZE,
@@ -75,17 +78,17 @@ void CreateCLRThread()
         }
     }
 }
-
 void CreateReceiverThread()
 {
     void *pointer = TX_NULL;
     UINT status = tx_byte_allocate(&byte_pool_0, (VOID **)&pointer, RECEIVER_THREAD_STACK_SIZE, TX_NO_WAIT);
+    ULONG parameter = 0;
 
     status = tx_thread_create(
-        &receiverThread,
+        &TX_receiverThread,
         (char *)"Receiver Thread",
-        ReceiverThread_entry,
-        0,
+        ReceiverThread,
+        parameter,
         pointer,
         RECEIVER_THREAD_STACK_SIZE,
         RECEIVER_THREAD_PRIORITY,
@@ -100,17 +103,17 @@ void CreateReceiverThread()
     }
     return;
 }
-
 void CreateNetworkThread()
 {
     void *pointer = TX_NULL;
     UINT status = tx_byte_allocate(&byte_pool_0, (VOID **)&pointer, NETWORK_THREAD_STACK_SIZE, TX_NO_WAIT);
+    ULONG parameter = 0;
 
     status = tx_thread_create(
-        &networkThread,
-        (char *)"Network Thread",
-        NetworkThread_entry,
-        0,
+        &TX_networkThread,
+        (char *)"Network Poll Thread",
+        NetworkThread,
+        parameter,
         pointer,
         NETWORK_THREAD_STACK_SIZE,
         NETWORK_THREAD_PRIORITY,
@@ -124,19 +127,19 @@ void CreateNetworkThread()
         }
     }
 }
-
 void CreateAsynchronousIOThread()
 {
     void *pointer = TX_NULL;
     int ASYNCHRONOUS_IO_THREAD_STACK_SIZE = 256;
     int ASYNCHRONOUS_IO_THREAD_PRIORITY = 5;
+    ULONG parameter = 0;
 
     UINT status = tx_byte_allocate(&byte_pool_0, (VOID **)&pointer, ASYNCHRONOUS_IO_THREAD_STACK_SIZE, TX_NO_WAIT);
     status = tx_thread_create(
-        &AsynchronousIOThread,
+        &TX_AsynchronousIOThread,
         (char *)"Asynchronous_IO_Worker_Thread",
-        DeviceIOAsynchronousThread_Entry,
-        0,
+        AsynchronousIOThread,
+        parameter,
         pointer,
         ASYNCHRONOUS_IO_THREAD_STACK_SIZE,
         ASYNCHRONOUS_IO_THREAD_PRIORITY,

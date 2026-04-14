@@ -85,7 +85,7 @@ endif()
              ${CMAKE_SOURCE_DIR}/${GRAPHICS_PATH}/nanoFramework.Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_Bitmap.cpp
              ${CMAKE_SOURCE_DIR}/${GRAPHICS_PATH}/nanoFramework.Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_DisplayControl.cpp
              ${CMAKE_SOURCE_DIR}/${GRAPHICS_PATH}/nanoFramework.Graphics/Graphics/Native/nanoFramework_Graphics_nanoFramework_UI_Font.cpp
-             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics/Graphics_Memory.cpp
+             ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/nanoFramework.Graphics/Graphics_Memory.cpp
  )
  
  # Display hardware

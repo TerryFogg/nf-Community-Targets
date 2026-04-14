@@ -6,13 +6,13 @@
 #include <WireProtocol.h>
 #include <WireProtocol_Message.h>
 
-void ReceiverThread_entry(uint32_t parameter)
+void ReceiverThread(ULONG parameter)
 {
     (void)parameter;
     extern WP_Message inboundMessage;
 
     InitWireProtocolCommunications();
-    tx_thread_sleep(50);
+    PLATFORM_DELAY(50);
 
     WP_Message_Initialize(&inboundMessage);
     WP_Message_PrepareReception();

@@ -29,22 +29,22 @@
  list(APPEND NETWORK_SOURCES                        
 
     # Included by specific drivers
-        #${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/nx_driver_framework.c
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/Network.Helpers.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/Network.cpp
+        #${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Device/nx_driver_framework.c
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Device/Network.Helpers.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Device/Network.cpp
 
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Network.Information.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Network.Interface.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Network.Security.SslNative.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Network.Sockets.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Network.WirelessAPConfiguration.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Network.Wireless80211Configuration.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/Network.Information.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/Network.Interface.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/Network.Security.SslNative.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/Network.Sockets.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/Network.WirelessAPConfiguration.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/Network.Wireless80211Configuration.cpp
     
 )
 
  list(APPEND NETWORK_SOURCES
     ${CMAKE_SOURCE_DIR}/src/System.Device.Wifi/sys_dev_wifi_native.cpp
-    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Wifi.Adapter.cpp
+    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/Wifi.Adapter.cpp
 )
 
 list(APPEND OPTIONAL_SOURCES

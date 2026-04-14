@@ -33,9 +33,9 @@ add_executable(nanoCLR)
     endif()
 
     target_sources(nanoCLR PUBLIC
-                   "../Common/Startup/main.c"
-                   "../Common/Startup/CLR_RT_InteropAssembliesTable.cpp"
-                   "../Common/Startup/targetHAL.cpp"
+                   "../Startup/main.c"
+                   "../Startup/CLR_RT_InteropAssembliesTable.cpp"
+                   "../Startup/targetHAL.cpp"
                    ${NF_INTERPRETER_SOURCES}
                    ${THREADX_SOURCES}
                    ${${TARGET_FAMILY}_SOURCES}
@@ -50,3 +50,4 @@ add_executable(nanoCLR)
 # Build parameters
     include( BuildParameters/Common.cmake)
     include( BuildParameters/DeviceFamilies/${TARGET_FAMILY}.cmake)
+

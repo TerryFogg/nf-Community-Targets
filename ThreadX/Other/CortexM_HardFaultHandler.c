@@ -1,4 +1,4 @@
-/*********************************************************************
+﻿/*********************************************************************
  *                     SEGGER Microcontroller GmbH                    *
  *                        The Embedded Experts                        *
  **********************************************************************
@@ -86,7 +86,7 @@
 extern "C"
 {
 #endif
-    void HardFaultHandler(unsigned int *pStack);
+    void HardFaultHandler(unsigned int *pStack, unsigned int exc_return);
 #ifdef __cplusplus
 }
 #endif
@@ -250,7 +250,7 @@ static struct
  *    C part of the hard fault handler which is called by the assembler
  *    function HardFault_Handler
  */
-void HardFaultHandler(unsigned int *pStack)
+void HardFaultHandler(unsigned int *pStack,unsigned int exc_return)
 {
     //
     // In case we received a hard fault because of a breakpoint instruction, we return.
@@ -263,6 +263,9 @@ void HardFaultHandler(unsigned int *pStack)
         *(pStack + 6u) += 2u;   // PC is located on stack at SP + 24 bytes. Increment PC by 2 to skip break instruction.
         return;                 // Return to interrupted application
     }
+
+    volatile unsigned int used_psp = (exc_return & (1u << 2)) != 0;
+
 #if DEBUG
     //
     // Read NVIC registers

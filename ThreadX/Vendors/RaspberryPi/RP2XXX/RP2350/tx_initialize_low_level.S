@@ -202,7 +202,14 @@ SysTick_Handler:
     .thumb_func
 .type HardFault_Handler, function
 HardFault_Handler:
-    B       HardFault_Handler
+HardFault_Handler:
+    mov r1, lr          // save EXC_RETURN
+    tst lr, #4
+    ite eq
+    mrseq r0, msp
+    mrsne r0, psp
+B HardFaultHandler
+//B       HardFault_Handler
 
     .section .text
     .balign 4

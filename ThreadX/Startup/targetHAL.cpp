@@ -2,30 +2,34 @@
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
-
 #include <nanoPAL.h>
 #include <nanoPAL_Events.h>
 #include <nanoPAL_BlockStorage.h>
 #include <nanoHAL_Graphics.h>
-#include <nanoHAL_v2.h>
 #include "target_board.h"
-#include "CLRNativeThreads.h"
-#include <fx_api.h>
 
 bool g_fDoNotUninitializeDebuggerPort = false;
 
 #if (TOUCH_DISPLAY_SUPPORT == TRUE)
-    #include "TouchPanel.h"
-    #include "TouchInterface.h"
-    extern TouchPanel g_TouchPanel;
-    extern TouchInterface g_TouchInterface;
-    extern TouchDevice g_TouchDevice;
+#include "TouchPanel.h"
+#include "TouchInterface.h"
+extern TouchPanel g_TouchPanel;
+extern TouchInterface g_TouchInterface;
+extern TouchDevice g_TouchDevice;
+#endif
+
+#if (NETWORKING_SUPPORT == TRUE)
+#include "NetworkConfigurationManager.h"
+NetworkConfiguration NetworkConfig;
 #endif
 
 void nanoHAL_Initialize()
 {
     unsigned char *heapStart = NULL;
     unsigned int heapSize = 0;
+    //BlockStorageStream stream;
+
+    ReadNetworkConfiguration();
 
     HAL_CONTINUATION::InitializeList();
     HAL_COMPLETION::InitializeList();
@@ -37,7 +41,10 @@ void nanoHAL_Initialize()
     BlockStorage_AddDevices();
     BlockStorageList_InitializeDevices();
 
- //   ConfigurationManager_Initialize();
+    //memset(&stream, 0, sizeof(BlockStorageStream));
+    //BlockStorageStream_Initialize(&stream, BlockUsage_CONFIG);
+
+    //ConfigurationManager_Initialize();
 
     Events_Initialize();
 
@@ -61,21 +68,20 @@ void nanoHAL_Initialize()
     g_TouchPanel.Initialize();
 #endif
 
-
 #if (FILE_SYSTEM_SUPPORT == TRUE)
-   // fx_system_initialize();
-    //FileSystemVolumeList::Initialize();
-    //FS_AddVolumes();
-    //FileSystemVolumeList::InitializeVolumes();
+    // fx_system_initialize();
+    // FileSystemVolumeList::Initialize();
+    // FS_AddVolumes();
+    // FileSystemVolumeList::InitializeVolumes();
 #endif
 #if (FILE_SYSTEM_SD == TRUE)
     File_System_SD_Initialize();
 #endif
 #if (FILE_SYSTEM_FLASH == TRUE)
-   // File_System_FLASH_Initialize();
+    // File_System_FLASH_Initialize();
 #endif
 #if (FILE_SYSTEM_RAM == TRUE)
-  //  File_System_RAM_Initialize();
+    //  File_System_RAM_Initialize();
 #endif
 }
 
@@ -86,7 +92,6 @@ void nanoHAL_Uninitialize(bool isPoweringDown)
     HAL_CONTINUATION::Uninitialize();
     HAL_COMPLETION::Uninitialize();
 }
-
 void HAL_AssertEx()
 {
     __asm("BKPT #0\n");
@@ -95,9 +100,7 @@ void HAL_AssertEx()
         /*nop*/
     }
 }
-
 bool Target_CanChangeMacAddress()
 {
     return false;
 }
-

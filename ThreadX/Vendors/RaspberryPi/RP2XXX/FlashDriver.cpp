@@ -5,6 +5,8 @@
 #include <targetHAL.h>
 #include "FlashDriver.h"
 #include "hardware/flash.h"
+#include "memory.h"
+#include <string.h>
 
 bool FlashDriver_InitializeDevice(void *context)
 {
@@ -35,6 +37,35 @@ bool FlashDriver_Read(void *context, ByteAddress startAddress, unsigned int numB
     }
     return true;
 }
+UpdateConfigurationResult FlashDriver_WriteConfig(unsigned char *configData, int length, int offset)
+{
+    // Erase the config block in flash which is a multiple of the flash block size, then write back the whole flash
+    // block with the updated config block content from RAM
+    UpdateConfigurationResult status = UpdateConfigurationResult_Failed;
+    uint8_t *configSectorCopy = (uint8_t *)platform_malloc(__nanoConfig_size__);
+    if (configSectorCopy != NULL)
+    {
+        // Copy the complete reserved config flash to RAM, update the RAM version
+        // and then write it back to flash. 
+        memcpy(configSectorCopy, &__nanoConfig_start__, __nanoConfig_size__);
+        memcpy(configSectorCopy + offset, configData, length);
+
+        if (FlashDriver_EraseBlock(NULL, (ByteAddress)&__nanoConfig_start__))
+        {
+            if (FlashDriver_Write(
+                    NULL,
+                    (uint32_t)&__nanoConfig_start__,
+                    __nanoConfig_size__,
+                    (unsigned char *)configSectorCopy,
+                    true))
+            {
+                status = UpdateConfigurationResult_Success;
+            }
+        }
+    } 
+    return status;
+}
+
 bool FlashDriver_Write(
     void *context,
     ByteAddress startAddress,

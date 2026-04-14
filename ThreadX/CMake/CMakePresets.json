@@ -63,7 +63,7 @@
             "hidden": true,
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "GRAPHICS_PATH": "targets-community/ThreadX/Common"
+                "GRAPHICS_PATH": "targets-community/ThreadX"
             }
         },
         {

@@ -332,38 +332,37 @@ set_source_files_properties(${LEVELX_PATH}/common/src/lx_nor_flash_next_block_to
 
 list(APPEND FILE_INCLUDES
      ${CMAKE_SOURCE_DIR}/src/System.IO.FileSystem
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/System.IO.FileSystem
 )
 list(APPEND FILE_SOURCES
      ${CMAKE_SOURCE_DIR}/src/System.IO.FileSystem/nf_sys_io_filesystem.cpp
     ### Not Used in the current system should be removed
     # ${CMAKE_SOURCE_DIR}/src/System.IO.FileSystem/nf_sys_io_filesystem_System_IO_File.cpp
 
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/FileSystem.Directory.cpp
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/FileSystem.DriveInfo.cpp
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/FileSystem.NativeFileStream.cpp
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/FileSystem.NativeFindFile.cpp
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/FileSystem.NativeIO.cpp
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/FileSystem.SDCard.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/FileSystem.Directory.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/FileSystem.DriveInfo.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/FileSystem.NativeFileStream.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/FileSystem.NativeFindFile.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/FileSystem.NativeIO.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/FileSystem.SDCard.cpp
 
-     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/FileSystem.cpp
+     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Device/FileSystem.cpp
 )
 
 if(FILE_SYSTEM_SD)
     list(APPEND FILE_SOURCES
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/FileSystem_SdDriver.cpp
+         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Device/FileSystem_SdDriver.cpp
     )
 endif()
 
 if(FILE_SYSTEM_FLASH)
     list(APPEND FILE_SOURCES
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/FileSystem_FlashDriver.cpp
+         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Device/FileSystem_FlashDriver.cpp
     )
 endif()
 
 if(FILE_SYSTEM_RAM)
     list(APPEND FILE_SOURCES
-         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/FileSystem_RamDriver.cpp
+         ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Device/FileSystem_RamDriver.cpp
     )
 endif()
 

@@ -252,72 +252,74 @@
 
 # Targets
         list(APPEND NF_INTERPRETER_INCLUDES 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Startup
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Configuration
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Startup
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Graphics																																																																																																																																																																																							
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other																																																																																																																																																																																							
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/RequiredNotUsed
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadX.Adaption
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Device
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/nanoFramework.Graphics																																																																																																																																																																																							
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/nanoFramework.Hardware
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Other																																																																																																																																																																																							
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Other/RequiredNotUsed
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ThreadX.Adaption
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/WireProtocol
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Startup
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/Common
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/WireProtocol
         )
         list(APPEND NF_INTERPRETER_SOURCES 
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/CircularBuffer.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/CortexM_HardFaultHandler.c
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/nanoCRT.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/nanoHAL_Boot.c
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/sys_calls.c
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/targetHAL_ConfigurationManager.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Configuration/Startup_Configuration.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Configuration/targetHAL_ConfigurationManager.cpp
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Other/TraceWireProtocol.c
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Other/CircularBuffer.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Other/CortexM_HardFaultHandler.c
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Other/nanoCRT.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Other/nanoHAL_Boot.c
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Other/sys_calls.c
+
 
 # To be reintegrated into core later
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Temporary_src/CLR/Core/TypeSystem.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Temporary_src/PAL/AsyncProcCall/AsyncCompletions.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Temporary_src/CLR/Core/TypeSystem.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Temporary_src/PAL/AsyncProcCall/AsyncCompletions.cpp
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/DevicePin.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Adc.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Dac.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Gpio.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/I2c.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/I2c.slave.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/I2s.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Pwm.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/Spi.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Device/AsychronousIO.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Device/DevicePin.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/Adc.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/Dac.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/Gpio.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/I2c.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/I2c.slave.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/I2s.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/Pwm.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/Spi.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Device/AsychronousIO.cpp
 
                ##     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/nx_driver_framework.cpp
 
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware/nanoframework_Hardware.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/nanoFramework.Hardware/nanoframework_Hardware_nanoframework_Hardware_NativeFunctions.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/nanoFramework.Hardware/nanoframework_Hardware.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/nanoFramework.Hardware/nanoframework_Hardware_nanoframework_Hardware_NativeFunctions.cpp
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Library/IO.Ports.SerialPort.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Library/IO.Ports.SerialPort.cpp
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadX.Adaption/ManagedThreadSupport.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadX.Adaption/Memory.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ThreadX.Adaption/ManagedThreadSupport.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ThreadX.Adaption/Memory.cpp
                     
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadX.Adaption/targetHAL_Rtos.c
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadX.Adaption/targetHAL_Time.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadX.Adaption/targetPAL_Events.cpp
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/ThreadX.Adaption/targetPAL_Time.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ThreadX.Adaption/targetHAL_Rtos.c
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ThreadX.Adaption/targetHAL_Time.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ThreadX.Adaption/targetPAL_Events.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/ThreadX.Adaption/targetPAL_Time.cpp
 
                     # Core RTOS ThreadX threads
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/Startup/RTOS_Thread_Creation.cpp
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Startup/RTOS_Thread_Creation.cpp
 
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/WireProtocol_MonitorCommands.c
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Common/WireProtocol/WireProtocol_Receiver.cpp
+
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/WireProtocol/WireProtocol_MonitorCommands.c
+                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/WireProtocol/WireProtocol_Receiver.cpp
 
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/Delays.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/Device.IO.cpp																																																																																																																																																																																							
-                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/Wifi.cpp
-##                    ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/Common/nx_driver_pico_w.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/FlashDriver.cpp
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/nanoSupport_CRC32.c
                     ${CMAKE_SOURCE_DIR}/targets-community/ThreadX/Vendors/${TARGET_VENDOR}/${TARGET_FAMILY}/WireProtocol_HAL_Interface.c

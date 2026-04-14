@@ -6,7 +6,7 @@
 #include "target_board.h"
 #include "Device.IO.h"
 #include "DevicePin.h"
-#include "wifi.h"
+#include "NetworkInterfaceAdapter.h"
 
 
 #define TX_BUFFER_SIZE 1024

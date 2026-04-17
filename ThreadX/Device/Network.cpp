@@ -17,7 +17,7 @@ extern TX_THREAD TX_networkThread;
 #define IP_THREAD_STACK_SIZE 3076
 static ULONG ip_thread_stack[IP_THREAD_STACK_SIZE / sizeof(ULONG)];
 
-#define IP_PRIORITY          5
+#define IP_PRIORITY 5
 
 static NX_IP IpInstance;
 static NX_DHCP DhcpClient;
@@ -51,15 +51,14 @@ UCHAR *_nx_driver_buffer;
 
 #define DRIVER_CACHE_BUFFER 1514
 
-TX_EVENT_FLAGS_GROUP native_cyw43_events;
+TX_EVENT_FLAGS_GROUP native_driver_events;
 
 ULONG flags;
 extern int g_Country_Code;
-extern NetworkConfiguration networkConfiguration;
+NetworkConfiguration networkConfiguration;
 
-void NetworkThread(ULONG parameter)
+void NetworkStartup()
 {
-    (void)parameter;
     volatile UINT status;
     NX_IP *ip_ptr = nx_driver_information.nx_driver_information_ip_ptr;
 
@@ -71,7 +70,7 @@ void NetworkThread(ULONG parameter)
     // The background thread created by nx_ip_create()
     // will call nx_driver_framework_entry_default() which will call into the physical network interface
 
-    tx_event_flags_create(&native_cyw43_events, (char *)"CLR Wifi event");
+    tx_event_flags_create(&native_driver_events, (char *)"CLR Wifi event");
 
     // The service nx_system_initialize must be called before any other NetX Duo service is called.
     nx_system_initialize();
@@ -97,7 +96,7 @@ void NetworkThread(ULONG parameter)
         nx_driver_framework_entry_default,
         ip_thread_stack,
         IP_THREAD_STACK_SIZE,
-        IP_PRIORITY);
+        IP_PRIORITY-1);
 
     // Create a table in RAM to store the IPv4 address  →  Ethernet MAC address
     status = nx_arp_enable(&IpInstance, arp_cache, ARP_CACHE_SIZE);
@@ -114,7 +113,7 @@ void NetworkThread(ULONG parameter)
     status = nx_dhcp_start(&DhcpClient);
 
     // Wait for the IP to become usable   (This is a blocking call)
-    status = nx_ip_status_check(&IpInstance, NX_IP_ADDRESS_RESOLVED, &actual_status, NX_WAIT_FOREVER);
+     //  status = nx_ip_status_check(&IpInstance, NX_IP_ADDRESS_RESOLVED, &actual_status, NX_WAIT_FOREVER);
 
     // DNS:
     // If your code ever contains a hostname string, you need DNS.
@@ -122,25 +121,27 @@ void NetworkThread(ULONG parameter)
     // 1 TX packet(DNS query)
     // 1 RX packet(DNS response)
     // 2 - 4 packets with retries
-    status = nx_dns_create(&DnsInstance, &IpInstance, (UCHAR *)"DNS Client");
+    //status = nx_dns_create(&DnsInstance, &IpInstance, (UCHAR *)"DNS Client");
     // nx_dns_server_add(&DnsInstance, dns_server_ip);
 
-    for (;;)
-    {
-        // Wait for events from the Wi-Fi driver, such as packet reception or link status changes.
-        tx_event_flags_get(&native_cyw43_events, 0xFFFFFFFF, TX_OR_CLEAR, &flags, TX_WAIT_FOREVER);
-        // Process received packets or handle link status changes based on the flags.
-        if (flags & 0x01)
-        {
-            // Handle packet reception
-            // This typically involves calling nx_ip_packet_receive() to get the packet and then processing it.
-        }
-        if (flags & 0x02)
-        {
-            // Handle link status change
-            // This may involve checking the link status and updating the IP instance accordingly.
-        }
-    }
+
+    //for (;;)
+    //{
+
+    //    //// Wait for events from the Wi-Fi driver, such as packet reception or link status changes.
+    //     tx_event_flags_get(&native_driver_events, 0xFFFFFFFF, TX_OR_CLEAR, &flags, TX_WAIT_FOREVER);
+    //    // Process received packets or handle link status changes based on the flags.
+    //     if (flags & 0x01)
+    //    {
+    //         // Handle packet reception
+    //         // This typically involves calling nx_ip_packet_receive() to get the packet and then processing it.
+    //     }
+    //     if (flags & 0x02)
+    //    {
+    //         // Handle link status change
+    //         // This may involve checking the link status and updating the IP instance accordingly.
+    //     }
+    //}
 }
 
 // A reference to this routine is passed in the nx_ip_create() earlier for

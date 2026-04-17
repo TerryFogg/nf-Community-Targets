@@ -40,10 +40,6 @@ void tx_application_define(void *first_unused_memory)
 
     CreateReceiverThread();
     CreateCLRThread();
-
-#if (NETWORKING_SUPPORT == TRUE)
-    CreateNetworkThread();
-#endif
 }
 void CLRThread(ULONG parameter)
 {
@@ -103,30 +99,8 @@ void CreateReceiverThread()
     }
     return;
 }
-void CreateNetworkThread()
-{
-    void *pointer = TX_NULL;
-    UINT status = tx_byte_allocate(&byte_pool_0, (VOID **)&pointer, NETWORK_THREAD_STACK_SIZE, TX_NO_WAIT);
-    ULONG parameter = 0;
 
-    status = tx_thread_create(
-        &TX_networkThread,
-        (char *)"Network Poll Thread",
-        NetworkThread,
-        parameter,
-        pointer,
-        NETWORK_THREAD_STACK_SIZE,
-        NETWORK_THREAD_PRIORITY,
-        NETWORK_THREAD_PRIORITY,
-        TX_NO_TIME_SLICE,
-        TX_AUTO_START);
-    if (status != TX_SUCCESS)
-    {
-        while (1)
-        {
-        }
-    }
-}
+// ??? Not implemented yet, but we need to create the thread so that the CLR can use it for async I/O operations
 void CreateAsynchronousIOThread()
 {
     void *pointer = TX_NULL;

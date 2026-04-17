@@ -45,7 +45,7 @@ void CreatePollingThread()
 {
     void *pointer = TX_NULL;
     int POLL_THREAD_STACK_SIZE = 2000;
-    int POLL_THREAD_PRIORITY = 5;
+    int POLL_THREAD_PRIORITY = 5-1;
     ULONG parameter = 0;
 
     UINT status = tx_byte_allocate(&byte_pool_0, (VOID **)&pointer, POLL_THREAD_STACK_SIZE, TX_NO_WAIT);
@@ -93,10 +93,10 @@ void Poll_cyw43_Thread(ULONG parameter)
         tx_mutex_get(&(ip_ptr->nx_ip_protection), TX_WAIT_FOREVER);
         {
             cyw43_arch_poll();
-            linkstatus = cyw43_wifi_link_status(&cyw43_state, CYW43_ITF_STA);
+  //          linkstatus = cyw43_wifi_link_status(&cyw43_state, CYW43_ITF_STA);
         }
         tx_mutex_put(&(ip_ptr->nx_ip_protection));
-        tx_thread_sleep(NX_DRIVER_THREAD_INTERVAL);
+        tx_thread_sleep(1);
     }
 }
 // Start the Wifi, default power management
@@ -104,7 +104,8 @@ bool Wifi::Initialize(uint8_t *mac)
 {
     if (cyw43_arch_init() != PICO_ERROR_GENERIC)
     {
-        cyw43_wifi_set_up(&cyw43_state, CYW43_ITF_STA, true, g_Country_Code);
+        cyw43_arch_enable_sta_mode();
+   //     cyw43_wifi_set_up(&cyw43_state, CYW43_ITF_STA, true, g_Country_Code);
         cyw43_hal_get_mac(0, mac);
         return true;
     }
@@ -117,8 +118,8 @@ bool Wifi::Enable()
 {
     bool isEnabled =
         (cyw43_arch_wifi_connect_timeout_ms(
-             networkConfiguration.ssid,
-             networkConfiguration.password,
+             networkConfiguration.initialSSID,
+             networkConfiguration.initialSSIDPassword,
              WIFI_AUTH_TYPE,
              WIFI_CONNECT_TIMEOUT) == PICO_OK);
 

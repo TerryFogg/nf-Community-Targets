@@ -7,6 +7,7 @@
 #include <nanoPAL_BlockStorage.h>
 #include <nanoHAL_Graphics.h>
 #include "target_board.h"
+#include "NetworkConfigurationManager.h"
 
 bool g_fDoNotUninitializeDebuggerPort = false;
 
@@ -18,18 +19,11 @@ extern TouchInterface g_TouchInterface;
 extern TouchDevice g_TouchDevice;
 #endif
 
-#if (NETWORKING_SUPPORT == TRUE)
-#include "NetworkConfigurationManager.h"
-NetworkConfiguration NetworkConfig;
-#endif
-
 void nanoHAL_Initialize()
 {
     unsigned char *heapStart = NULL;
     unsigned int heapSize = 0;
-    //BlockStorageStream stream;
-
-    ReadNetworkConfiguration();
+    // BlockStorageStream stream;
 
     HAL_CONTINUATION::InitializeList();
     HAL_COMPLETION::InitializeList();
@@ -41,14 +35,19 @@ void nanoHAL_Initialize()
     BlockStorage_AddDevices();
     BlockStorageList_InitializeDevices();
 
-    //memset(&stream, 0, sizeof(BlockStorageStream));
-    //BlockStorageStream_Initialize(&stream, BlockUsage_CONFIG);
+    // memset(&stream, 0, sizeof(BlockStorageStream));
+    // BlockStorageStream_Initialize(&stream, BlockUsage_CONFIG);
 
-    //ConfigurationManager_Initialize();
+    // ConfigurationManager_Initialize();
 
     Events_Initialize();
 
     SetupPinList();
+
+#if (NETWORKING_SUPPORT == TRUE)
+    ReadNetworkConfiguration();
+    NetworkStartup();
+#endif
 
 #if (NANOCLR_GRAPHICS == TRUE)
     DisplayInterfaceConfig displayConfig = {0};

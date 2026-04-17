@@ -11,9 +11,6 @@ void CLRThread(ULONG parameter);
 void CreateReceiverThread();
 void ReceiverThread(ULONG parameter);
 
-void CreateNetworkThread();
-void NetworkThread(ULONG parameter);
-
 void CreateAsynchronousIOThread();
 void AsynchronousIOThread(ULONG parameter);
 

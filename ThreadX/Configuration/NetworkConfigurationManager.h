@@ -15,15 +15,17 @@ extern "C"
 
     typedef struct NetworkConfiguration
     {
-        bool useDHCP;          // Whether to use DHCP or static IP
-        bool useICMP;          // Whether to enable ICMP (ping)
-        ULONG initialIP;       // Fixed IP address (if not using DHCP)
-        ULONG initialGateway;  // Gateway IP address
-        char ssid[64];         // WiFi SSID
-        char password[64];     // WiFi password
+        // bool enableDHCP;       // Whether to use DHCP or static IP
+        // bool enableDNS;        // Whether to use DNS
+        ULONG initialIP;              // Fixed IP address (if not using DHCP)
+        ULONG initialGateway;         // Gateway IP address
+        uint8_t macAddress[6];        // MAC address
+        char initialSSID[64];         // WiFi SSID
+        char initialSSIDPassword[64]; // WiFi password
     } NetworkConfiguration;
 
     bool ReadNetworkConfiguration();
+    void NetworkStartup();
 
 #ifdef __cplusplus
 }
